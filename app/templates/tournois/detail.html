@@ -17,13 +17,29 @@
   <dl style="font-size:0.85rem;margin:0">
     <dt>Joueurs</dt><dd>{{ tournoi.nb_joueurs }}</dd>
     <dt>Coeff.</dt><dd>{{ tournoi.coefficient }}</dd>
+    <dt>Pays</dt>
+    <dd>
+      {{ nb_pays }}
+      {% if pays_stats %}
+      <span style="display:inline-flex;flex-wrap:wrap;gap:0.3rem;margin-left:0.5rem;vertical-align:middle">
+        {% for p in pays_stats %}
+        <a href="/pays/{{ p.code }}?onglet=tournois"
+           style="display:inline-flex;align-items:center;gap:0.2rem;background:var(--bg3);border-radius:4px;padding:0.1rem 0.4rem;text-decoration:none;color:var(--text);font-size:0.8rem;white-space:nowrap">
+          {{ p.code | flag }} <span class="dim">{{ p.nb }}</span>
+        </a>
+        {% endfor %}
+      </span>
+      {% endif %}
+    </dd>
   </dl>
 </div>
 
 {% set is_mcr = tournoi.regles == 'MCR' %}
 {% set ncols = 6 if is_mcr else 5 %}
 
-<h2>Résultats <span class="t-count-header">({{ resultats | length }})</span></h2>
+<div class="ranking-layout" style="align-items:start;margin-top:1.5rem">
+<div class="ranking-left">
+<h2>Résultats</h2>
 <div class="scroll-table">
 <table style="table-layout:fixed;width:100%">
   <colgroup>
@@ -65,4 +81,53 @@
   </tbody>
 </table>
 </div>
+</div><!-- ranking-left -->
+
+<!-- Panneau droit : podium -->
+<div style="margin-top:calc(1.5rem + 1.2rem * 1.4 + 0.75rem + 0.75rem)">
+<div class="ranking-right" style="padding:1.25rem;min-height:0">
+  {% if podium %}
+  <div class="podium">
+    {% for p in podium %}
+    {% set medal = '🥇' if p.position == 1 else ('🥈' if p.position == 2 else '🥉') %}
+    {% set ordinal = p.rang_medaille %}
+    <div class="podium-step podium-{{ p.position }}">
+      <div class="podium-medal">{{ medal }}</div>
+      <div class="podium-flag">{{ p.joueur.nationalite | flag }}</div>
+      <a href="/joueurs/{{ p.joueur.id }}" class="podium-name">
+        {{ p.joueur.prenom | prenom }}<br>{{ p.joueur.nom | title }}
+      </a>
+      <div class="podium-stat dim">
+        {{ medal }} ({{ ordinal }})
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if tournoi.latitude and tournoi.longitude %}
+  <div id="tournoi-map" style="height:200px;border-radius:6px;border:1px solid var(--border);margin-top:1rem;z-index:1"></div>
+  <p class="t-map-hint">{{ tournoi.lieu }}, {{ tournoi.pays }}</p>
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var map = L.map('tournoi-map', {
+      center: [{{ tournoi.latitude }}, {{ tournoi.longitude }}],
+      zoom: 6,
+      zoomControl: false,
+      scrollWheelZoom: false,
+    });
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap'
+    }).addTo(map);
+    L.circleMarker([{{ tournoi.latitude }}, {{ tournoi.longitude }}], {
+      radius: 8, color: '#fff',
+      fillColor: 'var(--accent)', fillOpacity: 0.9, weight: 2
+    }).addTo(map).bindTooltip('{{ tournoi.lieu }}', {permanent: true, direction: 'top', offset: [0, -8]});
+  });
+  </script>
+  {% endif %}
+</div><!-- ranking-right -->
+</div><!-- margin wrapper -->
+</div><!-- ranking-layout -->
+
 {% endblock %}

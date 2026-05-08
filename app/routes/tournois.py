@@ -110,6 +110,7 @@ def detail_tournoi_ema(regles: str, ema_id: int, request: Request, db: Session =
 
 @router.get("/{tournoi_id}")
 def detail_tournoi(tournoi_id: int, request: Request, db: Session = Depends(get_db)):
+    from collections import Counter
     tournoi = db.query(Tournoi).filter(Tournoi.id == tournoi_id).first()
     resultats = (
         db.query(Resultat)
@@ -118,8 +119,51 @@ def detail_tournoi(tournoi_id: int, request: Request, db: Session = Depends(get_
         .all()
     )
     joueurs = db.query(Joueur).order_by(Joueur.nom).all()
-    return templates.TemplateResponse(request, "tournois/detail.html",
-        {"tournoi": tournoi, "resultats": resultats, "joueurs": joueurs})
+
+    # Stats par pays
+    joueurs_map = {j.id: j for j in joueurs}
+    pays_count = Counter(
+        joueurs_map[r.joueur_id].nationalite
+        for r in resultats
+        if r.joueur_id in joueurs_map
+    )
+    pays_stats = sorted(
+        [{"code": k, "nb": v} for k, v in pays_count.items() if k and k != "GUEST"],
+        key=lambda x: -x["nb"]
+    )
+
+    # Podium : top 3 avec rang de la médaille (combien de fois ce joueur a fini à cette position avant)
+    from sqlalchemy import text as _text
+    podium = []
+    for r in resultats:
+        if r.position > 3:
+            break
+        j = joueurs_map.get(r.joueur_id)
+        if not j:
+            continue
+        rang_med = db.execute(_text('''
+            SELECT COUNT(*) FROM resultats r2
+            JOIN tournois t2 ON t2.id = r2.tournoi_id
+            WHERE r2.joueur_id = :jid
+              AND r2.position = :pos
+              AND t2.regles   = :reg
+              AND t2.date_debut < :ddate
+        '''), {"jid": r.joueur_id, "pos": r.position,
+               "reg": tournoi.regles, "ddate": tournoi.date_debut}).scalar() or 0
+        podium.append({
+            "position":    r.position,
+            "joueur":      j,
+            "rang_medaille": rang_med + 1,  # 1 = première fois
+        })
+
+    return templates.TemplateResponse(request, "tournois/detail.html", {
+        "tournoi":    tournoi,
+        "resultats":  resultats,
+        "joueurs":    joueurs,
+        "pays_stats": pays_stats,
+        "nb_pays":    len(pays_stats),
+        "podium":     podium,
+    })
 
 
 @router.post("/{tournoi_id}/resultats")

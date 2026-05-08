@@ -12,6 +12,15 @@
     --row-wmc:  #fffbf0;
     --row-oemc: #f3f0ff;
     --shadow:   rgba(0,0,0,0.08);
+    --or-bg:      #fef0a0;
+    --or-border:  #c8a000;
+    --or-fg:      #7a3a00;
+    --argent-bg:  #dce8f0;
+    --argent-border: #8098b0;
+    --argent-fg:  #2a4460;
+    --bronze-bg:  #f0ddd0;
+    --bronze-border: #a06040;
+    --bronze-fg:  #6a2a10;
     --mcr-bg:   #d0e8ff;
     --mcr-fg:   #1a3a5c;
     --rcr-bg:   #ffe0d0;
@@ -41,6 +50,15 @@
     --row-wmc:  #2a2510;
     --row-oemc: #1e1a30;
     --shadow:   rgba(0,0,0,0.3);
+    --or-bg:      #2a2010;
+    --or-border:  #c8a800;
+    --or-fg:      #f0c840;
+    --argent-bg:  #1e3050;
+    --argent-border: #6080a8;
+    --argent-fg:  #aabbcc;
+    --bronze-bg:  #241810;
+    --bronze-border: #906040;
+    --bronze-fg:  #cc9060;
     --mcr-bg:   #1a3060;
     --mcr-fg:   #9ec8ff;
     --rcr-bg:   #602010;
@@ -250,6 +268,36 @@ a { color: var(--accent); }
     top: 1rem;
     min-height: 200px;
 }
+/* Podium tournoi */
+.podium {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0;
+}
+.podium-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.3rem;
+    text-align: center;
+    flex: 1;
+    background: var(--bg3);
+    border-radius: 8px 8px 0 0;
+    padding: 0.75rem 0.4rem;
+}
+/* Ordre visuel : 2e à gauche, 1er au centre, 3e à droite */
+.podium-1 { order: 2; height: 180px; background: var(--or-bg);     border: 1px solid var(--or-border); }
+.podium-2 { order: 1; height: 140px; background: var(--argent-bg); border: 1px solid var(--argent-border); }
+.podium-3 { order: 3; height: 115px; background: var(--bronze-bg); border: 1px solid var(--bronze-border); }
+.podium-medal  { font-size: 1.6rem; line-height: 1; }
+.podium-flag   { font-size: 1.2rem; line-height: 1; }
+.podium-name   { font-size: 0.8rem; font-weight: 600; color: var(--text); text-decoration: none; line-height: 1.3; word-break: break-word; }
+.podium-name:hover { color: var(--accent); }
+.podium-stat   { font-size: 0.72rem; margin-top: 0.2rem; }
+
 .ranking-table { width: 100%; }
 .ranking-row   { cursor: pointer; }
 .ranking-row:hover td { background: var(--row-actif) !important; }
@@ -270,9 +318,9 @@ a { color: var(--accent); }
 .td-rank  { text-align: center; font-size: 1.1rem; width: 2.5rem; }
 .rank-num { color: var(--text3); font-size: 0.95rem; }
 .score-val { font-weight: 600; color: var(--accent); font-variant-numeric: tabular-nums; }
-.row-top1 td { background: var(--row-wmc); }
-.row-top2 td { background: var(--bg3); }
-.row-top3 td { background: var(--row-oemc); }
+.row-top1 td { background: var(--or-bg); }
+.row-top2 td { background: var(--argent-bg); }
+.row-top3 td { background: var(--bronze-bg); }
 
 /* ── Page joueur ── */
 .player-header {
@@ -349,7 +397,7 @@ a { color: var(--accent); }
 .dim         { color: #bbb; }
 .pts-actif   { font-weight: 700; color: var(--accent); }
 .badge       { font-size: 0.7rem; background: #e0e8f8; color: var(--accent); padding: 0.1rem 0.4rem; border-radius: 8px; margin-left: 0.3rem; }
-.badge-gold  { background: #fef3c7; color: #92400e; }
+.badge-gold  { background: var(--or-bg); color: var(--or-fg); border: 1px solid var(--or-border); }
 .nowrap { white-space: nowrap; }
 .center { text-align: center; }
 .right  { text-align: right; }
@@ -407,8 +455,8 @@ tr.hidden { display: none; }
 
 /* ── Changement nationalité ── */
 .nat-warning {
-    background: #fff8e0;
-    border: 1px solid #f0c040;
+    background: var(--or-bg);
+    border: 1px solid var(--or-border);
     border-radius: 6px;
     padding: 0.6rem 1rem;
     margin-bottom: 1rem;
