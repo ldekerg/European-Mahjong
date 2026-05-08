@@ -1,13 +1,15 @@
 {# Tableau de liste de joueurs.
    Variables requises :
-     joueurs        — liste de {joueur: Joueur, nb_mcr, nb_rcr, nb_total}
-   Variables optionnelles (pour en-têtes triables) :
-     tri            — colonne active : id|nationalite|nom|prenom|nb_mcr|nb_rcr|nb_total
+     joueurs        — liste de {joueur: Joueur, nb_mcr, nb_rcr, nb_total, premier}
+   Variables optionnelles :
+     tri            — colonne active : id|nationalite|nom|prenom|premier|nb_mcr|nb_rcr|nb_total
      asc            — int 1=asc 0=desc
      sort_url_base  — base URL pour le tri (on y ajoute &tri=xxx&asc=x)
+     show_apercu    — bool (défaut false) : rend les lignes cliquables via loadApercu()
 #}
-{% set _sortable = sort_url_base is defined and sort_url_base %}
-{% set _asc = asc if asc is defined else 1 %}
+{% set _sortable   = sort_url_base is defined and sort_url_base %}
+{% set _asc        = asc if asc is defined else 1 %}
+{% set _apercu     = show_apercu if show_apercu is defined else false %}
 
 {% macro th_sort(col, label, cls='') %}
   {% if _sortable %}
@@ -48,6 +50,7 @@
     <col class="col-flag">
     <col class="col-nom">       <!-- Nom -->
     <col class="col-prenom">    <!-- Prénom -->
+    <col class="col-debut">     <!-- Début -->
     <col class="col-joueurs">
     <col class="col-joueurs">
     <col class="col-joueurs">
@@ -58,6 +61,7 @@
       {{ th_sort('nationalite', '🌍',    'center') }}
       {{ th_sort('nom',         'Nom') }}
       {{ th_sort('prenom',      'Prénom') }}
+      {{ th_sort('premier',     'Début',  'center') }}
       {{ th_sort_badge('nb_mcr', 'badge-mcr', 'center') }}
       {{ th_sort_badge('nb_rcr', 'badge-rcr', 'center') }}
       {{ th_sort('nb_total',    'Total',  'center') }}
@@ -66,13 +70,14 @@
   <tbody>
     {% for row in joueurs %}
     {% set j = row.joueur %}
-    <tr>
+    <tr {% if _apercu %}class="ranking-row" onclick="loadApercu('{{ j.id }}', this)"{% endif %}>
       <td class="dim" style="font-family:monospace;font-size:0.8rem">
-        <a href="/joueurs/{{ j.id }}">{{ j.id }}</a>
+        <a href="/joueurs/{{ j.id }}" {% if _apercu %}onclick="event.stopPropagation()"{% endif %}>{{ j.id }}</a>
       </td>
       <td class="col-flag">{{ j.nationalite | flag }}</td>
       <td>{{ j.nom | title }}</td>
       <td>{{ j.prenom | prenom }}</td>
+      <td class="center dim" style="font-size:0.82rem">{{ row.premier.strftime('%m/%Y') if row.premier else '—' }}</td>
       <td class="center {% if row.nb_mcr %}rank-num{% else %}dim{% endif %}">{{ row.nb_mcr or '—' }}</td>
       <td class="center {% if row.nb_rcr %}rank-num{% else %}dim{% endif %}">{{ row.nb_rcr or '—' }}</td>
       <td class="center" style="font-weight:600">{{ row.nb_total }}</td>

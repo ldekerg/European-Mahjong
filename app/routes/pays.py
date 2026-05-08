@@ -408,16 +408,20 @@ def pays_detail(
               for v in villes_q]
 
     # ── Liste joueurs ─────────────────────────────────────────────────────────
+    from datetime import date as _date
     joueurs_q = db.query(Joueur).filter(Joueur.nationalite == code).order_by(Joueur.nom).all()
+    joueur_ids = [j.id for j in joueurs_q]
     _tpj = {
         row.joueur_id: row
         for row in db.query(
             Resultat.joueur_id,
             func.sum(case((Tournoi.regles == "MCR", 1), else_=0)).label("nb_mcr"),
             func.sum(case((Tournoi.regles == "RCR", 1), else_=0)).label("nb_rcr"),
+            func.min(Tournoi.date_debut).label("premier"),
         )
         .join(Tournoi, Resultat.tournoi_id == Tournoi.id)
-        .filter(Resultat.joueur_id.in_([j.id for j in joueurs_q]))
+        .filter(Resultat.joueur_id.in_(joueur_ids),
+                Tournoi.date_debut != _date(1900, 1, 1))
         .group_by(Resultat.joueur_id)
         .all()
     }
@@ -428,6 +432,7 @@ def pays_detail(
             "nb_rcr":   (_tpj[j.id].nb_rcr if j.id in _tpj else 0) or 0,
             "nb_total": ((_tpj[j.id].nb_mcr if j.id in _tpj else 0) or 0)
                        + ((_tpj[j.id].nb_rcr if j.id in _tpj else 0) or 0),
+            "premier":  _tpj[j.id].premier if j.id in _tpj else None,
         }
         for j in joueurs_q
     ]

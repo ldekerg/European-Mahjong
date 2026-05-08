@@ -26,7 +26,7 @@ def liste_joueurs(
     from models import Resultat, Tournoi as T
     from sqlalchemy import func
 
-    # Sous-requêtes pour compter les tournois par joueur/règle
+    # Sous-requêtes pour compter les tournois par joueur/règle + date premier tournoi
     mcr_count = (
         db.query(Resultat.joueur_id, func.count(Resultat.id).label("nb"))
         .join(T).filter(T.regles == "MCR").group_by(Resultat.joueur_id).subquery()
@@ -35,13 +35,20 @@ def liste_joueurs(
         db.query(Resultat.joueur_id, func.count(Resultat.id).label("nb"))
         .join(T).filter(T.regles == "RCR").group_by(Resultat.joueur_id).subquery()
     )
+    premier_tournoi = (
+        db.query(Resultat.joueur_id, func.min(T.date_debut).label("premier"))
+        .join(T).filter(T.date_debut != date(1900, 1, 1))
+        .group_by(Resultat.joueur_id).subquery()
+    )
 
     qr = db.query(
         Joueur,
         func.coalesce(mcr_count.c.nb, 0).label("nb_mcr"),
         func.coalesce(rcr_count.c.nb, 0).label("nb_rcr"),
+        premier_tournoi.c.premier.label("premier"),
     ).outerjoin(mcr_count, Joueur.id == mcr_count.c.joueur_id
-    ).outerjoin(rcr_count, Joueur.id == rcr_count.c.joueur_id)
+    ).outerjoin(rcr_count, Joueur.id == rcr_count.c.joueur_id
+    ).outerjoin(premier_tournoi, Joueur.id == premier_tournoi.c.joueur_id)
 
     if regles == "MCR":
         qr = qr.filter(mcr_count.c.nb > 0)
@@ -60,20 +67,22 @@ def liste_joueurs(
         "nb_mcr":      func.coalesce(mcr_count.c.nb, 0),
         "nb_rcr":      func.coalesce(rcr_count.c.nb, 0),
         "nb_total":    func.coalesce(mcr_count.c.nb, 0) + func.coalesce(rcr_count.c.nb, 0),
+        "premier":     premier_tournoi.c.premier,
     }
     col = col_map.get(tri, Joueur.nom)
     qr = qr.order_by(col if asc else col.desc())
 
     rows = qr.all()
-    joueurs_list = [{"joueur": r[0], "nb_mcr": r[1], "nb_rcr": r[2], "nb_total": r[1]+r[2]} for r in rows]
+    joueurs_list = [{"joueur": r[0], "nb_mcr": r[1], "nb_rcr": r[2], "nb_total": r[1]+r[2], "premier": r[3]} for r in rows]
 
     return templates.TemplateResponse(request, "joueurs/liste.html", {
-        "joueurs": joueurs_list,
-        "tri": tri,
-        "asc": asc,
-        "regles": regles,
-        "q": q,
-        "total": len(joueurs_list),
+        "joueurs":          joueurs_list,
+        "tri":              tri,
+        "asc":              asc,
+        "regles":           regles,
+        "q":                q,
+        "total":            len(joueurs_list),
+        "semaine_actuelle": lundi_semaine(date.today()),
     })
 
 

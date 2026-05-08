@@ -100,12 +100,24 @@
      ONGLET JOUEURS
      ══════════════════════════════════════════════════════════════════════ -->
 <div id="tab-joueurs" class="tab-content hidden">
-  {% include 'partials/joueurs_table.html' %}
+  <div class="ranking-layout">
+    <div class="ranking-left">
+      {% with show_apercu=true %}
+      {% include 'partials/joueurs_table.html' %}
+      {% endwith %}
+    </div>
+    <div class="ranking-right" id="apercu-panel-joueurs">
+      <p class="empty">← Clique sur un joueur</p>
+    </div>
+  </div>
 </div>
 
 
 <!-- ── Scripts ──────────────────────────────────────────────────────────── -->
 <script>
+// Aperçu joueur — utilisé par l'onglet Classement ET l'onglet Joueurs
+var _activeJoueurRow = null;
+
 // Onglets principaux (Classement / Tournois / Joueurs)
 function showMainTab(name, btn) {
   document.querySelectorAll('#main-tabs + .tab-content, #main-tabs ~ .tab-content')
@@ -133,19 +145,40 @@ function fetchApercu(joueurId, regles) {
 }
 
 function loadApercu(joueurId, row) {
-  if (_activeRow === row) {
-    row.classList.remove('row-selected');
-    _activeRow = null;
-    _joueurPersiste = '';
-    var defaut = '{{ onglet_actif }}' === 'RCR' ? _joueurDefautRCR : _joueurDefautMCR;
-    fetchApercu(defaut);
-    return;
+  // Détecter si on est dans l'onglet Joueurs ou Classement
+  var inJoueurs = row.closest('#tab-joueurs') !== null;
+
+  if (inJoueurs) {
+    var panel = document.getElementById('apercu-panel-joueurs');
+    if (_activeJoueurRow === row) {
+      row.classList.remove('row-selected');
+      _activeJoueurRow = null;
+      panel.innerHTML = '<p class="empty">← Clique sur un joueur</p>';
+      return;
+    }
+    if (_activeJoueurRow) _activeJoueurRow.classList.remove('row-selected');
+    _activeJoueurRow = row;
+    row.classList.add('row-selected');
+    panel.innerHTML = '<p class="empty">Chargement…</p>';
+    fetch('/joueurs/' + joueurId + '/apercu?semaine={{ semaine.isoformat() }}')
+      .then(function(r) { return r.text(); })
+      .then(function(html) { panel.innerHTML = html; })
+      .catch(function() { panel.innerHTML = '<p class="empty">Erreur.</p>'; });
+  } else {
+    if (_activeRow === row) {
+      row.classList.remove('row-selected');
+      _activeRow = null;
+      _joueurPersiste = '';
+      var defaut = '{{ onglet_actif }}' === 'RCR' ? _joueurDefautRCR : _joueurDefautMCR;
+      fetchApercu(defaut);
+      return;
+    }
+    if (_activeRow) _activeRow.classList.remove('row-selected');
+    _activeRow = row;
+    row.classList.add('row-selected');
+    _joueurPersiste = joueurId;
+    fetchApercu(joueurId);
   }
-  if (_activeRow) _activeRow.classList.remove('row-selected');
-  _activeRow = row;
-  row.classList.add('row-selected');
-  _joueurPersiste = joueurId;
-  fetchApercu(joueurId);
 }
 
 function switchRegles(label) {

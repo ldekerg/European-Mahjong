@@ -21,6 +21,7 @@
     <div class="apercu-nbt">{{ data.nb_actifs }} actifs · {{ data.nb_total }} total</div>
     {% if data.meilleur %}
     <a class="apercu-best" href="/?semaine={{ data.meilleur.semaine.isoformat() }}&joueur={{ joueur.id }}&regles={{ label }}"
+       onclick="event.stopPropagation()"
        title="Voir le classement à cette date">
       🏆 #{{ data.meilleur.position }}
       <span class="apercu-best-date">{{ data.meilleur.semaine.strftime('%d/%m/%Y') }}</span>

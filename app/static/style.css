@@ -637,6 +637,7 @@ col.col-delta        { width: 3rem; }
 col.col-flag         { width: 3.5rem; }
 col.col-nom          { width: 12rem; }    /* nom de joueur dans classement */
 col.col-prenom       { width: 10rem; }
+col.col-debut        { width: 5.5rem; }   /* date premier tournoi */
 col.col-joueur-nom   { width: 14rem; }    /* nom joueur dans HOF */
 col.col-pays-nom     { width: 12rem; }    /* nom de pays */
 col.col-date         { width: 5.8rem; }

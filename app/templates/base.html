@@ -82,9 +82,12 @@
                 tabs.insertBefore(other, preferred.nextSibling);
             }
 
+            // Ne pas forcer si l'URL contient un paramètre regles explicite (navigation intentionnelle)
+            var urlRegles = new URLSearchParams(window.location.search).get('regles');
+            if (urlRegles) return;
+
             // Activer la règle préférée si aucun onglet n'est actif via URL/serveur
             var anyActive = btns.some(function(b) { return b.classList.contains('active'); });
-            // Vérifier si c'est l'autre règle qui est active (état serveur) — dans ce cas ne pas forcer
             var wrongActive = other.classList.contains('active') && !preferred.classList.contains('active');
             if (!anyActive || wrongActive) {
                 preferred.click();
