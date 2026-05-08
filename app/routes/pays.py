@@ -406,6 +406,31 @@ def pays_detail(
     )
     villes = [{"lieu": v.lieu, "pays": v.pays, "lat": v.latitude, "lon": v.longitude, "nb": v.nb}
               for v in villes_q]
+    # Détection de groupes géographiques (ex: métropole + îles distantes)
+    # On sépare les villes dont la distance dépasse un seuil (>15° de lat ou lon)
+    def _bounds(pts):
+        lats = [p["lat"] for p in pts]
+        lons = [p["lon"] for p in pts]
+        return [[min(lats), min(lons)], [max(lats), max(lons)]]
+
+    def _groupes(pts, seuil_lat=15, seuil_lon=30):
+        if not pts:
+            return []
+        pts_s = sorted(pts, key=lambda p: p["lat"])
+        groupes, grp = [], [pts_s[0]]
+        for p in pts_s[1:]:
+            if p["lat"] - grp[-1]["lat"] > seuil_lat:
+                groupes.append(grp); grp = [p]
+            else:
+                grp.append(p)
+        groupes.append(grp)
+        return groupes
+
+    groupes_villes = _groupes(villes)
+    # Trier les groupes par latitude décroissante (métropole avant DOM/îles)
+    groupes_villes.sort(key=lambda g: -max(p["lat"] for p in g))
+    cartes = [{"villes": g, "bounds": _bounds(g)} for g in groupes_villes]
+    carte_bounds = cartes[0]["bounds"] if cartes else None
 
     # ── Liste joueurs ─────────────────────────────────────────────────────────
     from datetime import date as _date
@@ -472,6 +497,8 @@ def pays_detail(
         "tournois":         tous_tournois,
         "actifs_ids":       actifs_dict,
         "villes":           villes,
+        "cartes":           cartes,
+        "carte_bounds":     carte_bounds,
         "ville_filtre":     None,
         # Joueurs
         "joueurs":          joueurs_data,

@@ -91,7 +91,19 @@
       {% include 'partials/tournois_table.html' %}
     </div>
     <div class="t-right">
-      {% include 'partials/tournois_carte.html' %}
+      {% if cartes | length > 1 %}
+        {% for grp in cartes %}
+          {% with villes=grp.villes, carte_bounds=grp.bounds, ville_filtre=ville_filtre,
+                  carte_id='t-map-pays-' + loop.index|string %}
+          {% include 'partials/tournois_carte.html' %}
+          {% endwith %}
+          {% if not loop.last %}<div style="height:0.75rem"></div>{% endif %}
+        {% endfor %}
+      {% else %}
+        {% with villes=villes, carte_bounds=carte_bounds, ville_filtre=ville_filtre %}
+        {% include 'partials/tournois_carte.html' %}
+        {% endwith %}
+      {% endif %}
     </div>
   </div>
 </div>

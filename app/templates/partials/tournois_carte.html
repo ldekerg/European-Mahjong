@@ -43,7 +43,12 @@
 
   function initMap() {
     if (map) return;
-    map = L.map(CARTE_ID).setView([50, 10], 4);
+    map = L.map(CARTE_ID);
+    {% if carte_bounds is defined and carte_bounds %}
+    map.fitBounds({{ carte_bounds | tojson }}, {padding: [20, 20]});
+    {% else %}
+    map.setView([50, 10], 4);
+    {% endif %}
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap'
     }).addTo(map);

@@ -34,18 +34,33 @@ def _tournois_tab(db, regles: str, vue: str, tri: str, asc: int, ville) -> dict:
         q = q.filter(Tournoi.lieu == ville)
     tournois_list = q.filter(Tournoi.date_debut != date(1900, 1, 1)).all()
 
-    villes = db.query(
+    vq = db.query(
         Tournoi.lieu, Tournoi.pays, Tournoi.latitude, Tournoi.longitude,
         func.count(Tournoi.id).label("nb"),
     ).filter(
         Tournoi.latitude.isnot(None), Tournoi.lieu != "", Tournoi.regles == regles,
-    ).group_by(Tournoi.lieu, Tournoi.pays, Tournoi.latitude, Tournoi.longitude).all()
+    )
+    if vue == "actifs":
+        vq = vq.filter(Tournoi.id.in_(actifs_ids.keys()))
+    elif vue == "speciaux":
+        vq = vq.filter(Tournoi.type_tournoi.in_(["wmc", "wrc", "oemc", "oerc"]))
+    villes = [{"lieu": v.lieu, "pays": v.pays, "lat": v.latitude,
+               "lon": v.longitude, "nb": v.nb}
+              for v in vq.group_by(Tournoi.lieu, Tournoi.pays,
+                                    Tournoi.latitude, Tournoi.longitude).all()]
+
+    # Bounds pour la carte : fitBounds sur tout si vue=speciaux, sinon Europe par défaut
+    carte_bounds = None
+    if vue == "speciaux" and villes:
+        lats = [v["lat"] for v in villes]
+        lons = [v["lon"] for v in villes]
+        carte_bounds = [[min(lats), min(lons)], [max(lats), max(lons)]]
 
     return {
-        "tournois":   tournois_list,
-        "actifs_ids": actifs_ids,
-        "villes":     [{"lieu": v.lieu, "pays": v.pays, "lat": v.latitude,
-                         "lon": v.longitude, "nb": v.nb} for v in villes],
+        "tournois":    tournois_list,
+        "actifs_ids":  actifs_ids,
+        "villes":      villes,
+        "carte_bounds": carte_bounds,
     }
 
 
@@ -68,6 +83,8 @@ def liste_tournois(
         "tri": tri,
         "asc": asc,
         "ville_filtre": ville,
+        "carte_bounds_mcr": mcr["carte_bounds"],
+        "carte_bounds_rcr": rcr["carte_bounds"],
     })
 
 

@@ -30,7 +30,8 @@
       {% endwith %}
     </div>
     <div class="t-right">
-      {% with villes=tab.villes, ville_filtre=ville_filtre, tab_key=regles_key %}
+      {% set _cb = carte_bounds_mcr if regles_key == 'mcr' else carte_bounds_rcr %}
+      {% with villes=tab.villes, ville_filtre=ville_filtre, tab_key=regles_key, carte_bounds=_cb %}
       {% include 'partials/tournois_carte.html' %}
       {% endwith %}
     </div>
