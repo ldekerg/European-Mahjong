@@ -630,26 +630,37 @@ tbody td { font-size: 0.9rem; padding: 0.4rem 0.6rem; }
 /* ── Colonnes standardisées ── */
 /* Utilisées sur <col> pour la largeur et sur <td>/<th> pour l'alignement */
 
-col.col-pos     { width: 2.8rem; }
-col.col-delta   { width: 3rem; }
-col.col-flag    { width: 2rem; }
-col.col-nom     { /* flexible */ }
-col.col-date    { width: 5.8rem; }
-col.col-ville   { width: 10rem; }
-col.col-duree   { width: 2.5rem; }
-col.col-regles  { width: 4.2rem; }
-col.col-coeff   { width: 2.8rem; }
-col.col-contrib { width: 4.4rem; }
-col.col-joueurs { width: 3rem; }
-col.col-score   { width: 5.5rem; }
-col.col-ema     { width: 3.5rem; }
-col.col-pts     { width: 2.8rem; }
-col.col-mahj    { width: 3.5rem; }
-col.col-podiums { width: 7rem; }
+col.col-ema-id       { width: 6rem; }
+col.col-pos          { width: 2.8rem; }
+col.col-pos-lg       { width: 5.5rem; }   /* position avec /nb_joueurs */
+col.col-delta        { width: 3rem; }
+col.col-flag         { width: 3.5rem; }
+col.col-nom          { width: 12rem; }    /* nom de joueur dans classement */
+col.col-prenom       { width: 10rem; }
+col.col-joueur-nom   { width: 14rem; }    /* nom joueur dans HOF */
+col.col-pays-nom     { width: 12rem; }    /* nom de pays */
+col.col-date         { width: 5.8rem; }
+col.col-date-lg      { width: 6.5rem; }   /* date avec année complète */
+col.col-ville        { width: 10rem; }
+col.col-duree        { width: 2.5rem; }
+col.col-regles       { width: 4.2rem; }
+col.col-coeff        { width: 2.8rem; }
+col.col-contrib      { width: 4.4rem; }
+col.col-joueurs      { width: 3rem; }
+col.col-score        { width: 5.5rem; }
+col.col-ema          { width: 3.5rem; }
+col.col-pts          { width: 2.8rem; }
+col.col-mahj         { width: 3.5rem; }
+col.col-podiums      { width: 7rem; }
+col.col-hof-stat     { width: 4rem; }     /* stat HOF (médailles, semaines) */
+col.col-hof-podium   { width: 4.5rem; }  /* podium HOF */
+col.col-hof-total    { width: 5rem; }     /* total HOF */
+col.col-pays-joueurs { width: 7rem; }     /* joueurs actifs dans liste pays */
+col.col-pays-tournois{ width: 6rem; }    /* tournois org dans liste pays */
 
 td.col-pos, th.col-pos     { text-align: center; width: 2.8rem; }
 td.col-delta, th.col-delta { text-align: center; width: 3rem; white-space: nowrap; }
-td.col-flag, th.col-flag   { text-align: center; width: 2rem; }
+td.col-flag, th.col-flag   { text-align: center; width: 3.5rem; max-width: 3.5rem; overflow: hidden; }
 td.col-date                { white-space: nowrap; }
 td.col-ville               { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 td.col-duree, th.col-duree { text-align: center; }

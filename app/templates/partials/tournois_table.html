@@ -23,18 +23,18 @@ window['{{ _fv }}'] = window['{{ _fv }}'] || function() {};
 </div>
 
 <div class="scroll-table t-left-scroll">
-<table id="t-table-{{ _tk if _tk else 'default' }}">
+<table id="t-table-{{ _tk if _tk else 'default' }}" style="table-layout:fixed;width:100%">
   <thead>
     <colgroup>
-      <col style="width:5.8rem">
-      <col style="width:1.8rem">
-      <col style="width:10rem">
-      <col>
-      <col style="width:2.5rem">
-      <col style="width:4.2rem">
-      <col style="width:2.5rem">
-      <col style="width:2.5rem">
-      <col style="width:4.4rem">
+      <col class="col-date">
+      <col class="col-flag">
+      <col class="col-ville">
+      <col>                      <!-- Tournoi -->
+      <col class="col-duree">
+      <col class="col-regles">
+      <col class="col-coeff">
+      <col class="col-joueurs">
+      <col class="col-contrib">
     </colgroup>
     {% set _s = sort_url_base if sort_url_base is defined else '' %}
     {% set _asc = asc if asc is defined else 0 %}
@@ -68,9 +68,9 @@ window['{{ _fv }}'] = window['{{ _fv }}'] || function() {};
   {% set contrib = actifs_ids[t.id] if actif else 0 %}
   <tr class="t-row t-row-{{ _tk if _tk else 'all' }} {% if actif %}row-actif{% endif %} {% if t.type_tournoi in ['wmc','wrc'] %}row-wmc{% elif t.type_tournoi in ['oemc','oerc'] %}row-oemc{% endif %}"
       data-lieu="{{ t.lieu }}">
-    <td class="nowrap">{{ t.date_debut.strftime('%d/%m/%y') }}</td>
-    <td class="nowrap">{{ t.pays | pays_flag }}</td>
-    <td class="t-ville" onclick="{{ _fv }}('{{ t.lieu }}')">{{ t.lieu }}</td>
+    <td class="col-date">{{ t.date_debut.strftime('%d/%m/%y') }}</td>
+    <td class="col-flag">{{ t.pays | pays_flag }}</td>
+    <td class="col-ville t-ville" onclick="{{ _fv }}('{{ t.lieu }}')">{{ t.lieu }}</td>
     <td>
       <a href="/tournois/{{ t.regles }}_{{ t.ema_id }}">{{ t.nom }}</a>
       {% if t.type_tournoi == 'wmc' %}<span class="badge badge-gold">WMC</span>
@@ -81,9 +81,9 @@ window['{{ _fv }}'] = window['{{ _fv }}'] || function() {};
     {% set duree = ((t.date_fin - t.date_debut).days + 1) if t.date_fin and t.date_debut.year != 1900 else 1 %}
     <td class="center dim">{{ [duree, 1] | max }}j</td>
     <td class="center"><span class="badge {% if t.regles == 'MCR' %}badge-mcr{% else %}badge-rcr{% endif %}">{{ t.regles }}</span></td>
-    <td class="center">{{ t.coefficient }}</td>
-    <td class="center">{{ t.nb_joueurs }}</td>
-    <td class="center">
+    <td class="col-coeff">{{ t.coefficient }}</td>
+    <td class="col-joueurs">{{ t.nb_joueurs }}</td>
+    <td class="col-contrib">
       {% if contrib == 1.0 %}<span class="contrib-100">100%</span>
       {% elif contrib == 0.5 %}<span class="contrib-50">50%</span>
       {% else %}<span class="dim">—</span>{% endif %}
