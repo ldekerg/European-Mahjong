@@ -7,11 +7,28 @@ from sqlalchemy.orm import Session
 from typing import Optional
 from datetime import date
 from database import get_db
-from models import Tournoi, Resultat, Joueur
+from models import Tournoi, Resultat, ResultatAnonyme, Joueur
 from ranking import lundi_semaine, tournois_actifs
 
 router = APIRouter(prefix="/tournois")
 from app.templates_config import templates
+
+
+PAYS_EMA = {
+    'FR','DE','NL','BE','LU','GB','IE','ES','PT','IT','AT','CH','DK','SE','NO','FI',
+    'PL','CZ','SK','HU','RO','UA','EE','LV','LT','HR','SI','RS','BG','GR','TR'
+}
+
+
+def _incomplets_ids(db, tournoi_ids: list) -> set:
+    """IDs de tournois ayant au moins un anonyme européen (joueur EMA manquant)."""
+    if not tournoi_ids:
+        return set()
+    rows = db.query(ResultatAnonyme.tournoi_id).filter(
+        ResultatAnonyme.tournoi_id.in_(tournoi_ids),
+        ResultatAnonyme.nationalite.in_(PAYS_EMA),
+    ).distinct().all()
+    return {row.tournoi_id for row in rows}
 
 
 def _tournois_tab(db, regles: str, vue: str, tri: str, asc: int, ville) -> dict:
@@ -56,11 +73,14 @@ def _tournois_tab(db, regles: str, vue: str, tri: str, asc: int, ville) -> dict:
         lons = [v["lon"] for v in villes]
         carte_bounds = [[min(lats), min(lons)], [max(lats), max(lons)]]
 
+    incomplets = _incomplets_ids(db, [t.id for t in tournois_list])
+
     return {
-        "tournois":    tournois_list,
-        "actifs_ids":  actifs_ids,
-        "villes":      villes,
+        "tournois":     tournois_list,
+        "actifs_ids":   actifs_ids,
+        "villes":       villes,
         "carte_bounds": carte_bounds,
+        "incomplets":   incomplets,
     }
 
 
@@ -129,21 +149,51 @@ def detail_tournoi_ema(regles: str, ema_id: int, request: Request, db: Session =
 def detail_tournoi(tournoi_id: int, request: Request, db: Session = Depends(get_db)):
     from collections import Counter
     tournoi = db.query(Tournoi).filter(Tournoi.id == tournoi_id).first()
-    resultats = (
+    resultats_identifies = (
         db.query(Resultat)
         .filter(Resultat.tournoi_id == tournoi_id)
         .order_by(Resultat.position)
         .all()
     )
-    joueurs = db.query(Joueur).order_by(Joueur.nom).all()
-
-    # Stats par pays
-    joueurs_map = {j.id: j for j in joueurs}
-    pays_count = Counter(
-        joueurs_map[r.joueur_id].nationalite
-        for r in resultats
-        if r.joueur_id in joueurs_map
+    resultats_anonymes = (
+        db.query(ResultatAnonyme)
+        .filter(ResultatAnonyme.tournoi_id == tournoi_id)
+        .order_by(ResultatAnonyme.position)
+        .all()
     )
+    joueurs = db.query(Joueur).order_by(Joueur.nom).all()
+    joueurs_map = {j.id: j for j in joueurs}
+
+    # Liste unifiée triée par position : chaque entrée a les champs nécessaires au template
+    def _as_row(r, joueur=None):
+        return {
+            "position":   r.position,
+            "nationalite": r.nationalite or "",
+            "joueur":     joueur,       # None si anonyme
+            "ranking":    getattr(r, "ranking", None),
+            "anonyme":    joueur is None,
+            "prenom":     getattr(r, "prenom", None) or (joueur.prenom if joueur else ""),
+            "nom":        getattr(r, "nom", None)    or (joueur.nom    if joueur else ""),
+        }
+
+    resultats_unifies = sorted(
+        [_as_row(r, joueurs_map.get(r.joueur_id)) for r in resultats_identifies]
+        + [_as_row(r) for r in resultats_anonymes],
+        key=lambda x: x["position"],
+    )
+
+    # Pour rétrocompatibilité avec le reste du template (podium, pays_stats, etc.)
+    resultats = resultats_identifies
+
+    # Stats par pays (identifiés + anonymes avec drapeau)
+    nat_list = [
+        joueurs_map[r.joueur_id].nationalite
+        for r in resultats_identifies
+        if r.joueur_id in joueurs_map
+    ] + [
+        r.nationalite for r in resultats_anonymes if r.nationalite
+    ]
+    pays_count = Counter(nat_list)
     pays_stats = sorted(
         [{"code": k, "nb": v} for k, v in pays_count.items() if k and k != "GUEST"],
         key=lambda x: -x["nb"]
@@ -173,13 +223,24 @@ def detail_tournoi(tournoi_id: int, request: Request, db: Session = Depends(get_
             "rang_medaille": rang_med + 1,  # 1 = première fois
         })
 
+    nb_resultats = len(resultats_identifies) + len(resultats_anonymes)
+    nb_anon_europeens = sum(
+        1 for r in resultats_anonymes
+        if r.nationalite and r.nationalite.upper() in PAYS_EMA
+    )  # PAYS_EMA défini en tête de module
+    resultats_incomplets = nb_anon_europeens > 0
+
     return templates.TemplateResponse(request, "tournois/detail.html", {
-        "tournoi":    tournoi,
-        "resultats":  resultats,
-        "joueurs":    joueurs,
-        "pays_stats": pays_stats,
-        "nb_pays":    len(pays_stats),
-        "podium":     podium,
+        "tournoi":              tournoi,
+        "resultats":            resultats_unifies,
+        "joueurs":              joueurs,
+        "pays_stats":           pays_stats,
+        "nb_pays":              len(pays_stats),
+        "podium":               podium,
+        "resultats_incomplets":  resultats_incomplets,
+        "nb_resultats":          nb_resultats,
+        "nb_anon_europeens":     nb_anon_europeens,
+        "is_mondial":            tournoi.type_tournoi in ('wmc', 'wrc'),
     })
 
 

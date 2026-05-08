@@ -12,11 +12,14 @@
       {% elif tournoi.type_tournoi == 'wrc' %}<span class="badge badge-gold">WRC</span>
       {% elif tournoi.type_tournoi == 'oemc' %}<span class="badge">OEMC</span>
       {% elif tournoi.type_tournoi == 'oerc' %}<span class="badge">OERC</span>{% endif %}
+      {% if resultats_incomplets %}
+      <span class="badge badge-warning" title="{{ nb_anon_europeens }} joueur{{ 's' if nb_anon_europeens > 1 }} EMA européen{{ 's' if nb_anon_europeens > 1 }} manquant{{ 's' if nb_anon_europeens > 1 }}">⚠ Résultats partiels</span>
+      {% endif %}
     </div>
   </div>
   <dl style="font-size:0.85rem;margin:0">
     <dt>Joueurs</dt><dd>{{ tournoi.nb_joueurs }}</dd>
-    <dt>Coeff.</dt><dd>{{ tournoi.coefficient }}</dd>
+    {% if not is_mondial %}<dt>Coeff.</dt><dd>{{ tournoi.coefficient }}</dd>{% endif %}
     <dt>Pays</dt>
     <dd>
       {{ nb_pays }}
@@ -35,7 +38,8 @@
 </div>
 
 {% set is_mcr = tournoi.regles == 'MCR' %}
-{% set ncols = 6 if is_mcr else 5 %}
+{% set show_ema_col = not is_mondial %}
+{% set ncols = (6 if is_mcr else 5) if show_ema_col else (5 if is_mcr else 4) %}
 
 <div class="ranking-layout" style="align-items:start;margin-top:1.5rem">
 <div class="ranking-left">
@@ -49,7 +53,7 @@
     <col>
     {% if is_mcr %}<col class="col-pts">{% endif %}
     <col class="col-mahj">
-    <col class="col-ema">
+    {% if show_ema_col %}<col class="col-ema">{% endif %}
   </colgroup>
   <thead>
     <tr>
@@ -59,21 +63,38 @@
       <th>Joueur</th>
       {% if is_mcr %}<th class="right" title="Points tournoi">Pts</th>{% endif %}
       <th class="right" title="{% if is_mcr %}Score Mahjong{% else %}Score{% endif %}">#</th>
-      <th class="right col-sticky" title="Points EMA">EMA</th>
+      {% if show_ema_col %}<th class="right col-sticky" title="Points EMA">EMA</th>{% endif %}
     </tr>
   </thead>
   <tbody>
     {% for r in resultats %}
-    <tr class="{% if r.position == 1 %}row-top1{% elif r.position == 2 %}row-top2{% elif r.position == 3 %}row-top3{% endif %}">
+    <tr class="{% if r.anonyme %}row-anonyme{% elif r.position == 1 %}row-top1{% elif r.position == 2 %}row-top2{% elif r.position == 3 %}row-top3{% endif %}">
       <td class="td-pos">
         <span class="pos-medal">{% if r.position == 1 %}🥇{% elif r.position == 2 %}🥈{% elif r.position == 3 %}🥉{% else %}{{ r.position }}{% endif %}</span>
       </td>
-      <td><a href="/joueurs/{{ r.joueur.id }}">{{ r.joueur.id }}</a></td>
-      <td class="center">{{ r.joueur.nationalite | flag_link('joueurs') }}</td>
-      <td>{{ r.joueur.prenom | prenom }} {{ r.joueur.nom | title }}</td>
-      {% if is_mcr %}<td class="right">{{ r.points }}</td>{% endif %}
-      <td class="right">{{ r.mahjong }}</td>
-      <td class="right col-sticky ema-pts" style="{{ r.ranking | ema_color }}">{{ r.ranking }}</td>
+      <td>
+        {% if r.joueur %}<a href="/joueurs/{{ r.joueur.id }}">{{ r.joueur.id }}</a>
+        {% else %}<span class="dim">—</span>{% endif %}
+      </td>
+      <td class="center">
+        {% if r.nationalite %}{{ r.nationalite | flag_link('joueurs') }}{% endif %}
+      </td>
+      <td>
+        {% if r.joueur %}
+          {{ r.joueur.prenom | prenom }} {{ r.joueur.nom | title }}
+        {% elif r.prenom or r.nom %}
+          <span class="dim">{{ r.prenom }} {{ r.nom }}</span>
+        {% else %}
+          <span class="dim">—</span>
+        {% endif %}
+      </td>
+      {% if is_mcr %}<td class="right">{% if not r.anonyme %}{{ r.points }}{% endif %}</td>{% endif %}
+      <td class="right">{% if not r.anonyme %}{{ r.mahjong }}{% endif %}</td>
+      {% if show_ema_col %}
+      <td class="right col-sticky ema-pts" style="{% if not r.anonyme %}{{ r.ranking | ema_color }}{% endif %}">
+        {% if not r.anonyme %}{{ r.ranking }}{% endif %}
+      </td>
+      {% endif %}
     </tr>
     {% else %}
     <tr><td colspan="{{ ncols }}">Aucun résultat enregistré.</td></tr>

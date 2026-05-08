@@ -321,6 +321,7 @@ a { color: var(--accent); }
 .row-top1 td { background: var(--or-bg); }
 .row-top2 td { background: var(--argent-bg); }
 .row-top3 td { background: var(--bronze-bg); }
+.row-anonyme td { color: var(--text3); }
 
 /* ── Page joueur ── */
 .player-header {
@@ -397,7 +398,9 @@ a { color: var(--accent); }
 .dim         { color: #bbb; }
 .pts-actif   { font-weight: 700; color: var(--accent); }
 .badge       { font-size: 0.7rem; background: #e0e8f8; color: var(--accent); padding: 0.1rem 0.4rem; border-radius: 8px; margin-left: 0.3rem; }
-.badge-gold  { background: var(--or-bg); color: var(--or-fg); border: 1px solid var(--or-border); }
+.badge-gold      { background: var(--or-bg); color: var(--or-fg); border: 1px solid var(--or-border); }
+.badge-warning   { background: #fff3cd; color: #7a5c00; border: 1px solid #e6c840; }
+.badge-suspendu  { background: #fde8e8; color: #a00; border: 1px solid #e88; }
 .nowrap { white-space: nowrap; }
 .center { text-align: center; }
 .right  { text-align: right; }
@@ -452,6 +455,8 @@ tr.hidden { display: none; }
 [data-theme="dark"] .expand-row { background: var(--bg3); border-color: var(--border); }
 [data-theme="dark"] .col-sticky { background: var(--bg2) !important; }
 [data-theme="dark"] .row-actif .col-sticky  { background: var(--row-actif) !important; }
+[data-theme="dark"] .badge-warning  { background: #3a2e00; color: #f0c040; border-color: #7a6010; }
+[data-theme="dark"] .badge-suspendu { background: #3a0000; color: #f08080; border-color: #803030; }
 
 /* ── Changement nationalité ── */
 .nat-warning {

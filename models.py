@@ -55,6 +55,24 @@ class Resultat(Base):
     joueur = relationship("Joueur", back_populates="resultats")
 
 
+class ResultatAnonyme(Base):
+    """Résultat d'un tournoi pour un joueur sans numéro EMA (non importable dans resultats)."""
+    __tablename__ = "resultats_anonymes"
+
+    id          = Column(Integer, primary_key=True, autoincrement=True)
+    tournoi_id  = Column(Integer, ForeignKey("tournois.id"), nullable=False)
+    position    = Column(Integer, nullable=False)
+    nationalite = Column(String, nullable=True)   # code ISO maj ex: "FR", vide si inconnu
+    nom         = Column(String, nullable=True)   # peut être vide
+    prenom      = Column(String, nullable=True)   # peut être vide
+
+    tournoi = relationship("Tournoi")
+
+    __table_args__ = (
+        UniqueConstraint("tournoi_id", "position", name="uq_anon_tournoi_position"),
+    )
+
+
 class ChangementNationalite(Base):
     __tablename__ = "changements_nationalite"
 

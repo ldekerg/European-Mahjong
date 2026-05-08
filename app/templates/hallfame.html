@@ -68,18 +68,25 @@
         <a href="/tournois/{{ t.regles }}_{{ t.ema_id }}" style="font-weight:700;font-size:0.95rem">{{ t.nom }}</a>
         {% if t.type_tournoi in ['wmc','wrc'] %}<span class="badge badge-gold" style="margin-left:0.4rem">{{ 'WMC' if t.type_tournoi == 'wmc' else 'WRC' }}</span>
         {% else %}<span class="badge" style="margin-left:0.4rem">{{ 'OEMC' if t.type_tournoi == 'oemc' else 'OERC' }}</span>{% endif %}
+        {% if t.id in incomplets %}<span class="badge badge-warning" style="margin-left:0.4rem">⚠ Partiel</span>{% endif %}
       </div>
       <span class="dim" style="font-size:0.82rem">{{ t.date_debut.strftime('%d/%m/%Y') if t.date_debut.year != 1900 else '—' }} · {{ t.nb_joueurs }} joueurs</span>
     </div>
     <div style="display:flex;gap:1rem;flex-wrap:wrap">
       {% for p in item.top3 %}
-      <div style="display:flex;align-items:center;gap:0.4rem;font-size:0.88rem">
+      <div style="display:flex;align-items:center;gap:0.4rem;font-size:0.88rem{% if p.anonyme %};color:var(--text3){% endif %}">
         {% if p.position == 1 %}<span>🥇</span>
         {% elif p.position == 2 %}<span>🥈</span>
         {% elif p.position == 3 %}<span>🥉</span>
         {% else %}<span class="dim" style="width:1.8rem;text-align:center;font-size:0.82rem">{{ p.position }}<sup>e</sup></span>{% endif %}
-        <span>{{ p.joueur.nationalite | flag }}</span>
-        <a href="/joueurs/{{ p.joueur.id }}">{{ p.joueur.prenom | prenom }} {{ p.joueur.nom | title }}</a>
+        {% if p.nationalite %}<span>{{ p.nationalite | flag }}</span>{% endif %}
+        {% if p.joueur %}
+          <a href="/joueurs/{{ p.joueur.id }}">{{ p.joueur.prenom | prenom }} {{ p.joueur.nom | title }}</a>
+        {% elif p.prenom or p.nom %}
+          <span>{{ p.prenom }} {{ p.nom }}</span>
+        {% else %}
+          <span>—</span>
+        {% endif %}
       </div>
       {% endfor %}
     </div>

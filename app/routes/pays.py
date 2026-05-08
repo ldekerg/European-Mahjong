@@ -396,6 +396,9 @@ def pays_detail(
     actifs_dict = {t.id: c for t, c in tournois_actifs(db, semaine_date, "MCR")}
     actifs_dict.update({t.id: c for t, c in tournois_actifs(db, semaine_date, "RCR")})
 
+    from app.routes.tournois import _incomplets_ids
+    incomplets = _incomplets_ids(db, [t.id for t in tous_tournois])
+
     # Villes pour la carte
     villes_q = (
         db.query(Tournoi.lieu, Tournoi.pays, Tournoi.latitude, Tournoi.longitude,
@@ -496,6 +499,7 @@ def pays_detail(
         # Tournois
         "tournois":         tous_tournois,
         "actifs_ids":       actifs_dict,
+        "incomplets":       incomplets,
         "villes":           villes,
         "cartes":           cartes,
         "carte_bounds":     carte_bounds,

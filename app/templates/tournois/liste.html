@@ -24,7 +24,7 @@
 <div id="tab-{{ regles_key }}" class="tab-content {% if regles_key != 'mcr' %}hidden{% endif %}">
   <div class="t-layout">
     <div class="t-left">
-      {% with tournois=tab.tournois, actifs_ids=tab.actifs_ids, ville_filtre=ville_filtre,
+      {% with tournois=tab.tournois, actifs_ids=tab.actifs_ids, incomplets=tab.incomplets, ville_filtre=ville_filtre,
               tab_key=regles_key, sort_url_base='?vue=' + vue, asc=asc %}
       {% include 'partials/tournois_table.html' %}
       {% endwith %}

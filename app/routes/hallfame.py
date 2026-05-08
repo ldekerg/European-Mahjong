@@ -7,7 +7,7 @@ from sqlalchemy import func, case
 from typing import Optional
 
 from database import get_db
-from models import ClassementHistorique, Joueur, Resultat, Tournoi
+from models import ClassementHistorique, Joueur, Resultat, ResultatAnonyme, Tournoi
 from app.templates_config import templates
 
 router = APIRouter(prefix="/hallfame")
@@ -111,7 +111,7 @@ def _meilleur_europeen(db: Session, type_tournoi: str):
 
 
 def _palmares_championnats(db: Session, regles: str) -> list:
-    """Pour chaque tournoi majeur avec résultats, retourne les 3 meilleurs Européens."""
+    """Pour chaque tournoi majeur avec résultats, retourne les 3 meilleurs (identifiés + anonymes fusionnés)."""
     types = ["wmc", "oemc"] if regles == "MCR" else ["wrc", "oerc"]
     tournois = db.query(Tournoi).filter(
         Tournoi.type_tournoi.in_(types),
@@ -119,21 +119,42 @@ def _palmares_championnats(db: Session, regles: str) -> list:
         Tournoi.date_debut != __import__('datetime').date(1900, 1, 1),
     ).order_by(Tournoi.date_debut.desc()).all()
 
+    PAYS_EUROPEENS = {
+        'FR','DE','NL','BE','LU','GB','IE','ES','PT','IT','AT','CH','DK','SE','NO','FI',
+        'PL','CZ','SK','HU','RO','UA','EE','LV','LT','HR','SI','RS','BG','GR','TR'
+    }
+
     result = []
     for t in tournois:
-        top3 = db.query(Resultat, Joueur).join(
+        identifies = db.query(Resultat, Joueur).join(
             Joueur, Resultat.joueur_id == Joueur.id
         ).filter(
             Resultat.tournoi_id == t.id,
             Joueur.statut == "europeen",
-        ).order_by(Resultat.position).limit(3).all()
+        ).order_by(Resultat.position).all()
 
-        if not top3:
-            continue  # Tournoi sans résultats (futur)
+        anonymes = db.query(ResultatAnonyme).filter(
+            ResultatAnonyme.tournoi_id == t.id,
+            ResultatAnonyme.nationalite.in_(PAYS_EUROPEENS),
+        ).order_by(ResultatAnonyme.position).all()
+
+        # Fusionner et trier par position, garder top3
+        all_entries = [
+            {"joueur": j, "position": r.position, "nationalite": r.nationalite, "anonyme": False}
+            for r, j in identifies
+        ] + [
+            {"joueur": None, "position": a.position, "nationalite": a.nationalite,
+             "prenom": a.prenom, "nom": a.nom, "anonyme": True}
+            for a in anonymes
+        ]
+        all_entries.sort(key=lambda x: x["position"])
+
+        if not all_entries:
+            continue  # Tournoi sans résultats
 
         result.append({
             "tournoi": t,
-            "top3": [{"joueur": j, "position": r.position} for r, j in top3],
+            "top3":    all_entries[:3],
         })
     return result
 
@@ -260,6 +281,10 @@ def hallfame(
     palmares_mcr = _palmares_championnats(db, "MCR")
     palmares_rcr = _palmares_championnats(db, "RCR")
 
+    from app.routes.tournois import _incomplets_ids
+    tous_ids = [item["tournoi"].id for item in palmares_mcr + palmares_rcr]
+    incomplets = _incomplets_ids(db, tous_ids)
+
     return templates.TemplateResponse(request, "hallfame.html", {
         "mcr":          mcr,
         "rcr":          rcr,
@@ -268,4 +293,5 @@ def hallfame(
         "champions":    champions,
         "palmares_mcr": palmares_mcr,
         "palmares_rcr": palmares_rcr,
+        "incomplets":   incomplets,
     })

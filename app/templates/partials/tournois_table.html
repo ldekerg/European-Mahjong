@@ -77,6 +77,7 @@ window['{{ _fv }}'] = window['{{ _fv }}'] || function() {};
       {% elif t.type_tournoi == 'wrc' %}<span class="badge badge-gold">WRC</span>
       {% elif t.type_tournoi == 'oemc' %}<span class="badge">OEMC</span>
       {% elif t.type_tournoi == 'oerc' %}<span class="badge">OERC</span>{% endif %}
+      {% if incomplets is defined and t.id in incomplets %}<span class="badge badge-warning">⚠ Partiel</span>{% endif %}
     </td>
     {% set duree = ((t.date_fin - t.date_debut).days + 1) if t.date_fin and t.date_debut.year != 1900 else 1 %}
     <td class="center dim">{{ [duree, 1] | max }}j</td>

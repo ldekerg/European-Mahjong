@@ -1,7 +1,12 @@
 """
 Script d'import des tournois EMA depuis mahjong-europe.org
 Usage : python3 import_ema.py [--start 0] [--end 453] [--delay 0.3] [--prefix TR]
-        python3 import_ema.py --prefix TR_RCR --end 411   # Riichi
+        python3 import_ema.py --prefix TR_RCR --end 411        # Riichi
+        python3 import_ema.py --prefix TR_RCR --ids 1000004    # WRC 2025
+
+Les joueurs sans numéro EMA sont stockés dans resultats_anonymes.
+Les mappings dans PRENOM_TO_ID_OVERRIDES convertissent automatiquement
+les anonymes identifiables en résultats liés à leur joueur EMA.
 """
 
 import sys
@@ -18,11 +23,21 @@ from bs4 import BeautifulSoup
 from sqlalchemy.orm import Session
 
 from database import engine, SessionLocal
-from models import Base, Joueur, Tournoi, Resultat
+from models import Base, Joueur, Tournoi, Resultat, ResultatAnonyme
 
 Base.metadata.create_all(bind=engine)
 
 BASE_URL = "http://mahjong-europe.org/ranking/Tournament/{}_{}.html"
+
+# Mappings prenom_complet -> joueur_id pour les tournois sans numéro EMA dans les résultats.
+# Clé : (ema_id, regles), valeur : dict {prenom_affiché: joueur_id}
+PRENOM_TO_ID_OVERRIDES: dict[tuple, dict[str, str]] = {
+    (1000004, "RCR"): {
+        "Mikko Aarnos":     "14990053",
+        "Manuel Tertre":    "04160092",
+        "Valentin Courtois":"04310012",
+    },
+}
 
 ssl_ctx = ssl.create_default_context()
 ssl_ctx.check_hostname = False
@@ -229,12 +244,14 @@ def parse_tournament(html: str, tournament_id: int) -> dict | None:
         position = int(pos_text.group())
 
         ema_link = cellules[1].find("a")
-        if not ema_link:
-            continue
-        joueur_id = ema_link.get_text(strip=True)
+        joueur_id = ema_link.get_text(strip=True) if ema_link else None
 
-        nom_joueur = cellules[2].get_text(strip=True)
+        nom_joueur    = cellules[2].get_text(strip=True)
         prenom_joueur = cellules[3].get_text(strip=True)
+        if nom_joueur == "-":
+            nom_joueur = ""
+        if prenom_joueur == "-":
+            prenom_joueur = ""
 
         # Nationalité depuis l'image du drapeau
         flag_img = cellules[4].find("img")
@@ -259,16 +276,32 @@ def parse_tournament(html: str, tournament_id: int) -> dict | None:
         except IndexError:
             continue
 
-        resultats.append({
-            "joueur_id": joueur_id,
-            "nom": nom_joueur,
-            "prenom": prenom_joueur,
-            "nationalite": nationalite,
-            "position": position,
-            "points": points,
-            "mahjong": mahjong,
-            "ranking": ranking,
-        })
+        # Ligne de pagination ou artefact HTML : nationalite vide et nom/prenom sont des chiffres
+        if not nationalite and not joueur_id and (nom_joueur + prenom_joueur).isdigit():
+            continue
+
+        if joueur_id:
+            resultats.append({
+                "joueur_id":  joueur_id,
+                "nom":        nom_joueur,
+                "prenom":     prenom_joueur,
+                "nationalite": nationalite,
+                "position":   position,
+                "points":     points,
+                "mahjong":    mahjong,
+                "ranking":    ranking,
+            })
+        else:
+            resultats.append({
+                "joueur_id":  None,
+                "nom":        nom_joueur,
+                "prenom":     prenom_joueur,
+                "nationalite": nationalite,
+                "position":   position,
+                "points":     points,
+                "mahjong":    mahjong,
+                "ranking":    ranking,
+            })
 
     return {
         "ema_id": t_id,
@@ -284,12 +317,21 @@ def parse_tournament(html: str, tournament_id: int) -> dict | None:
     }
 
 
-def import_tournament(db: Session, data: dict):
+def reset_tournament(db: Session, tournoi_id: int):
+    """Supprime tous les résultats (identifiés + anonymes) d'un tournoi."""
+    db.query(Resultat).filter(Resultat.tournoi_id == tournoi_id).delete()
+    db.query(ResultatAnonyme).filter(ResultatAnonyme.tournoi_id == tournoi_id).delete()
+    db.commit()
+
+
+def import_tournament(db: Session, data: dict, reset: bool = False):
     # Upsert tournoi via (ema_id, regles)
     tournoi = db.query(Tournoi).filter(
         Tournoi.ema_id == data["ema_id"],
         Tournoi.regles == data["regles"],
     ).first()
+    if tournoi and reset:
+        reset_tournament(db, tournoi.id)
     if not tournoi:
         tournoi = Tournoi(
             ema_id=data["ema_id"], nom=data["nom"], lieu=data["lieu"], pays=data["pays"],
@@ -310,6 +352,29 @@ def import_tournament(db: Session, data: dict):
 
     # Upsert joueurs + résultats
     for r in data["resultats"]:
+        if r["joueur_id"] is None:
+            # Joueur sans numéro EMA → resultats_anonymes
+            existing_anon = db.query(ResultatAnonyme).filter(
+                ResultatAnonyme.tournoi_id == tournoi.id,
+                ResultatAnonyme.position   == r["position"],
+            ).first()
+            if not existing_anon:
+                db.add(ResultatAnonyme(
+                    tournoi_id  = tournoi.id,
+                    position    = r["position"],
+                    nationalite = r["nationalite"] or None,
+                    nom         = r["nom"] or None,
+                    prenom      = r["prenom"] or None,
+                ))
+            else:
+                if not existing_anon.nationalite and r["nationalite"]:
+                    existing_anon.nationalite = r["nationalite"]
+                if not existing_anon.nom and r["nom"]:
+                    existing_anon.nom = r["nom"]
+                if not existing_anon.prenom and r["prenom"]:
+                    existing_anon.prenom = r["prenom"]
+            continue
+
         joueur = db.query(Joueur).filter(Joueur.id == r["joueur_id"]).first()
         if not joueur:
             joueur = Joueur(
@@ -323,22 +388,50 @@ def import_tournament(db: Session, data: dict):
         # Eviter les doublons de résultat
         existing = db.query(Resultat).filter(
             Resultat.tournoi_id == tournoi.id,
-            Resultat.joueur_id == r["joueur_id"],
+            Resultat.joueur_id  == r["joueur_id"],
         ).first()
         if not existing:
             db.add(Resultat(
-                tournoi_id=tournoi.id,
-                joueur_id=r["joueur_id"],
-                position=r["position"],
-                points=r["points"],
-                mahjong=r["mahjong"],
-                ranking=r["ranking"],
-                nationalite=r["nationalite"],
+                tournoi_id  = tournoi.id,
+                joueur_id   = r["joueur_id"],
+                position    = r["position"],
+                points      = r["points"],
+                mahjong     = r["mahjong"],
+                ranking     = r["ranking"],
+                nationalite = r["nationalite"],
             ))
         else:
-            # Mettre à jour la nationalité si elle n'est pas encore renseignée
             if not existing.nationalite and r["nationalite"]:
                 existing.nationalite = r["nationalite"]
+
+    # Convertir les anonymes identifiables par prénom (overrides connus)
+    db.flush()
+    override_map = PRENOM_TO_ID_OVERRIDES.get((data["ema_id"], data["regles"]), {})
+    for prenom_complet, joueur_id in override_map.items():
+        anon = db.query(ResultatAnonyme).filter(
+            ResultatAnonyme.tournoi_id == tournoi.id,
+            ResultatAnonyme.prenom     == prenom_complet,
+        ).first()
+        if not anon:
+            continue
+        joueur = db.query(Joueur).filter(Joueur.id == joueur_id).first()
+        if not joueur:
+            continue
+        existing = db.query(Resultat).filter(
+            Resultat.tournoi_id == tournoi.id,
+            Resultat.joueur_id  == joueur_id,
+        ).first()
+        if not existing:
+            db.add(Resultat(
+                tournoi_id  = tournoi.id,
+                joueur_id   = joueur_id,
+                position    = anon.position,
+                points      = 1,
+                mahjong     = 1,
+                ranking     = 0,
+                nationalite = anon.nationalite,
+            ))
+        db.delete(anon)
 
     db.commit()
 
@@ -350,6 +443,7 @@ def main():
     parser.add_argument("--ids", nargs="+", help="IDs explicites (ex: 01 02 1000001)")
     parser.add_argument("--delay", type=float, default=0.3, help="Délai entre requêtes (secondes)")
     parser.add_argument("--prefix", type=str, default="TR", help="Préfixe URL (TR ou TR_RCR)")
+    parser.add_argument("--reset", action="store_true", help="Vider les résultats existants avant reimport")
     args = parser.parse_args()
 
     if args.ids:
@@ -375,8 +469,11 @@ def main():
             print("(vide)")
             skip += 1
         else:
-            import_tournament(db, data)
-            print(f"{data['regles']:3}  {data['date_debut']}  {len(data['resultats']):3} joueurs  {data['nom']}")
+            import_tournament(db, data, reset=args.reset)
+            nb_id  = sum(1 for r in data["resultats"] if r["joueur_id"])
+            nb_ano = sum(1 for r in data["resultats"] if not r["joueur_id"])
+            suffix = f"  ({nb_id} id, {nb_ano} anon)" if nb_ano else ""
+            print(f"{data['regles']:3}  {data['date_debut']}  {len(data['resultats']):3} joueurs  {data['nom']}{suffix}")
             ok += 1
 
         time.sleep(args.delay)

@@ -6,6 +6,9 @@
   <h1 style="display:flex;align-items:center;gap:0.5rem">
     <span style="font-size:2rem">{{ code | flag }}</span>
     {{ nom_pays }}
+    {% if code in ['RU', 'BY'] %}
+    <span class="badge badge-suspendu" title="Suspendu(e) de l'EMA depuis 2022">⛔ Suspendu</span>
+    {% endif %}
   </h1>
 </div>
 
