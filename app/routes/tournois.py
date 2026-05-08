@@ -26,7 +26,8 @@ def _tournois_tab(db, regles: str, vue: str, tri: str, asc: int, ville) -> dict:
         q = q.filter(Tournoi.type_tournoi.in_(["wmc", "wrc", "oemc", "oerc"]))
 
     col_map = {"date": Tournoi.date_debut, "coeff": Tournoi.coefficient,
-               "joueurs": Tournoi.nb_joueurs, "nom": Tournoi.nom}
+               "joueurs": Tournoi.nb_joueurs, "nom": Tournoi.nom,
+               "lieu": Tournoi.lieu, "pays": Tournoi.pays}
     col = col_map.get(tri, Tournoi.date_debut)
     q = q.order_by(col if asc else col.desc())
     if ville:

@@ -17,7 +17,7 @@ from app.templates_config import templates
 @router.get("/")
 def liste_joueurs(
     request: Request,
-    tri: str = "nom",          # nom | prenom | nationalite | nb_mcr | nb_rcr | nb_total
+    tri: str = "nom",          # id | nom | prenom | nationalite | nb_mcr | nb_rcr | nb_total
     asc: int = 1,              # 1 = ascendant, 0 = descendant
     regles: str = "tous",      # tous | MCR | RCR
     q: str = "",               # recherche textuelle
@@ -53,6 +53,7 @@ def liste_joueurs(
         qr = qr.filter((Joueur.nom.ilike(like)) | (Joueur.prenom.ilike(like)) | (Joueur.id.ilike(like)))
 
     col_map = {
+        "id":          Joueur.id,
         "nom":         Joueur.nom,
         "prenom":      Joueur.prenom,
         "nationalite": Joueur.nationalite,

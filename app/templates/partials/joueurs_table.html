@@ -2,27 +2,42 @@
    Variables requises :
      joueurs        — liste de {joueur: Joueur, nb_mcr, nb_rcr, nb_total}
    Variables optionnelles (pour en-têtes triables) :
-     tri            — colonne active : nom|prenom|nationalite|nb_mcr|nb_rcr|nb_total
-     sort_url_base  — base de l'URL pour le tri, ex: "?regles=tous&q=" (on y ajoute &tri=xxx)
+     tri            — colonne active : id|nationalite|nom|prenom|nb_mcr|nb_rcr|nb_total
+     asc            — int 1=asc 0=desc
+     sort_url_base  — base URL pour le tri (on y ajoute &tri=xxx&asc=x)
 #}
 {% set _sortable = sort_url_base is defined and sort_url_base %}
 {% set _asc = asc if asc is defined else 1 %}
+
 {% macro th_sort(col, label, cls='') %}
   {% if _sortable %}
-  {% set _active = (tri == col) %}
-  {% set _next_asc = (0 if _active and _asc else 1) %}
-  <th class="sortable-th {{ cls }}" title="Trier par {{ label }}">
-    <a href="{{ sort_url_base }}&tri={{ col }}&asc={{ _next_asc }}" class="th-sort-link">
-      {{ label }}
-      {% if _active %}
-        <span class="sort-arrow">{{ '▲' if _asc else '▼' }}</span>
-      {% else %}
-        <span class="sort-arrow dim">⇅</span>
-      {% endif %}
-    </a>
-  </th>
+    {% set _active = (tri == col) %}
+    {% set _next   = (0 if _active and _asc else 1) %}
+    <th class="sortable-th {{ cls }}">
+      <a href="{{ sort_url_base }}&tri={{ col }}&asc={{ _next }}" class="th-sort-link">
+        {{ label }}
+        {% if _active %}<span class="sort-arrow">{{ '▲' if _asc else '▼' }}</span>
+        {% else %}<span class="sort-arrow dim">⇅</span>{% endif %}
+      </a>
+    </th>
   {% else %}
   <th class="{{ cls }}">{{ label }}</th>
+  {% endif %}
+{% endmacro %}
+
+{% macro th_sort_badge(col, badge_class, cls='') %}
+  {% if _sortable %}
+    {% set _active = (tri == col) %}
+    {% set _next   = (0 if _active and _asc else 1) %}
+    <th class="sortable-th {{ cls }}">
+      <a href="{{ sort_url_base }}&tri={{ col }}&asc={{ _next }}" class="th-sort-link">
+        <span class="badge {{ badge_class }}">{{ col | upper | replace('NB_','') }}</span>
+        {% if _active %}<span class="sort-arrow">{{ '▲' if _asc else '▼' }}</span>
+        {% else %}<span class="sort-arrow dim">⇅</span>{% endif %}
+      </a>
+    </th>
+  {% else %}
+  <th class="{{ cls }}"><span class="badge {{ badge_class }}">{{ col | upper | replace('NB_','') }}</span></th>
   {% endif %}
 {% endmacro %}
 
@@ -39,13 +54,13 @@
   </colgroup>
   <thead>
     <tr>
-      <th>EMA ID</th>
-      {{ th_sort('nationalite', '🌍', 'center') }}
-      {{ th_sort('nom', 'Nom') }}
-      {{ th_sort('prenom', 'Prénom') }}
-      <th class="center">{% if _sortable %}{% set _na = (0 if tri=='nb_mcr' and _asc else 1) %}<a href="{{ sort_url_base }}&tri=nb_mcr&asc={{ _na }}" class="th-sort-link"><span class="badge badge-mcr">MCR</span>{% if tri=='nb_mcr' %}<span class="sort-arrow">{{ '▲' if _asc else '▼' }}</span>{% else %}<span class="sort-arrow dim">⇅</span>{% endif %}</a>{% else %}<span class="badge badge-mcr">MCR</span>{% endif %}</th>
-      <th class="center">{% if _sortable %}{% set _na = (0 if tri=='nb_rcr' and _asc else 1) %}<a href="{{ sort_url_base }}&tri=nb_rcr&asc={{ _na }}" class="th-sort-link"><span class="badge badge-rcr">RCR</span>{% if tri=='nb_rcr' %}<span class="sort-arrow">{{ '▲' if _asc else '▼' }}</span>{% else %}<span class="sort-arrow dim">⇅</span>{% endif %}</a>{% else %}<span class="badge badge-rcr">RCR</span>{% endif %}</th>
-      {{ th_sort('nb_total', 'Total', 'center') }}
+      {{ th_sort('id',          'EMA ID') }}
+      {{ th_sort('nationalite', '🌍',    'center') }}
+      {{ th_sort('nom',         'Nom') }}
+      {{ th_sort('prenom',      'Prénom') }}
+      {{ th_sort_badge('nb_mcr', 'badge-mcr', 'center') }}
+      {{ th_sort_badge('nb_rcr', 'badge-rcr', 'center') }}
+      {{ th_sort('nb_total',    'Total',  'center') }}
     </tr>
   </thead>
   <tbody>
