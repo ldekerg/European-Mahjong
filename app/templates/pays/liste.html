@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="ranking-header">
+  <h1>🌍 Pays</h1>
+</div>
+
+<!-- Stats globales -->
+<div class="stats-grid" style="margin-bottom:1.25rem">
+  <div class="stat-card">
+    <div class="stat-label">Joueurs enregistrés</div>
+    <div class="stat-value">{{ stats.nb_joueurs }}</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Pays représentés</div>
+    <div class="stat-value">{{ stats.nb_pays }}</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Classés actuellement</div>
+    <div class="stat-value">
+      <span class="badge badge-mcr">MCR</span> {{ stats.classes_mcr }}
+      <span style="margin-left:0.4rem"><span class="badge badge-rcr">RCR</span> {{ stats.classes_rcr }}</span>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Tournois joués</div>
+    <div class="stat-value">
+      <span class="badge badge-mcr">MCR</span> {{ stats.nb_tournois_mcr }}
+      <span style="margin-left:0.4rem"><span class="badge badge-rcr">RCR</span> {{ stats.nb_tournois_rcr }}</span>
+    </div>
+  </div>
+</div>
+
+<!-- Graphique évolution — MCR + RCR global -->
+{% with chart_id='chart-joueurs-liste' %}
+{% include 'partials/joueurs_actifs_chart.html' %}
+{% endwith %}
+
+<!-- Onglets principaux -->
+<div class="tabs" id="main-tabs">
+  <button class="tab-btn {% if onglet != 'classement' %}active{% endif %}" onclick="showMainTab('liste', this)">🌍 Tous les pays</button>
+  <button class="tab-btn {% if onglet == 'classement' %}active{% endif %}" onclick="showMainTab('classement', this)">📊 Classement équipes</button>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     ONGLET CLASSEMENT ÉQUIPES
+     ══════════════════════════════════════════════════════════════════════ -->
+<div id="tab-classement" class="tab-content {% if onglet != 'classement' %}hidden{% endif %}">
+  <div class="ranking-header" style="padding-top:0.5rem">
+    {% with base_url='/pays/', qs_extra='&onglet=classement' %}
+    {% include 'partials/week_picker.html' %}
+    {% endwith %}
+  </div>
+  <p class="dim" style="margin:0.25rem 0 0.75rem;font-size:0.85rem">
+    Score équipe = moyenne des 3 meilleurs joueurs classés (0 si moins de 3 joueurs)
+  </p>
+
+  <!-- Sous-onglets MCR / RCR -->
+  <div class="tabs" id="cl-tabs">
+    <button class="tab-btn active" onclick="showClTab('mcr', this)"><span class="badge badge-mcr">MCR</span></button>
+    <button class="tab-btn"       onclick="showClTab('rcr', this)"><span class="badge badge-rcr">RCR</span></button>
+  </div>
+
+  {% for regles_key, equipes in [('mcr', equipes_mcr), ('rcr', equipes_rcr)] %}
+  <div id="cl-tab-{{ regles_key }}" class="tab-content {% if regles_key != 'mcr' %}hidden{% endif %}">
+    <div class="scroll-table">
+    <table style="table-layout:fixed;width:100%">
+      <colgroup>
+        <col style="width:2.8rem">
+        <col style="width:2rem">
+        <col style="width:10rem">
+        <col style="width:5.5rem">
+        <col><col><col>
+      </colgroup>
+      <thead>
+        <tr>
+          <th class="th-rank">#</th>
+          <th></th>
+          <th>Pays</th>
+          <th class="right" title="Moyenne top 3">Score</th>
+          <th class="center">🥇 Joueur</th>
+          <th class="center">🥈 Joueur</th>
+          <th class="center">🥉 Joueur</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for e in equipes %}
+        <tr class="{% if e.rang <= 3 %}row-top{{ e.rang }}{% endif %}">
+          <td class="td-rank">
+            {% if e.rang == 1 %}🥇{% elif e.rang == 2 %}🥈{% elif e.rang == 3 %}🥉
+            {% else %}<span class="rank-num">{{ e.rang }}</span>{% endif %}
+          </td>
+          <td class="center" style="font-size:1.2rem">{{ e.code | flag }}</td>
+          <td><a href="/pays/{{ e.code }}">{{ e.nom }}</a></td>
+          <td class="right score-val">{{ e.score_equipe }}</td>
+          {% for i in range(3) %}
+          {% if i < e.top3 | length %}{% set j = e.top3[i] %}
+          <td class="center" style="font-size:0.82rem">
+            <a href="/joueurs/{{ j.joueur_id }}" title="#{{ j.position }} mondial · {{ j.score }} pts">
+              {{ j.prenom | prenom }} {{ j.nom | title }}
+            </a>
+            <span class="dim" style="display:block;font-size:0.75rem">#{{ j.position }} · {{ j.score }}</span>
+          </td>
+          {% else %}
+          <td class="center dim">—</td>
+          {% endif %}
+          {% endfor %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     ONGLET LISTE PAYS
+     ══════════════════════════════════════════════════════════════════════ -->
+<div id="tab-liste" class="tab-content {% if onglet == 'classement' %}hidden{% endif %}">
+  <div class="scroll-table">
+  <table style="table-layout:fixed;width:100%">
+    <colgroup>
+      <col style="width:2.5rem">
+      <col style="width:12rem">
+      <col style="width:7rem">
+      <col style="width:6rem">
+    </colgroup>
+    <thead>
+      <tr>
+        <th class="center">🌍</th>
+        <th>Pays</th>
+        <th class="center" title="Joueurs actifs / all-time">Joueurs</th>
+        <th class="center">Tournois org.</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in pays_list %}
+      <tr>
+        <td class="center" style="font-size:1.3rem">{{ p.code | flag }}</td>
+        <td><a href="/pays/{{ p.code }}">{{ p.nom }}</a></td>
+        <td class="center">
+          <span class="rank-num">{{ p.nb_actifs }}</span>
+          <span class="dim" style="font-size:0.8rem"> / {{ p.nb_joueurs }}</span>
+        </td>
+        <td class="center {% if p.nb_tournois %}rank-num{% else %}dim{% endif %}">
+          {{ p.nb_tournois or '—' }}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<script>
+function showClTab(name, btn) {
+  ['mcr','rcr'].forEach(function(r) {
+    document.getElementById('cl-tab-' + r).classList.add('hidden');
+  });
+  document.querySelectorAll('#cl-tabs .tab-btn').forEach(function(b) { b.classList.remove('active'); });
+  document.getElementById('cl-tab-' + name).classList.remove('hidden');
+  btn.classList.add('active');
+}
+
+function showMainTab(name, btn) {
+  ['classement', 'liste'].forEach(function(t) {
+    document.getElementById('tab-' + t).classList.add('hidden');
+  });
+  document.querySelectorAll('#main-tabs .tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.remove('hidden');
+  btn.classList.add('active');
+  // Mettre à jour le paramètre onglet dans l'URL sans rechargement
+  var url = new URL(window.location.href);
+  if (name === 'liste') {
+    url.searchParams.delete('onglet');
+  } else {
+    url.searchParams.set('onglet', name);
+  }
+  history.replaceState(null, '', url.toString());
+}
+</script>
+
+{% endblock %}

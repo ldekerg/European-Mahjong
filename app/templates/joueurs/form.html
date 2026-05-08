@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{% if joueur %}Modifier le joueur{% else %}Nouveau joueur{% endif %}</h1>
+<form method="post">
+    {% if not joueur %}
+    <label>EMA Number
+        <input type="text" name="id" required placeholder="ex: 04290031">
+    </label>
+    {% endif %}
+    <label>Nom
+        <input type="text" name="nom" required value="{{ joueur.nom if joueur else '' }}">
+    </label>
+    <label>Prénom
+        <input type="text" name="prenom" required value="{{ joueur.prenom if joueur else '' }}">
+    </label>
+    <label>Nationalité (code pays)
+        <input type="text" name="nationalite" required maxlength="3" value="{{ joueur.nationalite if joueur else '' }}" placeholder="ex: FR">
+    </label>
+    <button type="submit">Enregistrer</button>
+    <a href="/joueurs/">Annuler</a>
+</form>
+{% endblock %}

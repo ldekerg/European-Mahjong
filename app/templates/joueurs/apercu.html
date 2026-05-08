@@ -1,0 +1,19 @@
+{% if not joueur %}
+<p class="empty">← Clique sur un joueur</p>
+{% else %}
+<div class="apercu-header">
+  <div class="apercu-name">{{ joueur.prenom | prenom }} {{ joueur.nom | title }}</div>
+  <div class="apercu-meta">
+    {{ joueur.nationalite | flag }} {{ joueur.nationalite }}
+    {% if joueur.statut != 'europeen' %}<span class="statut statut-{{ joueur.statut }}">{{ joueur.statut }}</span>{% endif %}
+  </div>
+  <div class="apercu-id">{{ joueur.id }}</div>
+</div>
+
+{% include 'partials/apercu_discipline_cards.html' %}
+
+{% set data = mcr if regles == 'MCR' else rcr %}
+{% include 'partials/apercu_snapshot.html' %}
+
+<a href="/joueurs/{{ joueur.id }}" class="btn apercu-link">Voir la fiche complète →</a>
+{% endif %}

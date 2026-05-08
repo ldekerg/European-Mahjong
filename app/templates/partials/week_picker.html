@@ -1,0 +1,61 @@
+{# Navigation semaine (prev/next/dropdown).
+   Variables requises :
+     base_url      — URL de base sans query string (ex: '/' ou '/pays/FR')
+     semaine       — date courante
+     semaine_num   — numéro de la semaine
+     semaine_prev  — isoformat semaine précédente ou None
+     semaine_next  — isoformat semaine suivante ou None
+     semaines_dispo — liste groupées par année
+     aujourd_hui   — date du jour
+   Variable optionnelle :
+     qs_extra — query string supplémentaire à ajouter après semaine= (ex: '&regles=MCR')
+#}
+{% set _qs = qs_extra if qs_extra is defined else '' %}
+<div class="date-nav">
+  <a href="{{ base_url }}{{ _qs | replace('&', '?', 1) }}" class="nav-arrow nav-today">
+    ⟳ {{ aujourd_hui.strftime('%d/%m/%Y') }}
+  </a>
+
+  {% if semaine_prev %}
+  <a href="{{ base_url }}?semaine={{ semaine_prev }}{{ _qs }}" class="nav-arrow">◀</a>
+  {% else %}
+  <span class="nav-arrow disabled">◀</span>
+  {% endif %}
+
+  <div class="week-picker" id="week-picker">
+    <button type="button" class="week-current" onclick="togglePicker()">
+      #{{ semaine_num }} — {{ semaine.strftime('%d/%m/%Y') }} ▾
+    </button>
+    <div class="week-dropdown" id="week-dropdown" style="display:none">
+      {% for grp in semaines_dispo %}
+      <div class="week-group">
+        <div class="week-group-label">{{ grp.annee }}</div>
+        {% for s in grp.semaines %}
+        <a class="week-option {% if s.date == semaine %}active{% endif %}"
+           href="{{ base_url }}?semaine={{ s.date.isoformat() }}{{ _qs }}">
+          #{{ s.num }} — {{ s.date.strftime('%d/%m/%Y') }}
+        </a>
+        {% endfor %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  {% if semaine_next %}
+  <a href="{{ base_url }}?semaine={{ semaine_next }}{{ _qs }}" class="nav-arrow">▶</a>
+  {% else %}
+  <span class="nav-arrow disabled">▶</span>
+  {% endif %}
+</div>
+
+<script>
+function togglePicker() {
+  var d = document.getElementById('week-dropdown');
+  d.style.display = d.style.display === 'none' ? 'block' : 'none';
+}
+document.addEventListener('click', function(e) {
+  var wp = document.getElementById('week-picker');
+  if (wp && !wp.contains(e.target))
+    document.getElementById('week-dropdown').style.display = 'none';
+});
+</script>

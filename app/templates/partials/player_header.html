@@ -1,0 +1,15 @@
+{# En-tête d'un joueur : ID, nom complet, nationalité, statut.
+   Variables requises :
+     joueur — objet Joueur (id, prenom, nom, nationalite, statut)
+   Variable optionnelle :
+     show_edit — bool (défaut false) : affiche le bouton Modifier
+#}
+<div class="player-header">
+  <div class="player-id">{{ joueur.id }}</div>
+  <div class="player-name">{{ joueur.prenom | prenom }} {{ joueur.nom | title }}</div>
+  <div class="player-meta">
+    <span class="flag">{{ joueur.nationalite | flag }} {{ joueur.nationalite }}</span>
+    {% if joueur.statut != 'europeen' %}<span class="statut statut-{{ joueur.statut }}">{{ joueur.statut }}</span>{% endif %}
+    {% if show_edit %}<a href="/joueurs/{{ joueur.id }}/modifier" class="btn-sm">Modifier</a>{% endif %}
+  </div>
+</div>

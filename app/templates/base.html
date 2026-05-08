@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EMA Ranking</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3/dist/chartjs-plugin-annotation.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+
+    <script>
+      (function() {
+        if (localStorage.getItem('theme') === 'dark')
+          document.documentElement.setAttribute('data-theme', 'dark');
+      })();
+    </script>
+</head>
+<body>
+    <nav>
+        <a href="/">EMA Ranking</a>
+        <a href="/">Classement</a>
+        <a href="/joueurs/">Joueurs</a>
+        <a href="/pays/">Pays</a>
+        <a href="/tournois/">Tournois</a>
+        <a href="/hallfame/">Hall of Fame</a>
+        <button class="theme-toggle" onclick="toggleTheme()" title="Dark mode">🌙</button>
+    </nav>
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    <script>
+    function toggleTheme() {
+        var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+        document.documentElement.setAttribute('data-theme', dark ? '' : 'dark');
+        localStorage.setItem('theme', dark ? 'light' : 'dark');
+        document.querySelector('.theme-toggle').textContent = dark ? '🌙' : '☀️';
+        _refreshAllCharts();
+    }
+
+    function _refreshAllCharts() {
+        // Relit les variables CSS et met à jour tous les charts enregistrés
+        var style = getComputedStyle(document.documentElement);
+        function cv(name) { return style.getPropertyValue(name).trim(); }
+
+        function refreshChartJS(chart) {
+            if (!chart) return;
+            var textColor = cv('--text2')       || '#666';
+            var gridColor = cv('--chart-grid')  || 'rgba(0,0,0,0.07)';
+            // Axes
+            ['x','yPos','yScore','y'].forEach(function(axisId) {
+                var ax = chart.options.scales[axisId];
+                if (!ax) return;
+                if (ax.ticks)  ax.ticks.color  = textColor;
+                if (ax.grid)   ax.grid.color   = gridColor;
+                if (ax.title)  ax.title.color  = textColor;
+            });
+            // Légende
+            if (chart.options.plugins && chart.options.plugins.legend)
+                chart.options.plugins.legend.labels.color = textColor;
+            // Couleurs cssColor dans les datasets
+            chart.data.datasets.forEach(function(ds) {
+                if (ds._cssColor) ds.borderColor = cv(ds._cssColor);
+            });
+            chart.update('none');
+        }
+
+        // Charts joueurs actifs (joueurs_actifs_chart.html)
+        var reg = window._JOUEURS_CHARTS;
+        if (reg) Object.keys(reg).forEach(function(id) { refreshChartJS(reg[id]); });
+
+        // Charts évolution joueur (joueurs/detail.html)
+        var charts = window.CHARTS;
+        if (charts) Object.keys(charts).forEach(function(id) { refreshChartJS(charts[id]); });
+    }
+    if (localStorage.getItem('theme') === 'dark')
+        document.querySelector('.theme-toggle').textContent = '☀️';
+
+    function updateStickyOffsets() {
+        var root = document.documentElement;
+        var off = 0;
+
+        // 1. nav
+        var nav = document.querySelector('nav');
+        if (nav) off += nav.offsetHeight;
+
+        // --sticky-header-top : .ranking-header et .player-header top-level
+        root.style.setProperty('--sticky-header-top', off + 'px');
+
+        // 2. .ranking-header et .player-header hors onglet
+        document.querySelectorAll('.ranking-header, .player-header').forEach(function(el) {
+            if (!el.closest('.tab-content')) off += el.offsetHeight;
+        });
+
+        // --sticky-tabs-top : .tabs top-level
+        root.style.setProperty('--sticky-tabs-top', off + 'px');
+
+        // 3. .tabs hors onglet
+        document.querySelectorAll('.tabs').forEach(function(el) {
+            if (!el.closest('.tab-content')) off += el.offsetHeight;
+        });
+
+        // --sticky-inner-top : .ranking-header dans un onglet (week picker)
+        root.style.setProperty('--sticky-inner-top', off + 'px');
+
+        // 4. .ranking-header de niveau 1 dans un onglet
+        document.querySelectorAll('.tab-content .ranking-header').forEach(function(el) {
+            if (!el.closest('.tab-content .tab-content')) off += el.offsetHeight;
+        });
+
+        // --sticky-inner2-top : .tabs dans un onglet (MCR/RCR)
+        root.style.setProperty('--sticky-inner2-top', off + 'px');
+    }
+
+    document.addEventListener('DOMContentLoaded', updateStickyOffsets);
+    window.addEventListener('resize', updateStickyOffsets);
+    </script>
+</body>
+</html>

@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!-- ── En-tête pays ─────────────────────────────────────────────────────── -->
+<div class="ranking-header">
+  <h1 style="display:flex;align-items:center;gap:0.5rem">
+    <span style="font-size:2rem">{{ code | flag }}</span>
+    {{ nom_pays }}
+  </h1>
+</div>
+
+<!-- ── Stats fixes ──────────────────────────────────────────────────────── -->
+<div class="stats-grid" style="margin-bottom:1.25rem">
+  <div class="stat-card">
+    <div class="stat-label">Joueurs</div>
+    <div class="stat-value">{{ nb_joueurs }}</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Classés MCR</div>
+    <div class="stat-value">
+      {{ nb_classes_mcr }}
+      {% if meilleur_actuel_mcr %}<span class="stat-sub">meilleur #{{ meilleur_actuel_mcr }}</span>{% endif %}
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Classés RCR</div>
+    <div class="stat-value">
+      {{ nb_classes_rcr }}
+      {% if meilleur_actuel_rcr %}<span class="stat-sub">meilleur #{{ meilleur_actuel_rcr }}</span>{% endif %}
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Tournois organisés</div>
+    <div class="stat-value">{{ nb_tournois_org }}</div>
+  </div>
+</div>
+
+<!-- Graphique évolution joueurs actifs -->
+{% with chart_id='chart-joueurs-detail' %}
+{% include 'partials/joueurs_actifs_chart.html' %}
+{% endwith %}
+
+<!-- ── Onglets principaux ────────────────────────────────────────────────── -->
+<div class="tabs" id="main-tabs">
+  <button class="tab-btn active"  onclick="showMainTab('classement', this)">📊 Classement</button>
+  <button class="tab-btn"        onclick="showMainTab('tournois', this)">🏟 Tournois</button>
+  <button class="tab-btn"        onclick="showMainTab('joueurs', this)">👥 Joueurs</button>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     ONGLET CLASSEMENT
+     ══════════════════════════════════════════════════════════════════════ -->
+<div id="tab-classement" class="tab-content">
+
+  <div class="ranking-header" style="padding-top:0.5rem">
+    {% with base_url='/pays/' + code, qs_extra='&regles=' + onglet_actif %}
+    {% include 'partials/week_picker.html' %}
+    {% endwith %}
+  </div>
+
+  <!-- Sous-onglets MCR / RCR -->
+  <div class="tabs">
+    <button class="tab-btn {% if onglet_actif == 'MCR' %}active{% endif %}" onclick="showTab('mcr', this)"><span class="badge badge-mcr">MCR</span> ({{ mcr | length }})</button>
+    <button class="tab-btn {% if onglet_actif == 'RCR' %}active{% endif %}" onclick="showTab('rcr', this)"><span class="badge badge-rcr">RCR</span> ({{ rcr | length }})</button>
+  </div>
+
+  <div class="ranking-layout">
+    <div class="ranking-left">
+      {% for regles_key, data in [('mcr', mcr), ('rcr', rcr)] %}
+      <div id="tab-{{ regles_key }}" class="tab-content {% if onglet_actif|lower != regles_key %}hidden{% endif %}">
+        {% with ranking_data=data, show_apercu=true, show_rang_national=true, rang_national_flag=code %}
+        {% include 'partials/ranking_table.html' %}
+        {% endwith %}
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="ranking-right" id="apercu-panel">
+      <p class="empty">← Clique sur un joueur</p>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     ONGLET TOURNOIS
+     ══════════════════════════════════════════════════════════════════════ -->
+<div id="tab-tournois" class="tab-content hidden">
+  <div class="t-layout">
+    <div class="t-left">
+      {% include 'partials/tournois_table.html' %}
+    </div>
+    <div class="t-right">
+      {% include 'partials/tournois_carte.html' %}
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     ONGLET JOUEURS
+     ══════════════════════════════════════════════════════════════════════ -->
+<div id="tab-joueurs" class="tab-content hidden">
+  {% include 'partials/joueurs_table.html' %}
+</div>
+
+
+<!-- ── Scripts ──────────────────────────────────────────────────────────── -->
+<script>
+// Onglets principaux (Classement / Tournois / Joueurs)
+function showMainTab(name, btn) {
+  document.querySelectorAll('#main-tabs + .tab-content, #main-tabs ~ .tab-content')
+    .forEach(el => el.classList.add('hidden'));
+  document.querySelectorAll('#main-tabs .tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.remove('hidden');
+  btn.classList.add('active');
+}
+
+// Sous-onglets MCR / RCR dans l'onglet Classement
+var _activeRow = null;
+var _joueurDefautMCR = '{{ joueur_defaut_mcr or "" }}';
+var _joueurDefautRCR = '{{ joueur_defaut_rcr or "" }}';
+var _joueurPersiste  = '';
+
+function fetchApercu(joueurId, regles) {
+  var panel = document.getElementById('apercu-panel');
+  panel.innerHTML = '<p class="empty">Chargement…</p>';
+  var semaine = '{{ semaine.isoformat() }}';
+  var r = regles || document.querySelector('#tab-classement .tab-btn.active').textContent.trim().split(' ')[0];
+  fetch('/joueurs/' + joueurId + '/apercu?semaine=' + semaine + '&regles=' + r)
+    .then(function(res){ return res.text(); })
+    .then(function(html){ panel.innerHTML = html; })
+    .catch(function(){ panel.innerHTML = '<p class="empty">Erreur de chargement.</p>'; });
+}
+
+function loadApercu(joueurId, row) {
+  if (_activeRow === row) {
+    row.classList.remove('row-selected');
+    _activeRow = null;
+    _joueurPersiste = '';
+    var defaut = '{{ onglet_actif }}' === 'RCR' ? _joueurDefautRCR : _joueurDefautMCR;
+    fetchApercu(defaut);
+    return;
+  }
+  if (_activeRow) _activeRow.classList.remove('row-selected');
+  _activeRow = row;
+  row.classList.add('row-selected');
+  _joueurPersiste = joueurId;
+  fetchApercu(joueurId);
+}
+
+function switchRegles(label) {
+  var name = label.toLowerCase();
+  var btns = document.querySelectorAll('#tab-classement .tabs:last-of-type .tab-btn');
+  var btn = null;
+  btns.forEach(function(b) { if (b.textContent.trim().startsWith(label)) btn = b; });
+  if (btn) showTab(name, btn);
+}
+
+function showTab(name, btn) {
+  ['mcr','rcr'].forEach(function(r) {
+    var el = document.getElementById('tab-' + r);
+    if (el) el.classList.add('hidden');
+  });
+  document.querySelectorAll('#tab-classement .tabs .tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.remove('hidden');
+  btn.classList.add('active');
+  // Mettre à jour regles dans tous les liens de navigation semaine
+  var reglesUp = name.toUpperCase();
+  document.querySelectorAll('.date-nav a[href], .week-option').forEach(function(a) {
+    try {
+      var url = new URL(a.href, window.location.origin);
+      url.searchParams.set('regles', reglesUp);
+      a.href = url.toString();
+    } catch(e) {}
+  });
+  var defaut = name === 'mcr' ? _joueurDefautMCR : _joueurDefautRCR;
+  var joueurId = _joueurPersiste || defaut;
+  if (joueurId) fetchApercu(joueurId, name.toUpperCase());
+}
+
+window.addEventListener('DOMContentLoaded', function() {
+  var defaut = '{{ onglet_actif }}' === 'RCR' ? _joueurDefautRCR : _joueurDefautMCR;
+  if (defaut) fetchApercu(defaut, '{{ onglet_actif }}');
+});
+</script>
+
+{% endblock %}

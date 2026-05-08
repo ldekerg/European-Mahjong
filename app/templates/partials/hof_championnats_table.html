@@ -1,0 +1,39 @@
+{# Tableau Hall of Fame — résultats OEMC/WMC/OERC/WRC.
+   Variables requises :
+     championnats — liste de (Resultat, Tournoi, Joueur)
+#}
+<div class="scroll-table">
+<table style="table-layout:fixed;width:100%">
+  <colgroup>
+    <col style="width:14rem"><col style="width:2.5rem"><col style="width:2rem">
+    <col><col style="width:5rem"><col style="width:3.5rem">
+  </colgroup>
+  <thead>
+    <tr>
+      <th>Tournoi</th><th class="center">🏅</th><th class="center">🌍</th>
+      <th>Joueur</th><th>Date</th><th class="center">EMA</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for r, t, j in championnats %}
+    <tr class="{% if t.type_tournoi in ['wmc','wrc'] %}row-wmc{% else %}row-oemc{% endif %}">
+      <td class="nowrap">
+        <a href="/tournois/{{ t.regles }}_{{ t.ema_id }}">{{ t.nom[:28] }}</a>
+        {% if t.type_tournoi in ['wmc','wrc'] %}<span class="badge badge-gold">WMC</span>
+        {% else %}<span class="badge">OEMC</span>{% endif %}
+      </td>
+      <td class="td-pos">
+        <span class="pos-medal">{% if r.position == 1 %}🥇{% elif r.position == 2 %}🥈{% elif r.position == 3 %}🥉{% endif %}</span>
+        <span class="pos-score">{{ r.position }}</span>
+      </td>
+      <td class="center">{{ j.nationalite | flag }}</td>
+      <td><a href="/joueurs/{{ j.id }}">{{ j.prenom | prenom }} {{ j.nom | title }}</a></td>
+      <td class="dim nowrap">{{ t.date_debut.strftime('%d/%m/%Y') if t.date_debut.year != 1900 else '—' }}</td>
+      <td class="right ema-pts" style="{{ r.ranking | ema_color }}">{{ r.ranking }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="6" class="empty">Aucun résultat.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>

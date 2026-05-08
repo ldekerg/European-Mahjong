@@ -1,0 +1,31 @@
+{# Cartes MCR/RCR cliquables dans le panneau aperçu joueur.
+   Variables requises :
+     joueur — objet Joueur
+     mcr    — dict {rang, nb_actifs, nb_total, meilleur}
+     rcr    — dict {rang, nb_actifs, nb_total, meilleur}
+     regles — discipline active ('MCR' ou 'RCR')
+   Dépendance JS : switchRegles() défini dans accueil.html
+#}
+<div class="apercu-stats">
+  {% for label, data in [('MCR', mcr), ('RCR', rcr)] %}
+  <div class="apercu-discipline {% if label == regles %}apercu-active{% endif %} apercu-discipline-btn"
+       onclick="switchRegles('{{ label }}')"
+       title="Afficher le classement {{ label }}">
+    <div class="apercu-disc-label">{{ label }}</div>
+    {% if data.rang %}
+    <div class="apercu-rank">#{{ data.rang.position }}</div>
+    <div class="apercu-score">{{ data.rang.score | round(2) }}</div>
+    {% else %}
+    <div class="apercu-rank dim">—</div>
+    {% endif %}
+    <div class="apercu-nbt">{{ data.nb_actifs }} actifs · {{ data.nb_total }} total</div>
+    {% if data.meilleur %}
+    <a class="apercu-best" href="/?semaine={{ data.meilleur.semaine.isoformat() }}&joueur={{ joueur.id }}&regles={{ label }}"
+       title="Voir le classement à cette date">
+      🏆 #{{ data.meilleur.position }}
+      <span class="apercu-best-date">{{ data.meilleur.semaine.strftime('%d/%m/%Y') }}</span>
+    </a>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>

@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="ranking-header">
+  <h1>EMA Ranking</h1>
+  <div class="date-nav">
+    <a href="/{% if joueur_selectionne %}?joueur={{ joueur_selectionne }}{% endif %}" class="nav-arrow nav-today">
+      ⟳ {{ aujourd_hui.strftime('%d/%m/%Y') }}
+    </a>
+
+    {% if semaine_prev %}
+    <a href="/?semaine={{ semaine_prev }}{% if joueur_selectionne %}&joueur={{ joueur_selectionne }}{% endif %}&regles={{ onglet_actif }}" class="nav-arrow">◀</a>
+    {% else %}
+    <span class="nav-arrow disabled">◀</span>
+    {% endif %}
+
+    <div class="week-picker" id="week-picker">
+      <button type="button" class="week-current" onclick="togglePicker()">
+        #{{ semaine_num }} — {{ semaine.strftime('%d/%m/%Y') }} ▾
+      </button>
+      <div class="week-dropdown" id="week-dropdown" style="display:none">
+        {% for grp in semaines_dispo %}
+        <div class="week-group">
+          <div class="week-group-label">{{ grp.annee }}</div>
+          {% for s in grp.semaines %}
+          <a class="week-option {% if s.date == semaine %}active{% endif %}"
+             href="/?semaine={{ s.date.isoformat() }}{% if joueur_selectionne %}&joueur={{ joueur_selectionne }}{% endif %}&regles={{ onglet_actif }}">
+            #{{ s.num }} — {{ s.date.strftime('%d/%m/%Y') }}
+          </a>
+          {% endfor %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    {% if semaine_next %}
+    <a href="/?semaine={{ semaine_next }}{% if joueur_selectionne %}&joueur={{ joueur_selectionne }}{% endif %}&regles={{ onglet_actif }}" class="nav-arrow">▶</a>
+    {% else %}
+    <span class="nav-arrow disabled">▶</span>
+    {% endif %}
+  </div>
+
+  <script>
+  function togglePicker() {
+    var d = document.getElementById('week-dropdown');
+    d.style.display = d.style.display === 'none' ? 'block' : 'none';
+  }
+  document.addEventListener('click', function(e) {
+    if (!document.getElementById('week-picker').contains(e.target))
+      document.getElementById('week-dropdown').style.display = 'none';
+  });
+
+  var _activeRow = null;
+  var _joueurPersiste  = '{{ joueur_selectionne or "" }}';
+  var _joueurDefaut    = '{{ joueur_defaut or "" }}';
+  var _joueurDefautMCR = '{{ joueur_defaut_mcr or "" }}';
+  var _joueurDefautRCR = '{{ joueur_defaut_rcr or "" }}';
+
+  function fetchApercu(joueurId, regles) {
+    var panel = document.getElementById('apercu-panel');
+    panel.innerHTML = '<p class="empty">Chargement…</p>';
+    var semaine = '{{ semaine.isoformat() }}';
+    var r = regles || document.querySelector('.tab-btn.active').textContent.trim().split(' ')[0];
+    fetch('/joueurs/' + joueurId + '/apercu?semaine=' + semaine + '&regles=' + r)
+      .then(function(res){ return res.text(); })
+      .then(function(html){ panel.innerHTML = html; })
+      .catch(function(){ panel.innerHTML = '<p class="empty">Erreur de chargement.</p>'; });
+  }
+
+  function loadApercu(joueurId, row) {
+    if (_activeRow === row) {
+      // Déselection : retirer le highlight, revenir au joueur #1 sans persistance
+      row.classList.remove('row-selected');
+      _activeRow = null;
+      _joueurPersiste = '';
+      document.querySelectorAll('a[href*="semaine="]').forEach(function(a) {
+        var url = new URL(a.href, window.location.origin);
+        url.searchParams.delete('joueur');
+        a.href = url.toString();
+      });
+      fetchApercu(_joueurDefaut);
+      return;
+    }
+    // Sélection : highlight + persistance dans l'URL
+    if (_activeRow) _activeRow.classList.remove('row-selected');
+    _activeRow = row;
+    row.classList.add('row-selected');
+    _joueurPersiste = joueurId;
+    document.querySelectorAll('a[href*="semaine="]').forEach(function(a) {
+      var url = new URL(a.href, window.location.origin);
+      url.searchParams.set('joueur', joueurId);
+      a.href = url.toString();
+    });
+    fetchApercu(joueurId);
+  }
+
+  window.addEventListener('DOMContentLoaded', function() {
+    if (_joueurPersiste) {
+      // Joueur persisté : highlight + chargement
+      var regles = document.querySelector('.tab-btn.active').textContent.trim().split(' ')[0].toLowerCase();
+      var row = document.querySelector('#tab-' + regles + ' .ranking-row[data-joueur="' + _joueurPersiste + '"]');
+      if (row) {
+        if (_activeRow) _activeRow.classList.remove('row-selected');
+        _activeRow = row;
+        row.classList.add('row-selected');
+        row.scrollIntoView({ block: 'nearest' });
+      }
+      fetchApercu(_joueurPersiste, '{{ onglet_actif }}');
+    } else if (_joueurDefaut) {
+      var defautInit = '{{ onglet_actif }}' === 'RCR' ? _joueurDefautRCR : _joueurDefautMCR;
+      fetchApercu(defautInit || _joueurDefaut, '{{ onglet_actif }}');
+    }
+  });
+  </script>
+</div>
+
+<!-- Onglets -->
+<div class="tabs">
+  <button class="tab-btn {% if onglet_actif == 'MCR' %}active{% endif %}" onclick="showTab('mcr', this)"><span class="badge badge-mcr">MCR</span> ({{ mcr | length }})</button>
+  <button class="tab-btn {% if onglet_actif == 'RCR' %}active{% endif %}" onclick="showTab('rcr', this)"><span class="badge badge-rcr">RCR</span> ({{ rcr | length }})</button>
+</div>
+<div class="ranking-layout">
+  <div class="ranking-left">
+    {% for regles, data in [('mcr', mcr), ('rcr', rcr)] %}
+    <div id="tab-{{ regles }}" class="tab-content {% if onglet_actif|lower != regles %}hidden{% endif %}">
+      {% with ranking_data=data, show_apercu=true %}
+      {% include 'partials/ranking_table.html' %}
+      {% endwith %}
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="ranking-right" id="apercu-panel">
+    <p class="empty">← Clique sur un joueur</p>
+  </div>
+</div>
+
+<script>
+function switchRegles(label) {
+  var name = label.toLowerCase();
+  var btns = document.querySelectorAll('.tab-btn');
+  var btn = null;
+  btns.forEach(function(b) {
+    if (b.textContent.trim().startsWith(label)) btn = b;
+  });
+  if (btn) showTab(name, btn);
+}
+
+function showTab(name, btn) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.remove('hidden');
+  btn.classList.add('active');
+  // Mettre à jour regles dans tous les liens de navigation
+  var reglesUp = name.toUpperCase();
+  document.querySelectorAll('a[href*="semaine="], a[href*="regles="], .nav-arrow[href], .nav-today[href]').forEach(function(a) {
+    var url = new URL(a.href, window.location.origin);
+    if (url.pathname === '/') {
+      url.searchParams.set('regles', reglesUp);
+      a.href = url.toString();
+    }
+  });
+  // Recharger l'aperçu avec la bonne discipline
+  var reglesUp = name.toUpperCase();
+  var defaut = name === 'mcr' ? _joueurDefautMCR : _joueurDefautRCR;
+  var joueurId = _joueurPersiste || defaut;
+  if (joueurId) fetchApercu(joueurId, reglesUp);
+}
+</script>
+{% endblock %}

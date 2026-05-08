@@ -1,0 +1,367 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!-- Infos joueur -->
+{% with show_edit=true %}
+{% include 'partials/player_header.html' %}
+{% endwith %}
+
+{% if changements_nat %}
+<div class="nat-warning">
+  ⚠️ Changement de nationalité détecté :
+  {% for c in changements_nat %}
+    {{ c.nationalite_avant | flag }} {{ c.nationalite_avant }}
+    → {{ c.nationalite_apres | flag }} {{ c.nationalite_apres }}
+    à partir du {{ c.date_changement.strftime('%d/%m/%Y') }}{% if not loop.last %}, {% endif %}
+  {% endfor %}
+</div>
+{% endif %}
+
+<!-- Onglets -->
+<div class="tabs">
+  <button class="tab-btn active" onclick="showTab('mcr', this)"><span class="badge badge-mcr">MCR</span></button>
+  <button class="tab-btn"       onclick="showTab('rcr', this)"><span class="badge badge-rcr">RCR</span></button>
+</div>
+
+{% for regles, data in [('mcr', mcr), ('rcr', rcr)] %}
+<div id="tab-{{ regles }}" class="tab-content {% if regles != 'mcr' %}hidden{% endif %}">
+
+  <!-- Statistiques -->
+  {% include 'partials/stat_cards.html' %}
+
+  <!-- Graphique évolution -->
+  {% if data.historique_chart %}
+  <div class="chart-section">
+    <div class="chart-controls">
+      <span class="chart-title">Évolution du classement</span>
+      <div class="chart-range-btns">
+        <button onclick="setRange('{{ regles }}', 52)"  class="range-btn">1 an</button>
+        <button onclick="setRange('{{ regles }}', 156)" class="range-btn">3 ans</button>
+        <button onclick="setRange('{{ regles }}', 0)"   class="range-btn active">Tout</button>
+      </div>
+    </div>
+    <canvas id="chart-{{ regles }}" height="100"></canvas>
+  </div>
+  {% endif %}
+
+  <!-- Liste des tournois -->
+  {% if data.tournois %}
+  {% set inactifs = data.tournois | selectattr('actif', 'equalto', false) | list %}
+  <div id="ville-badge-{{ regles }}" style="display:none" class="ville-badge">
+    📍 <span id="ville-badge-nom-{{ regles }}"></span>
+    <button onclick="filtreJoueurVille(null,'{{ regles | upper }}',null)" class="ville-badge-close" title="Effacer">✕</button>
+    <a id="ville-badge-link-{{ regles }}" href="#" class="ville-badge-link">Voir tous les tournois de <span></span> →</a>
+  </div>
+  <h2>Tournois {{ regles | upper }}</h2>
+  <div class="scroll-table"><table style="table-layout:fixed;width:100%">
+    <colgroup>
+      <col class="col-date">
+      <col style="width:2rem">     <!-- Durée -->
+      <col class="col-ville">
+      <col>                        <!-- Tournoi -->
+      <col class="col-coeff">
+      <col class="col-contrib">
+      <col class="col-pos" style="width:5.5rem">
+      {% if regles == 'mcr' %}<col style="width:2.8rem">{% endif %}  <!-- Pts MCR uniquement -->
+      <col style="width:3.5rem">   <!-- Score -->
+      <col class="col-ema">
+    </colgroup>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th title="Durée">🗓️</th>
+        <th>Ville</th>
+        <th>Tournoi</th>
+        <th class="center" title="Coefficient MERS">⚖️</th>
+        <th class="center" title="Contribution">⏱️</th>
+        <th class="th-pos" title="Position">🏅</th>
+        {% if regles == 'mcr' %}<th class="right" title="Points tournoi">Pts</th>{% endif %}
+        <th class="right" title="Score {% if regles == 'mcr' %}Mahjong{% else %}classement{% endif %}">#</th>
+        <th class="col-sticky" title="Points EMA">EMA</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for t in data.tournois %}
+      <tr class="t-joueur-row {% if t.actif %}row-actif{% endif %} {% if t.type in ['wmc','wrc'] %}row-wmc{% elif t.type in ['oemc','oerc'] %}row-oemc{% endif %}{% if not t.actif %} row-inactif row-inactif-{{ regles }} hidden{% endif %}"
+          data-ville="{{ t.lieu }}" data-regles="{{ regles | upper }}">
+        <td class="col-date">{{ t.date.strftime('%d/%m/%Y') if t.date.year != 1900 else '—' }}</td>
+        <td class="col-duree center">{{ t.duree }}j</td>
+        <td class="nowrap">
+          {{ t.pays | pays_flag }}
+          <span class="t-ville" onclick="filtreJoueurVille('{{ t.lieu }}', '{{ regles | upper }}', this)">{{ t.lieu }}</span>
+          {% if t.nat_tournoi != joueur.nationalite %}
+          <span title="Nationalité lors du tournoi : {{ t.nat_tournoi }}">{{ t.nat_tournoi | flag }}</span>
+          {% endif %}
+        </td>
+        <td>
+          <a href="/tournois/{{ regles | upper }}_{{ t.ema_id }}">{{ t.nom }}</a>
+          {% if t.type == 'oemc' %}<span class="badge">OEMC</span>
+          {% elif t.type == 'oerc' %}<span class="badge">OERC</span>
+          {% elif t.type == 'wmc' %}<span class="badge badge-gold">WMC</span>
+          {% elif t.type == 'wrc' %}<span class="badge badge-gold">WRC</span>{% endif %}
+        </td>
+        {% set hors_cl = t.type in ['wmc', 'wrc'] %}
+        <td class="center">{% if not hors_cl %}{{ t.coeff }}{% else %}<span class="dim">—</span>{% endif %}</td>
+        <td class="center">
+          {% if hors_cl %}<span class="dim">—</span>
+          {% elif t.contrib == 1.0 %}<span class="contrib-100">100%</span>
+          {% elif t.contrib == 0.5 %}<span class="contrib-50">50%</span>
+          {% else %}<span class="dim">—</span>{% endif %}
+        </td>
+        <td class="td-pos">
+          <span class="pos-medal">{% if t.position == 1 %}🥇{% elif t.position == 2 %}🥈{% elif t.position == 3 %}🥉{% endif %}</span>
+          <span class="pos-score">{{ t.position }}/{{ t.nb_joueurs }}</span>
+        </td>
+        {% if regles == 'mcr' %}<td class="right">{{ t.points }}</td>{% endif %}
+        <td class="right">{{ t.mahjong }}</td>
+        <td class="col-ema col-sticky ema-pts" {% if not hors_cl %}style="{{ t.ranking | ema_color }}"{% endif %}>
+          {% if not hors_cl %}{{ t.ranking }}{% else %}<span class="dim">—</span>{% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table></div>
+  {% if inactifs %}
+  <div class="expand-row" id="expand-{{ regles }}" onclick="toggleInactifs('{{ regles }}')">
+    <span id="expand-{{ regles }}-icon">▼</span>
+    <span id="expand-{{ regles }}-label">{{ inactifs | length }} tournois inactifs</span>
+  </div>
+  {% endif %}
+  {% else %}
+  <p class="empty">Aucun tournoi {{ regles | upper }} enregistré.</p>
+  {% endif %}
+
+</div>
+{% endfor %}
+
+<script>
+function highlightDate(regles, axis, isoDate) {
+  const chart = CHARTS[regles];
+  if (!chart || !isoDate) return;
+  const dsIdx = axis === 'pos' ? 0 : 1;
+  const otherIdx = axis === 'pos' ? 1 : 0;
+  // Trouver l'index du point
+  const idx = chart.data.labels.indexOf(isoDate);
+  // Mettre en évidence : gros point rouge sur la date du max, griser l'autre courbe
+  chart.data.datasets[dsIdx].pointRadius = chart.data.labels.map((_, i) => i === idx ? 8 : 0);
+  chart.data.datasets[dsIdx].pointBackgroundColor = chart.data.labels.map((_, i) => i === idx ? style.getPropertyValue('--chart-point').trim() : 'transparent');
+  chart.data.datasets[otherIdx].borderColor = 'rgba(150,150,150,0.2)';
+  chart.update('none');
+}
+
+function clearHighlight(regles) {
+  const chart = CHARTS[regles];
+  if (!chart) return;
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  chart.data.datasets[0].pointRadius = chart.data.datasets[0].data.map(() => 0);
+  chart.data.datasets[1].pointRadius = chart.data.datasets[1].data.map(() => 0);
+  chart.data.datasets[0].borderColor = getComputedStyle(document.documentElement).getPropertyValue('--chart-line1').trim();
+  chart.data.datasets[1].borderColor = getComputedStyle(document.documentElement).getPropertyValue('--chart-line2').trim();
+  chart.update('none');
+}
+
+const FREEZE_START = '{{ freeze_debut }}';
+const FREEZE_END   = '{{ freeze_fin }}';
+const CHARTS = {};
+
+function buildChart(regles, data) {
+  const ctx = document.getElementById('chart-' + regles);
+  if (!ctx || !data.length) return;
+
+  const style = getComputedStyle(document.documentElement);
+  const lineColor  = style.getPropertyValue('--chart-line1').trim();
+  const scoreColor = style.getPropertyValue('--chart-line2').trim();
+  const textColor  = style.getPropertyValue('--text2').trim();
+  const gridColor  = style.getPropertyValue('--chart-grid').trim() || 'rgba(0,0,0,0.07)';
+
+  const labels = data.map(d => d.semaine);
+  const positions = data.map(d => d.position);
+  const scores    = data.map(d => d.score);
+
+  if (CHARTS[regles]) CHARTS[regles].destroy();
+
+  CHARTS[regles] = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'Classement',
+          data: positions,
+          borderColor: lineColor,
+          backgroundColor: 'transparent',
+          borderWidth: 2,
+          pointRadius: 0,
+          tension: 0.2,
+          yAxisID: 'yPos',
+          _cssColor: '--chart-line1',
+        },
+        {
+          label: 'Score',
+          data: scores,
+          borderColor: scoreColor,
+          backgroundColor: 'transparent',
+          borderWidth: 1.5,
+          borderDash: [4, 3],
+          pointRadius: 0,
+          tension: 0.2,
+          yAxisID: 'yScore',
+          _cssColor: '--chart-line2',
+        },
+      ],
+    },
+    options: {
+      animation: false,
+      responsive: true,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { labels: { color: textColor, boxWidth: 20 } },
+        annotation: {
+          annotations: {
+            freeze: {
+              type: 'box',
+              xMin: FREEZE_START,
+              xMax: FREEZE_END,
+              backgroundColor: 'rgba(220,60,60,0.12)',
+              borderColor: 'rgba(220,60,60,0.3)',
+              borderWidth: 1,
+              label: {
+                display: true,
+                content: 'COVID',
+                color: 'rgba(200,50,50,0.7)',
+                font: { size: 10 },
+                position: { x: 'center', y: 'start' },
+              },
+            },
+          },
+        },
+      },
+      scales: {
+        x: {
+          type: 'time',
+          time: { unit: 'year', tooltipFormat: 'dd/MM/yyyy' },
+          grid: { color: gridColor },
+          ticks: { color: textColor, maxTicksLimit: 10 },
+        },
+        yPos: {
+          reverse: true,
+          min: 1,
+          max: Math.ceil(Math.max(...positions) * 1.15 / 50) * 50,
+          position: 'left',
+          grid: { color: gridColor },
+          ticks: { color: textColor },
+          title: { display: true, text: 'Classement', color: textColor },
+        },
+        yScore: {
+          min: 0,
+          max: 1000,
+          position: 'right',
+          grid: { display: false },
+          ticks: { color: scoreColor },
+          title: { display: true, text: 'Score', color: scoreColor },
+        },
+      },
+    },
+  });
+}
+
+function setRange(regles, weeks) {
+  const chart = CHARTS[regles];
+  if (!chart) return;
+  document.querySelectorAll('#tab-' + regles + ' .range-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  if (weeks === 0) {
+    chart.options.scales.x.min = undefined;
+    chart.options.scales.x.max = undefined;
+  } else {
+    const now = new Date();
+    const from = new Date(now);
+    from.setDate(from.getDate() - weeks * 7);
+    chart.options.scales.x.min = from.toISOString().slice(0, 10);
+    chart.options.scales.x.max = now.toISOString().slice(0, 10);
+  }
+  chart.update();
+}
+
+{% for regles, data in [('mcr', mcr), ('rcr', rcr)] %}
+{% if data.historique_chart %}
+buildChart('{{ regles }}', {{ data.historique_chart | tojson }});
+{% endif %}
+{% endfor %}
+
+var _villesFiltres = {};
+
+function filtreJoueurVille(ville, regles, el) {
+  var reglesLow = regles.toLowerCase();
+  if (!ville || _villesFiltres[reglesLow] === ville) {
+    // Désélection : restaurer l'état normal (inactifs cachés sauf si dépliés)
+    _villesFiltres[reglesLow] = null;
+    var inactifsOuverts = document.getElementById('expand-' + reglesLow + '-icon') &&
+                          document.getElementById('expand-' + reglesLow + '-icon').textContent === '▲';
+    document.querySelectorAll('.t-joueur-row[data-regles="' + regles + '"]').forEach(function(r) {
+      var estInactif = r.classList.contains('row-inactif-' + reglesLow);
+      r.style.display = (estInactif && !inactifsOuverts) ? 'none' : '';
+    });
+    document.getElementById('ville-badge-' + reglesLow).style.display = 'none';
+    // Restaurer le compteur total
+    var expandLabel2 = document.getElementById('expand-' + reglesLow + '-label');
+    var expandIcon2  = document.getElementById('expand-' + reglesLow + '-icon');
+    if (expandLabel2 && expandIcon2 && expandIcon2.textContent === '▼') {
+      var total = document.querySelectorAll('.row-inactif-' + regles.toLowerCase()).length;
+      expandLabel2.textContent = total + ' tournois inactifs';
+    }
+    return;
+  }
+  _villesFiltres[reglesLow] = ville;
+  // Filtrer : n'afficher que les lignes de cette ville
+  document.querySelectorAll('.t-joueur-row[data-regles="' + regles + '"]').forEach(function(r) {
+    r.style.display = r.dataset.ville === ville ? '' : 'none';
+  });
+  // Mettre à jour le compteur d'inactifs (classes en minuscules)
+  var allInactifs = document.querySelectorAll('.row-inactif-' + reglesLow);
+  var countVille = Array.from(allInactifs).filter(function(r){ return r.dataset.ville === ville; }).length;
+  var expandLabel = document.getElementById('expand-' + reglesLow + '-label');
+  if (expandLabel && document.getElementById('expand-' + reglesLow + '-icon').textContent === '▼') {
+    expandLabel.textContent = countVille + ' tournois inactifs';
+  }
+  // Badge
+  var badge = document.getElementById('ville-badge-' + reglesLow);
+  badge.style.display = 'inline-flex';
+  document.getElementById('ville-badge-nom-' + reglesLow).textContent = ville;
+  // Lien vers page tournois
+  var link = document.getElementById('ville-badge-link-' + reglesLow);
+  link.href = '/tournois/?vue=tous&regles=' + regles + '&tri=date&ville=' + encodeURIComponent(ville);
+  link.querySelector('span').textContent = ville;
+}
+
+function showTab(name, btn) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.remove('hidden');
+  btn.classList.add('active');
+}
+
+const _inactifsVisible = {};
+function toggleInactifs(regles) {
+  const show = !_inactifsVisible[regles];
+  _inactifsVisible[regles] = show;
+  const villeActive = _villesFiltres[regles.toLowerCase()];
+  document.querySelectorAll('.row-inactif-' + regles).forEach(el => {
+    el.classList.toggle('hidden', !show);
+    // Respecter le filtre ville si actif
+    if (villeActive) {
+      el.style.display = (show && el.dataset.ville === villeActive) ? '' : 'none';
+    } else {
+      el.style.display = show ? '' : 'none';
+    }
+  });
+  document.getElementById('expand-' + regles + '-icon').textContent = show ? '▲' : '▼';
+  const allInactifs = document.querySelectorAll('.row-inactif-' + regles);
+  const count = villeActive
+    ? Array.from(allInactifs).filter(r => r.dataset.ville === villeActive).length
+    : allInactifs.length;
+  document.getElementById('expand-' + regles + '-label').textContent =
+    show ? 'Masquer les tournois inactifs' : count + ' tournois inactifs';
+}
+</script>
+{% endblock %}

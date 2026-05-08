@@ -1,0 +1,73 @@
+{# Tableau de classement hebdomadaire.
+   Variables requises :
+     ranking_data       — liste de lignes de classement (joueur_id, prenom, nom, nationalite,
+                          position, delta, score, nb_tournois, nb_or, nb_argent, nb_bronze)
+   Variables optionnelles :
+     show_apercu        — bool (défaut false) : wire onclick loadApercu()
+     show_rang_national — bool (défaut false) : affiche une colonne rang dans le pays en tête
+     rang_national_flag — str  (défaut '') : code ISO affiché en en-tête de la colonne nationale
+#}
+{% set _show_nat = show_rang_national if show_rang_national is defined else false %}
+{% set _nat_flag = rang_national_flag if rang_national_flag is defined else '' %}
+
+{% if ranking_data %}
+<div class="scroll-table">
+<table class="ranking-table" style="table-layout:fixed;width:100%">
+  <colgroup>
+    {% if _show_nat %}<col style="width:2.5rem">{% endif %}
+    <col class="col-pos">
+    <col class="col-delta">
+    <col class="col-flag">
+    <col class="col-nom">
+    <col class="col-score">
+    <col class="col-joueurs">
+    <col class="col-podiums">
+  </colgroup>
+  <thead>
+    <tr>
+      {% if _show_nat %}<th class="center" title="Rang au sein du pays">{{ _nat_flag | flag }}</th>{% endif %}
+      <th class="th-rank">#</th>
+      <th class="center" title="Variation vs semaine précédente">Δ</th>
+      <th></th>
+      <th>Joueur</th>
+      <th class="right">Score</th>
+      <th class="center" title="Tournois actifs">T</th>
+      <th class="center" title="Podiums dans les tournois actifs">🏆</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for r in ranking_data %}
+    <tr class="ranking-row {% if loop.index <= 3 %}row-top{{ loop.index }}{% endif %}"
+        data-joueur="{{ r.joueur_id }}"
+        {% if show_apercu %}onclick="loadApercu('{{ r.joueur_id }}', this)"{% endif %}>
+      {% if _show_nat %}
+      <td class="center rank-num" style="font-size:0.8rem">{{ loop.index }}</td>
+      {% endif %}
+      <td class="td-rank">
+        {% if r.position == 1 %}🥇
+        {% elif r.position == 2 %}🥈
+        {% elif r.position == 3 %}🥉
+        {% else %}<span class="rank-num">{{ r.position }}</span>
+        {% endif %}
+      </td>
+      <td class="center delta-rang">
+        {% if r.delta is none %}<span class="delta-new">▶ new</span>
+        {% elif r.delta > 0 %}<span class="delta-up">▲{{ r.delta }}</span>
+        {% elif r.delta < 0 %}<span class="delta-down">▼{{ r.delta | abs }}</span>
+        {% else %}<span class="dim">—</span>{% endif %}
+      </td>
+      <td class="col-flag">{{ r.nationalite | flag }}</td>
+      <td><a href="/joueurs/{{ r.joueur_id }}" {% if show_apercu %}onclick="event.stopPropagation()"{% endif %}>{{ r.prenom | prenom }} {{ r.nom | title }}</a></td>
+      <td class="col-score score-val">{{ r.score | round(2) }}</td>
+      <td class="col-joueurs rank-num">{{ r.nb_tournois }}</td>
+      <td class="col-podiums">
+        {{ '🥇' * r.nb_or }}{{ '🥈' * r.nb_argent }}{{ '🥉' * r.nb_bronze }}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+{% else %}
+<p class="empty">Aucun classement pour cette semaine.</p>
+{% endif %}

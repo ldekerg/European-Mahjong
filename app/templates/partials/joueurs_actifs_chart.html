@@ -1,0 +1,133 @@
+{# Graphique évolution du nombre de joueurs actifs.
+   Variables requises :
+     chart_json  — JSON string {labels: [...], datasets: [{label, color, width, data}]}
+     chart_id    — ID unique du canvas
+   Comportement légende :
+     1er clic  → isole ce dataset
+     2e clic   → ajoute ce dataset à la sélection
+     clic seul → tout réafficher
+#}
+<div class="chart-section">
+  <div class="chart-controls">
+    <span class="chart-title">Joueurs actifs</span>
+    <div class="chart-range-btns">
+      <button onclick="setChartRange('{{ chart_id }}', 52)"  class="range-btn">1 an</button>
+      <button onclick="setChartRange('{{ chart_id }}', 156)" class="range-btn">3 ans</button>
+      <button onclick="setChartRange('{{ chart_id }}', 0)"   class="range-btn active">Tout</button>
+    </div>
+  </div>
+  <canvas id="{{ chart_id }}" height="90"></canvas>
+</div>
+
+<script>
+(function() {
+  var RAW = {{ chart_json | safe }};
+  var CHART_REG = window._JOUEURS_CHARTS = window._JOUEURS_CHARTS || {};
+  window._chartSelection = window._chartSelection || {};
+
+  function cssVar(name) {
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  }
+
+  function buildDatasets(raw) {
+    return raw.map(function(d) {
+      var color = d.cssColor ? cssVar(d.cssColor) : d.color;
+      return {
+        label:           d.label,
+        data:            d.data,
+        borderColor:     color,
+        backgroundColor: 'transparent',
+        borderWidth:     d.width || 1.5,
+        pointRadius:     0,
+        tension:         0.2,
+        _cssColor:       d.cssColor || null,
+      };
+    });
+  }
+
+  function initChart(id) {
+    var ctx = document.getElementById(id);
+    if (!ctx) return;
+    var textColor = cssVar('--text2') || '#666';
+    var gridColor = cssVar('--chart-grid') || 'rgba(0,0,0,0.07)';
+
+    window._chartSelection[id] = null;
+    if (CHART_REG[id]) CHART_REG[id].destroy();
+
+    CHART_REG[id] = new Chart(ctx, {
+      type: 'line',
+      data: { labels: RAW.labels, datasets: buildDatasets(RAW.datasets) },
+      options: {
+        animation: false,
+        responsive: true,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: {
+            labels: { color: textColor, boxWidth: 14, font: { size: 11 } },
+            onClick: function(e, legendItem, legend) {
+              var chart = legend.chart;
+              var idx   = legendItem.datasetIndex;
+              var sel   = window._chartSelection[id];
+
+              if (sel === null) {
+                sel = new Set([idx]);               // isoler
+              } else if (sel.has(idx) && sel.size === 1) {
+                sel = null;                          // seul visible → tout réafficher
+              } else if (sel.has(idx)) {
+                sel = new Set(sel); sel.delete(idx); // retirer
+                if (sel.size === 0) sel = null;
+              } else {
+                sel = new Set(sel); sel.add(idx);    // ajouter
+              }
+              window._chartSelection[id] = sel;
+              chart.data.datasets.forEach(function(ds, i) {
+                ds.hidden = sel !== null && !sel.has(i);
+              });
+              chart.update('none');
+            },
+          },
+        },
+        scales: {
+          x: {
+            type: 'time',
+            time: { unit: 'year', tooltipFormat: 'dd/MM/yyyy' },
+            grid: { color: gridColor },
+            ticks: { color: textColor, maxTicksLimit: 10 },
+          },
+          y: {
+            min: 0,
+            grid: { color: gridColor },
+            ticks: { color: textColor },
+            title: { display: true, text: 'Joueurs actifs', color: textColor, font: { size: 11 } },
+          },
+        },
+      },
+    });
+  }
+
+  window.setChartRange = function(id, weeks) {
+    var chart = CHART_REG[id];
+    if (!chart) return;
+    if (weeks === 0) {
+      chart.options.scales.x.min = undefined;
+      chart.options.scales.x.max = undefined;
+    } else {
+      var now  = new Date();
+      var from = new Date(now);
+      from.setDate(from.getDate() - weeks * 7);
+      chart.options.scales.x.min = from.toISOString().slice(0, 10);
+      chart.options.scales.x.max = now.toISOString().slice(0, 10);
+    }
+    chart.update();
+    var canvas = document.getElementById(id);
+    if (canvas) {
+      canvas.closest('.chart-section').querySelectorAll('.range-btn').forEach(function(b) {
+        b.classList.toggle('active',
+          b.getAttribute('onclick') === "setChartRange('" + id + "', " + weeks + ")");
+      });
+    }
+  };
+
+  document.addEventListener('DOMContentLoaded', function() { initChart('{{ chart_id }}'); });
+})();
+</script>

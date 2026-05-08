@@ -1,0 +1,41 @@
+{# Tableau Hall of Fame — semaines au sommet.
+   Variables requises :
+     data    — liste de {joueur, nb_or, nb_bronze, nb_top10, nb_top20, nb_top50, nb_semaines}
+     periode — 'alltime' ou 'encours'
+   Dépendances JS : sortTable() et le tri DOMContentLoaded définis dans hallfame.html
+#}
+<div class="scroll-table">
+<table id="hof-table" style="table-layout:fixed;width:100%">
+  <colgroup>
+    <col style="width:2.5rem"><col style="width:2rem"><col style="width:14rem">
+    <col style="width:4rem"><col style="width:4.5rem">
+    <col style="width:4rem"><col style="width:4rem"><col style="width:4rem">
+  </colgroup>
+  <thead>
+    <tr>
+      <th class="center">#</th>
+      <th class="center">🌍</th>
+      <th>Joueur</th>
+      <th class="center sortable" onclick="sortTable(3)" title="Semaines #1">🥇 <span class="sort-icon">⇅</span></th>
+      <th class="center sortable" onclick="sortTable(4)" title="Semaines top 3">Podium <span class="sort-icon">⇅</span></th>
+      <th class="center sortable" onclick="sortTable(5)" title="Semaines top 10">Top 10 <span class="sort-icon">⇅</span></th>
+      <th class="center sortable" onclick="sortTable(6)" title="Semaines top 20">Top 20 <span class="sort-icon">⇅</span></th>
+      <th class="center sortable" onclick="sortTable(7)" title="Semaines top 50">Top 50 <span class="sort-icon">⇅</span></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for d in data %}
+    <tr>
+      <td class="center rank-num">{{ loop.index }}</td>
+      <td class="center">{{ d.joueur.nationalite | flag }}</td>
+      <td><a href="/joueurs/{{ d.joueur.id }}">{{ d.joueur.prenom | prenom }} {{ d.joueur.nom | title }}</a></td>
+      <td class="center" data-val="{{ d.nb_or }}">{% if d.nb_or %}<strong>{{ d.nb_or }}</strong>{% else %}<span class="dim">—</span>{% endif %}</td>
+      <td class="center" data-val="{{ d.nb_bronze }}">{{ d.nb_bronze or '—' }}</td>
+      <td class="center" data-val="{{ d.nb_top10 }}">{{ d.nb_top10 or '—' }}</td>
+      <td class="center" data-val="{{ d.nb_top20 }}">{{ d.nb_top20 or '—' }}</td>
+      <td class="center" data-val="{{ d.nb_top50 }}">{{ d.nb_top50 or '—' }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>

@@ -1,0 +1,41 @@
+{# Tableau Hall of Fame — médailles de tournois.
+   Variables requises :
+     medals_data — liste de {joueur, or_t, argent_t, bronze_t, total_t}
+   Dépendances JS : sortTable() et le tri DOMContentLoaded définis dans hallfame.html
+#}
+<div class="scroll-table">
+<table id="hof-table" style="table-layout:fixed;width:100%">
+  <colgroup>
+    <col style="width:2.5rem"><col style="width:2rem"><col style="width:14rem">
+    <col style="width:4rem"><col style="width:4rem"><col style="width:4rem">
+    <col style="width:4.5rem"><col style="width:5rem">
+  </colgroup>
+  <thead>
+    <tr>
+      <th class="center">#</th>
+      <th class="center">🌍</th>
+      <th>Joueur</th>
+      <th class="center sortable" onclick="sortTable(3)" title="Victoires">🥇 <span class="sort-icon">⇅</span></th>
+      <th class="center sortable" onclick="sortTable(4)" title="2e places">🥈 <span class="sort-icon">⇅</span></th>
+      <th class="center sortable" onclick="sortTable(5)" title="3e places">🥉 <span class="sort-icon">⇅</span></th>
+      <th class="center sortable" onclick="sortTable(6)" title="Total médailles">🏅 <span class="sort-icon">⇅</span></th>
+      <th class="center sortable" onclick="sortTable(7)" title="Tournois joués">Tournois <span class="sort-icon">⇅</span></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for d in medals_data %}
+    {% set total_medals = d.or_t + d.argent_t + d.bronze_t %}
+    <tr data-total="{{ d.total_t }}">
+      <td class="center rank-num">{{ loop.index }}</td>
+      <td class="center">{{ d.joueur.nationalite | flag }}</td>
+      <td><a href="/joueurs/{{ d.joueur.id }}">{{ d.joueur.prenom | prenom }} {{ d.joueur.nom | title }}</a></td>
+      <td class="center" data-val="{{ d.or_t }}">{% if d.or_t %}<strong>{{ d.or_t }}</strong>{% else %}<span class="dim">—</span>{% endif %}</td>
+      <td class="center" data-val="{{ d.argent_t }}">{{ d.argent_t or '—' }}</td>
+      <td class="center" data-val="{{ d.bronze_t }}">{{ d.bronze_t or '—' }}</td>
+      <td class="center rank-num" data-val="{{ total_medals }}"><strong>{{ total_medals }}</strong></td>
+      <td class="center dim" data-val="{{ d.total_t }}">{{ d.total_t }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>

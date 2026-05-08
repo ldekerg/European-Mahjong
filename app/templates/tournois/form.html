@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Nouveau tournoi</h1>
+<form method="post">
+    <label>ID (numéro EMA)
+        <input type="number" name="id" required placeholder="ex: 366">
+    </label>
+    <label>Nom
+        <input type="text" name="nom" required placeholder="ex: Kleine 3 Draken Toernooi 2023">
+    </label>
+    <label>Lieu
+        <input type="text" name="lieu" required placeholder="ex: Temse">
+    </label>
+    <label>Pays (code)
+        <input type="text" name="pays" required maxlength="3" placeholder="ex: BE">
+    </label>
+    <label>Date début
+        <input type="date" name="date_debut" required>
+    </label>
+    <label>Date fin
+        <input type="date" name="date_fin" required>
+    </label>
+    <label>Nombre de joueurs
+        <input type="number" name="nb_joueurs" required>
+    </label>
+    <label>Coefficient MERS
+        <input type="number" name="coefficient" step="0.1" required placeholder="ex: 3.5">
+    </label>
+    <label>Règles
+        <select name="regles">
+            <option value="MCR">MCR</option>
+            <option value="RCR">RCR</option>
+        </select>
+    </label>
+    <button type="submit">Enregistrer</button>
+    <a href="/tournois/">Annuler</a>
+</form>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="ranking-header">
+  <h1>Tournois <span class="t-count-header">({{ tournois | length }})</span></h1>
+  <div class="t-filters">
+    <div class="t-filter-group">
+      {% for r, label in [('tous','MCR+RCR'),('MCR','MCR'),('RCR','RCR')] %}
+      <a href="?vue={{ vue }}&regles={{ r }}&tri={{ tri }}"
+         class="filter-btn {% if regles == r %}active{% endif %}">{{ label }}</a>
+      {% endfor %}
+    </div>
+    <div class="t-filter-group">
+      {% for v, label in [('actifs','Actifs'),('tous','Tous'),('speciaux','Spéciaux')] %}
+      <a href="?vue={{ v }}&regles={{ regles }}&tri={{ tri }}"
+         class="filter-btn {% if vue == v %}active{% endif %}">{{ label }}</a>
+      {% endfor %}
+    </div>
+    {% if ville_filtre %}
+    <a href="?vue={{ vue }}&regles={{ regles }}&tri={{ tri }}" class="filter-btn active">
+      📍 {{ ville_filtre }} ✕
+    </a>
+    {% endif %}
+  </div>
+</div>
+
+<div class="t-layout">
+  <!-- Table -->
+  <div class="t-left">
+    {% with sort_url_base='?vue=' + vue + '&regles=' + regles, asc=asc %}
+    {% include 'partials/tournois_table.html' %}
+    {% endwith %}
+  </div>
+
+  <!-- Carte -->
+  <div class="t-right">
+    {% include 'partials/tournois_carte.html' %}
+  </div>
+</div>
+{% endblock %}

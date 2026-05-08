@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="player-header">
+  <div>
+    <div class="player-name">{{ tournoi.nom }}</div>
+    <div class="player-meta">
+      <span>{{ tournoi.pays | pays_flag }} {{ tournoi.lieu }}</span>
+      <span class="dim">{{ tournoi.date_debut.strftime('%d/%m/%Y') }} → {{ tournoi.date_fin.strftime('%d/%m/%Y') }}</span>
+      <span class="badge {% if tournoi.regles == 'MCR' %}badge-mcr{% else %}badge-rcr{% endif %}">{{ tournoi.regles }}</span>
+      {% if tournoi.type_tournoi == 'wmc' %}<span class="badge badge-gold">WMC</span>
+      {% elif tournoi.type_tournoi == 'wrc' %}<span class="badge badge-gold">WRC</span>
+      {% elif tournoi.type_tournoi == 'oemc' %}<span class="badge">OEMC</span>
+      {% elif tournoi.type_tournoi == 'oerc' %}<span class="badge">OERC</span>{% endif %}
+    </div>
+  </div>
+  <dl style="font-size:0.85rem;margin:0">
+    <dt>Joueurs</dt><dd>{{ tournoi.nb_joueurs }}</dd>
+    <dt>Coeff.</dt><dd>{{ tournoi.coefficient }}</dd>
+  </dl>
+</div>
+
+{% set is_mcr = tournoi.regles == 'MCR' %}
+{% set ncols = 6 if is_mcr else 5 %}
+
+<h2>Résultats <span class="t-count-header">({{ resultats | length }})</span></h2>
+<div class="scroll-table">
+<table style="table-layout:fixed;width:100%">
+  <colgroup>
+    <col class="col-pos">
+    <col class="col-date" style="width:6.5rem">
+    <col class="col-flag">
+    <col>
+    {% if is_mcr %}<col class="col-pts">{% endif %}
+    <col class="col-mahj" style="width:4rem">
+    <col class="col-ema">
+  </colgroup>
+  <thead>
+    <tr>
+      <th class="center" title="Position">🏅</th>
+      <th>EMA ID</th>
+      <th class="center" title="Pays">🌍</th>
+      <th>Joueur</th>
+      {% if is_mcr %}<th class="right" title="Points tournoi">Pts</th>{% endif %}
+      <th class="right" title="{% if is_mcr %}Score Mahjong{% else %}Score{% endif %}">#</th>
+      <th class="right col-sticky" title="Points EMA">EMA</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for r in resultats %}
+    <tr class="{% if r.position == 1 %}row-top1{% elif r.position == 2 %}row-top2{% elif r.position == 3 %}row-top3{% endif %}">
+      <td class="td-pos">
+        <span class="pos-medal">{% if r.position == 1 %}🥇{% elif r.position == 2 %}🥈{% elif r.position == 3 %}🥉{% else %}{{ r.position }}{% endif %}</span>
+      </td>
+      <td><a href="/joueurs/{{ r.joueur.id }}">{{ r.joueur.id }}</a></td>
+      <td class="center">{{ r.joueur.nationalite | flag }}</td>
+      <td>{{ r.joueur.prenom | prenom }} {{ r.joueur.nom | title }}</td>
+      {% if is_mcr %}<td class="right">{{ r.points }}</td>{% endif %}
+      <td class="right">{{ r.mahjong }}</td>
+      <td class="right col-sticky ema-pts" style="{{ r.ranking | ema_color }}">{{ r.ranking }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="{{ ncols }}">Aucun résultat enregistré.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}

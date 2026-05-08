@@ -1,0 +1,51 @@
+{# Grille de stats d'un joueur pour une discipline.
+   Variables requises :
+     data   — dict {rang, meilleur, date_meilleur, score_max, date_score_max, nb_actifs, tournois}
+     regles — 'mcr' ou 'rcr'
+   Dépendance JS : highlightDate() et clearHighlight() définis dans joueurs/detail.html
+#}
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-label">Classement actuel</div>
+    <div class="stat-value">
+      {% if data.rang %}
+        {{ data.rang.position }}
+        <span class="stat-sub">{{ data.rang.score | round(2) }}</span>
+      {% else %}—{% endif %}
+    </div>
+  </div>
+  <div class="stat-card stat-card-hl"
+       onmouseenter="highlightDate('{{ regles }}','pos','{{ data.date_meilleur }}')"
+       onmouseleave="clearHighlight('{{ regles }}')">
+    <div class="stat-label">Meilleur classement</div>
+    <div class="stat-value">
+      {% if data.meilleur %}
+        {{ data.meilleur }}
+        {% if data.date_meilleur %}
+        <span class="stat-sub">{{ data.date_meilleur | fmt_date }}</span>
+        {% endif %}
+      {% else %}—{% endif %}
+    </div>
+  </div>
+  <div class="stat-card stat-card-hl"
+       onmouseenter="highlightDate('{{ regles }}','score','{{ data.date_score_max }}')"
+       onmouseleave="clearHighlight('{{ regles }}')">
+    <div class="stat-label">Score max</div>
+    <div class="stat-value">
+      {% if data.score_max %}
+        {{ data.score_max }}
+        {% if data.date_score_max %}
+        <span class="stat-sub">{{ data.date_score_max | fmt_date }}</span>
+        {% endif %}
+      {% else %}—{% endif %}
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Tournois actifs</div>
+    <div class="stat-value">{{ data.nb_actifs }}</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Tournois joués</div>
+    <div class="stat-value">{{ data.tournois | length }}</div>
+  </div>
+</div>

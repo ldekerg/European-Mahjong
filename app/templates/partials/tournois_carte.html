@@ -1,0 +1,101 @@
+{# Carte Leaflet des tournois + fonction filtreVille().
+   Variables requises :
+     villes       — liste de {lieu, pays, lat, lon, nb}
+     ville_filtre — str|None (filtre initial côté serveur)
+     carte_id     — str (optionnel, défaut "t-map") : id du div carte
+   Dépendance : interagit avec .t-row[data-lieu] définis dans partials/tournois_table.html
+#}
+{% set carte_id = carte_id if carte_id is defined else 't-map' %}
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9/dist/leaflet.js"></script>
+
+<div id="{{ carte_id }}"></div>
+<p class="t-map-hint">Clic sur un marqueur pour filtrer par ville</p>
+
+<script>
+(function() {
+var villes = {{ villes | tojson }};
+var villeFiltre = {{ (ville_filtre | tojson) if ville_filtre else 'null' }};
+var map = L.map('{{ carte_id }}').setView([50, 10], 4);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '© OpenStreetMap'
+}).addTo(map);
+
+if (villeFiltre) {
+  document.getElementById('ville-badge-nom').textContent = villeFiltre;
+  document.getElementById('ville-badge').style.display = 'inline-flex';
+}
+
+var PAYS_COLORS = {
+  'France':          '#0055a4',
+  'Netherlands':     '#ff6600',
+  'Germany':         '#555555',
+  'Belgium':         '#c8a800',
+  'Luxembourg':      '#ef3340',
+  'Great Britain':   '#cc0000',
+  'Ireland':         '#169b62',
+  'Spain':           '#c60b1e',
+  'Portugal':        '#006600',
+  'Italy':           '#009246',
+  'Austria':         '#ed2939',
+  'Switzerland':     '#ff0000',
+  'Denmark':         '#c8102e',
+  'Sweden':          '#006aa7',
+  'Norway':          '#ef2b2d',
+  'Finland':         '#003580',
+  'Poland':          '#dc143c',
+  'Czech Republic':  '#c0c0c0',
+  'Slovakia':        '#0b4ea2',
+  'Hungary':         '#436f4d',
+  'Romania':         '#fcd116',
+  'Russia':          '#4c75a3',
+  'Ukraine':         '#005bbb',
+  'BELARUS':         '#cf101a',
+  'Japan':           '#bc002d',
+  'China':           '#de2910',
+  'South Korea':     '#003478',
+  'Canada':          '#ff0000',
+  'United States':   '#3c3b6e',
+};
+function paysCouleur(pays) { return PAYS_COLORS[pays] || '#888888'; }
+
+var markers = [];
+villes.forEach(function(v) {
+  var col = paysCouleur(v.pays);
+  var m = L.circleMarker([v.lat, v.lon], {
+    radius: 6, color: '#fff', fillColor: col, fillOpacity: 0.85, weight: 1.5
+  }).addTo(map);
+  m.bindTooltip(v.lieu + ', ' + v.pays + ' (' + v.nb + ')');
+  m.on('click', function() { filtreVille(v.lieu); });
+  markers.push({m: m, lieu: v.lieu, col: col});
+});
+
+window.filtreVille = function(lieu) {
+  if (villeFiltre === lieu) {
+    villeFiltre = null;
+    document.querySelectorAll('.t-row').forEach(r => r.style.display = '');
+    markers.forEach(function(item) {
+      item.m.setStyle({fillColor: item.col, fillOpacity: 0.85, radius: 6, weight: 1.5, color: '#fff'});
+    });
+    document.getElementById('ville-badge').style.display = 'none';
+    return;
+  }
+  villeFiltre = lieu;
+  document.querySelectorAll('.t-row').forEach(function(r) {
+    r.style.display = r.dataset.lieu === lieu ? '' : 'none';
+  });
+  markers.forEach(function(item) {
+    if (item.lieu === lieu) {
+      item.m.setStyle({fillColor: item.col, fillOpacity: 1.0, radius: 9, weight: 3, color: '#fff'});
+      item.m.bringToFront();
+    } else {
+      item.m.setStyle({fillColor: item.col, fillOpacity: 0.1, radius: 6, weight: 1, color: '#fff'});
+      item.m.bringToBack();
+    }
+  });
+  document.getElementById('ville-badge-nom').textContent = lieu;
+  document.getElementById('ville-badge').style.display = 'inline-flex';
+};
+})();
+</script>
