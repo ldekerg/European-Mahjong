@@ -436,36 +436,58 @@ def import_tournament(db: Session, data: dict, reset: bool = False):
     db.commit()
 
 
+def _fetch_one(args_tuple):
+    """Appelé dans un thread : fetch + parse, sans accès DB."""
+    tid, prefix = args_tuple
+    html = fetch_page(tid, prefix)
+    if not html:
+        return tid, None, "error"
+    numeric_tid = int(tid) if str(tid).lstrip("0").isdigit() else tid
+    data = parse_tournament(html, numeric_tid)
+    if not data:
+        return tid, None, "empty"
+    return tid, data, "ok"
+
+
 def main():
     parser = argparse.ArgumentParser(description="Import EMA tournaments")
     parser.add_argument("--start", type=int, default=0)
     parser.add_argument("--end", type=int, default=453)
     parser.add_argument("--ids", nargs="+", help="IDs explicites (ex: 01 02 1000001)")
-    parser.add_argument("--delay", type=float, default=0.3, help="Délai entre requêtes (secondes)")
     parser.add_argument("--prefix", type=str, default="TR", help="Préfixe URL (TR ou TR_RCR)")
     parser.add_argument("--reset", action="store_true", help="Vider les résultats existants avant reimport")
+    parser.add_argument("--threads", type=int, default=8, help="Nombre de threads fetch (défaut: 8)")
     args = parser.parse_args()
 
     if args.ids:
-        id_list = args.ids  # chaînes brutes, ex: ["01", "1000001"]
+        id_list = args.ids
     else:
-        id_list = list(range(args.start, args.end + 1))
+        # Formater les IDs < 10 avec zéro initial (format EMA : 01, 02, ...)
+        id_list = [f"{i:02d}" if i < 10 else str(i) for i in range(args.start, args.end + 1)]
+
+    from concurrent.futures import ThreadPoolExecutor, as_completed
 
     db = SessionLocal()
-    ok = 0
-    skip = 0
-    errors = 0
+    ok = skip = errors = 0
+    total = len(id_list)
 
+    tasks = [(tid, args.prefix) for tid in id_list]
+
+    with ThreadPoolExecutor(max_workers=args.threads) as executor:
+        futures = {executor.submit(_fetch_one, t): t[0] for t in tasks}
+        # Collect results ordered by completion, import sequentially in main thread
+        results = {}
+        for future in as_completed(futures):
+            tid, data, status = future.result()
+            results[str(tid)] = (data, status)
+
+    # Import dans l'ordre original pour une sortie lisible
     for tid in id_list:
+        data, status = results[str(tid)]
         print(f"[{str(tid):>8}] ", end="", flush=True)
-        html = fetch_page(tid, args.prefix)
-        if not html:
+        if status == "error":
             errors += 1
-            continue
-
-        numeric_tid = int(tid) if str(tid).lstrip("0").isdigit() else tid
-        data = parse_tournament(html, numeric_tid)
-        if not data:
+        elif status == "empty":
             print("(vide)")
             skip += 1
         else:
@@ -475,8 +497,6 @@ def main():
             suffix = f"  ({nb_id} id, {nb_ano} anon)" if nb_ano else ""
             print(f"{data['regles']:3}  {data['date_debut']}  {len(data['resultats']):3} joueurs  {data['nom']}{suffix}")
             ok += 1
-
-        time.sleep(args.delay)
 
     db.close()
     print(f"\nTerminé : {ok} importés, {skip} vides, {errors} erreurs.")

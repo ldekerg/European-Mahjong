@@ -111,16 +111,20 @@
   <div class="podium">
     {% for p in podium %}
     {% set medal = '🥇' if p.position == 1 else ('🥈' if p.position == 2 else '🥉') %}
-    {% set ordinal = p.rang_medaille %}
     <div class="podium-step podium-{{ p.position }}">
       <div class="podium-medal">{{ medal }}</div>
+      {% if p.anonyme %}
+      <div class="podium-flag">{{ p.nationalite | flag }}</div>
+      <span class="podium-name dim">
+        {% if p.prenom or p.nom %}{{ p.prenom }} {{ p.nom }}{% else %}—{% endif %}
+      </span>
+      {% else %}
       <div class="podium-flag">{{ p.joueur.nationalite | flag }}</div>
       <a href="/joueurs/{{ p.joueur.id }}" class="podium-name">
         {{ p.joueur.prenom | prenom }}<br>{{ p.joueur.nom | title }}
       </a>
-      <div class="podium-stat dim">
-        {{ medal }} ({{ ordinal }})
-      </div>
+      <div class="podium-stat dim">{{ medal }} ({{ p.rang_medaille }})</div>
+      {% endif %}
     </div>
     {% endfor %}
   </div>

@@ -29,14 +29,23 @@ def flag_emoji(value: str) -> str:
     return "".join(chr(0x1F1E6 + ord(c) - ord("A")) for c in iso[:2])
 
 
+PAYS_EMA = {
+    'FR','DE','NL','BE','LU','GB','IE','ES','PT','IT','AT','CH','DK','SE','NO','FI',
+    'PL','CZ','SK','HU','RO','UA','EE','LV','LT','HR','SI','RS','BG','GR','TR',
+    'RU','BY','IL','MK','MD','AL','ME','BA',
+}
+
+
 def flag_link(value: str, onglet: str = "joueurs") -> Markup:
-    """Code ISO OU nom de pays → drapeau cliquable vers /pays/{ISO}?onglet=X."""
+    """Code ISO OU nom de pays → drapeau cliquable (EMA uniquement) vers /pays/{ISO}?onglet=X."""
     if not value or value.upper() in ("GUEST", "OTHER", "XX"):
         return Markup(flag_emoji(value))
     iso = _to_iso(value)
     if not iso:
         return Markup(flag_emoji(value))
     emoji = flag_emoji(iso)
+    if iso not in PAYS_EMA:
+        return Markup(emoji)
     url = f"/pays/{iso}?onglet={onglet}"
     return Markup(f'<a href="{url}" title="{value}" onclick="event.stopPropagation()">{emoji}</a>')
 

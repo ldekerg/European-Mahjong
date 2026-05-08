@@ -8,7 +8,7 @@ from typing import Optional
 
 from database import get_db
 from models import ClassementHistorique, Joueur, Resultat, ResultatAnonyme, Tournoi
-from app.templates_config import templates
+from app.templates_config import templates, PAYS_EMA
 
 router = APIRouter(prefix="/hallfame")
 
@@ -119,11 +119,6 @@ def _palmares_championnats(db: Session, regles: str) -> list:
         Tournoi.date_debut != __import__('datetime').date(1900, 1, 1),
     ).order_by(Tournoi.date_debut.desc()).all()
 
-    PAYS_EUROPEENS = {
-        'FR','DE','NL','BE','LU','GB','IE','ES','PT','IT','AT','CH','DK','SE','NO','FI',
-        'PL','CZ','SK','HU','RO','UA','EE','LV','LT','HR','SI','RS','BG','GR','TR'
-    }
-
     result = []
     for t in tournois:
         identifies = db.query(Resultat, Joueur).join(
@@ -135,7 +130,7 @@ def _palmares_championnats(db: Session, regles: str) -> list:
 
         anonymes = db.query(ResultatAnonyme).filter(
             ResultatAnonyme.tournoi_id == t.id,
-            ResultatAnonyme.nationalite.in_(PAYS_EUROPEENS),
+            ResultatAnonyme.nationalite.in_(PAYS_EMA),
         ).order_by(ResultatAnonyme.position).all()
 
         # Fusionner et trier par position, garder top3

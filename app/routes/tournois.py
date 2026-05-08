@@ -11,22 +11,18 @@ from models import Tournoi, Resultat, ResultatAnonyme, Joueur
 from ranking import lundi_semaine, tournois_actifs
 
 router = APIRouter(prefix="/tournois")
-from app.templates_config import templates
-
-
-PAYS_EMA = {
-    'FR','DE','NL','BE','LU','GB','IE','ES','PT','IT','AT','CH','DK','SE','NO','FI',
-    'PL','CZ','SK','HU','RO','UA','EE','LV','LT','HR','SI','RS','BG','GR','TR'
-}
+from app.templates_config import templates, PAYS_EMA
 
 
 def _incomplets_ids(db, tournoi_ids: list) -> set:
-    """IDs de tournois ayant au moins un anonyme européen (joueur EMA manquant)."""
+    """IDs de tournois avec au moins un anonyme européen sans nom (joueur EMA non identifié)."""
     if not tournoi_ids:
         return set()
     rows = db.query(ResultatAnonyme.tournoi_id).filter(
         ResultatAnonyme.tournoi_id.in_(tournoi_ids),
         ResultatAnonyme.nationalite.in_(PAYS_EMA),
+        ResultatAnonyme.prenom.is_(None),
+        ResultatAnonyme.nom.is_(None),
     ).distinct().all()
     return {row.tournoi_id for row in rows}
 
@@ -202,7 +198,9 @@ def detail_tournoi(tournoi_id: int, request: Request, db: Session = Depends(get_
     # Podium : top 3 avec rang de la médaille (combien de fois ce joueur a fini à cette position avant)
     from sqlalchemy import text as _text
     podium = []
-    for r in resultats:
+    positions_podium = set()
+
+    for r in resultats_identifies:
         if r.position > 3:
             break
         j = joueurs_map.get(r.joueur_id)
@@ -218,15 +216,36 @@ def detail_tournoi(tournoi_id: int, request: Request, db: Session = Depends(get_
         '''), {"jid": r.joueur_id, "pos": r.position,
                "reg": tournoi.regles, "ddate": tournoi.date_debut}).scalar() or 0
         podium.append({
-            "position":    r.position,
-            "joueur":      j,
-            "rang_medaille": rang_med + 1,  # 1 = première fois
+            "position":      r.position,
+            "joueur":        j,
+            "rang_medaille": rang_med + 1,
+            "anonyme":       False,
         })
+        positions_podium.add(r.position)
+
+    for r in resultats_anonymes:
+        if r.position > 3:
+            continue
+        if r.position in positions_podium:
+            continue
+        podium.append({
+            "position":      r.position,
+            "joueur":        None,
+            "rang_medaille": None,
+            "anonyme":       True,
+            "nationalite":   r.nationalite or "",
+            "prenom":        r.prenom or "",
+            "nom":           r.nom or "",
+        })
+        positions_podium.add(r.position)
+
+    podium.sort(key=lambda x: x["position"])
 
     nb_resultats = len(resultats_identifies) + len(resultats_anonymes)
     nb_anon_europeens = sum(
         1 for r in resultats_anonymes
         if r.nationalite and r.nationalite.upper() in PAYS_EMA
+        and not (r.prenom or r.nom)
     )  # PAYS_EMA défini en tête de module
     resultats_incomplets = nb_anon_europeens > 0
 
