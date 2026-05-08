@@ -14,70 +14,58 @@ router = APIRouter(prefix="/tournois")
 from app.templates_config import templates
 
 
-@router.get("/")
-def liste_tournois(
-    request: Request,
-    vue: str = Query("tous"),
-    regles: str = Query("tous"),
-    tri: str = Query("date"),
-    asc: int = Query(0),       # 1 = ascendant, 0 = descendant (défaut desc pour date/coeff/joueurs)
-    ville: Optional[str] = Query(None),
-    db: Session = Depends(get_db),
-):
+def _tournois_tab(db, regles: str, vue: str, tri: str, asc: int, ville) -> dict:
+    from sqlalchemy import func
     semaine = lundi_semaine(date.today())
-    regles_list = ["MCR", "RCR"] if regles == "tous" else [regles]
-    actifs_ids: dict = {}
-    for r in regles_list:
-        actifs_ids.update({t.id: c for t, c in tournois_actifs(db, semaine, r)})
+    actifs_ids = {t.id: c for t, c in tournois_actifs(db, semaine, regles)}
 
-    q = db.query(Tournoi)
-    if regles != "tous":
-        q = q.filter(Tournoi.regles == regles)
-
+    q = db.query(Tournoi).filter(Tournoi.regles == regles)
     if vue == "actifs":
         q = q.filter(Tournoi.id.in_(actifs_ids.keys()))
     elif vue == "speciaux":
         q = q.filter(Tournoi.type_tournoi.in_(["wmc", "wrc", "oemc", "oerc"]))
-    # "tous" = pas de filtre supplémentaire
 
-    # Tri
-    col_map = {
-        "date":    Tournoi.date_debut,
-        "coeff":   Tournoi.coefficient,
-        "joueurs": Tournoi.nb_joueurs,
-        "nom":     Tournoi.nom,
-    }
+    col_map = {"date": Tournoi.date_debut, "coeff": Tournoi.coefficient,
+               "joueurs": Tournoi.nb_joueurs, "nom": Tournoi.nom}
     col = col_map.get(tri, Tournoi.date_debut)
     q = q.order_by(col if asc else col.desc())
-
     if ville:
         q = q.filter(Tournoi.lieu == ville)
-
     tournois_list = q.filter(Tournoi.date_debut != date(1900, 1, 1)).all()
 
-    # Points carte : villes avec coordonnées
-    from sqlalchemy import func
-    villes_q = db.query(
-        Tournoi.lieu, Tournoi.pays,
-        Tournoi.latitude, Tournoi.longitude,
+    villes = db.query(
+        Tournoi.lieu, Tournoi.pays, Tournoi.latitude, Tournoi.longitude,
         func.count(Tournoi.id).label("nb"),
     ).filter(
-        Tournoi.latitude.isnot(None),
-        Tournoi.lieu != "",
-    )
-    if regles != "tous":
-        villes_q = villes_q.filter(Tournoi.regles == regles)
-    villes = villes_q.group_by(Tournoi.lieu, Tournoi.pays, Tournoi.latitude, Tournoi.longitude).all()
+        Tournoi.latitude.isnot(None), Tournoi.lieu != "", Tournoi.regles == regles,
+    ).group_by(Tournoi.lieu, Tournoi.pays, Tournoi.latitude, Tournoi.longitude).all()
+
+    return {
+        "tournois":   tournois_list,
+        "actifs_ids": actifs_ids,
+        "villes":     [{"lieu": v.lieu, "pays": v.pays, "lat": v.latitude,
+                         "lon": v.longitude, "nb": v.nb} for v in villes],
+    }
+
+
+@router.get("/")
+def liste_tournois(
+    request: Request,
+    vue: str = Query("tous"),
+    tri: str = Query("date"),
+    asc: int = Query(0),
+    ville: Optional[str] = Query(None),
+    db: Session = Depends(get_db),
+):
+    mcr = _tournois_tab(db, "MCR", vue, tri, asc, ville)
+    rcr = _tournois_tab(db, "RCR", vue, tri, asc, ville)
 
     return templates.TemplateResponse(request, "tournois/liste.html", {
-        "tournois": tournois_list,
-        "actifs_ids": actifs_ids,
+        "mcr": mcr,
+        "rcr": rcr,
         "vue": vue,
-        "regles": regles,
         "tri": tri,
         "asc": asc,
-        "semaine": semaine,
-        "villes": [{"lieu": v.lieu, "pays": v.pays, "lat": v.latitude, "lon": v.longitude, "nb": v.nb} for v in villes],
         "ville_filtre": ville,
     })
 

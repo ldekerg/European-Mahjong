@@ -72,22 +72,17 @@ def _championnats(db: Session, regles: str):
     return rows
 
 
-@router.get("/")
-def hallfame(
-    request: Request,
-    regles: str = Query("MCR"),
-    vue: str = Query("medailles"),   # medailles | semaines | championnats
-    periode: str = Query("alltime"), # alltime | encours
-    db: Session = Depends(get_db),
-):
-    from ranking import lundi_semaine
-    from datetime import date as dt, timedelta
+def _compute_hof(db: Session, regles: str, periode: str) -> dict:
+    """Calcule toutes les données HoF pour une discipline et une période."""
+    from ranking import lundi_semaine, FREEZE_DEBUT, FREEZE_FIN
+    from datetime import date as dt
+    from collections import defaultdict
+
     semaine_actuelle = lundi_semaine(dt.today())
     actifs_ids = None
-    streak_map = {}  # joueur_id → nb semaines dans la série courante
+    streak_map = {}
 
     if periode == "encours":
-        # Charger toutes les semaines classées par joueur, triées desc
         toutes = db.query(
             ClassementHistorique.joueur_id,
             ClassementHistorique.semaine,
@@ -98,13 +93,11 @@ def hallfame(
             ClassementHistorique.semaine.desc(),
         ).all()
 
-        from collections import defaultdict
         par_joueur = defaultdict(list)
         for jid, sem in toutes:
             par_joueur[jid].append(sem)
 
-        from ranking import FREEZE_DEBUT, FREEZE_FIN
-        freeze_gap = (FREEZE_FIN - FREEZE_DEBUT).days // 7 + 1  # semaines freeze absentes
+        freeze_gap = (FREEZE_FIN - FREEZE_DEBUT).days // 7 + 1
 
         for jid, semaines in par_joueur.items():
             if semaines[0] != semaine_actuelle:
@@ -113,9 +106,9 @@ def hallfame(
             for k in range(1, len(semaines)):
                 diff = (semaines[k-1] - semaines[k]).days // 7
                 if diff == 1:
-                    streak += 1          # consécutif normal
+                    streak += 1
                 elif diff == freeze_gap:
-                    streak += 1          # saut freeze = continuité
+                    streak += 1
                 else:
                     break
             streak_map[jid] = streak
@@ -125,7 +118,6 @@ def hallfame(
     data = _hof_data(db, regles, actifs_ids)
     championnats = _championnats(db, regles)
 
-    # Médailles de tournois (1er/2e/3e dans résultats réels)
     medals_q = db.query(
         Resultat.joueur_id,
         func.sum(case((Resultat.position == 1, 1), else_=0)).label("or_t"),
@@ -138,24 +130,20 @@ def hallfame(
 
     medals_rows = db.query(medals_q, Joueur).join(Joueur, medals_q.c.joueur_id == Joueur.id).all()
     medals_data = [{
-        "joueur":    row.Joueur,
-        "or_t":      row.or_t or 0,
-        "argent_t":  row.argent_t or 0,
-        "bronze_t":  row.bronze_t or 0,
-        "total_t":   row.total_t or 0,
+        "joueur":   row.Joueur,
+        "or_t":     row.or_t or 0,
+        "argent_t": row.argent_t or 0,
+        "bronze_t": row.bronze_t or 0,
+        "total_t":  row.total_t or 0,
     } for row in medals_rows if (row.or_t or 0) + (row.argent_t or 0) + (row.bronze_t or 0) > 0]
     medals_data.sort(key=lambda x: (-x["or_t"], -x["argent_t"], -x["bronze_t"]))
 
-    # En mode "en cours", chaque colonne = série courante à CETTE position
     if periode == "encours" and streak_map:
         def streak_for(semaines_desc, threshold):
-            """Nb semaines consécutives à position <= threshold, finissant à semaine_actuelle."""
             s = 0
             for _, p in semaines_desc:
-                if p <= threshold:
-                    s += 1
-                else:
-                    break
+                if p <= threshold: s += 1
+                else: break
             return s
 
         for d in data:
@@ -170,26 +158,36 @@ def hallfame(
             ).order_by(ClassementHistorique.semaine.desc()).limit(total_streak).all()
 
             d["nb_semaines"] = total_streak
-            d["nb_or"]       = streak_for(toutes_serie, 1)
-            d["nb_argent"]   = streak_for(toutes_serie, 2)   # non affiché mais gardé
-            d["nb_bronze"]   = streak_for(toutes_serie, 3)
-            d["nb_top10"]    = streak_for(toutes_serie, 10)
-            d["nb_top20"]    = streak_for(toutes_serie, 20)
-            d["nb_top50"]    = streak_for(toutes_serie, 50)
+            d["nb_or"]    = streak_for(toutes_serie, 1)
+            d["nb_argent"] = streak_for(toutes_serie, 2)
+            d["nb_bronze"] = streak_for(toutes_serie, 3)
+            d["nb_top10"]  = streak_for(toutes_serie, 10)
+            d["nb_top20"]  = streak_for(toutes_serie, 20)
+            d["nb_top50"]  = streak_for(toutes_serie, 50)
 
-    # Tris par défaut
     if periode == "encours":
         data.sort(key=lambda x: (-x["nb_or"], -x["nb_bronze"], -x["nb_top10"], -x["nb_top20"], -x["nb_top50"]))
-        data = [d for d in data if d["nb_top50"] > 0]  # au moins dans le top50
+        data = [d for d in data if d["nb_top50"] > 0]
     else:
         data.sort(key=lambda x: (-x["nb_or"], -x["nb_argent"], -x["nb_bronze"]))
         data = [d for d in data if d["nb_semaines"] > 0]
 
+    return {"data": data, "medals_data": medals_data, "championnats": championnats}
+
+
+@router.get("/")
+def hallfame(
+    request: Request,
+    vue: str = Query("medailles"),   # medailles | semaines | championnats
+    periode: str = Query("alltime"), # alltime | encours
+    db: Session = Depends(get_db),
+):
+    mcr = _compute_hof(db, "MCR", periode)
+    rcr = _compute_hof(db, "RCR", periode)
+
     return templates.TemplateResponse(request, "hallfame.html", {
-        "data":         data,
-        "medals_data":  medals_data,
-        "championnats": championnats,
-        "regles":   regles,
-        "vue":      vue,
-        "periode":  periode,
+        "mcr":     mcr,
+        "rcr":     rcr,
+        "vue":     vue,
+        "periode": periode,
     })

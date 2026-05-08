@@ -3,22 +3,27 @@
      tournois       — liste de Tournoi
      actifs_ids     — dict {tournoi_id: contribution}
      ville_filtre   — str|None
-   Variables optionnelles (en-têtes triables) :
+   Variables optionnelles :
+     tab_key        — str ('mcr'|'rcr') pour isoler badge/filtreVille par onglet
      tri            — colonne active : date|nom|coeff|joueurs
-     sort_url_base  — base URL pour le tri, ex: "?vue=tous&regles=tous" (on y ajoute &tri=xxx)
-   Dépendance JS : filtreVille() définie dans partials/tournois_carte.html
+     sort_url_base  — base URL pour le tri (on y ajoute &tri=xxx)
 #}
+{% set _tk = tab_key if tab_key is defined else '' %}
+{% set _fv = 'filtreVille_' + _tk if _tk else 'filtreVille' %}
+{% set _badge_id = 'ville-badge-' + _tk if _tk else 'ville-badge' %}
+{% set _badge_nom_id = 'ville-badge-nom-' + _tk if _tk else 'ville-badge-nom' %}
+
 <script>
-if (typeof filtreVille === 'undefined') { function filtreVille() {} }
+window['{{ _fv }}'] = window['{{ _fv }}'] || function() {};
 </script>
 
-<div id="ville-badge" style="{% if not ville_filtre %}display:none{% endif %}" class="ville-badge">
-  📍 <span id="ville-badge-nom">{{ ville_filtre or '' }}</span>
-  <button onclick="filtreVille(villeFiltre)" class="ville-badge-close" title="Effacer le filtre">✕</button>
+<div id="{{ _badge_id }}" style="{% if not ville_filtre %}display:none{% endif %}" class="ville-badge">
+  📍 <span id="{{ _badge_nom_id }}">{{ ville_filtre or '' }}</span>
+  <button onclick="{{ _fv }}(null)" class="ville-badge-close" title="Effacer le filtre">✕</button>
 </div>
 
 <div class="scroll-table t-left-scroll">
-<table id="t-table">
+<table id="t-table-{{ _tk if _tk else 'default' }}">
   <thead>
     <colgroup>
       <col style="width:5.8rem">
@@ -61,11 +66,11 @@ if (typeof filtreVille === 'undefined') { function filtreVille() {} }
   {% for t in tournois %}
   {% set actif = t.id in actifs_ids %}
   {% set contrib = actifs_ids[t.id] if actif else 0 %}
-  <tr class="t-row {% if actif %}row-actif{% endif %} {% if t.type_tournoi in ['wmc','wrc'] %}row-wmc{% elif t.type_tournoi in ['oemc','oerc'] %}row-oemc{% endif %}"
+  <tr class="t-row t-row-{{ _tk if _tk else 'all' }} {% if actif %}row-actif{% endif %} {% if t.type_tournoi in ['wmc','wrc'] %}row-wmc{% elif t.type_tournoi in ['oemc','oerc'] %}row-oemc{% endif %}"
       data-lieu="{{ t.lieu }}">
     <td class="nowrap">{{ t.date_debut.strftime('%d/%m/%y') }}</td>
     <td class="nowrap">{{ t.pays | pays_flag }}</td>
-    <td class="t-ville" onclick="filtreVille('{{ t.lieu }}')">{{ t.lieu }}</td>
+    <td class="t-ville" onclick="{{ _fv }}('{{ t.lieu }}')">{{ t.lieu }}</td>
     <td>
       <a href="/tournois/{{ t.regles }}_{{ t.ema_id }}">{{ t.nom }}</a>
       {% if t.type_tournoi == 'wmc' %}<span class="badge badge-gold">WMC</span>

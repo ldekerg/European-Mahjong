@@ -2,22 +2,7 @@
 {% block content %}
 
 <div class="ranking-header">
-  <h1>Joueurs <span class="t-count-header">({{ total }})</span></h1>
-  <div class="t-filters">
-    <form method="get" action="/joueurs/" style="display:flex;gap:0.5rem;align-items:center">
-      <input type="search" name="q" value="{{ q }}" placeholder="Nom, prénom, ID…"
-             style="padding:0.3rem 0.6rem;border:1px solid var(--border);border-radius:4px;font-size:0.85rem;width:14rem;background:var(--bg2);color:var(--text)">
-      <input type="hidden" name="tri" value="{{ tri }}">
-      <input type="hidden" name="regles" value="{{ regles }}">
-      <button type="submit" class="btn-sm">🔍</button>
-    </form>
-    <div class="t-filter-group">
-      {% for r, label in [('tous','Tous'),('MCR','MCR'),('RCR','RCR')] %}
-      <a href="?tri={{ tri }}&regles={{ r }}&q={{ q }}"
-         class="filter-btn {% if regles == r %}active{% endif %}">{{ label }}</a>
-      {% endfor %}
-    </div>
-  </div>
+  <h1>👥 Joueurs <span class="t-count-header">({{ total }})</span></h1>
 </div>
 
 {% with sort_url_base='?regles=' + regles + '&q=' + q, asc=asc %}

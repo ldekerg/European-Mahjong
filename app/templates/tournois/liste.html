@@ -1,39 +1,51 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="ranking-header">
-  <h1>Tournois <span class="t-count-header">({{ tournois | length }})</span></h1>
+  <h1>Tournois</h1>
   <div class="t-filters">
     <div class="t-filter-group">
-      {% for r, label in [('tous','MCR+RCR'),('MCR','MCR'),('RCR','RCR')] %}
-      <a href="?vue={{ vue }}&regles={{ r }}&tri={{ tri }}"
-         class="filter-btn {% if regles == r %}active{% endif %}">{{ label }}</a>
-      {% endfor %}
-    </div>
-    <div class="t-filter-group">
       {% for v, label in [('actifs','Actifs'),('tous','Tous'),('speciaux','Spéciaux')] %}
-      <a href="?vue={{ v }}&regles={{ regles }}&tri={{ tri }}"
-         class="filter-btn {% if vue == v %}active{% endif %}">{{ label }}</a>
+      <a href="?vue={{ v }}&tri={{ tri }}" class="filter-btn {% if vue == v %}active{% endif %}">{{ label }}</a>
       {% endfor %}
     </div>
     {% if ville_filtre %}
-    <a href="?vue={{ vue }}&regles={{ regles }}&tri={{ tri }}" class="filter-btn active">
-      📍 {{ ville_filtre }} ✕
-    </a>
+    <span class="filter-btn active">📍 {{ ville_filtre }}</span>
     {% endif %}
   </div>
 </div>
 
-<div class="t-layout">
-  <!-- Table -->
-  <div class="t-left">
-    {% with sort_url_base='?vue=' + vue + '&regles=' + regles, asc=asc %}
-    {% include 'partials/tournois_table.html' %}
-    {% endwith %}
-  </div>
+<!-- Onglets MCR / RCR -->
+<div class="tabs">
+  <button class="tab-btn active" onclick="showTab('mcr', this)"><span class="badge badge-mcr">MCR</span> ({{ mcr.tournois | length }})</button>
+  <button class="tab-btn"       onclick="showTab('rcr', this)"><span class="badge badge-rcr">RCR</span> ({{ rcr.tournois | length }})</button>
+</div>
 
-  <!-- Carte -->
-  <div class="t-right">
-    {% include 'partials/tournois_carte.html' %}
+{% for regles_key, tab in [('mcr', mcr), ('rcr', rcr)] %}
+<div id="tab-{{ regles_key }}" class="tab-content {% if regles_key != 'mcr' %}hidden{% endif %}">
+  <div class="t-layout">
+    <div class="t-left">
+      {% with tournois=tab.tournois, actifs_ids=tab.actifs_ids, ville_filtre=ville_filtre,
+              tab_key=regles_key, sort_url_base='?vue=' + vue, asc=asc %}
+      {% include 'partials/tournois_table.html' %}
+      {% endwith %}
+    </div>
+    <div class="t-right">
+      {% with villes=tab.villes, ville_filtre=ville_filtre, tab_key=regles_key %}
+      {% include 'partials/tournois_carte.html' %}
+      {% endwith %}
+    </div>
   </div>
 </div>
+{% endfor %}
+
+<script>
+function showTab(name, btn) {
+  ['mcr','rcr'].forEach(function(r) {
+    document.getElementById('tab-' + r).classList.add('hidden');
+  });
+  document.querySelectorAll('.tabs .tab-btn').forEach(function(b) { b.classList.remove('active'); });
+  document.getElementById('tab-' + name).classList.remove('hidden');
+  btn.classList.add('active');
+}
+</script>
 {% endblock %}

@@ -521,12 +521,12 @@ tr.hidden { display: none; }
 .t-layout { display: grid; grid-template-columns: 1fr 500px; gap: 1.5rem; align-items: start; }
 .t-left   { min-width: 0; }
 .t-right  { position: sticky; top: 7.5rem; }
-#t-map    { height: 480px; border-radius: 8px; border: 1px solid var(--border); z-index: 1; }
+#t-map, [id^="t-map-"] { height: 480px; border-radius: 8px; border: 1px solid var(--border); z-index: 1; }
 .t-map-hint { font-size: 0.75rem; color: var(--text3); text-align: center; margin-top: 0.3rem; }
 .t-ville  { cursor: pointer; color: var(--accent); }
 .t-ville:hover { text-decoration: underline; }
 .t-right { margin-top: 0; padding-top: 0; }
-#t-map   { margin-top: 0; }
+#t-map, [id^="t-map-"] { margin-top: 0; }
 caption.t-count {
     caption-side: top;
     text-align: left;

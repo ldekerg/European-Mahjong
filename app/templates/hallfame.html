@@ -5,73 +5,92 @@
   <h1>🏆 Hall of Fame</h1>
   <div class="t-filters">
     <div class="t-filter-group">
-      {% for r in ['MCR','RCR'] %}
-      <a href="?regles={{ r }}&vue={{ vue }}" class="filter-btn {% if regles == r %}active{% endif %}">{{ r }}</a>
-      {% endfor %}
-    </div>
-    <div class="t-filter-group">
       {% for v, label in [('medailles','🎖 Médailles tournois'),('semaines','⏱ Semaines au sommet'),('championnats','🌍 Championnats')] %}
-      <a href="?regles={{ regles }}&vue={{ v }}&periode={{ periode }}" class="filter-btn {% if vue == v %}active{% endif %}">{{ label }}</a>
+      <a href="?vue={{ v }}&periode={{ periode }}" class="filter-btn {% if vue == v %}active{% endif %}">{{ label }}</a>
       {% endfor %}
     </div>
   </div>
 </div>
 
-{% if vue == 'championnats' %}
-{% include 'partials/hof_championnats_table.html' %}
-
-{% elif vue == 'medailles' %}
-{% include 'partials/hof_medals_table.html' %}
-
-{% else %}
-<!-- Filtre période -->
-<div class="t-filters" style="margin-bottom:0.75rem;justify-content:flex-end">
-  <div class="t-filter-group">
-    {% for p, label in [('alltime','All time'),('encours','En cours')] %}
-    <a href="?regles={{ regles }}&vue={{ vue }}&periode={{ p }}" class="filter-btn {% if periode == p %}active{% endif %}">{{ label }}</a>
-    {% endfor %}
-  </div>
+<!-- Onglets MCR / RCR -->
+<div class="tabs">
+  <button class="tab-btn active" onclick="showTab('mcr', this)"><span class="badge badge-mcr">MCR</span></button>
+  <button class="tab-btn"       onclick="showTab('rcr', this)"><span class="badge badge-rcr">RCR</span></button>
 </div>
-{% include 'partials/hof_semaines_table.html' %}
-{% endif %}
+
+{% for regles_key, tab in [('mcr', mcr), ('rcr', rcr)] %}
+<div id="tab-{{ regles_key }}" class="tab-content {% if regles_key != 'mcr' %}hidden{% endif %}">
+
+  {% if vue == 'championnats' %}
+  {% with championnats=tab.championnats %}
+  {% include 'partials/hof_championnats_table.html' %}
+  {% endwith %}
+
+  {% elif vue == 'medailles' %}
+  {% with medals_data=tab.medals_data, table_id='hof-medals-' + regles_key %}
+  {% include 'partials/hof_medals_table.html' %}
+  {% endwith %}
+
+  {% else %}
+  <div class="t-filters" style="margin-bottom:0.75rem;justify-content:flex-end">
+    <div class="t-filter-group">
+      {% for p, label in [('alltime','All time'),('encours','En cours')] %}
+      <a href="?vue={{ vue }}&periode={{ p }}" class="filter-btn {% if periode == p %}active{% endif %}">{{ label }}</a>
+      {% endfor %}
+    </div>
+  </div>
+  {% with data=tab.data, periode=periode, table_id='hof-semaines-' + regles_key %}
+  {% include 'partials/hof_semaines_table.html' %}
+  {% endwith %}
+  {% endif %}
+
+</div>
+{% endfor %}
 
 <script>
-var _sortCol = -1, _sortAsc = false;
+function showTab(name, btn) {
+  ['mcr','rcr'].forEach(function(r) {
+    document.getElementById('tab-' + r).classList.add('hidden');
+  });
+  document.querySelectorAll('.tabs .tab-btn').forEach(function(b) { b.classList.remove('active'); });
+  document.getElementById('tab-' + name).classList.remove('hidden');
+  btn.classList.add('active');
+  // Trier la table active
+  var tid = '{{ "hof-medals" if vue == "medailles" else "hof-semaines" }}-' + name;
+  sortDefault(tid);
+}
 
-// Tri par défaut au chargement : col3 → col4 → col5 → col6
-window.addEventListener('DOMContentLoaded', function() {
-  if (document.getElementById('hof-table')) {
-    // Appliquer le tie-break multi-colonnes sans changer l'icône
-    var table = document.getElementById('hof-table');
-    if (!table) return;
-    var rows = Array.from(table.tBodies[0].rows);
-    function getVal(row, c) { var el = row.cells[c]; return el && el.dataset.val ? parseInt(el.dataset.val) || 0 : 0; }
-    rows.sort(function(a, b) {
-      for (var c of [3, 4, 5, 6, 7]) {
-        var da = getVal(a, c), db = getVal(b, c);
-        if (da !== db) return db - da;
-      }
-      return (parseInt(a.dataset.total) || 9999) - (parseInt(b.dataset.total) || 9999);
-    });
-    rows.forEach(function(r, i) {
-      r.cells[0].textContent = i + 1;
-      table.tBodies[0].appendChild(r);
-    });
-  }
-});
-
-function sortTable(col) {
-  var table = document.getElementById('hof-table');
+function sortDefault(tableId) {
+  var table = document.getElementById(tableId);
   if (!table) return;
-  _sortAsc = (_sortCol === col) ? !_sortAsc : false;
-  _sortCol = col;
+  var rows = Array.from(table.tBodies[0].rows);
+  function getVal(row, c) { var el = row.cells[c]; return el && el.dataset.val ? parseInt(el.dataset.val) || 0 : 0; }
+  rows.sort(function(a, b) {
+    for (var c of [3, 4, 5, 6, 7]) {
+      var da = getVal(a, c), db = getVal(b, c);
+      if (da !== db) return db - da;
+    }
+    return (parseInt(a.dataset.total) || 9999) - (parseInt(b.dataset.total) || 9999);
+  });
+  rows.forEach(function(r, i) {
+    r.cells[0].textContent = i + 1;
+    table.tBodies[0].appendChild(r);
+  });
+}
+
+var _sortState = {};
+function sortTable(col, tableId) {
+  var table = document.getElementById(tableId);
+  if (!table) return;
+  var prev = _sortState[tableId] || {};
+  var asc = (prev.col === col) ? !prev.asc : false;
+  _sortState[tableId] = {col: col, asc: asc};
+
   var rows = Array.from(table.tBodies[0].rows);
   function getVal(row, c) { return parseInt(row.cells[c].dataset.val) || 0; }
   rows.sort(function(a, b) {
-    // Tri principal
     var va = getVal(a, col), vb = getVal(b, col);
-    if (va !== vb) return _sortAsc ? va - vb : vb - va;
-    // Tie-break 
+    if (va !== vb) return asc ? va - vb : vb - va;
     for (var c of [3, 4, 5, 6]) {
       if (c === col) continue;
       var da = getVal(a, c), db = getVal(b, c);
@@ -79,15 +98,20 @@ function sortTable(col) {
     }
     return (parseInt(a.dataset.total) || 9999) - (parseInt(b.dataset.total) || 9999);
   });
-
   rows.forEach(function(r, i) {
     r.cells[0].textContent = i + 1;
     table.tBodies[0].appendChild(r);
   });
-  // Mettre à jour les icônes
-  document.querySelectorAll('.sort-icon').forEach(function(el) { el.textContent = '⇅'; });
+  table.querySelectorAll('.sort-icon').forEach(function(el) { el.textContent = '⇅'; });
   var ths = table.tHead.rows[0].cells;
-  if (ths[col]) ths[col].querySelector('.sort-icon').textContent = _sortAsc ? '↑' : '↓';
+  if (ths[col]) ths[col].querySelector('.sort-icon').textContent = asc ? '↑' : '↓';
 }
+
+window.addEventListener('DOMContentLoaded', function() {
+  ['mcr','rcr'].forEach(function(r) {
+    var tid = '{{ "hof-medals" if vue == "medailles" else "hof-semaines" }}-' + r;
+    sortDefault(tid);
+  });
+});
 </script>
 {% endblock %}

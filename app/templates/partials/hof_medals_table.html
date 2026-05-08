@@ -4,7 +4,7 @@
    Dépendances JS : sortTable() et le tri DOMContentLoaded définis dans hallfame.html
 #}
 <div class="scroll-table">
-<table id="hof-table" style="table-layout:fixed;width:100%">
+<table id="{{ table_id if table_id is defined else 'hof-table' }}" style="table-layout:fixed;width:100%">
   <colgroup>
     <col style="width:2.5rem"><col style="width:2rem"><col style="width:14rem">
     <col style="width:4rem"><col style="width:4rem"><col style="width:4rem">
@@ -15,11 +15,12 @@
       <th class="center">#</th>
       <th class="center">🌍</th>
       <th>Joueur</th>
-      <th class="center sortable" onclick="sortTable(3)" title="Victoires">🥇 <span class="sort-icon">⇅</span></th>
-      <th class="center sortable" onclick="sortTable(4)" title="2e places">🥈 <span class="sort-icon">⇅</span></th>
-      <th class="center sortable" onclick="sortTable(5)" title="3e places">🥉 <span class="sort-icon">⇅</span></th>
-      <th class="center sortable" onclick="sortTable(6)" title="Total médailles">🏅 <span class="sort-icon">⇅</span></th>
-      <th class="center sortable" onclick="sortTable(7)" title="Tournois joués">Tournois <span class="sort-icon">⇅</span></th>
+      {% set _tid = table_id if table_id is defined else 'hof-table' %}
+      <th class="center sortable" onclick="sortTable(3,'{{ _tid }}')" title="Victoires">🥇 <span class="sort-icon">⇅</span></th>
+      <th class="center sortable" onclick="sortTable(4,'{{ _tid }}')" title="2e places">🥈 <span class="sort-icon">⇅</span></th>
+      <th class="center sortable" onclick="sortTable(5,'{{ _tid }}')" title="3e places">🥉 <span class="sort-icon">⇅</span></th>
+      <th class="center sortable" onclick="sortTable(6,'{{ _tid }}')" title="Total médailles">🏅 <span class="sort-icon">⇅</span></th>
+      <th class="center sortable" onclick="sortTable(7,'{{ _tid }}')" title="Tournois joués">Tournois <span class="sort-icon">⇅</span></th>
     </tr>
   </thead>
   <tbody>
