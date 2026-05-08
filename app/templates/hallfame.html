@@ -22,9 +22,70 @@
 <div id="tab-{{ regles_key }}" class="tab-content {% if regles_key != 'mcr' %}hidden{% endif %}">
 
   {% if vue == 'championnats' %}
-  {% with championnats=tab.championnats %}
-  {% include 'partials/hof_championnats_table.html' %}
-  {% endwith %}
+  {% set is_mcr = regles_key == 'mcr' %}
+
+  <!-- Champions en titre -->
+  <div class="stats-grid" style="margin-bottom:1.5rem">
+    {% for type_key, label, is_world in ([('oemc','🇪🇺 Championnat d\'Europe', false), ('wmc','🌍 Championnat du Monde', true)] if is_mcr else [('oerc','🇪🇺 Championnat d\'Europe', false), ('wrc','🌍 Championnat du Monde', true)]) %}
+    {% set c = champions[type_key] %}
+    <div class="stat-card" style="text-align:center">
+      <div class="stat-label" style="font-size:0.8rem;margin-bottom:0.5rem">{{ label }}</div>
+      {% if c %}
+      <div style="font-size:1.8rem">{{ c.joueur.nationalite | flag }}</div>
+      <a href="/joueurs/{{ c.joueur.id }}" style="font-weight:700;display:block;margin:0.25rem 0;font-size:0.9rem">
+        {{ c.joueur.prenom | prenom }} {{ c.joueur.nom | title }}
+      </a>
+      <div class="dim" style="font-size:0.78rem">{{ c.tournoi.nom[:35] }}</div>
+      <div style="margin-top:0.4rem">
+        {% if c.est_champion %}<span style="color:var(--or-fg);font-weight:700">🥇 Champion</span>
+        {% elif c.est_vice %}<span style="color:var(--argent-fg);font-weight:700">🥈 Vice-champion</span>
+        {% elif c.est_bronze %}<span style="color:var(--bronze-fg);font-weight:700">🥉 3e place</span>
+        {% else %}<span class="dim">{{ c.position }}e / {{ c.tournoi.nb_joueurs }}</span>
+        {% endif %}
+        {% if is_world and not c.est_champion %}
+        <span class="dim" style="font-size:0.75rem;display:block">Meilleur européen</span>
+        {% endif %}
+      </div>
+      <div class="dim" style="font-size:0.75rem;margin-top:0.25rem">
+        {{ c.tournoi.date_debut.strftime('%Y') if c.tournoi.date_debut.year != 1900 else '' }}
+      </div>
+      {% else %}
+      <div class="dim" style="font-size:0.82rem;margin-top:0.5rem">Pas de données</div>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Palmarès par tournoi -->
+  <h2 style="margin-bottom:0.75rem">Palmarès européen</h2>
+  {% set palmares = palmares_mcr if is_mcr else palmares_rcr %}
+  <div style="display:flex;flex-direction:column;gap:1rem">
+  {% for item in palmares %}
+  {% set t = item.tournoi %}
+  <div style="background:var(--bg2);border-radius:8px;padding:0.75rem 1rem;border:1px solid var(--border)">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem">
+      <div>
+        <a href="/tournois/{{ t.regles }}_{{ t.ema_id }}" style="font-weight:700;font-size:0.95rem">{{ t.nom }}</a>
+        {% if t.type_tournoi in ['wmc','wrc'] %}<span class="badge badge-gold" style="margin-left:0.4rem">{{ 'WMC' if t.type_tournoi == 'wmc' else 'WRC' }}</span>
+        {% else %}<span class="badge" style="margin-left:0.4rem">{{ 'OEMC' if t.type_tournoi == 'oemc' else 'OERC' }}</span>{% endif %}
+      </div>
+      <span class="dim" style="font-size:0.82rem">{{ t.date_debut.strftime('%d/%m/%Y') if t.date_debut.year != 1900 else '—' }} · {{ t.nb_joueurs }} joueurs</span>
+    </div>
+    <div style="display:flex;gap:1rem;flex-wrap:wrap">
+      {% for p in item.top3 %}
+      <div style="display:flex;align-items:center;gap:0.4rem;font-size:0.88rem">
+        {% if p.position == 1 %}<span>🥇</span>
+        {% elif p.position == 2 %}<span>🥈</span>
+        {% elif p.position == 3 %}<span>🥉</span>
+        {% else %}<span class="dim" style="width:1.8rem;text-align:center;font-size:0.82rem">{{ p.position }}<sup>e</sup></span>{% endif %}
+        <span>{{ p.joueur.nationalite | flag }}</span>
+        <a href="/joueurs/{{ p.joueur.id }}">{{ p.joueur.prenom | prenom }} {{ p.joueur.nom | title }}</a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endfor %}
+  </div>
 
   {% elif vue == 'medailles' %}
   {% with medals_data=tab.medals_data, table_id='hof-medals-' + regles_key %}

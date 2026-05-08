@@ -19,7 +19,9 @@
     <tr class="{% if t.type_tournoi in ['wmc','wrc'] %}row-wmc{% else %}row-oemc{% endif %}">
       <td class="nowrap">
         <a href="/tournois/{{ t.regles }}_{{ t.ema_id }}">{{ t.nom[:28] }}</a>
-        {% if t.type_tournoi in ['wmc','wrc'] %}<span class="badge badge-gold">WMC</span>
+        {% if t.type_tournoi == 'wmc' %}<span class="badge badge-gold">WMC</span>
+        {% elif t.type_tournoi == 'wrc' %}<span class="badge badge-gold">WRC</span>
+        {% elif t.type_tournoi == 'oerc' %}<span class="badge">OERC</span>
         {% else %}<span class="badge">OEMC</span>{% endif %}
       </td>
       <td class="td-pos">

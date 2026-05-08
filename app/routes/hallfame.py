@@ -72,6 +72,72 @@ def _championnats(db: Session, regles: str):
     return rows
 
 
+def _meilleur_europeen(db: Session, type_tournoi: str):
+    """Meilleur joueur européen du dernier tournoi de ce type."""
+    from sqlalchemy import func
+    # Date du dernier tournoi de ce type AVEC des résultats
+    dernier = db.query(func.max(Tournoi.date_debut)).join(
+        Resultat, Resultat.tournoi_id == Tournoi.id
+    ).filter(
+        Tournoi.type_tournoi == type_tournoi
+    ).scalar()
+    if not dernier:
+        return None
+
+    tournoi = db.query(Tournoi).filter(
+        Tournoi.type_tournoi == type_tournoi,
+        Tournoi.date_debut == dernier,
+    ).first()
+
+    resultat = db.query(Resultat, Joueur).join(
+        Joueur, Resultat.joueur_id == Joueur.id
+    ).filter(
+        Resultat.tournoi_id == tournoi.id,
+        Joueur.statut == "europeen",
+    ).order_by(Resultat.position).first()
+
+    if not resultat:
+        return None
+
+    r, j = resultat
+    return {
+        "tournoi":  tournoi,
+        "joueur":   j,
+        "position": r.position,
+        "est_champion": r.position == 1,
+        "est_vice":     r.position == 2,
+        "est_bronze":   r.position == 3,
+    }
+
+
+def _palmares_championnats(db: Session, regles: str) -> list:
+    """Pour chaque tournoi majeur avec résultats, retourne les 3 meilleurs Européens."""
+    types = ["wmc", "oemc"] if regles == "MCR" else ["wrc", "oerc"]
+    tournois = db.query(Tournoi).filter(
+        Tournoi.type_tournoi.in_(types),
+        Tournoi.date_debut.isnot(None),
+        Tournoi.date_debut != __import__('datetime').date(1900, 1, 1),
+    ).order_by(Tournoi.date_debut.desc()).all()
+
+    result = []
+    for t in tournois:
+        top3 = db.query(Resultat, Joueur).join(
+            Joueur, Resultat.joueur_id == Joueur.id
+        ).filter(
+            Resultat.tournoi_id == t.id,
+            Joueur.statut == "europeen",
+        ).order_by(Resultat.position).limit(3).all()
+
+        if not top3:
+            continue  # Tournoi sans résultats (futur)
+
+        result.append({
+            "tournoi": t,
+            "top3": [{"joueur": j, "position": r.position} for r, j in top3],
+        })
+    return result
+
+
 def _compute_hof(db: Session, regles: str, periode: str) -> dict:
     """Calcule toutes les données HoF pour une discipline et une période."""
     from ranking import lundi_semaine, FREEZE_DEBUT, FREEZE_FIN
@@ -185,9 +251,21 @@ def hallfame(
     mcr = _compute_hof(db, "MCR", periode)
     rcr = _compute_hof(db, "RCR", periode)
 
+    champions = {
+        "oemc": _meilleur_europeen(db, "oemc"),
+        "wmc":  _meilleur_europeen(db, "wmc"),
+        "oerc": _meilleur_europeen(db, "oerc"),
+        "wrc":  _meilleur_europeen(db, "wrc"),
+    }
+    palmares_mcr = _palmares_championnats(db, "MCR")
+    palmares_rcr = _palmares_championnats(db, "RCR")
+
     return templates.TemplateResponse(request, "hallfame.html", {
-        "mcr":     mcr,
-        "rcr":     rcr,
-        "vue":     vue,
-        "periode": periode,
+        "mcr":          mcr,
+        "rcr":          rcr,
+        "vue":          vue,
+        "periode":      periode,
+        "champions":    champions,
+        "palmares_mcr": palmares_mcr,
+        "palmares_rcr": palmares_rcr,
     })
