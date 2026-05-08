@@ -46,6 +46,7 @@
     map = L.map(CARTE_ID);
     {% if carte_bounds is defined and carte_bounds %}
     map.fitBounds({{ carte_bounds | tojson }}, {padding: [20, 20]});
+    map.setZoom(map.getZoom() - 1);
     {% else %}
     map.setView([50, 10], 4);
     {% endif %}
