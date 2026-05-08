@@ -1,4 +1,5 @@
 import os
+from markupsafe import Markup
 from fastapi.templating import Jinja2Templates
 
 _TEMPLATES_DIR = os.path.join(os.path.dirname(__file__), "templates")
@@ -6,18 +7,42 @@ _TEMPLATES_DIR = os.path.join(os.path.dirname(__file__), "templates")
 templates = Jinja2Templates(directory=_TEMPLATES_DIR)
 
 
-def flag_emoji(code: str) -> str:
-    """Code ISO 2 lettres → emoji drapeau. Ex: 'FR' → '🇫🇷'. Guest → 🌍"""
-    if not code:
+def _to_iso(value: str) -> str | None:
+    """Résout un code ISO ou un nom de pays → code ISO 2 lettres, ou None."""
+    if not value:
+        return None
+    v = value.strip()
+    if len(v) == 2:
+        return v.upper()
+    return _PAYS_ISO.get(v.lower())
+
+
+def flag_emoji(value: str) -> str:
+    """Code ISO 2 lettres OU nom de pays → emoji drapeau. Guest → 🌍"""
+    if not value:
         return ""
-    if code.upper() in ("GUEST", "OTHER", "XX"):
+    if value.upper() in ("GUEST", "OTHER", "XX"):
         return "🌍"
-    if len(code) < 2:
+    iso = _to_iso(value) or (value.upper()[:2] if len(value) >= 2 else "")
+    if not iso or len(iso) < 2:
         return ""
-    return "".join(chr(0x1F1E6 + ord(c) - ord("A")) for c in code.upper()[:2])
+    return "".join(chr(0x1F1E6 + ord(c) - ord("A")) for c in iso[:2])
 
 
-templates.env.filters["flag"] = flag_emoji
+def flag_link(value: str, onglet: str = "joueurs") -> Markup:
+    """Code ISO OU nom de pays → drapeau cliquable vers /pays/{ISO}?onglet=X."""
+    if not value or value.upper() in ("GUEST", "OTHER", "XX"):
+        return Markup(flag_emoji(value))
+    iso = _to_iso(value)
+    if not iso:
+        return Markup(flag_emoji(value))
+    emoji = flag_emoji(iso)
+    url = f"/pays/{iso}?onglet={onglet}"
+    return Markup(f'<a href="{url}" title="{value}" onclick="event.stopPropagation()">{emoji}</a>')
+
+
+templates.env.filters["flag"]      = flag_emoji
+templates.env.filters["flag_link"] = flag_link
 
 ISO_NOM_PAYS = {
     "FR": "France",       "DE": "Germany",       "NL": "Netherlands",   "BE": "Belgium",
@@ -49,19 +74,9 @@ _PAYS_ISO = {
     "bosnia and h.": "BA", "luxembourg": "LU", "ireland": "IE",
 }
 
-def pays_flag(pays: str) -> str:
-    """Convertit un nom de pays en emoji drapeau."""
-    if not pays:
-        return ""
-    iso = _PAYS_ISO.get(pays.lower().strip())
-    if iso:
-        return flag_emoji(iso)
-    # Fallback : essayer les 2 premiers caractères si le pays ressemble à un code
-    if len(pays) == 2:
-        return flag_emoji(pays)
-    return ""
-
-templates.env.filters["pays_flag"] = pays_flag
+# Alias rétrocompatibles — même comportement que flag / flag_link
+templates.env.filters["pays_flag"]      = flag_emoji
+templates.env.filters["pays_flag_link"] = flag_link
 
 
 def ema_color(value: int, max_val: int = 1000) -> str:

@@ -87,10 +87,10 @@
         <td class="col-date">{{ t.date.strftime('%d/%m/%Y') if t.date.year != 1900 else '—' }}</td>
         <td class="col-duree center">{{ t.duree }}j</td>
         <td class="nowrap">
-          {{ t.pays | pays_flag }}
+          {{ t.pays | pays_flag_link('tournois') }}
           <span class="t-ville" onclick="filtreJoueurVille('{{ t.lieu }}', '{{ regles | upper }}', this)">{{ t.lieu }}</span>
           {% if t.nat_tournoi != joueur.nationalite %}
-          <span title="Nationalité lors du tournoi : {{ t.nat_tournoi }}">{{ t.nat_tournoi | flag }}</span>
+          <span title="Nationalité lors du tournoi : {{ t.nat_tournoi }}">{{ t.nat_tournoi | flag_link('joueurs') }}</span>
           {% endif %}
         </td>
         <td>

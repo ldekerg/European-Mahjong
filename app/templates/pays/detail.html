@@ -212,6 +212,14 @@ function showTab(name, btn) {
 }
 
 window.addEventListener('DOMContentLoaded', function() {
+  // Activer l'onglet principal demandé par l'URL (?onglet=classement|tournois|joueurs)
+  var ongletUrl = new URLSearchParams(window.location.search).get('onglet');
+  if (ongletUrl && ongletUrl !== 'classement') {
+    var btn = document.querySelector('#main-tabs .tab-btn[onclick*="' + ongletUrl + '"]');
+    if (btn) showMainTab(ongletUrl, btn);
+  }
+
+  // Charger l'aperçu par défaut dans l'onglet classement
   var defaut = '{{ onglet_actif }}' === 'RCR' ? _joueurDefautRCR : _joueurDefautMCR;
   if (defaut) fetchApercu(defaut, '{{ onglet_actif }}');
 });

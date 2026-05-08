@@ -8,7 +8,7 @@
   <div class="player-id">{{ joueur.id }}</div>
   <div class="player-name">{{ joueur.prenom | prenom }} {{ joueur.nom | title }}</div>
   <div class="player-meta">
-    <span class="flag">{{ joueur.nationalite | flag }} {{ joueur.nationalite }}</span>
+    <span class="flag">{{ joueur.nationalite | flag_link('joueurs') }} {{ joueur.nationalite }}</span>
     {% if joueur.statut != 'europeen' %}<span class="statut statut-{{ joueur.statut }}">{{ joueur.statut }}</span>{% endif %}
     {% if show_edit %}<a href="/joueurs/{{ joueur.id }}/modifier" class="btn-sm">Modifier</a>{% endif %}
   </div>

@@ -5,7 +5,7 @@
   <div>
     <div class="player-name">{{ tournoi.nom }}</div>
     <div class="player-meta">
-      <span>{{ tournoi.pays | pays_flag }} {{ tournoi.lieu }}</span>
+      <span>{{ tournoi.pays | pays_flag_link('tournois') }} {{ tournoi.lieu }}</span>
       <span class="dim">{{ tournoi.date_debut.strftime('%d/%m/%Y') }} → {{ tournoi.date_fin.strftime('%d/%m/%Y') }}</span>
       <span class="badge {% if tournoi.regles == 'MCR' %}badge-mcr{% else %}badge-rcr{% endif %}">{{ tournoi.regles }}</span>
       {% if tournoi.type_tournoi == 'wmc' %}<span class="badge badge-gold">WMC</span>
@@ -53,7 +53,7 @@
         <span class="pos-medal">{% if r.position == 1 %}🥇{% elif r.position == 2 %}🥈{% elif r.position == 3 %}🥉{% else %}{{ r.position }}{% endif %}</span>
       </td>
       <td><a href="/joueurs/{{ r.joueur.id }}">{{ r.joueur.id }}</a></td>
-      <td class="center">{{ r.joueur.nationalite | flag }}</td>
+      <td class="center">{{ r.joueur.nationalite | flag_link('joueurs') }}</td>
       <td>{{ r.joueur.prenom | prenom }} {{ r.joueur.nom | title }}</td>
       {% if is_mcr %}<td class="right">{{ r.points }}</td>{% endif %}
       <td class="right">{{ r.mahjong }}</td>

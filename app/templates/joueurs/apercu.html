@@ -4,7 +4,7 @@
 <div class="apercu-header">
   <div class="apercu-name">{{ joueur.prenom | prenom }} {{ joueur.nom | title }}</div>
   <div class="apercu-meta">
-    {{ joueur.nationalite | flag }} {{ joueur.nationalite }}
+    {{ joueur.nationalite | flag_link('joueurs') }} {{ joueur.nationalite }}
     {% if joueur.statut != 'europeen' %}<span class="statut statut-{{ joueur.statut }}">{{ joueur.statut }}</span>{% endif %}
   </div>
   <div class="apercu-id">{{ joueur.id }}</div>

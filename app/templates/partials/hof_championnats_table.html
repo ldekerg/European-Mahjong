@@ -26,7 +26,7 @@
         <span class="pos-medal">{% if r.position == 1 %}🥇{% elif r.position == 2 %}🥈{% elif r.position == 3 %}🥉{% endif %}</span>
         <span class="pos-score">{{ r.position }}</span>
       </td>
-      <td class="center">{{ j.nationalite | flag }}</td>
+      <td class="center">{{ j.nationalite | flag_link('classement') }}</td>
       <td><a href="/joueurs/{{ j.id }}">{{ j.prenom | prenom }} {{ j.nom | title }}</a></td>
       <td class="dim nowrap">{{ t.date_debut.strftime('%d/%m/%Y') if t.date_debut.year != 1900 else '—' }}</td>
       <td class="right ema-pts" style="{{ r.ranking | ema_color }}">{{ r.ranking }}</td>

@@ -69,7 +69,7 @@ window['{{ _fv }}'] = window['{{ _fv }}'] || function() {};
   <tr class="t-row t-row-{{ _tk if _tk else 'all' }} {% if actif %}row-actif{% endif %} {% if t.type_tournoi in ['wmc','wrc'] %}row-wmc{% elif t.type_tournoi in ['oemc','oerc'] %}row-oemc{% endif %}"
       data-lieu="{{ t.lieu }}">
     <td class="col-date">{{ t.date_debut.strftime('%d/%m/%y') }}</td>
-    <td class="col-flag">{{ t.pays | pays_flag }}</td>
+    <td class="col-flag">{{ t.pays | pays_flag_link('tournois') }}</td>
     <td class="col-ville t-ville" onclick="{{ _fv }}('{{ t.lieu }}')">{{ t.lieu }}</td>
     <td>
       <a href="/tournois/{{ t.regles }}_{{ t.ema_id }}">{{ t.nom }}</a>

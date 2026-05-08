@@ -56,7 +56,7 @@
         {% elif r.delta < 0 %}<span class="delta-down">▼{{ r.delta | abs }}</span>
         {% else %}<span class="dim">—</span>{% endif %}
       </td>
-      <td class="col-flag">{{ r.nationalite | flag }}</td>
+      <td class="col-flag">{{ r.nationalite | flag_link('classement') }}</td>
       <td><a href="/joueurs/{{ r.joueur_id }}" {% if show_apercu %}onclick="event.stopPropagation()"{% endif %}>{{ r.prenom | prenom }} {{ r.nom | title }}</a></td>
       <td class="col-score score-val">{{ r.score | round(2) }}</td>
       <td class="col-joueurs rank-num">{{ r.nb_tournois }}</td>

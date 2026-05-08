@@ -74,7 +74,7 @@
       <td class="dim" style="font-family:monospace;font-size:0.8rem">
         <a href="/joueurs/{{ j.id }}" {% if _apercu %}onclick="event.stopPropagation()"{% endif %}>{{ j.id }}</a>
       </td>
-      <td class="col-flag">{{ j.nationalite | flag }}</td>
+      <td class="col-flag">{{ j.nationalite | flag_link('joueurs') }}</td>
       <td>{{ j.nom | title }}</td>
       <td>{{ j.prenom | prenom }}</td>
       <td class="center dim" style="font-size:0.82rem">{{ row.premier.strftime('%m/%Y') if row.premier else '—' }}</td>

@@ -28,7 +28,7 @@
     {% set total_medals = d.or_t + d.argent_t + d.bronze_t %}
     <tr data-total="{{ d.total_t }}">
       <td class="center rank-num">{{ loop.index }}</td>
-      <td class="center">{{ d.joueur.nationalite | flag }}</td>
+      <td class="center">{{ d.joueur.nationalite | flag_link('classement') }}</td>
       <td><a href="/joueurs/{{ d.joueur.id }}">{{ d.joueur.prenom | prenom }} {{ d.joueur.nom | title }}</a></td>
       <td class="center" data-val="{{ d.or_t }}">{% if d.or_t %}<strong>{{ d.or_t }}</strong>{% else %}<span class="dim">—</span>{% endif %}</td>
       <td class="center" data-val="{{ d.argent_t }}">{{ d.argent_t or '—' }}</td>
