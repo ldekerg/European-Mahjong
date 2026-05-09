@@ -1,0 +1,90 @@
+{# Liste des tournois du calendrier.
+   Variables requises :
+     tournois_par_mois — liste de {label, tournois}
+   Variables optionnelles :
+     compact     — bool, si true affiche N premiers sans entêtes de mois (défaut: false)
+     compact_max — int, nombre max de lignes en mode compact (défaut: 8)
+#}
+{% set _compact = compact if compact is defined else false %}
+{% set _max = compact_max if compact_max is defined else 8 %}
+
+{% set _all = [] %}
+{% for grp in tournois_par_mois %}{% for t in grp.tournois %}{% if _all.append(t) %}{% endif %}{% endfor %}{% endfor %}
+
+{% macro calendar_table(tournois, table_id='t-table-cal') %}
+<div class="scroll-table t-left-scroll">
+<table id="{{ table_id }}" style="table-layout:fixed;width:100%">
+  <colgroup>
+    <col class="col-date">
+    <col class="col-flag">
+    <col class="col-ville">
+    <col>
+    <col class="col-duree">
+    <col class="col-regles">
+    <col class="col-statut-cal">
+  </colgroup>
+  <thead>
+    <tr>
+      <th class="col-date">Date</th>
+      <th class="col-flag center" title="Pays">🌍</th>
+      <th class="col-ville">Ville</th>
+      <th>Tournoi</th>
+      <th class="col-duree center" title="Durée">🗓️</th>
+      <th class="col-regles center" title="Règles">🀄</th>
+      <th class="col-statut-cal center">Statut</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for t in tournois %}
+    {% set _href = '/tournois/' + t.regles + '_' + t.ema_id|string if t.ema_id else '#' %}
+    <tr class="{% if t.type_tournoi in ['wmc','wrc'] %}row-wmc{% elif t.type_tournoi in ['oemc','oerc'] %}row-oemc{% endif %}{% if t.approbation == 'no_mers' %} row-anonyme{% endif %}">
+      <td class="col-date">{{ t.date_debut.strftime('%d/%m/%y') }}</td>
+      <td class="col-flag">{{ t.pays | pays_flag_link('tournois') }}</td>
+      <td class="col-ville">{{ t.lieu }}</td>
+      <td>
+        {% if t.ema_id %}<a href="{{ _href }}">{{ t.nom }}</a>{% else %}{{ t.nom }}{% endif %}
+        {% if t.type_tournoi == 'wmc' %}<span class="badge badge-gold">WMC</span>
+        {% elif t.type_tournoi == 'wrc' %}<span class="badge badge-gold">WRC</span>
+        {% elif t.type_tournoi == 'oemc' %}<span class="badge">OEMC</span>
+        {% elif t.type_tournoi == 'oerc' %}<span class="badge">OERC</span>{% endif %}
+      </td>
+      {% set duree = ((t.date_fin - t.date_debut).days + 1) if t.date_fin and t.date_fin != t.date_debut else 1 %}
+      <td class="col-duree center dim">{{ [duree, 1] | max }}j</td>
+      <td class="col-regles center"><span class="badge {% if t.regles == 'MCR' %}badge-mcr{% else %}badge-rcr{% endif %}">{{ t.regles }}</span></td>
+      <td class="col-statut-cal center" style="white-space:nowrap">
+        {% if t.approbation == 'ok' %}<span class="badge" style="background:var(--bronze-bg);color:#2a6a2a;border:1px solid #5a9a5a">✓ OK</span>
+        {% elif t.approbation == 'pending' %}<span class="badge badge-warning">⏳ Pending</span>
+        {% elif t.approbation == 'no_mers' %}<span class="badge" style="background:var(--bg3);color:var(--text3);border:1px solid var(--border)">No MERS</span>
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+    {% if not tournois %}
+    <tr><td colspan="7" class="empty">Aucun tournoi.</td></tr>
+    {% endif %}
+  </tbody>
+</table>
+</div>
+{% endmacro %}
+
+{% if _compact %}
+
+{{ calendar_table(_all[:_max]) }}
+{% if _all | length > _max %}
+<a href="/tournois/calendrier" class="dim" style="font-size:0.8rem;display:block;margin-top:0.4rem;text-align:right">
+  + {{ _all | length - _max }} autres →
+</a>
+{% endif %}
+
+{% else %}
+
+{% for grp in tournois_par_mois %}
+<div style="margin-bottom:1.5rem">
+  <h3 style="font-size:0.9rem;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.4rem;padding-bottom:0.25rem;border-bottom:1px solid var(--border)">
+    {{ grp.label }}
+  </h3>
+  {{ calendar_table(grp.tournois, 't-table-cal-' + loop.index|string) }}
+</div>
+{% endfor %}
+
+{% endif %}

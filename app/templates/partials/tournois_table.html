@@ -24,18 +24,18 @@ window['{{ _fv }}'] = window['{{ _fv }}'] || function() {};
 
 <div class="scroll-table t-left-scroll">
 <table id="t-table-{{ _tk if _tk else 'default' }}" style="table-layout:fixed;width:100%">
+  <colgroup>
+    <col class="col-date">
+    <col class="col-flag">
+    <col class="col-ville">
+    <col>
+    <col class="col-duree">
+    <col class="col-regles">
+    <col class="col-coeff">
+    <col class="col-joueurs">
+    <col class="col-contrib">
+  </colgroup>
   <thead>
-    <colgroup>
-      <col class="col-date">
-      <col class="col-flag">
-      <col class="col-ville">
-      <col>                      <!-- Tournoi -->
-      <col class="col-duree">
-      <col class="col-regles">
-      <col class="col-coeff">
-      <col class="col-joueurs">
-      <col class="col-contrib">
-    </colgroup>
     {% set _s = sort_url_base if sort_url_base is defined else '' %}
     {% set _asc = asc if asc is defined else 0 %}
     {% macro th_s(col, label, cls='', title='') %}

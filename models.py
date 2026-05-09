@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Integer, Float, Date, ForeignKey, UniqueConstraint, Boolean, Index
+from sqlalchemy import Column, String, Integer, Float, Date, ForeignKey, UniqueConstraint, Boolean, Index, text
 from sqlalchemy.orm import relationship
 from database import Base
 
@@ -20,7 +20,7 @@ class Tournoi(Base):
     __tablename__ = "tournois"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    ema_id = Column(Integer, nullable=False)       # numéro EMA original
+    ema_id = Column(Integer, nullable=True)        # numéro EMA original, NULL si pas encore assigné
     regles = Column(String, nullable=False)        # MCR ou RCR
     nom = Column(String, nullable=False)
     lieu = Column(String, nullable=False)
@@ -33,8 +33,16 @@ class Tournoi(Base):
     longitude = Column(Float, nullable=True)
     # normal | wmc | oemc | wrc | oerc  (wmc/wrc exclus du classement)
     type_tournoi = Column(String, nullable=False, default="normal")
+    # actif | calendrier | archive
+    statut = Column(String, nullable=False, default="actif")
+    # ok | pending | no_mers | NULL (pour les tournois importés via EMA)
+    approbation = Column(String, nullable=True)
 
-    __table_args__ = (UniqueConstraint("ema_id", "regles", name="uq_tournoi_ema_regles"),)
+    __table_args__ = (
+        # Unicité (ema_id, regles) seulement quand ema_id n'est pas NULL (index partiel SQLite)
+        Index("uq_tournoi_ema_regles", "ema_id", "regles", unique=True,
+              sqlite_where=text("ema_id IS NOT NULL")),
+    )
 
     resultats = relationship("Resultat", back_populates="tournoi")
 

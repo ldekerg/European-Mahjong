@@ -608,7 +608,8 @@ caption.t-count {
 #t-table td, #t-table th { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 #t-table td:nth-child(4), #t-table th:nth-child(4) { white-space: normal; } /* Tournoi peut wrapper */
 .badge-mcr, .badge-rcr { padding: 0.1rem 0.35rem; font-size: 0.75rem; }
-#t-table thead th { position: sticky; top: 0; z-index: 2; background: var(--bg3); }
+#t-table thead th,
+[id^="t-table-cal"] thead th { position: sticky; top: 0; z-index: 2; background: var(--bg3); }
 .t-left .table-scroll { max-height: calc(100vh - 14rem); overflow-y: auto; }
 
 /* ── Harmonisation globale tableaux ── */
@@ -700,6 +701,7 @@ col.col-duree        { width: 2.5rem; }
 col.col-regles       { width: 4.2rem; }
 col.col-coeff        { width: 2.8rem; }
 col.col-contrib      { width: 4.4rem; }
+col.col-statut-cal   { width: 6rem; }
 col.col-joueurs      { width: 3rem; }
 col.col-score        { width: 5.5rem; }
 col.col-ema          { width: 3.5rem; }

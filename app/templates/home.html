@@ -126,10 +126,10 @@
   <div>
     <h2 style="margin-bottom:0.5rem">
       Prochains tournois
-      <a href="/tournois/?vue=actifs" class="dim" style="font-size:0.78rem;font-weight:400;margin-left:0.5rem">voir tout →</a>
+      <a href="/tournois/calendrier" class="dim" style="font-size:0.78rem;font-weight:400;margin-left:0.5rem">calendrier →</a>
     </h2>
-    {% with tournois=prochains, actifs_ids={}, ville_filtre=None, tab_key='prochains' %}
-    {% include 'partials/tournois_table.html' %}
+    {% with tournois_par_mois=calendrier_par_mois, compact=true, compact_max=8 %}
+    {% include 'partials/calendrier_liste.html' %}
     {% endwith %}
   </div>
 

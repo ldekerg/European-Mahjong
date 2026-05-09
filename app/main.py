@@ -151,6 +151,24 @@ def home(request: Request):
             .limit(6).all()
         )
 
+        # Calendrier (pour le partial compact de la home)
+        from collections import defaultdict
+        MOIS_FR = ["", "Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
+                   "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"]
+        cal_tournois = (
+            db.query(Tournoi)
+            .filter(Tournoi.statut == "calendrier")
+            .order_by(Tournoi.date_debut)
+            .all()
+        )
+        cal_par_mois_raw = defaultdict(list)
+        for t in cal_tournois:
+            cal_par_mois_raw[(t.date_debut.year, t.date_debut.month)].append(t)
+        calendrier_par_mois = [
+            {"label": f"{MOIS_FR[m]} {y}", "tournois": ts}
+            for (y, m), ts in sorted(cal_par_mois_raw.items())
+        ]
+
         # Champions en titre
         champions = {
             "oemc": _meilleur_europeen(db, "oemc"),
@@ -169,9 +187,10 @@ def home(request: Request):
         "nb_classes_rcr": nb_classes_rcr,
         "top_mcr":       top5("MCR"),
         "top_rcr":       top5("RCR"),
-        "derniers":      derniers,
-        "prochains":     prochains,
-        "champions":     champions,
+        "derniers":           derniers,
+        "prochains":          prochains,
+        "champions":          champions,
+        "calendrier_par_mois": calendrier_par_mois,
     })
 
 

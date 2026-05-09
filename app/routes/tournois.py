@@ -104,6 +104,35 @@ def liste_tournois(
     })
 
 
+@router.get("/calendrier")
+def calendrier(request: Request, db: Session = Depends(get_db)):
+    from collections import defaultdict
+    from datetime import date as _date
+    MOIS_FR = ["", "Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
+               "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"]
+
+    tournois = (
+        db.query(Tournoi)
+        .filter(Tournoi.statut == "calendrier")
+        .order_by(Tournoi.date_debut)
+        .all()
+    )
+
+    par_mois = defaultdict(list)
+    for t in tournois:
+        par_mois[(t.date_debut.year, t.date_debut.month)].append(t)
+
+    tournois_par_mois = [
+        {"label": f"{MOIS_FR[m]} {y}", "tournois": ts}
+        for (y, m), ts in sorted(par_mois.items())
+    ]
+
+    return templates.TemplateResponse(request, "tournois/calendrier.html", {
+        "tournois_par_mois": tournois_par_mois,
+        "nb_total": len(tournois),
+    })
+
+
 @router.get("/nouveau")
 def nouveau_tournoi_form(request: Request):
     return templates.TemplateResponse(request, "tournois/form.html", {"tournoi": None})
