@@ -15,7 +15,7 @@
 <div class="scroll-table t-left-scroll">
 <table id="{{ table_id }}" style="table-layout:fixed;width:100%">
   <colgroup>
-    <col class="col-date">
+    <col class="col-date-lg">
     <col class="col-flag">
     <col class="col-ville">
     <col>
@@ -25,7 +25,7 @@
   </colgroup>
   <thead>
     <tr>
-      <th class="col-date">{{ trad('common.date') }}</th>
+      <th class="col-date-lg">{{ trad('common.date') }}</th>
       <th class="col-flag center" title="{{ trad('common.pays') }}">🌍</th>
       <th class="col-ville">{{ trad('common.ville') }}</th>
       <th>{{ trad('common.tournoi') }}</th>
@@ -38,7 +38,7 @@
     {% for trn in tournois %}
     {% set _href = '/tournois/' + trn.regles + '_' + trn.ema_id|string if trn.ema_id else '#' %}
     <tr class="{% if trn.type_tournoi in ['wmc','wrc'] %}row-wmc{% elif trn.type_tournoi in ['oemc','oerc'] %}row-oemc{% endif %}{% if trn.approbation == 'no_mers' %} row-anonyme{% endif %}">
-      <td class="col-date">{{ trn.date_debut.strftime('%d/%m/%y') }}</td>
+      <td class="col-date-lg">{{ trn.date_debut.strftime('%d/%m/%y') }}</td>
       <td class="col-flag">{{ trn.pays | pays_flag_link('tournois') }}</td>
       <td class="col-ville">{{ trn.lieu }}</td>
       <td>

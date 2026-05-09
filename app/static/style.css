@@ -730,7 +730,7 @@ col.col-debut        { width: 5.5rem; }   /* date premier tournoi */
 col.col-joueur-nom   { width: 14rem; }    /* nom joueur dans HOF */
 col.col-pays-nom     { width: 12rem; }    /* nom de pays */
 col.col-date         { width: 3rem; }
-col.col-date-lg      { width: 6.5rem; }   /* date avec année complète */
+col.col-date-lg      { width: 4.5rem; }   /* date avec année complète */
 col.col-ville        { width: 10rem; }
 col.col-duree        { width: 2.5rem; }
 col.col-regles       { width: 4.2rem; }
