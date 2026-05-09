@@ -7,7 +7,7 @@
     <span style="font-size:2rem">{{ code | flag }}</span>
     {{ nom_pays }}
     {% if code in ['RU', 'BY'] %}
-    <span class="badge badge-suspendu" title="Suspendu(e) de l'EMA depuis 2022">⛔ Suspendu</span>
+    <span class="badge badge-suspendu" title="{{ trad('pays.suspendu_title') }}">{{ trad('pays.suspendu') }}</span>
     {% endif %}
   </h1>
 </div>
@@ -15,25 +15,25 @@
 <!-- ── Stats fixes ──────────────────────────────────────────────────────── -->
 <div class="stats-grid" style="margin-bottom:1.25rem">
   <div class="stat-card">
-    <div class="stat-label">Joueurs</div>
+    <div class="stat-label">{{ trad('common.joueurs') }}</div>
     <div class="stat-value">{{ nb_joueurs }}</div>
   </div>
   <div class="stat-card">
-    <div class="stat-label">Classés MCR</div>
+    <div class="stat-label">{{ trad('pays.classes_mcr') }}</div>
     <div class="stat-value">
       {{ nb_classes_mcr }}
-      {% if meilleur_actuel_mcr %}<span class="stat-sub">meilleur #{{ meilleur_actuel_mcr }}</span>{% endif %}
+      {% if meilleur_actuel_mcr %}<span class="stat-sub">{{ trad('pays.meilleur', n=meilleur_actuel_mcr) }}</span>{% endif %}
     </div>
   </div>
   <div class="stat-card">
-    <div class="stat-label">Classés RCR</div>
+    <div class="stat-label">{{ trad('pays.classes_rcr') }}</div>
     <div class="stat-value">
       {{ nb_classes_rcr }}
-      {% if meilleur_actuel_rcr %}<span class="stat-sub">meilleur #{{ meilleur_actuel_rcr }}</span>{% endif %}
+      {% if meilleur_actuel_rcr %}<span class="stat-sub">{{ trad('pays.meilleur', n=meilleur_actuel_rcr) }}</span>{% endif %}
     </div>
   </div>
   <div class="stat-card">
-    <div class="stat-label">Tournois organisés</div>
+    <div class="stat-label">{{ trad('pays.tournois_org') }}</div>
     <div class="stat-value">{{ nb_tournois_org }}</div>
   </div>
 </div>
@@ -45,9 +45,9 @@
 
 <!-- ── Onglets principaux ────────────────────────────────────────────────── -->
 <div class="tabs" id="main-tabs">
-  <button class="tab-btn active"  onclick="showMainTab('classement', this)">📊 Classement</button>
-  <button class="tab-btn"        onclick="showMainTab('tournois', this)">🏟 Tournois</button>
-  <button class="tab-btn"        onclick="showMainTab('joueurs', this)">👥 Joueurs</button>
+  <button class="tab-btn active"  onclick="showMainTab('classement', this)">{{ trad('pays.tab_classement') }}</button>
+  <button class="tab-btn"        onclick="showMainTab('tournois', this)">{{ trad('pays.tab_tournois') }}</button>
+  <button class="tab-btn"        onclick="showMainTab('joueurs', this)">{{ trad('pays.tab_joueurs') }}</button>
 </div>
 
 <!-- ══════════════════════════════════════════════════════════════════════
@@ -79,7 +79,7 @@
     </div>
 
     <div class="ranking-right" id="apercu-panel">
-      <p class="empty">← Clique sur un joueur</p>
+      <p class="empty">{{ trad('common.clique_joueur') }}</p>
     </div>
   </div>
 
@@ -122,7 +122,7 @@
       {% endwith %}
     </div>
     <div class="ranking-right" id="apercu-panel-joueurs">
-      <p class="empty">← Clique sur un joueur</p>
+      <p class="empty">{{ trad('common.clique_joueur') }}</p>
     </div>
   </div>
 </div>
@@ -130,6 +130,12 @@
 
 <!-- ── Scripts ──────────────────────────────────────────────────────────── -->
 <script>
+var _I18N = {
+  clique_joueur: "{{ trad('common.clique_joueur') }}",
+  chargement:    "{{ trad('common.chargement') }}",
+  erreur:        "{{ trad('common.erreur') }}",
+  erreur_chargement: "{{ trad('common.erreur_chargement') }}"
+};
 // Aperçu joueur — utilisé par l'onglet Classement ET l'onglet Joueurs
 var _activeJoueurRow = null;
 
@@ -150,13 +156,13 @@ var _joueurPersiste  = '';
 
 function fetchApercu(joueurId, regles) {
   var panel = document.getElementById('apercu-panel');
-  panel.innerHTML = '<p class="empty">Chargement…</p>';
+  panel.innerHTML = '<p class="empty">' + _I18N.chargement + '</p>';
   var semaine = '{{ semaine.isoformat() }}';
   var r = regles || document.querySelector('#tab-classement .tab-btn.active').textContent.trim().split(' ')[0];
   fetch('/joueurs/' + joueurId + '/apercu?semaine=' + semaine + '&regles=' + r)
     .then(function(res){ return res.text(); })
     .then(function(html){ panel.innerHTML = html; })
-    .catch(function(){ panel.innerHTML = '<p class="empty">Erreur de chargement.</p>'; });
+    .catch(function(){ panel.innerHTML = '<p class="empty">' + _I18N.erreur_chargement + '</p>'; });
 }
 
 function loadApercu(joueurId, row) {
@@ -168,17 +174,17 @@ function loadApercu(joueurId, row) {
     if (_activeJoueurRow === row) {
       row.classList.remove('row-selected');
       _activeJoueurRow = null;
-      panel.innerHTML = '<p class="empty">← Clique sur un joueur</p>';
+      panel.innerHTML = '<p class="empty">' + _I18N.clique_joueur + '</p>';
       return;
     }
     if (_activeJoueurRow) _activeJoueurRow.classList.remove('row-selected');
     _activeJoueurRow = row;
     row.classList.add('row-selected');
-    panel.innerHTML = '<p class="empty">Chargement…</p>';
+    panel.innerHTML = '<p class="empty">' + _I18N.chargement + '</p>';
     fetch('/joueurs/' + joueurId + '/apercu?semaine={{ semaine.isoformat() }}')
       .then(function(r) { return r.text(); })
       .then(function(html) { panel.innerHTML = html; })
-      .catch(function() { panel.innerHTML = '<p class="empty">Erreur.</p>'; });
+      .catch(function() { panel.innerHTML = '<p class="empty">' + _I18N.erreur + '</p>'; });
   } else {
     if (_activeRow === row) {
       row.classList.remove('row-selected');

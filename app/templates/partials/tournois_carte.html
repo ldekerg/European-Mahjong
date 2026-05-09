@@ -15,7 +15,7 @@
 {% set _row_cls  = '.t-row-' + _tk if _tk else '.t-row' %}
 
 <div id="{{ carte_id }}"></div>
-<p class="t-map-hint">Clic sur un marqueur pour filtrer par ville</p>
+<p class="t-map-hint">{{ trad('tournois.carte_hint') }}</p>
 
 <script>
 (function() {

@@ -7,22 +7,22 @@
 #}
 {% if data.snapshot %}
 <div class="apercu-snapshot">
-  <div class="apercu-snapshot-title">Tournois actifs — {{ regles }} · {{ semaine.strftime('%d/%m/%Y') }}</div>
+  <div class="apercu-snapshot-title">{{ trad('apercu.titre', regles=regles, date=semaine.strftime('%d/%m/%Y')) }}</div>
   <div class="apercu-scroll">
   <table class="apercu-table">
     <thead>
-      <tr><th>Date</th><th>Tournoi</th><th>Pos.</th><th>EMA</th></tr>
+      <tr><th>{{ trad('common.date') }}</th><th>{{ trad('common.tournoi') }}</th><th>{{ trad('apercu.position') }}</th><th>{{ trad('detail_tournoi.ema_pts') }}</th></tr>
     </thead>
     <tbody>
-    {% for t in data.snapshot %}
+    {% for trn in data.snapshot %}
     <tr>
-      <td class="nowrap dim">{{ t.date.strftime('%m/%Y') if t.date.year != 1900 else '—' }}</td>
-      <td><a href="/tournois/{{ regles }}_{{ t.ema_id }}">{{ t.nom[:30] }}</a></td>
+      <td class="nowrap dim">{{ trn.date.strftime('%m/%Y') if trn.date.year != 1900 else '—' }}</td>
+      <td><a href="/tournois/{{ regles }}_{{ trn.ema_id }}">{{ trn.nom[:30] }}</a></td>
       <td class="center nowrap">
-        {% if t.position == 1 %}🥇{% elif t.position == 2 %}🥈{% elif t.position == 3 %}🥉{% endif %}
-        {{ t.position }}/{{ t.nb_joueurs }}
+        {% if trn.position == 1 %}🥇{% elif trn.position == 2 %}🥈{% elif trn.position == 3 %}🥉{% endif %}
+        {{ trn.position }}/{{ trn.nb_joueurs }}
       </td>
-      <td class="right" style="{{ t.ranking | ema_color }}">{{ t.ranking }}</td>
+      <td class="right" style="{{ trn.ranking | ema_color }}">{{ trn.ranking }}</td>
     </tr>
     {% endfor %}
     </tbody>

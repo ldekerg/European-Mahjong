@@ -2,10 +2,10 @@
 {% block content %}
 
 <div class="ranking-header">
-  <h1>👥 Joueurs <span class="t-count-header">({{ total }})</span></h1>
+  <h1>👥 {{ trad('common.joueurs') }} <span class="t-count-header">({{ total }})</span></h1>
   <div class="t-filters">
     <form method="get" action="/joueurs/" style="display:flex;gap:0.5rem;align-items:center">
-      <input type="search" name="q" value="{{ q }}" placeholder="Nom, prénom, ID…"
+      <input type="search" name="q" value="{{ q }}" placeholder="{{ trad('joueurs.recherche_placeholder') }}"
              style="padding:0.3rem 0.6rem;border:1px solid var(--border);border-radius:4px;font-size:0.85rem;width:14rem;background:var(--bg2);color:var(--text)">
       <input type="hidden" name="tri" value="{{ tri }}">
       <input type="hidden" name="asc" value="{{ asc }}">
@@ -13,7 +13,7 @@
       <button type="submit" class="btn-sm">🔍</button>
     </form>
     <div class="t-filter-group">
-      {% for r, label in [('tous','Tous'),('MCR','MCR'),('RCR','RCR')] %}
+      {% for r, label in [('tous', trad('common.tous')), ('MCR','MCR'), ('RCR','RCR')] %}
       <a href="?tri={{ tri }}&asc={{ asc }}&regles={{ r }}&q={{ q }}"
          class="filter-btn {% if regles == r %}active{% endif %}">{{ label }}</a>
       {% endfor %}
@@ -28,11 +28,16 @@
     {% endwith %}
   </div>
   <div class="ranking-right" id="apercu-panel">
-    <p class="empty">← Clique sur un joueur</p>
+    <p class="empty">{{ trad('common.clique_joueur') }}</p>
   </div>
 </div>
 
 <script>
+var _I18N = {
+  clique_joueur: "{{ trad('common.clique_joueur') }}",
+  chargement:    "{{ trad('common.chargement') }}",
+  erreur_chargement: "{{ trad('common.erreur_chargement') }}"
+};
 var _activeRow = null;
 var _semaine = '{{ semaine_actuelle.isoformat() if semaine_actuelle else "" }}';
 
@@ -40,7 +45,7 @@ function loadApercu(joueurId, row) {
   if (_activeRow === row) {
     row.classList.remove('row-selected');
     _activeRow = null;
-    document.getElementById('apercu-panel').innerHTML = '<p class="empty">← Clique sur un joueur</p>';
+    document.getElementById('apercu-panel').innerHTML = '<p class="empty">' + _I18N.clique_joueur + '</p>';
     return;
   }
   if (_activeRow) _activeRow.classList.remove('row-selected');
@@ -48,11 +53,11 @@ function loadApercu(joueurId, row) {
   row.classList.add('row-selected');
 
   var panel = document.getElementById('apercu-panel');
-  panel.innerHTML = '<p class="empty">Chargement…</p>';
+  panel.innerHTML = '<p class="empty">' + _I18N.chargement + '</p>';
   fetch('/joueurs/' + joueurId + '/apercu' + (_semaine ? '?semaine=' + _semaine : ''))
     .then(function(r) { return r.text(); })
     .then(function(html) { panel.innerHTML = html; })
-    .catch(function() { panel.innerHTML = '<p class="empty">Erreur de chargement.</p>'; });
+    .catch(function() { panel.innerHTML = '<p class="empty">' + _I18N.erreur_chargement + '</p>'; });
 }
 </script>
 {% endblock %}

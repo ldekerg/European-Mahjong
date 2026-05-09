@@ -6,7 +6,7 @@
 #}
 <div class="stats-grid">
   <div class="stat-card">
-    <div class="stat-label">Classement actuel</div>
+    <div class="stat-label">{{ trad('joueur_detail.stat_classement_actuel') }}</div>
     <div class="stat-value">
       {% if data.rang %}
         {{ data.rang.position }}
@@ -17,7 +17,7 @@
   <div class="stat-card stat-card-hl"
        onmouseenter="highlightDate('{{ regles }}','pos','{{ data.date_meilleur }}')"
        onmouseleave="clearHighlight('{{ regles }}')">
-    <div class="stat-label">Meilleur classement</div>
+    <div class="stat-label">{{ trad('joueur_detail.stat_meilleur') }}</div>
     <div class="stat-value">
       {% if data.meilleur %}
         {{ data.meilleur }}
@@ -30,7 +30,7 @@
   <div class="stat-card stat-card-hl"
        onmouseenter="highlightDate('{{ regles }}','score','{{ data.date_score_max }}')"
        onmouseleave="clearHighlight('{{ regles }}')">
-    <div class="stat-label">Score max</div>
+    <div class="stat-label">{{ trad('joueur_detail.stat_score_max') }}</div>
     <div class="stat-value">
       {% if data.score_max %}
         {{ data.score_max }}
@@ -41,11 +41,11 @@
     </div>
   </div>
   <div class="stat-card">
-    <div class="stat-label">Tournois actifs</div>
+    <div class="stat-label">{{ trad('joueur_detail.stat_tournois_actifs') }}</div>
     <div class="stat-value">{{ data.nb_actifs }}</div>
   </div>
   <div class="stat-card">
-    <div class="stat-label">Tournois joués</div>
+    <div class="stat-label">{{ trad('joueur_detail.stat_tournois_joues') }}</div>
     <div class="stat-value">{{ data.tournois | length }}</div>
   </div>
 </div>

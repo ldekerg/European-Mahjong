@@ -27,12 +27,12 @@
     <tr>
       {% if _show_nat %}<th class="center" title="Rang au sein du pays">{{ _nat_flag | flag }}</th>{% endif %}
       <th class="th-rank">#</th>
-      <th class="center" title="Variation vs semaine précédente">Δ</th>
+      <th class="center" title="{{ trad('classement.delta_title') }}">Δ</th>
       <th></th>
-      <th>Joueur</th>
-      <th class="right">Score</th>
-      <th class="center" title="Tournois actifs">T</th>
-      <th class="center" title="Podiums dans les tournois actifs">🏆</th>
+      <th>{{ trad('common.joueurs') }}</th>
+      <th class="right">{{ trad('common.score') }}</th>
+      <th class="center" title="{{ trad('classement.tournois_actifs_title') }}">T</th>
+      <th class="center" title="{{ trad('classement.podiums_title') }}">🏆</th>
     </tr>
   </thead>
   <tbody>
@@ -51,7 +51,7 @@
         {% endif %}
       </td>
       <td class="center delta-rang">
-        {% if r.delta is none %}<span class="delta-new">▶ new</span>
+        {% if r.delta is none %}<span class="delta-new">▶ {{ trad('classement.nouveau') }}</span>
         {% elif r.delta > 0 %}<span class="delta-up">▲{{ r.delta }}</span>
         {% elif r.delta < 0 %}<span class="delta-down">▼{{ r.delta | abs }}</span>
         {% else %}<span class="dim">—</span>{% endif %}
@@ -69,5 +69,5 @@
 </table>
 </div>
 {% else %}
-<p class="empty">Aucun classement pour cette semaine.</p>
+<p class="empty">{{ trad('classement.aucun') }}</p>
 {% endif %}

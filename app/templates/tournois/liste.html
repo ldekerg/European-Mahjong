@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="ranking-header">
-  <h1>Tournois</h1>
+  <h1>{{ trad('common.tournois') }}</h1>
   <div class="t-filters">
     <div class="t-filter-group">
-      {% for v, label in [('actifs','Actifs'),('tous','Tous'),('speciaux','Spéciaux')] %}
+      {% for v, label in [('actifs', trad('common.actifs')), ('tous', trad('common.tous')), ('speciaux', trad('common.speciaux'))] %}
       <a href="?vue={{ v }}&tri={{ tri }}" class="filter-btn {% if vue == v %}active{% endif %}">{{ label }}</a>
       {% endfor %}
     </div>

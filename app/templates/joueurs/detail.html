@@ -8,11 +8,11 @@
 
 {% if changements_nat %}
 <div class="nat-warning">
-  ⚠️ Changement de nationalité détecté :
+  {{ trad('joueur_detail.nat_warning') }}
   {% for c in changements_nat %}
     {{ c.nationalite_avant | flag }} {{ c.nationalite_avant }}
     → {{ c.nationalite_apres | flag }} {{ c.nationalite_apres }}
-    à partir du {{ c.date_changement.strftime('%d/%m/%Y') }}{% if not loop.last %}, {% endif %}
+    {{ trad('joueur_detail.nat_a_partir') }} {{ c.date_changement.strftime('%d/%m/%Y') }}{% if not loop.last %}, {% endif %}
   {% endfor %}
 </div>
 {% endif %}
@@ -33,11 +33,11 @@
   {% if data.historique_chart %}
   <div class="chart-section">
     <div class="chart-controls">
-      <span class="chart-title">Évolution du classement</span>
+      <span class="chart-title">{{ trad('joueur_detail.evolution') }}</span>
       <div class="chart-range-btns">
-        <button onclick="setRange('{{ regles }}', 52)"  class="range-btn">1 an</button>
-        <button onclick="setRange('{{ regles }}', 156)" class="range-btn">3 ans</button>
-        <button onclick="setRange('{{ regles }}', 0)"   class="range-btn active">Tout</button>
+        <button onclick="setRange('{{ regles }}', 52)"  class="range-btn">{{ trad('common.range_1an') }}</button>
+        <button onclick="setRange('{{ regles }}', 156)" class="range-btn">{{ trad('common.range_3ans') }}</button>
+        <button onclick="setRange('{{ regles }}', 0)"   class="range-btn active">{{ trad('common.range_tout') }}</button>
       </div>
     </div>
     <canvas id="chart-{{ regles }}" height="100"></canvas>
@@ -52,7 +52,7 @@
     <button onclick="filtreJoueurVille(null,'{{ regles | upper }}',null)" class="ville-badge-close" title="Effacer">✕</button>
     <a id="ville-badge-link-{{ regles }}" href="#" class="ville-badge-link">Voir tous les tournois de <span></span> →</a>
   </div>
-  <h2>Tournois {{ regles | upper }}</h2>
+  <h2>{{ trad('joueur_detail.tournois_section') }} {{ regles | upper }}</h2>
   <div class="scroll-table"><table style="table-layout:fixed;width:100%">
     <colgroup>
       <col class="col-date">
@@ -68,54 +68,54 @@
     </colgroup>
     <thead>
       <tr>
-        <th>Date</th>
-        <th title="Durée">🗓️</th>
-        <th>Ville</th>
-        <th>Tournoi</th>
-        <th class="center" title="Coefficient MERS">⚖️</th>
-        <th class="center" title="Contribution">⏱️</th>
-        <th class="th-pos" title="Position">🏅</th>
-        {% if regles == 'mcr' %}<th class="right" title="Points tournoi">Pts</th>{% endif %}
-        <th class="right" title="Score {% if regles == 'mcr' %}Mahjong{% else %}classement{% endif %}">#</th>
-        <th class="col-sticky" title="Points EMA">EMA</th>
+        <th>{{ trad('common.date') }}</th>
+        <th title="{{ trad('common.duree') }}">🗓️</th>
+        <th>{{ trad('common.ville') }}</th>
+        <th>{{ trad('common.tournoi') }}</th>
+        <th class="center" title="{{ trad('common.coeff_title') }}">⚖️</th>
+        <th class="center" title="{{ trad('tournois.contribution_title') }}">⏱️</th>
+        <th class="th-pos" title="{{ trad('detail_tournoi.position_title') }}">🏅</th>
+        {% if regles == 'mcr' %}<th class="right" title="{{ trad('detail_tournoi.points_title') }}">{{ trad('detail_tournoi.points') }}</th>{% endif %}
+        <th class="right" title="{{ trad('detail_tournoi.score_mcr_title') if regles == 'mcr' else trad('common.score') }}">#</th>
+        <th class="col-sticky" title="{{ trad('detail_tournoi.ema_pts_title') }}">EMA</th>
       </tr>
     </thead>
     <tbody>
-      {% for t in data.tournois %}
-      <tr class="t-joueur-row {% if t.actif %}row-actif{% endif %} {% if t.type in ['wmc','wrc'] %}row-wmc{% elif t.type in ['oemc','oerc'] %}row-oemc{% endif %}{% if not t.actif %} row-inactif row-inactif-{{ regles }} hidden{% endif %}"
-          data-ville="{{ t.lieu }}" data-regles="{{ regles | upper }}">
-        <td class="col-date">{{ t.date.strftime('%d/%m/%Y') if t.date.year != 1900 else '—' }}</td>
-        <td class="col-duree center">{{ t.duree }}j</td>
+      {% for trn in data.tournois %}
+      <tr class="t-joueur-row {% if trn.actif %}row-actif{% endif %} {% if trn.type in ['wmc','wrc'] %}row-wmc{% elif trn.type in ['oemc','oerc'] %}row-oemc{% endif %}{% if not trn.actif %} row-inactif row-inactif-{{ regles }} hidden{% endif %}"
+          data-ville="{{ trn.lieu }}" data-regles="{{ regles | upper }}">
+        <td class="col-date">{{ trn.date.strftime('%d/%m/%Y') if trn.date.year != 1900 else '—' }}</td>
+        <td class="col-duree center">{{ trn.duree }}j</td>
         <td class="nowrap">
-          {{ t.pays | pays_flag_link('tournois') }}
-          <span class="t-ville" onclick="filtreJoueurVille('{{ t.lieu }}', '{{ regles | upper }}', this)">{{ t.lieu }}</span>
-          {% if t.nat_tournoi != joueur.nationalite %}
-          <span title="Nationalité lors du tournoi : {{ t.nat_tournoi }}">{{ t.nat_tournoi | flag_link('joueurs') }}</span>
+          {{ trn.pays | pays_flag_link('tournois') }}
+          <span class="t-ville" onclick="filtreJoueurVille('{{ trn.lieu }}', '{{ regles | upper }}', this)">{{ trn.lieu }}</span>
+          {% if trn.nat_tournoi != joueur.nationalite %}
+          <span title="Nationalité lors du tournoi : {{ trn.nat_tournoi }}">{{ trn.nat_tournoi | flag_link('joueurs') }}</span>
           {% endif %}
         </td>
         <td>
-          <a href="/tournois/{{ regles | upper }}_{{ t.ema_id }}">{{ t.nom }}</a>
-          {% if t.type == 'oemc' %}<span class="badge">OEMC</span>
-          {% elif t.type == 'oerc' %}<span class="badge">OERC</span>
-          {% elif t.type == 'wmc' %}<span class="badge badge-gold">WMC</span>
-          {% elif t.type == 'wrc' %}<span class="badge badge-gold">WRC</span>{% endif %}
+          <a href="/tournois/{{ regles | upper }}_{{ trn.ema_id }}">{{ trn.nom }}</a>
+          {% if trn.type == 'oemc' %}<span class="badge">OEMC</span>
+          {% elif trn.type == 'oerc' %}<span class="badge">OERC</span>
+          {% elif trn.type == 'wmc' %}<span class="badge badge-gold">WMC</span>
+          {% elif trn.type == 'wrc' %}<span class="badge badge-gold">WRC</span>{% endif %}
         </td>
-        {% set hors_cl = t.type in ['wmc', 'wrc'] %}
-        <td class="center">{% if not hors_cl %}{{ t.coeff }}{% else %}<span class="dim">—</span>{% endif %}</td>
+        {% set hors_cl = trn.type in ['wmc', 'wrc'] %}
+        <td class="center">{% if not hors_cl %}{{ trn.coeff }}{% else %}<span class="dim">—</span>{% endif %}</td>
         <td class="center">
           {% if hors_cl %}<span class="dim">—</span>
-          {% elif t.contrib == 1.0 %}<span class="contrib-100">100%</span>
-          {% elif t.contrib == 0.5 %}<span class="contrib-50">50%</span>
+          {% elif trn.contrib == 1.0 %}<span class="contrib-100">100%</span>
+          {% elif trn.contrib == 0.5 %}<span class="contrib-50">50%</span>
           {% else %}<span class="dim">—</span>{% endif %}
         </td>
         <td class="td-pos">
-          <span class="pos-medal">{% if t.position == 1 %}🥇{% elif t.position == 2 %}🥈{% elif t.position == 3 %}🥉{% endif %}</span>
-          <span class="pos-score">{{ t.position }}/{{ t.nb_joueurs }}</span>
+          <span class="pos-medal">{% if trn.position == 1 %}🥇{% elif trn.position == 2 %}🥈{% elif trn.position == 3 %}🥉{% endif %}</span>
+          <span class="pos-score">{{ trn.position }}/{{ trn.nb_joueurs }}</span>
         </td>
-        {% if regles == 'mcr' %}<td class="right">{{ t.points }}</td>{% endif %}
-        <td class="right">{{ t.mahjong }}</td>
-        <td class="col-ema col-sticky ema-pts" {% if not hors_cl %}style="{{ t.ranking | ema_color }}"{% endif %}>
-          {% if not hors_cl %}{{ t.ranking }}{% else %}<span class="dim">—</span>{% endif %}
+        {% if regles == 'mcr' %}<td class="right">{{ trn.points }}</td>{% endif %}
+        <td class="right">{{ trn.mahjong }}</td>
+        <td class="col-ema col-sticky ema-pts" {% if not hors_cl %}style="{{ trn.ranking | ema_color }}"{% endif %}>
+          {% if not hors_cl %}{{ trn.ranking }}{% else %}<span class="dim">—</span>{% endif %}
         </td>
       </tr>
       {% endfor %}
@@ -124,17 +124,24 @@
   {% if inactifs %}
   <div class="expand-row" id="expand-{{ regles }}" onclick="toggleInactifs('{{ regles }}')">
     <span id="expand-{{ regles }}-icon">▼</span>
-    <span id="expand-{{ regles }}-label">{{ inactifs | length }} tournois inactifs</span>
+    <span id="expand-{{ regles }}-label">{{ trad('joueur_detail.inactifs_afficher', n=inactifs | length) }}</span>
   </div>
   {% endif %}
   {% else %}
-  <p class="empty">Aucun tournoi {{ regles | upper }} enregistré.</p>
+  <p class="empty">{{ trad('common.aucun_joueur') }} {{ regles | upper }}</p>
   {% endif %}
 
 </div>
 {% endfor %}
 
 <script>
+var _I18N_DETAIL = {
+  inactifs_afficher: "{{ trad('joueur_detail.inactifs_afficher', n='COUNT') }}",
+  inactifs_masquer:  "{{ trad('joueur_detail.inactifs_masquer') }}",
+  covid:             "{{ trad('joueur_detail.covid') }}",
+  axe_classement:    "{{ trad('common.classement') }}",
+  axe_score:         "{{ trad('common.score') }}"
+};
 function highlightDate(regles, axis, isoDate) {
   const chart = CHARTS[regles];
   if (!chart || !isoDate) return;
@@ -227,7 +234,7 @@ function buildChart(regles, data) {
               borderWidth: 1,
               label: {
                 display: true,
-                content: 'COVID',
+                content: _I18N_DETAIL.covid,
                 color: 'rgba(200,50,50,0.7)',
                 font: { size: 10 },
                 position: { x: 'center', y: 'start' },
@@ -308,7 +315,7 @@ function filtreJoueurVille(ville, regles, el) {
     var expandIcon2  = document.getElementById('expand-' + reglesLow + '-icon');
     if (expandLabel2 && expandIcon2 && expandIcon2.textContent === '▼') {
       var total = document.querySelectorAll('.row-inactif-' + regles.toLowerCase()).length;
-      expandLabel2.textContent = total + ' tournois inactifs';
+      expandLabel2.textContent = _I18N_DETAIL.inactifs_afficher.replace('COUNT', total);
     }
     return;
   }
@@ -322,7 +329,7 @@ function filtreJoueurVille(ville, regles, el) {
   var countVille = Array.from(allInactifs).filter(function(r){ return r.dataset.ville === ville; }).length;
   var expandLabel = document.getElementById('expand-' + reglesLow + '-label');
   if (expandLabel && document.getElementById('expand-' + reglesLow + '-icon').textContent === '▼') {
-    expandLabel.textContent = countVille + ' tournois inactifs';
+    expandLabel.textContent = _I18N_DETAIL.inactifs_afficher.replace('COUNT', countVille);
   }
   // Badge
   var badge = document.getElementById('ville-badge-' + reglesLow);
@@ -361,7 +368,7 @@ function toggleInactifs(regles) {
     ? Array.from(allInactifs).filter(r => r.dataset.ville === villeActive).length
     : allInactifs.length;
   document.getElementById('expand-' + regles + '-label').textContent =
-    show ? 'Masquer les tournois inactifs' : count + ' tournois inactifs';
+    show ? _I18N_DETAIL.inactifs_masquer : _I18N_DETAIL.inactifs_afficher.replace('COUNT', count);
 }
 </script>
 {% endblock %}

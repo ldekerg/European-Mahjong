@@ -57,14 +57,14 @@
   </colgroup>
   <thead>
     <tr>
-      {{ th_sort('id',          'EMA ID') }}
+      {{ th_sort('id',          trad('common.ema_id')) }}
       {{ th_sort('nationalite', '🌍',    'center') }}
-      {{ th_sort('nom',         'Nom') }}
-      {{ th_sort('prenom',      'Prénom') }}
-      {{ th_sort('premier',     'Début',  'center') }}
+      {{ th_sort('nom',         trad('common.nom')) }}
+      {{ th_sort('prenom',      trad('common.prenom')) }}
+      {{ th_sort('premier',     trad('joueurs.debut'),  'center') }}
       {{ th_sort_badge('nb_mcr', 'badge-mcr', 'center') }}
       {{ th_sort_badge('nb_rcr', 'badge-rcr', 'center') }}
-      {{ th_sort('nb_total',    'Total',  'center') }}
+      {{ th_sort('nb_total',    trad('common.tous'),  'center') }}
     </tr>
   </thead>
   <tbody>
@@ -83,7 +83,7 @@
       <td class="center" style="font-weight:600">{{ row.nb_total }}</td>
     </tr>
     {% else %}
-    <tr><td colspan="7" class="empty">Aucun joueur.</td></tr>
+    <tr><td colspan="7" class="empty">{{ trad('common.aucun_joueur') }}</td></tr>
     {% endfor %}
   </tbody>
 </table>

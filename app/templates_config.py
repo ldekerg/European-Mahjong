@@ -1,10 +1,84 @@
-import os
+import os, json
 from markupsafe import Markup
 from fastapi.templating import Jinja2Templates
+from fastapi import Request
 
 _TEMPLATES_DIR = os.path.join(os.path.dirname(__file__), "templates")
+_LOCALES_DIR   = os.path.join(os.path.dirname(__file__), "..", "locales")
+
+# Chargement des catalogues de traduction
+_LOCALES: dict[str, dict] = {}
+for _fname in sorted(os.listdir(_LOCALES_DIR)):
+    if _fname.endswith(".json"):
+        _lang = _fname[:-5]
+        with open(os.path.join(_LOCALES_DIR, _fname), encoding="utf-8") as _f:
+            _LOCALES[_lang] = json.load(_f)
+
+SUPPORTED_LANGS = list(_LOCALES.keys())
+DEFAULT_LANG = "fr"
+
+
+def _detect_lang(request: Request) -> str:
+    """Priorité : cookie lang → Accept-Language → défaut."""
+    # 1. Cookie
+    lang = request.cookies.get("lang", "").lower()[:2]
+    if lang in _LOCALES:
+        return lang
+    # 2. Accept-Language header
+    accept = request.headers.get("accept-language", "")
+    for part in accept.replace(" ", "").split(","):
+        code = part.split(";")[0].split("-")[0].lower()
+        if code in _LOCALES:
+            return code
+    return DEFAULT_LANG
+
+
+def trad(key: str, lang: str, **kwargs) -> str:
+    """Résout 'section.clé' dans le catalogue de la langue donnée."""
+    catalogue = _LOCALES.get(lang, _LOCALES.get(DEFAULT_LANG, {}))
+    parts = key.split(".")
+    val = catalogue
+    for p in parts:
+        if isinstance(val, dict):
+            val = val.get(p, key)
+        else:
+            return key
+    if not isinstance(val, str):
+        return key
+    # Interpolation simple {n}, {x}, etc.
+    if kwargs:
+        try:
+            val = val.format(**kwargs)
+        except (KeyError, ValueError):
+            pass
+    return val
+
 
 templates = Jinja2Templates(directory=_TEMPLATES_DIR)
+
+# Injecter la fonction t() et la langue dans tous les contextes Jinja2
+_orig_response = templates.TemplateResponse
+
+def _patched_response(request_or_name, *args, **kwargs):
+    # Compatibilité avec les deux signatures (request, name, context) et (name, context, request)
+    if isinstance(request_or_name, Request):
+        request = request_or_name
+        name = args[0]
+        context = args[1] if len(args) > 1 else kwargs.get("context", {})
+    else:
+        name = request_or_name
+        context = args[0] if args else {}
+        request = context.get("request") or kwargs.get("request")
+
+    lang = _detect_lang(request) if request else DEFAULT_LANG
+    context["lang"] = lang
+    context["trad"] = lambda key, **kw: trad(key, lang, **kw)
+
+    if isinstance(request_or_name, Request):
+        return _orig_response(request, name, context, **{k: v for k, v in kwargs.items() if k not in ("context",)})
+    return _orig_response(request_or_name, context, **kwargs)
+
+templates.TemplateResponse = _patched_response
 
 
 def _to_iso(value: str) -> str | None:

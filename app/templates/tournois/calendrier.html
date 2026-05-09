@@ -2,12 +2,12 @@
 {% block content %}
 
 <div class="ranking-header">
-  <h1>Calendrier</h1>
+  <h1>{{ trad('common.calendrier') }}</h1>
   <div class="t-filters">
     <div class="t-filter-group">
-      <a href="/tournois/" class="filter-btn">Tous les tournois</a>
+      <a href="/tournois/" class="filter-btn">{{ trad('calendrier.tous_tournois') }}</a>
     </div>
-    <span class="dim" style="font-size:0.82rem">{{ nb_total }} tournois à venir</span>
+    <span class="dim" style="font-size:0.82rem">{{ trad('calendrier.a_venir', n=nb_total) }}</span>
   </div>
 </div>
 

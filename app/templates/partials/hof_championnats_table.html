@@ -10,18 +10,18 @@
   </colgroup>
   <thead>
     <tr>
-      <th>Tournoi</th><th class="center">🏅</th><th class="center">🌍</th>
-      <th>Joueur</th><th>Date</th><th class="center">EMA</th>
+      <th>{{ trad('common.tournoi') }}</th><th class="center">🏅</th><th class="center">🌍</th>
+      <th>{{ trad('common.joueurs') }}</th><th>{{ trad('common.date') }}</th><th class="center">EMA</th>
     </tr>
   </thead>
   <tbody>
-    {% for r, t, j in championnats %}
-    <tr class="{% if t.type_tournoi in ['wmc','wrc'] %}row-wmc{% else %}row-oemc{% endif %}">
+    {% for r, trn, j in championnats %}
+    <tr class="{% if trn.type_tournoi in ['wmc','wrc'] %}row-wmc{% else %}row-oemc{% endif %}">
       <td class="nowrap">
-        <a href="/tournois/{{ t.regles }}_{{ t.ema_id }}">{{ t.nom[:28] }}</a>
-        {% if t.type_tournoi == 'wmc' %}<span class="badge badge-gold">WMC</span>
-        {% elif t.type_tournoi == 'wrc' %}<span class="badge badge-gold">WRC</span>
-        {% elif t.type_tournoi == 'oerc' %}<span class="badge">OERC</span>
+        <a href="/tournois/{{ trn.regles }}_{{ trn.ema_id }}">{{ trn.nom[:28] }}</a>
+        {% if trn.type_tournoi == 'wmc' %}<span class="badge badge-gold">WMC</span>
+        {% elif trn.type_tournoi == 'wrc' %}<span class="badge badge-gold">WRC</span>
+        {% elif trn.type_tournoi == 'oerc' %}<span class="badge">OERC</span>
         {% else %}<span class="badge">OEMC</span>{% endif %}
       </td>
       <td class="td-pos">
@@ -30,11 +30,11 @@
       </td>
       <td class="center">{{ j.nationalite | flag_link('classement') }}</td>
       <td><a href="/joueurs/{{ j.id }}">{{ j.prenom | prenom }} {{ j.nom | title }}</a></td>
-      <td class="dim nowrap">{{ t.date_debut.strftime('%d/%m/%Y') if t.date_debut.year != 1900 else '—' }}</td>
+      <td class="dim nowrap">{{ trn.date_debut.strftime('%d/%m/%Y') if trn.date_debut.year != 1900 else '—' }}</td>
       <td class="right ema-pts" style="{{ r.ranking | ema_color }}">{{ r.ranking }}</td>
     </tr>
     {% else %}
-    <tr><td colspan="6" class="empty">Aucun résultat.</td></tr>
+    <tr><td colspan="6" class="empty">{{ trad('common.aucun_resultat') }}</td></tr>
     {% endfor %}
   </tbody>
 </table>

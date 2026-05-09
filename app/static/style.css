@@ -428,7 +428,7 @@ tr.hidden { display: none; }
 .th-pos    { min-width: 7rem; }
 
 /* ── Dark mode extras ── */
-.theme-toggle, .regles-toggle {
+.theme-toggle, .regles-toggle, .lang-toggle {
     background: transparent;
     border: 1px solid rgba(255,255,255,0.3);
     color: #fff;
@@ -441,8 +441,42 @@ tr.hidden { display: none; }
 }
 .regles-toggle { margin-left: auto; }
 .theme-toggle { font-size: 1rem; font-weight: 400; }
-.theme-toggle:hover, .regles-toggle:hover { background: rgba(255,255,255,0.1); }
+.lang-toggle  { font-size: 1.1rem; font-weight: 400; padding: 0.2rem 0.5rem; }
+.theme-toggle:hover, .regles-toggle:hover, .lang-toggle:hover { background: rgba(255,255,255,0.1); }
 .regles-toggle { border-color: rgba(255,255,255,0.5); }
+
+.lang-picker   { position: relative; }
+.lang-dropdown {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    z-index: 200;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    box-shadow: 0 4px 12px var(--shadow);
+    min-width: 9rem;
+    overflow: hidden;
+    font-size: 15px;
+    font-weight: 400;
+}
+.lang-dropdown a {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0 0.9rem;
+    height: 2.2rem;
+    font-size: 0.88rem;
+    line-height: 1;
+    color: var(--text);
+    text-decoration: none;
+    cursor: pointer;
+    white-space: nowrap;
+    font-weight: 400;
+}
+.lang-flag { font-size: 1rem; line-height: 1; display: inline-block; width: 1.4rem; text-align: center; }
+.lang-dropdown a span:not(.lang-flag) { font-size: 0.88rem; line-height: 1; font-weight: 400; font-family: system-ui, sans-serif; }
+.lang-dropdown a:hover { background: var(--row-actif); }
 
 [data-theme="dark"] input,
 [data-theme="dark"] select {

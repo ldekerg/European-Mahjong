@@ -14,13 +14,13 @@
     <tr>
       <th class="center">#</th>
       <th class="center">🌍</th>
-      <th>Joueur</th>
+      <th>{{ trad('common.joueurs') }}</th>
       {% set _tid = table_id if table_id is defined else 'hof-table' %}
-      <th class="center sortable" onclick="sortTable(3,'{{ _tid }}')" title="Victoires">🥇 <span class="sort-icon">⇅</span></th>
-      <th class="center sortable" onclick="sortTable(4,'{{ _tid }}')" title="2e places">🥈 <span class="sort-icon">⇅</span></th>
-      <th class="center sortable" onclick="sortTable(5,'{{ _tid }}')" title="3e places">🥉 <span class="sort-icon">⇅</span></th>
-      <th class="center sortable" onclick="sortTable(6,'{{ _tid }}')" title="Total médailles">🏅 <span class="sort-icon">⇅</span></th>
-      <th class="center sortable" onclick="sortTable(7,'{{ _tid }}')" title="Tournois joués">Tournois <span class="sort-icon">⇅</span></th>
+      <th class="center sortable" onclick="sortTable(3,'{{ _tid }}')" title="{{ trad('hallfame.victoires_title') }}">🥇 <span class="sort-icon">⇅</span></th>
+      <th class="center sortable" onclick="sortTable(4,'{{ _tid }}')" title="{{ trad('hallfame.deuxiemes_title') }}">🥈 <span class="sort-icon">⇅</span></th>
+      <th class="center sortable" onclick="sortTable(5,'{{ _tid }}')" title="{{ trad('hallfame.troisiemes_title') }}">🥉 <span class="sort-icon">⇅</span></th>
+      <th class="center sortable" onclick="sortTable(6,'{{ _tid }}')" title="{{ trad('hallfame.total_medailles_title') }}">🏅 <span class="sort-icon">⇅</span></th>
+      <th class="center sortable" onclick="sortTable(7,'{{ _tid }}')" title="{{ trad('hallfame.tournois_joues_title') }}">{{ trad('common.tournois') }} <span class="sort-icon">⇅</span></th>
     </tr>
   </thead>
   <tbody>

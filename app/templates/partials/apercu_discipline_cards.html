@@ -10,7 +10,7 @@
   {% for label, data in [('MCR', mcr), ('RCR', rcr)] %}
   <div class="apercu-discipline {% if label == regles %}apercu-active{% endif %} apercu-discipline-btn"
        onclick="switchRegles('{{ label }}')"
-       title="Afficher le classement {{ label }}">
+       title="{{ trad('joueurs.afficher_mcr') if label == 'MCR' else trad('joueurs.afficher_rcr') }}">
     <div class="apercu-disc-label">{{ label }}</div>
     {% if data.rang %}
     <div class="apercu-rank">#{{ data.rang.position }}</div>
@@ -18,7 +18,7 @@
     {% else %}
     <div class="apercu-rank dim">—</div>
     {% endif %}
-    <div class="apercu-nbt">{{ data.nb_actifs }} actifs · {{ data.nb_total }} total</div>
+    <div class="apercu-nbt">{{ data.nb_actifs }} {{ trad('joueurs.actifs') }} · {{ data.nb_total }} {{ trad('joueurs.total_label') }}</div>
     {% if data.meilleur %}
     <a class="apercu-best" href="/?semaine={{ data.meilleur.semaine.isoformat() }}&joueur={{ joueur.id }}&regles={{ label }}"
        onclick="event.stopPropagation()"

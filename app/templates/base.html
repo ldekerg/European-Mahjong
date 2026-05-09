@@ -20,20 +20,60 @@
 </head>
 <body>
     <nav>
-        <a href="/accueil">EMA Ranking</a>
-        <a href="/classement">Classement</a>
-        <a href="/joueurs/">Joueurs</a>
-        <a href="/pays/">Pays</a>
-        <a href="/tournois/">Tournois</a>
-        <a href="/tournois/calendrier">Calendrier</a>
-        <a href="/hallfame/">Hall of Fame</a>
+        <a href="/accueil">{{ trad('nav.home') }}</a>
+        <a href="/classement">{{ trad('nav.classement') }}</a>
+        <a href="/joueurs/">{{ trad('nav.joueurs') }}</a>
+        <a href="/pays/">{{ trad('nav.pays') }}</a>
+        <a href="/tournois/">{{ trad('nav.tournois') }}</a>
+        <a href="/tournois/calendrier">{{ trad('common.calendrier') }}</a>
+        <a href="/hallfame/">{{ trad('nav.hallfame') }}</a>
         <button class="regles-toggle" onclick="toggleRegles()" title="Règle par défaut">MCR</button>
-        <button class="theme-toggle" onclick="toggleTheme()" title="Dark mode">🌙</button>
+        <div class="lang-picker" id="lang-picker">
+          <button class="lang-toggle" onclick="toggleLangDropdown()" title="{{ trad('common.langue') }}">
+            {% set _flags = {'fr':'🇫🇷','en':'🇬🇧','de':'🇩🇪','nl':'🇳🇱','pl':'🇵🇱','sv':'🇸🇪','fi':'🇫🇮','it':'🇮🇹','es':'🇪🇸','uk':'🇺🇦','hu':'🇭🇺','da':'🇩🇰','pt':'🇵🇹','ro':'🇷🇴','cs':'🇨🇿','sk':'🇸🇰','no':'🇳🇴','lv':'🇱🇻'} %}
+            {{ _flags.get(lang, lang | upper) }}
+          </button>
+          <div class="lang-dropdown" id="lang-dropdown" style="display:none">
+            <a onclick="setLang('cs')"><span class="lang-flag">🇨🇿</span><span>Čeština</span></a>
+            <a onclick="setLang('da')"><span class="lang-flag">🇩🇰</span><span>Dansk</span></a>
+            <a onclick="setLang('de')"><span class="lang-flag">🇩🇪</span><span>Deutsch</span></a>
+            <a onclick="setLang('en')"><span class="lang-flag">🇬🇧</span><span>English</span></a>
+            <a onclick="setLang('es')"><span class="lang-flag">🇪🇸</span><span>Español</span></a>
+            <a onclick="setLang('fr')"><span class="lang-flag">🇫🇷</span><span>Français</span></a>
+            <a onclick="setLang('it')"><span class="lang-flag">🇮🇹</span><span>Italiano</span></a>
+            <a onclick="setLang('lv')"><span class="lang-flag">🇱🇻</span><span>Latviešu</span></a>
+            <a onclick="setLang('hu')"><span class="lang-flag">🇭🇺</span><span>Magyar</span></a>
+            <a onclick="setLang('nl')"><span class="lang-flag">🇳🇱</span><span>Nederlands</span></a>
+            <a onclick="setLang('no')"><span class="lang-flag">🇳🇴</span><span>Norsk</span></a>
+            <a onclick="setLang('pl')"><span class="lang-flag">🇵🇱</span><span>Polski</span></a>
+            <a onclick="setLang('pt')"><span class="lang-flag">🇵🇹</span><span>Português</span></a>
+            <a onclick="setLang('ro')"><span class="lang-flag">🇷🇴</span><span>Română</span></a>
+            <a onclick="setLang('sk')"><span class="lang-flag">🇸🇰</span><span>Slovenčina</span></a>
+            <a onclick="setLang('fi')"><span class="lang-flag">🇫🇮</span><span>Suomi</span></a>
+            <a onclick="setLang('sv')"><span class="lang-flag">🇸🇪</span><span>Svenska</span></a>
+            <a onclick="setLang('uk')"><span class="lang-flag">🇺🇦</span><span>Українська</span></a>
+          </div>
+        </div>
+        <button class="theme-toggle" onclick="toggleTheme()" title="{{ trad('common.dark_mode') }}">🌙</button>
     </nav>
     <main>
         {% block content %}{% endblock %}
     </main>
     <script>
+    // ── Langue ───────────────────────────────────────────────────────────────
+    function toggleLangDropdown() {
+        var d = document.getElementById('lang-dropdown');
+        d.style.display = d.style.display === 'none' ? 'block' : 'none';
+    }
+    function setLang(lang) {
+        document.cookie = 'lang=' + lang + ';path=/;max-age=31536000';
+        location.reload();
+    }
+    document.addEventListener('click', function(e) {
+        if (!document.getElementById('lang-picker').contains(e.target))
+            document.getElementById('lang-dropdown').style.display = 'none';
+    });
+
     // ── Thème ────────────────────────────────────────────────────────────────
     function toggleTheme() {
         var dark = document.documentElement.getAttribute('data-theme') === 'dark';

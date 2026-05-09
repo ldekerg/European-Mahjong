@@ -50,6 +50,11 @@
       document.getElementById('week-dropdown').style.display = 'none';
   });
 
+  var _I18N = {
+    clique_joueur: "{{ trad('common.clique_joueur') }}",
+    chargement:    "{{ trad('common.chargement') }}",
+    erreur_chargement: "{{ trad('common.erreur_chargement') }}"
+  };
   var _activeRow = null;
   var _joueurPersiste  = '{{ joueur_selectionne or "" }}';
   var _joueurDefaut    = '{{ joueur_defaut or "" }}';
@@ -58,13 +63,13 @@
 
   function fetchApercu(joueurId, regles) {
     var panel = document.getElementById('apercu-panel');
-    panel.innerHTML = '<p class="empty">Chargement…</p>';
+    panel.innerHTML = '<p class="empty">' + _I18N.chargement + '</p>';
     var semaine = '{{ semaine.isoformat() }}';
     var r = regles || document.querySelector('.tab-btn.active').textContent.trim().split(' ')[0];
     fetch('/joueurs/' + joueurId + '/apercu?semaine=' + semaine + '&regles=' + r)
       .then(function(res){ return res.text(); })
       .then(function(html){ panel.innerHTML = html; })
-      .catch(function(){ panel.innerHTML = '<p class="empty">Erreur de chargement.</p>'; });
+      .catch(function(){ panel.innerHTML = '<p class="empty">' + _I18N.erreur_chargement + '</p>'; });
   }
 
   function loadApercu(joueurId, row) {
@@ -131,7 +136,7 @@
   </div>
 
   <div class="ranking-right" id="apercu-panel">
-    <p class="empty">← Clique sur un joueur</p>
+    <p class="empty">{{ trad('common.clique_joueur') }}</p>
   </div>
 </div>
 
