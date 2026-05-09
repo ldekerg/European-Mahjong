@@ -57,7 +57,7 @@ for r in con.execute("SELECT type_tournoi, regles, COUNT(*) FROM tournois GROUP 
 
 print("\nListe WMC/WRC/OEMC/OERC :")
 for r in con.execute("SELECT type_tournoi, ema_id, regles, nom FROM tournois WHERE type_tournoi != 'normal' ORDER BY type_tournoi, regles, nom").fetchall():
-    print(f"  [{r[0]:4}] [{r[1]:>8}] {r[2]:3}  {r[3]}")
+    print(f"  [{r[0]:4}] [{str(r[1] or ''):>8}] {r[2]:3}  {r[3]}")
 
 # --- Statut joueurs ---
 
