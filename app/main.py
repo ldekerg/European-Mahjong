@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Request, Query
+from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 import sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
@@ -87,7 +88,94 @@ def get_classement_semaine(db: Session, semaine: date, regles: str) -> list:
     ]
 
 
-@app.get("/")
+@app.get("/accueil")
+def home(request: Request):
+    from models import Tournoi, Resultat, ResultatAnonyme
+    from app.routes.hallfame import _meilleur_europeen
+    from sqlalchemy import func, exists
+    db = SessionLocal()
+    try:
+        today = date.today()
+        semaine_date = lundi_semaine(today)
+
+        # Stats globales
+        nb_joueurs   = db.query(Joueur).filter(Joueur.statut == "europeen").count()
+        nb_tournois  = db.query(Tournoi).count()
+        nb_classes_mcr = db.query(ClassementHistorique.joueur_id).filter(
+            ClassementHistorique.semaine == semaine_date,
+            ClassementHistorique.regles  == "MCR",
+        ).distinct().count()
+        nb_classes_rcr = db.query(ClassementHistorique.joueur_id).filter(
+            ClassementHistorique.semaine == semaine_date,
+            ClassementHistorique.regles  == "RCR",
+        ).distinct().count()
+
+        # Top 5 MCR et RCR
+        def top5(regles):
+            rows = (
+                db.query(ClassementHistorique, Joueur)
+                .join(Joueur, ClassementHistorique.joueur_id == Joueur.id)
+                .filter(
+                    ClassementHistorique.semaine == semaine_date,
+                    ClassementHistorique.regles  == regles,
+                )
+                .order_by(ClassementHistorique.position)
+                .limit(5).all()
+            )
+            return [{"position": ch.position, "joueur": j, "score": ch.score} for ch, j in rows]
+
+        # Derniers tournois joués : avec résultats ET date passée
+        has_resultats = exists().where(Resultat.tournoi_id == Tournoi.id)
+        from datetime import date as _date
+        derniers = (
+            db.query(Tournoi)
+            .filter(
+                Tournoi.date_debut <= today,
+                Tournoi.date_debut != _date(1900, 1, 1),
+                has_resultats,
+            )
+            .order_by(Tournoi.date_debut.desc())
+            .limit(6).all()
+        )
+
+        # Prochains tournois : date future ET sans résultats
+        has_no_resultats = ~exists().where(Resultat.tournoi_id == Tournoi.id)
+        prochains = (
+            db.query(Tournoi)
+            .filter(
+                Tournoi.date_debut > today,
+                has_no_resultats,
+                Tournoi.type_tournoi == "normal",
+            )
+            .order_by(Tournoi.date_debut)
+            .limit(6).all()
+        )
+
+        # Champions en titre
+        champions = {
+            "oemc": _meilleur_europeen(db, "oemc"),
+            "wmc":  _meilleur_europeen(db, "wmc"),
+            "oerc": _meilleur_europeen(db, "oerc"),
+            "wrc":  _meilleur_europeen(db, "wrc"),
+        }
+
+    finally:
+        db.close()
+
+    return templates.TemplateResponse(request, "home.html", {
+        "nb_joueurs":    nb_joueurs,
+        "nb_tournois":   nb_tournois,
+        "nb_classes_mcr": nb_classes_mcr,
+        "nb_classes_rcr": nb_classes_rcr,
+        "top_mcr":       top5("MCR"),
+        "top_rcr":       top5("RCR"),
+        "derniers":      derniers,
+        "prochains":     prochains,
+        "champions":     champions,
+    })
+
+
+@app.get("/classement")
 def accueil(
     request: Request,
     semaine: Optional[str] = Query(None),
@@ -143,7 +231,7 @@ def accueil(
     semaine_actuelle = lundi_semaine(date.today())
     aujourd_hui = date.today()
 
-    return templates.TemplateResponse(request, "accueil.html", {
+    return templates.TemplateResponse(request, "classement.html", {
         "mcr": mcr,
         "rcr": rcr,
         "semaine_actuelle": semaine_actuelle,
@@ -159,3 +247,8 @@ def accueil(
         "joueur_defaut_mcr": mcr[0]["joueur_id"] if mcr else None,
         "joueur_defaut_rcr": rcr[0]["joueur_id"] if rcr else None,
     })
+
+
+@app.get("/")
+def root():
+    return RedirectResponse(url="/accueil")

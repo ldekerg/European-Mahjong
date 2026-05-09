@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!-- ── Intro ─────────────────────────────────────────────────────────────── -->
+<div class="ranking-header" style="margin-bottom:1.25rem">
+  <div>
+    <h1 style="margin-bottom:0.4rem">EMA Ranking</h1>
+    <p style="max-width:680px;line-height:1.6;color:var(--text2);font-size:0.92rem;margin:0">
+      Bienvenue sur le classement européen de Mahjong, regroupant les disciplines
+      <strong>MCR</strong> (Mahjong Compétitif Riichi) et <strong>RCR</strong> (Riichi Compétitif).
+      Les points sont calculés à partir des résultats des tournois reconnus par
+      l'<a href="http://mahjong-europe.org" target="_blank" rel="noopener" style="color:var(--accent)">European Mahjong Association (EMA)</a>.
+      Ce site présente les classements hebdomadaires, l'historique des tournois, les palmarès
+      par joueur et par pays, ainsi que le Hall of Fame.
+    </p>
+  </div>
+</div>
+
+<!-- ── Stats globales ────────────────────────────────────────────────────── -->
+<div class="stats-grid" style="margin-bottom:1.5rem">
+  <a href="/joueurs/" class="stat-card stat-card-hl" style="text-decoration:none;color:inherit">
+    <div class="stat-label">Joueurs EMA</div>
+    <div class="stat-value">{{ nb_joueurs }}</div>
+  </a>
+  <a href="/tournois/" class="stat-card stat-card-hl" style="text-decoration:none;color:inherit">
+    <div class="stat-label">Tournois</div>
+    <div class="stat-value">{{ nb_tournois }}</div>
+  </a>
+  <a href="/classement" class="stat-card stat-card-hl" style="text-decoration:none;color:inherit">
+    <div class="stat-label">Classés MCR</div>
+    <div class="stat-value">{{ nb_classes_mcr }}</div>
+  </a>
+  <a href="/classement?regles=RCR" class="stat-card stat-card-hl" style="text-decoration:none;color:inherit">
+    <div class="stat-label">Classés RCR</div>
+    <div class="stat-value">{{ nb_classes_rcr }}</div>
+  </a>
+</div>
+
+<!-- ── Champions en titre ────────────────────────────────────────────────── -->
+<h2 style="margin-bottom:0.75rem">
+  Championnats Internationaux
+  <a href="/hallfame/?vue=championnats" class="dim" style="font-size:0.78rem;font-weight:400;margin-left:0.5rem">Hall of Fame →</a>
+</h2>
+<div class="stats-grid" style="margin-bottom:1.5rem">
+  {% for type_key, label in [('oemc','🇪🇺 OEMC'), ('wmc','🌍 WMC'), ('oerc','🇪🇺 OERC'), ('wrc','🌍 WRC')] %}
+  {% set c = champions[type_key] %}
+  <div class="stat-card" style="text-align:center">
+    <div class="stat-label" style="font-size:0.8rem;margin-bottom:0.4rem">{{ label }}</div>
+    {% if c %}
+    <div style="font-size:1.5rem">{{ c.joueur.nationalite | flag }}</div>
+    <a href="/joueurs/{{ c.joueur.id }}" style="font-weight:700;display:block;margin:0.2rem 0;font-size:0.88rem">
+      {{ c.joueur.prenom | prenom }} {{ c.joueur.nom | title }}
+    </a>
+    <div class="dim" style="font-size:0.75rem">{{ c.tournoi.nom[:30] }}</div>
+    <div style="margin-top:0.3rem;font-size:0.82rem">
+      {% if c.est_champion %}<span style="color:var(--or-fg);font-weight:700">🥇 Champion</span>
+      {% elif c.est_vice %}<span style="color:var(--argent-fg);font-weight:700">🥈 Vice-champion</span>
+      {% elif c.est_bronze %}<span style="color:var(--bronze-fg);font-weight:700">🥉 3e place</span>
+      {% else %}<span class="dim">{{ c.position }}e</span>{% endif %}
+      {% if type_key in ['wmc','wrc'] and not c.est_champion %}
+      <span class="dim" style="font-size:0.72rem;display:block">Meilleur européen</span>{% endif %}
+    </div>
+    {% else %}
+    <div class="dim" style="font-size:0.82rem;margin-top:0.5rem">Pas de données</div>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>
+
+<!-- ── Top 5 + tournois ───────────────────────────────────────────────────── -->
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem">
+
+  <!-- Top 5 MCR -->
+  <div>
+    <h2 style="margin-bottom:0.5rem">
+      Top 5 <span class="badge badge-mcr">MCR</span>
+      <a href="/classement" class="dim" style="font-size:0.78rem;font-weight:400;margin-left:0.5rem">voir tout →</a>
+    </h2>
+    <div style="display:flex;flex-direction:column;gap:0.3rem">
+      {% for r in top_mcr %}
+      <a href="/joueurs/{{ r.joueur.id }}" style="display:flex;align-items:center;gap:0.6rem;padding:0.4rem 0.6rem;background:var(--bg2);border-radius:6px;text-decoration:none;color:inherit;border:1px solid var(--border)">
+        <span style="width:1.4rem;text-align:right;font-weight:700;color:{% if r.position==1 %}var(--or-fg){% elif r.position==2 %}var(--argent-fg){% elif r.position==3 %}var(--bronze-fg){% else %}var(--text3){% endif %}">{{ r.position }}</span>
+        <span>{{ r.joueur.nationalite | flag }}</span>
+        <span style="flex:1;font-size:0.88rem">{{ r.joueur.prenom | prenom }} {{ r.joueur.nom | title }}</span>
+        <span class="dim" style="font-size:0.8rem">{{ r.score | round(1) }}</span>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Top 5 RCR -->
+  <div>
+    <h2 style="margin-bottom:0.5rem">
+      Top 5 <span class="badge badge-rcr">RCR</span>
+      <a href="/classement?regles=RCR" class="dim" style="font-size:0.78rem;font-weight:400;margin-left:0.5rem">voir tout →</a>
+    </h2>
+    <div style="display:flex;flex-direction:column;gap:0.3rem">
+      {% for r in top_rcr %}
+      <a href="/joueurs/{{ r.joueur.id }}" style="display:flex;align-items:center;gap:0.6rem;padding:0.4rem 0.6rem;background:var(--bg2);border-radius:6px;text-decoration:none;color:inherit;border:1px solid var(--border)">
+        <span style="width:1.4rem;text-align:right;font-weight:700;color:{% if r.position==1 %}var(--or-fg){% elif r.position==2 %}var(--argent-fg){% elif r.position==3 %}var(--bronze-fg){% else %}var(--text3){% endif %}">{{ r.position }}</span>
+        <span>{{ r.joueur.nationalite | flag }}</span>
+        <span style="flex:1;font-size:0.88rem">{{ r.joueur.prenom | prenom }} {{ r.joueur.nom | title }}</span>
+        <span class="dim" style="font-size:0.8rem">{{ r.score | round(1) }}</span>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+
+</div>
+
+<!-- ── Tournois ───────────────────────────────────────────────────────────── -->
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
+
+  <!-- Derniers tournois -->
+  <div>
+    <h2 style="margin-bottom:0.5rem">
+      Derniers tournois
+      <a href="/tournois/" class="dim" style="font-size:0.78rem;font-weight:400;margin-left:0.5rem">voir tout →</a>
+    </h2>
+    {% with tournois=derniers, actifs_ids={}, ville_filtre=None, tab_key='derniers' %}
+    {% include 'partials/tournois_table.html' %}
+    {% endwith %}
+  </div>
+
+  <!-- Prochains tournois -->
+  <div>
+    <h2 style="margin-bottom:0.5rem">
+      Prochains tournois
+      <a href="/tournois/?vue=actifs" class="dim" style="font-size:0.78rem;font-weight:400;margin-left:0.5rem">voir tout →</a>
+    </h2>
+    {% with tournois=prochains, actifs_ids={}, ville_filtre=None, tab_key='prochains' %}
+    {% include 'partials/tournois_table.html' %}
+    {% endwith %}
+  </div>
+
+</div>
+
+{% endblock %}
