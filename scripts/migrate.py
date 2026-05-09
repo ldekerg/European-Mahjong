@@ -83,6 +83,31 @@ print(f"Joueurs étrangers (WMC/WRC uniquement) : {cur.rowcount}")
 
 con.commit()
 
+# --- Inversion points/mahjong pour tournois MCR mal importés ---
+# Un tournoi est inversé si au moins une ligne a points < 0
+# (les points EMA sont toujours >= 1) et mahjong > 0.
+# On exclut les cas avec une seule ligne (données partielles légitimes).
+inversions = con.execute("""
+    SELECT t.id, t.nom
+    FROM tournois t
+    JOIN resultats r ON r.tournoi_id = t.id
+    WHERE t.regles = 'MCR'
+    GROUP BY t.id
+    HAVING SUM(CASE WHEN r.points < 0 THEN 1 ELSE 0 END) > 0
+       AND COUNT(*) > 1
+       AND MAX(r.mahjong) > 0
+""").fetchall()
+
+print(f"\nTournois MCR avec inversion points/mahjong détectée : {len(inversions)}")
+for tid, nom in inversions:
+    cur = con.execute("""
+        UPDATE resultats SET points = mahjong, mahjong = points
+        WHERE tournoi_id = ?
+    """, (tid,))
+    print(f"  [{tid}] {nom[:50]} — {cur.rowcount} lignes inversées")
+
+con.commit()
+
 print("\nRésumé statuts joueurs :")
 for r in con.execute("SELECT statut, COUNT(*) FROM joueurs GROUP BY statut ORDER BY statut").fetchall():
     print(f"  {r[0]:12} {r[1]}")
