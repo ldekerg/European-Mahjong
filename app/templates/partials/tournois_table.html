@@ -23,12 +23,12 @@ window['{{ _fv }}'] = window['{{ _fv }}'] || function() {};
 </div>
 
 <div class="scroll-table t-left-scroll">
-<table id="t-table-{{ _tk if _tk else 'default' }}" style="table-layout:fixed;width:100%">
+<table id="t-table-{{ _tk if _tk else 'default' }}" class="tournois-table" style="table-layout:fixed;width:100%">
   <colgroup>
-    <col class="col-date-lg">
+    <col class="col-date-tournoi">
     <col class="col-flag">
     <col class="col-ville">
-    <col>
+    <col class="col-tournoi-nom">
     <col class="col-duree">
     <col class="col-regles">
     <col class="col-coeff">
@@ -51,15 +51,15 @@ window['{{ _fv }}'] = window['{{ _fv }}'] || function() {};
       {% else %}<th class="{{ cls }}" title="{{ title }}">{{ label }}</th>{% endif %}
     {% endmacro %}
     <tr>
-      {{ th_s('date',    trad('common.date')) }}
-      {{ th_s('pays',    '🌍',  'center', trad('common.pays')) }}
-      {{ th_s('lieu',    trad('common.ville')) }}
-      <th>{{ trad('common.tournoi') }}</th>
-      <th class="center" title="{{ trad('common.duree') }}">🗓️</th>
-      <th class="center" title="{{ trad('common.regles') }}">🀄</th>
-      {{ th_s('coeff',   '⚖️', 'center', trad('common.coeff_title')) }}
-      {{ th_s('joueurs', '👥', 'center', trad('common.nb_joueurs')) }}
-      <th class="center" title="{{ trad('tournois.contribution_title') }}">⏱️</th>
+      {{ th_s('date',    trad('common.date'), 'col-date-tournoi') }}
+      {{ th_s('pays',    '🌍',  'col-flag center', trad('common.pays')) }}
+      {{ th_s('lieu',    trad('common.ville'), 'col-ville') }}
+      <th class="col-tournoi-nom">{{ trad('common.tournoi') }}</th>
+      <th class="col-duree center" title="{{ trad('common.duree') }}">🗓️</th>
+      <th class="col-regles center" title="{{ trad('common.regles') }}">🀄</th>
+      {{ th_s('coeff',   '⚖️', 'col-coeff center', trad('common.coeff_title')) }}
+      {{ th_s('joueurs', '👥', 'col-joueurs center', trad('common.nb_joueurs')) }}
+      <th class="col-contrib center" title="{{ trad('tournois.contribution_title') }}">⏱️</th>
     </tr>
   </thead>
   <tbody>
@@ -68,11 +68,11 @@ window['{{ _fv }}'] = window['{{ _fv }}'] || function() {};
   {% set contrib = actifs_ids[trn.id] if actif else 0 %}
   <tr class="t-row t-row-{{ _tk if _tk else 'all' }} {% if actif %}row-actif{% endif %} {% if trn.type_tournoi in ['wmc','wrc'] %}row-wmc{% elif trn.type_tournoi in ['oemc','oerc'] %}row-oemc{% endif %}"
       data-lieu="{{ trn.lieu }}">
-    <td class="col-date">{{ trn.date_debut.strftime('%d/%m/%y') }}</td>
+    <td class="col-date-tournoi">{{ trn.date_debut.strftime('%d/%m') }}</td>
     <td class="col-flag">{{ trn.pays | pays_flag_link('tournois') }}</td>
     <td class="col-ville t-ville" onclick="{{ _fv }}('{{ trn.lieu }}')">{{ trn.lieu }}</td>
-    <td>
-      <a href="/tournois/{{ trn.regles }}_{{ trn.ema_id }}">{{ trn.nom }}</a>
+    <td class="col-tournoi-nom">
+      <span class="mobile-flag">{{ trn.pays | pays_flag_link('tournois') }}</span><a href="/tournois/{{ trn.regles }}_{{ trn.ema_id }}">{{ trn.nom }}</a>
       {% if trn.type_tournoi == 'wmc' %}<span class="badge badge-gold">WMC</span>
       {% elif trn.type_tournoi == 'wrc' %}<span class="badge badge-gold">WRC</span>
       {% elif trn.type_tournoi == 'oemc' %}<span class="badge">OEMC</span>
@@ -80,8 +80,8 @@ window['{{ _fv }}'] = window['{{ _fv }}'] || function() {};
       {% if incomplets is defined and trn.id in incomplets %}<span class="badge badge-warning">{{ trad('common.resultats_partiels') }}</span>{% endif %}
     </td>
     {% set duree = ((trn.date_fin - trn.date_debut).days + 1) if trn.date_fin and trn.date_debut.year != 1900 else 1 %}
-    <td class="center dim">{{ [duree, 1] | max }}j</td>
-    <td class="center"><span class="badge {% if trn.regles == 'MCR' %}badge-mcr{% else %}badge-rcr{% endif %}">{{ trn.regles }}</span></td>
+    <td class="col-duree center dim">{{ [duree, 1] | max }}j</td>
+    <td class="col-regles center"><span class="badge {% if trn.regles == 'MCR' %}badge-mcr{% else %}badge-rcr{% endif %}">{{ trn.regles }}</span></td>
     <td class="col-coeff">{{ trn.coefficient }}</td>
     <td class="col-joueurs">{{ trn.nb_joueurs }}</td>
     <td class="col-contrib">

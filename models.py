@@ -122,6 +122,8 @@ class SerieChampionnat(Base):
 
     editions = relationship("Championnat", back_populates="serie", order_by="Championnat.annee.desc()")
 
+    __table_args__ = (Index("ix_serie_championnat_pays", "pays"),)
+
 
 class Championnat(Base):
     __tablename__ = "championnat"
@@ -152,6 +154,7 @@ class ChampionnatTournoi(Base):
 
     __table_args__ = (
         UniqueConstraint("championnat_id", "tournoi_id", name="uq_champ_tournoi"),
+        Index("ix_championnat_tournoi_tournoi", "tournoi_id"),
     )
 
 

@@ -44,7 +44,7 @@
 {% endmacro %}
 
 <div class="scroll-table">
-<table style="table-layout:fixed;width:100%">
+<table class="joueurs-table" style="table-layout:fixed;width:100%">
   <colgroup>
     <col class="col-ema-id">    <!-- EMA ID -->
     <col class="col-flag">
@@ -57,30 +57,30 @@
   </colgroup>
   <thead>
     <tr>
-      {{ th_sort('id',          trad('common.ema_id')) }}
-      {{ th_sort('nationalite', '🌍',    'center') }}
-      {{ th_sort('nom',         trad('common.nom')) }}
-      {{ th_sort('prenom',      trad('common.prenom')) }}
-      {{ th_sort('premier',     trad('joueurs.debut'),  'center') }}
-      {{ th_sort_badge('nb_mcr', 'badge-mcr', 'center') }}
-      {{ th_sort_badge('nb_rcr', 'badge-rcr', 'center') }}
-      {{ th_sort('nb_total',    trad('common.tous'),  'center') }}
+      {{ th_sort('id',          trad('common.ema_id'),         'col-ema-id') }}
+      {{ th_sort('nationalite', '🌍',    'col-flag center') }}
+      {{ th_sort('nom',         trad('common.nom'),            'col-nom') }}
+      {{ th_sort('prenom',      trad('common.prenom'),         'col-prenom') }}
+      {{ th_sort('premier',     trad('joueurs.debut'),         'col-debut center') }}
+      {{ th_sort_badge('nb_mcr', 'badge-mcr', 'col-joueurs center') }}
+      {{ th_sort_badge('nb_rcr', 'badge-rcr', 'col-joueurs center') }}
+      {{ th_sort('nb_total',    trad('common.tous'),           'col-joueurs center') }}
     </tr>
   </thead>
   <tbody>
     {% for row in joueurs %}
     {% set j = row.joueur %}
     <tr {% if _apercu %}class="ranking-row" onclick="loadApercu('{{ j.id }}', this)"{% endif %}>
-      <td class="dim" style="font-family:monospace;font-size:0.8rem">
+      <td class="col-ema-id dim" style="font-family:monospace;font-size:0.8rem">
         <a href="/joueurs/{{ j.id }}" {% if _apercu %}onclick="event.stopPropagation()"{% endif %}>{{ j.id }}</a>
       </td>
       <td class="col-flag">{{ j.nationalite | flag_link('joueurs') }}</td>
-      <td>{{ j.nom | title }}</td>
-      <td>{{ j.prenom | prenom }}</td>
-      <td class="center dim" style="font-size:0.82rem">{{ row.premier.strftime('%m/%Y') if row.premier else '—' }}</td>
-      <td class="center {% if row.nb_mcr %}rank-num{% else %}dim{% endif %}">{{ row.nb_mcr or '—' }}</td>
-      <td class="center {% if row.nb_rcr %}rank-num{% else %}dim{% endif %}">{{ row.nb_rcr or '—' }}</td>
-      <td class="center" style="font-weight:600">{{ row.nb_total }}</td>
+      <td class="col-nom">{{ j.nationalite | flag_link('joueurs') }} {{ j.nom | title }}</td>
+      <td class="col-prenom">{{ j.prenom | prenom }}</td>
+      <td class="col-debut center dim" style="font-size:0.82rem">{{ row.premier.strftime('%m/%Y') if row.premier else '—' }}</td>
+      <td class="col-joueurs center {% if row.nb_mcr %}rank-num{% else %}dim{% endif %}">{{ row.nb_mcr or '—' }}</td>
+      <td class="col-joueurs center {% if row.nb_rcr %}rank-num{% else %}dim{% endif %}">{{ row.nb_rcr or '—' }}</td>
+      <td class="col-joueurs center" style="font-weight:600">{{ row.nb_total }}</td>
     </tr>
     {% else %}
     <tr><td colspan="7" class="empty">{{ trad('common.aucun_joueur') }}</td></tr>

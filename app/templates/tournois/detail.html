@@ -48,9 +48,9 @@
 <table style="table-layout:fixed;width:100%">
   <colgroup>
     <col class="col-pos">
-    <col class="col-date-lg">
+    <col class="col-ema-id">
     <col class="col-flag">
-    <col>
+    <col class="col-nom">
     {% if is_mcr %}<col class="col-pts">{% endif %}
     <col class="col-mahj">
     {% if show_ema_col %}<col class="col-ema">{% endif %}
@@ -58,11 +58,11 @@
   <thead>
     <tr>
       <th class="center" title="{{ trad('detail_tournoi.position_title') }}">🏅</th>
-      <th>{{ trad('common.ema_id') }}</th>
-      <th class="center" title="{{ trad('common.pays') }}">🌍</th>
-      <th>{{ trad('common.joueurs') }}</th>
-      {% if is_mcr %}<th class="right" title="{{ trad('detail_tournoi.points_title') }}">{{ trad('detail_tournoi.points') }}</th>{% endif %}
-      <th class="right" title="{{ trad('detail_tournoi.score_mcr_title') if is_mcr else trad('common.score') }}">{{ trad('common.score') }}</th>
+      <th class="col-ema-id"></th>
+      <th class="col-flag center" title="{{ trad('common.pays') }}">🌍</th>
+      <th class="col-nom">{{ trad('common.joueurs') }}</th>
+      {% if is_mcr %}<th class="col-pts right" title="{{ trad('detail_tournoi.points_title') }}">{{ trad('detail_tournoi.points') }}</th>{% endif %}
+      <th class="col-mahj right" title="{{ trad('detail_tournoi.score_mcr_title') if is_mcr else trad('common.score') }}">{{ trad('common.score') }}</th>
       {% if show_ema_col %}<th class="right col-sticky" title="{{ trad('detail_tournoi.ema_pts_title') }}">{{ trad('detail_tournoi.ema_pts') }}</th>{% endif %}
     </tr>
   </thead>
@@ -72,14 +72,15 @@
       <td class="td-pos">
         <span class="pos-medal">{% if r.position == 1 %}🥇{% elif r.position == 2 %}🥈{% elif r.position == 3 %}🥉{% else %}{{ r.position }}{% endif %}</span>
       </td>
-      <td>
+      <td class="col-ema-id">
         {% if r.joueur %}<a href="/joueurs/{{ r.joueur.id }}">{{ r.joueur.id }}</a>
         {% else %}<span class="dim">—</span>{% endif %}
       </td>
-      <td class="center">
+      <td class="col-flag center">
         {% if r.nationalite %}{{ r.nationalite | flag_link('joueurs') }}{% endif %}
       </td>
-      <td>
+      <td class="col-nom">
+        <span class="mobile-flag">{% if r.nationalite %}{{ r.nationalite | flag_link('joueurs') }}{% endif %}</span>
         {% if r.joueur %}
           {{ r.joueur.prenom | prenom }} {{ r.joueur.nom | title }}
         {% elif r.prenom or r.nom %}
@@ -88,8 +89,8 @@
           <span class="dim">—</span>
         {% endif %}
       </td>
-      {% if is_mcr %}<td class="right">{% if not r.anonyme %}{{ r.points }}{% endif %}</td>{% endif %}
-      <td class="right">{% if not r.anonyme %}{{ r.mahjong }}{% endif %}</td>
+      {% if is_mcr %}<td class="col-pts right">{% if not r.anonyme %}{{ r.points }}{% endif %}</td>{% endif %}
+      <td class="col-mahj right">{% if not r.anonyme %}{{ r.mahjong }}{% endif %}</td>
       {% if show_ema_col %}
       <td class="right col-sticky ema-pts" style="{% if not r.anonyme %}{{ r.ranking | ema_color }}{% endif %}">
         {% if not r.anonyme %}{{ r.ranking }}{% endif %}

@@ -70,17 +70,17 @@
         <col class="col-flag">
         <col class="col-pays-nom">
         <col class="col-score">
-        <col><col><col>
+        <col class="col-pays-medailles"><col class="col-pays-medailles"><col class="col-pays-medailles">
       </colgroup>
       <thead>
         <tr>
           <th class="th-rank">#</th>
-          <th></th>
-          <th>{{ trad('common.pays') }}</th>
-          <th class="right" title="{{ trad('pays.score_title') }}">{{ trad('common.score') }}</th>
-          <th class="center">🥇 {{ trad('common.joueurs') }}</th>
-          <th class="center">🥈 {{ trad('common.joueurs') }}</th>
-          <th class="center">🥉 {{ trad('common.joueurs') }}</th>
+          <th class="col-flag center">🌍</th>
+          <th class="col-pays-nom">{{ trad('common.pays') }}</th>
+          <th class="col-score right" title="{{ trad('pays.score_title') }}">{{ trad('common.score') }}</th>
+          <th class="col-pays-medailles center">🥇 {{ trad('common.joueurs') }}</th>
+          <th class="col-pays-medailles center">🥈 {{ trad('common.joueurs') }}</th>
+          <th class="col-pays-medailles center">🥉 {{ trad('common.joueurs') }}</th>
         </tr>
       </thead>
       <tbody>
@@ -90,19 +90,19 @@
             {% if e.rang == 1 %}🥇{% elif e.rang == 2 %}🥈{% elif e.rang == 3 %}🥉
             {% else %}<span class="rank-num">{{ e.rang }}</span>{% endif %}
           </td>
-          <td class="center" style="font-size:1.2rem">{{ e.code | flag }}</td>
-          <td><a href="/pays/{{ e.code }}">{{ e.nom }}</a></td>
-          <td class="right score-val">{{ e.score_equipe }}</td>
+          <td class="col-flag center" style="font-size:1.2rem">{{ e.code | flag }}</td>
+          <td class="col-pays-nom"><span class="mobile-flag">{{ e.code | flag }} </span><a href="/pays/{{ e.code }}">{{ e.nom }}</a></td>
+          <td class="col-score right score-val">{{ e.score_equipe }}</td>
           {% for i in range(3) %}
           {% if i < e.top3 | length %}{% set j = e.top3[i] %}
-          <td class="center" style="font-size:0.82rem">
+          <td class="col-pays-medailles center" style="font-size:0.82rem">
             <a href="/joueurs/{{ j.joueur_id }}" title="#{{ j.position }} mondial · {{ j.score }} pts">
               {{ j.prenom | prenom }} {{ j.nom | title }}
             </a>
             <span class="dim" style="display:block;font-size:0.75rem">#{{ j.position }} · {{ j.score }}</span>
           </td>
           {% else %}
-          <td class="center dim">—</td>
+          <td class="col-pays-medailles center dim">—</td>
           {% endif %}
           {% endfor %}
         </tr>
@@ -128,22 +128,22 @@
     </colgroup>
     <thead>
       <tr>
-        <th class="center">🌍</th>
-        <th>{{ trad('common.pays') }}</th>
-        <th class="center" title="{{ trad('pays.joueurs_actifs_title') }}">{{ trad('common.joueurs') }}</th>
-        <th class="center">{{ trad('pays.tournois_org_abbr') }}</th>
+        <th class="col-flag center">🌍</th>
+        <th class="col-pays-nom">{{ trad('common.pays') }}</th>
+        <th class="col-pays-joueurs center" title="{{ trad('pays.joueurs_actifs_title') }}">{{ trad('common.joueurs') }}</th>
+        <th class="col-pays-tournois center">{{ trad('pays.tournois_org_abbr') }}</th>
       </tr>
     </thead>
     <tbody>
       {% for p in pays_list %}
       <tr>
-        <td class="center" style="font-size:1.3rem">{{ p.code | flag }}</td>
-        <td><a href="/pays/{{ p.code }}">{{ p.nom }}</a></td>
-        <td class="center">
+        <td class="col-flag center" style="font-size:1.3rem">{{ p.code | flag }}</td>
+        <td class="col-pays-nom"><a href="/pays/{{ p.code }}">{{ p.nom }}</a></td>
+        <td class="col-pays-joueurs center">
           <span class="rank-num">{{ p.nb_actifs }}</span>
           <span class="dim" style="font-size:0.8rem"> / {{ p.nb_joueurs }}</span>
         </td>
-        <td class="center {% if p.nb_tournois %}rank-num{% else %}dim{% endif %}">
+        <td class="col-pays-tournois center {% if p.nb_tournois %}rank-num{% else %}dim{% endif %}">
           {{ p.nb_tournois or '—' }}
         </td>
       </tr>

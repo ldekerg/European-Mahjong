@@ -21,12 +21,17 @@
 <body>
     <nav>
         <a href="/accueil">{{ trad('nav.home') }}</a>
-        <a href="/classement">{{ trad('nav.classement') }}</a>
-        <a href="/joueurs/">{{ trad('nav.joueurs') }}</a>
-        <a href="/pays/">{{ trad('nav.pays') }}</a>
-        <a href="/tournois/">{{ trad('nav.tournois') }}</a>
-        <a href="/tournois/calendrier">{{ trad('common.calendrier') }}</a>
-        <a href="/hallfame/">{{ trad('nav.hallfame') }}</a>
+        <button id="nav-toggle" aria-label="Menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+        <div id="nav-links">
+          <a href="/classement">{{ trad('nav.classement') }}</a>
+          <a href="/joueurs/">{{ trad('nav.joueurs') }}</a>
+          <a href="/pays/">{{ trad('nav.pays') }}</a>
+          <a href="/tournois/">{{ trad('nav.tournois') }}</a>
+          <a href="/tournois/calendrier">{{ trad('common.calendrier') }}</a>
+          <a href="/hallfame/">{{ trad('nav.hallfame') }}</a>
+        </div>
         <button class="regles-toggle" onclick="toggleRegles()" title="Règle par défaut">MCR</button>
         <div class="lang-picker" id="lang-picker">
           <button class="lang-toggle" onclick="toggleLangDropdown()" title="{{ trad('common.langue') }}">
@@ -195,6 +200,24 @@
 
     document.addEventListener('DOMContentLoaded', updateStickyOffsets);
     window.addEventListener('resize', updateStickyOffsets);
+
+    // ── Hamburger menu ───────────────────────────────────────────────────────
+    (function() {
+        var btn   = document.getElementById('nav-toggle');
+        var links = document.getElementById('nav-links');
+        if (!btn) return;
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            var open = links.classList.toggle('nav-open');
+            btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        });
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('nav')) {
+                links.classList.remove('nav-open');
+                btn.setAttribute('aria-expanded', 'false');
+            }
+        });
+    })();
     </script>
 </body>
 </html>
