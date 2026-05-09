@@ -224,7 +224,7 @@ function fetchApercu(joueurId, regles) {
   panel.innerHTML = '<p class="empty">' + _I18N.chargement + '</p>';
   var semaine = '{{ semaine.isoformat() }}';
   var r = regles || document.querySelector('#tab-classement .tab-btn.active').textContent.trim().split(' ')[0];
-  fetch('/joueurs/' + joueurId + '/apercu?semaine=' + semaine + '&regles=' + r)
+  fetch('/joueurs/' + joueurId + '/apercu?semaine=' + semaine + '&regles=' + r + '&pays_code={{ code }}')
     .then(function(res){ return res.text(); })
     .then(function(html){ panel.innerHTML = html; })
     .catch(function(){ panel.innerHTML = '<p class="empty">' + _I18N.erreur_chargement + '</p>'; });

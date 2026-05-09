@@ -14,9 +14,15 @@
       {% else %}—{% endif %}
     </div>
   </div>
+  {% if data.meilleur and data.date_meilleur %}
+  <a class="stat-card stat-card-hl" href="/classement?semaine={{ data.date_meilleur }}&joueur={{ joueur.id }}&regles={{ regles | upper }}" style="color:inherit;text-decoration:none"
+     onmouseenter="highlightDate('{{ regles }}','pos','{{ data.date_meilleur }}')"
+     onmouseleave="clearHighlight('{{ regles }}')">
+  {% else %}
   <div class="stat-card stat-card-hl"
        onmouseenter="highlightDate('{{ regles }}','pos','{{ data.date_meilleur }}')"
        onmouseleave="clearHighlight('{{ regles }}')">
+  {% endif %}
     <div class="stat-label">{{ trad('joueur_detail.stat_meilleur') }}</div>
     <div class="stat-value">
       {% if data.meilleur %}
@@ -26,10 +32,17 @@
         {% endif %}
       {% else %}—{% endif %}
     </div>
-  </div>
+  {% if data.meilleur and data.date_meilleur %}</a>{% else %}</div>{% endif %}
+
+  {% if data.score_max and data.date_score_max %}
+  <a class="stat-card stat-card-hl" href="/classement?semaine={{ data.date_score_max }}&joueur={{ joueur.id }}&regles={{ regles | upper }}" style="color:inherit;text-decoration:none"
+     onmouseenter="highlightDate('{{ regles }}','score','{{ data.date_score_max }}')"
+     onmouseleave="clearHighlight('{{ regles }}')">
+  {% else %}
   <div class="stat-card stat-card-hl"
        onmouseenter="highlightDate('{{ regles }}','score','{{ data.date_score_max }}')"
        onmouseleave="clearHighlight('{{ regles }}')">
+  {% endif %}
     <div class="stat-label">{{ trad('joueur_detail.stat_score_max') }}</div>
     <div class="stat-value">
       {% if data.score_max %}
@@ -39,7 +52,7 @@
         {% endif %}
       {% else %}—{% endif %}
     </div>
-  </div>
+  {% if data.score_max and data.date_score_max %}</a>{% else %}</div>{% endif %}
   <div class="stat-card">
     <div class="stat-label">{{ trad('joueur_detail.stat_tournois_actifs') }}</div>
     <div class="stat-value">{{ data.nb_actifs }}</div>
