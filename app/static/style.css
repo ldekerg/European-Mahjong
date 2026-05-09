@@ -255,7 +255,7 @@ a { color: var(--accent); }
 .week-option.active { font-weight: 700; color: var(--accent); background: var(--row-actif); }
 .ranking-layout {
     display: grid;
-    grid-template-columns: 1fr 400px;
+    grid-template-columns: 1fr 460px;
     gap: 1.5rem;
     align-items: start;
 }
@@ -267,6 +267,7 @@ a { color: var(--accent); }
     position: sticky;
     top: 1rem;
     min-height: 200px;
+    overflow: visible;
 }
 /* Podium tournoi */
 .podium {
@@ -728,7 +729,7 @@ col.col-prenom       { width: 10rem; }
 col.col-debut        { width: 5.5rem; }   /* date premier tournoi */
 col.col-joueur-nom   { width: 14rem; }    /* nom joueur dans HOF */
 col.col-pays-nom     { width: 12rem; }    /* nom de pays */
-col.col-date         { width: 5.8rem; }
+col.col-date         { width: 3rem; }
 col.col-date-lg      { width: 6.5rem; }   /* date avec année complète */
 col.col-ville        { width: 10rem; }
 col.col-duree        { width: 2.5rem; }
@@ -742,11 +743,14 @@ col.col-ema          { width: 3.5rem; }
 col.col-pts          { width: 2.8rem; }
 col.col-mahj         { width: 3.5rem; }
 col.col-podiums      { width: 7rem; }
+col.col-tournoi      { width: 8rem; }    /* nom de tournoi dans classement */
 col.col-hof-stat     { width: 4rem; }     /* stat HOF (médailles, semaines) */
 col.col-hof-podium   { width: 4.5rem; }  /* podium HOF */
 col.col-hof-total    { width: 5rem; }     /* total HOF */
 col.col-pays-joueurs { width: 7rem; }     /* joueurs actifs dans liste pays */
 col.col-pays-tournois{ width: 6rem; }    /* tournois org dans liste pays */
+col.col-champ-score  { width: 5rem; }    /* score moyen championnat */
+col.col-champ-t      { width: 4rem; }    /* nb tournois championnat */
 
 td.col-pos, th.col-pos     { text-align: center; width: 2.8rem; }
 td.col-delta, th.col-delta { text-align: center; width: 3rem; white-space: nowrap; }
@@ -763,3 +767,52 @@ td.col-ema, th.col-ema     { text-align: right; }
 td.col-pts, th.col-pts     { text-align: right; }
 td.col-mahj, th.col-mahj   { text-align: right; }
 td.col-podiums             { white-space: nowrap; }
+
+/* --- Éditions championnat expand/collapse --- */
+.edition-block {
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(0,0,0,.08);
+}
+.edition-summary {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.85rem 1rem;
+    background: var(--bg2);
+    cursor: pointer;
+    user-select: none;
+    list-style: none;
+}
+.edition-block[open] > .edition-summary {
+    border-bottom: 2px solid var(--border);
+}
+.edition-summary::-webkit-details-marker { display: none; }
+.edition-summary::before {
+    content: '▶';
+    font-size: 0.7rem;
+    color: var(--accent);
+    transition: transform 0.15s;
+    flex-shrink: 0;
+}
+.edition-block[open] > .edition-summary::before { transform: rotate(90deg); }
+.edition-summary:hover { background: var(--bg3); }
+.edition-summary-left {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 10rem;
+}
+.edition-summary-title { font-size: 1rem; font-weight: 700; }
+.edition-summary-right {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+.edition-body {
+    padding: 1rem;
+    background: var(--bg);
+}

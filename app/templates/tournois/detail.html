@@ -130,26 +130,23 @@
   </div>
   {% endif %}
 
-  {% if tournoi.latitude and tournoi.longitude %}
-  <div id="tournoi-map" style="height:200px;border-radius:6px;border:1px solid var(--border);margin-top:1rem;z-index:1"></div>
-  <p class="t-map-hint">{{ tournoi.lieu }}, {{ tournoi.pays }}</p>
-  <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    var map = L.map('tournoi-map', {
-      center: [{{ tournoi.latitude }}, {{ tournoi.longitude }}],
-      zoom: 6,
-      zoomControl: false,
-      scrollWheelZoom: false,
-    });
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap'
-    }).addTo(map);
-    L.circleMarker([{{ tournoi.latitude }}, {{ tournoi.longitude }}], {
-      radius: 8, color: '#fff',
-      fillColor: 'var(--accent)', fillOpacity: 0.9, weight: 2
-    }).addTo(map).bindTooltip('{{ tournoi.lieu }}', {permanent: true, direction: 'top', offset: [0, -8]});
-  });
-  </script>
+  {% if circuit_serie and circuit_tournois %}
+  <div style="margin-top:1rem">
+    <div style="font-size:0.82rem;margin-bottom:0.4rem">
+      Circuit : <a href="/championnats/{{ circuit_serie.slug }}/{{ circuit_edition.annee }}">{{ circuit_edition.nom or circuit_serie.nom }}</a>
+    </div>
+    {% set carte_pts = [] %}
+    {% for t in circuit_tournois %}{% set _ = carte_pts.append({'lat': t.ville.latitude, 'lon': t.ville.longitude, 'lieu': t.lieu, 'pays': t.pays, 'current': t.id == tournoi.id}) %}{% endfor %}
+    {% set carte_simple_id = 'tournoi-map' %}
+    {% include 'partials/carte_simple.html' %}
+  </div>
+  {% elif tournoi.ville %}
+  <div style="margin-top:1rem">
+    {% set carte_pts = [{'lat': tournoi.ville.latitude, 'lon': tournoi.ville.longitude, 'lieu': tournoi.lieu, 'pays': tournoi.pays}] %}
+    {% set carte_simple_id = 'tournoi-map' %}
+    {% set carte_simple_zoom = 8 %}
+    {% include 'partials/carte_simple.html' %}
+  </div>
   {% endif %}
 </div><!-- ranking-right -->
 </div><!-- margin wrapper -->

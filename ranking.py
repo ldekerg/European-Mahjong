@@ -209,3 +209,14 @@ def classement(db: Session, semaine_cible: date, regles: str) -> list[dict]:
         s["position"] = i + 1
 
     return scores
+
+
+def points_ema_tournoi(position: int, nb_joueurs: int) -> int:
+    """
+    Calcule les points EMA attribués à un joueur selon sa position dans un tournoi.
+    Formule : EMA = (NB - POS) / (NB - 1) * 1000, arrondi à l'entier.
+    1er → 1000, dernier → 0. Retourne 0 si nb_joueurs <= 1.
+    """
+    if nb_joueurs <= 1:
+        return 0
+    return round((nb_joueurs - position) / (nb_joueurs - 1) * 1000)

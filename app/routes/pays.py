@@ -400,11 +400,13 @@ def pays_detail(
     incomplets = _incomplets_ids(db, [t.id for t in tous_tournois])
 
     # Villes pour la carte
+    from models import Ville
     villes_q = (
-        db.query(Tournoi.lieu, Tournoi.pays, Tournoi.latitude, Tournoi.longitude,
+        db.query(Tournoi.lieu, Tournoi.pays, Ville.latitude, Ville.longitude,
                  func.count(Tournoi.id).label("nb"))
-        .filter(Tournoi.pays == pays_nom, Tournoi.latitude.isnot(None))
-        .group_by(Tournoi.lieu, Tournoi.pays, Tournoi.latitude, Tournoi.longitude)
+        .join(Ville, Tournoi.ville_id == Ville.id)
+        .filter(Tournoi.pays == pays_nom)
+        .group_by(Tournoi.lieu, Tournoi.pays, Ville.latitude, Ville.longitude)
         .all()
     )
     villes = [{"lieu": v.lieu, "pays": v.pays, "lat": v.latitude, "lon": v.longitude, "nb": v.nb}
@@ -473,6 +475,9 @@ def pays_detail(
     import json
     chart_detail = _chart_joueurs_detail(db, code)
 
+    from models import SerieChampionnat
+    series_pays = db.query(SerieChampionnat).filter_by(pays=code).order_by(SerieChampionnat.nom).all()
+
     return templates.TemplateResponse(request, "pays/detail.html", {
         "code":             code,
         "nom_pays":         nom_pays,
@@ -508,4 +513,6 @@ def pays_detail(
         "joueurs":          joueurs_data,
         # Graphique
         "chart_json":       json.dumps(chart_detail),
+        # Circuits nationaux
+        "series_pays":      series_pays,
     })

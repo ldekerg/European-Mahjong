@@ -31,7 +31,7 @@ def _tournois_tab(db, regles: str, vue: str, tri: str, asc: int, ville) -> dict:
     semaine = lundi_semaine(date.today())
     actifs_ids = {t.id: c for t, c in tournois_actifs(db, semaine, regles)}
 
-    q = db.query(Tournoi).filter(Tournoi.regles == regles)
+    q = db.query(Tournoi).filter(Tournoi.regles == regles, Tournoi.ema_id.isnot(None))
     if vue == "actifs":
         q = q.filter(Tournoi.id.in_(actifs_ids.keys()))
     elif vue == "speciaux":
@@ -46,11 +46,14 @@ def _tournois_tab(db, regles: str, vue: str, tri: str, asc: int, ville) -> dict:
         q = q.filter(Tournoi.lieu == ville)
     tournois_list = q.filter(Tournoi.date_debut != date(1900, 1, 1)).all()
 
+    from models import Ville
     vq = db.query(
-        Tournoi.lieu, Tournoi.pays, Tournoi.latitude, Tournoi.longitude,
+        Tournoi.lieu, Tournoi.pays, Ville.latitude, Ville.longitude,
         func.count(Tournoi.id).label("nb"),
+    ).join(Ville, Tournoi.ville_id == Ville.id
     ).filter(
-        Tournoi.latitude.isnot(None), Tournoi.lieu != "", Tournoi.regles == regles,
+        Tournoi.lieu != "", Tournoi.regles == regles,
+        Tournoi.ema_id.isnot(None),
     )
     if vue == "actifs":
         vq = vq.filter(Tournoi.id.in_(actifs_ids.keys()))
@@ -59,7 +62,7 @@ def _tournois_tab(db, regles: str, vue: str, tri: str, asc: int, ville) -> dict:
     villes = [{"lieu": v.lieu, "pays": v.pays, "lat": v.latitude,
                "lon": v.longitude, "nb": v.nb}
               for v in vq.group_by(Tournoi.lieu, Tournoi.pays,
-                                    Tournoi.latitude, Tournoi.longitude).all()]
+                                    Ville.latitude, Ville.longitude).all()]
 
     # Bounds pour la carte : fitBounds sur tout si vue=speciaux, sinon Europe par défaut
     carte_bounds = None
@@ -251,6 +254,20 @@ def detail_tournoi(tournoi_id: int, request: Request, db: Session = Depends(get_
     )  # PAYS_EMA défini en tête de module
     resultats_incomplets = nb_anon_europeens > 0
 
+    # Championnat dont fait partie ce tournoi (s'il existe)
+    from models import ChampionnatTournoi, Championnat, SerieChampionnat
+    lien_champ = db.query(ChampionnatTournoi).filter_by(tournoi_id=tournoi_id).first()
+    circuit_tournois = []
+    circuit_serie = None
+    circuit_edition = None
+    if lien_champ:
+        circuit_edition = db.query(Championnat).filter_by(id=lien_champ.championnat_id).first()
+        circuit_serie = db.query(SerieChampionnat).filter_by(id=circuit_edition.serie_id).first()
+        circuit_tournois = [
+            l.tournoi for l in circuit_edition.liens
+            if l.tournoi.ville_id
+        ]
+
     return templates.TemplateResponse(request, "tournois/detail.html", {
         "tournoi":              tournoi,
         "resultats":            resultats_unifies,
@@ -262,6 +279,9 @@ def detail_tournoi(tournoi_id: int, request: Request, db: Session = Depends(get_
         "nb_resultats":          nb_resultats,
         "nb_anon_europeens":     nb_anon_europeens,
         "is_mondial":            tournoi.type_tournoi in ('wmc', 'wrc'),
+        "circuit_tournois":      circuit_tournois,
+        "circuit_serie":         circuit_serie,
+        "circuit_edition":       circuit_edition,
     })
 
 

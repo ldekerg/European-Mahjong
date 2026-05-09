@@ -126,7 +126,8 @@ def detail_joueur(joueur_id: str, request: Request, db: Session = Depends(get_db
         resultats = (
             db.query(Resultat)
             .join(Tournoi)
-            .filter(Resultat.joueur_id == joueur_id, Tournoi.regles == regles)
+            .filter(Resultat.joueur_id == joueur_id, Tournoi.regles == regles,
+                    Tournoi.ema_id.isnot(None))
             .order_by(Tournoi.date_debut.desc())
             .all()
         )
@@ -257,6 +258,7 @@ def apercu_joueur(
             Resultat.joueur_id == joueur_id,
             T.regles == regles,
             T.type_tournoi.notin_(["wmc", "wrc"]),
+            T.ema_id.isnot(None),
         ).count()
 
         ids_dict = actifs_mcr if regles == "MCR" else actifs_rcr

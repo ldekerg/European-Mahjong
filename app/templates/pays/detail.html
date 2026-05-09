@@ -48,6 +48,9 @@
   <button class="tab-btn active"  onclick="showMainTab('classement', this)">{{ trad('pays.tab_classement') }}</button>
   <button class="tab-btn"        onclick="showMainTab('tournois', this)">{{ trad('pays.tab_tournois') }}</button>
   <button class="tab-btn"        onclick="showMainTab('joueurs', this)">{{ trad('pays.tab_joueurs') }}</button>
+  {% if series_pays %}
+  <button class="tab-btn"        onclick="showMainTab('circuits', this)">Circuits nationaux</button>
+  {% endif %}
 </div>
 
 <!-- ══════════════════════════════════════════════════════════════════════
@@ -126,6 +129,68 @@
     </div>
   </div>
 </div>
+
+{% if series_pays %}
+<div id="tab-circuits" class="tab-content hidden">
+  {% for serie in series_pays %}
+  <details class="edition-block" {% if loop.first %}open{% endif %}>
+    <summary class="edition-summary">
+      <div class="edition-summary-left">
+        <a href="/championnats/{{ serie.slug }}" class="edition-summary-title" onclick="event.stopPropagation()">{{ serie.nom }}</a>
+        <span class="dim" style="font-size:0.82rem">
+          <span class="badge {% if serie.regles == 'MCR' %}badge-mcr{% else %}badge-rcr{% endif %}">{{ serie.regles }}</span>
+          {{ serie.editions | length }} édition{{ 's' if serie.editions | length > 1 }}
+        </span>
+      </div>
+      <div class="edition-summary-right">
+        {% if serie.editions %}
+          {% set ed = serie.editions[0] %}
+          {% set cl = [] %}
+          {# Champion de la dernière édition #}
+          {% if ed.champion %}
+            {% set c = ed.champion %}
+            <span style="display:inline-flex;align-items:center;gap:0.3rem;font-size:0.85rem">
+              🏆
+              {% if c.nationalite %}{{ c.nationalite | flag }}{% endif %}
+              {% if c.joueur %}{{ c.joueur.prenom | prenom }} {{ c.joueur.nom | title }}
+              {% else %}{{ c.nom_affiche }}{% endif %}
+              <span class="dim">({{ ed.annee }})</span>
+            </span>
+          {% endif %}
+        {% endif %}
+      </div>
+    </summary>
+    <div class="edition-body">
+      <div class="scroll-table">
+      <table style="width:100%">
+        <colgroup>
+          <col class="col-date">
+          <col>
+          <col class="col-joueurs">
+        </colgroup>
+        <thead>
+          <tr>
+            <th>Année</th>
+            <th>Édition</th>
+            <th class="right">Tournois</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for ed in serie.editions %}
+          <tr>
+            <td class="dim">{{ ed.annee }}</td>
+            <td><a href="/championnats/{{ serie.slug }}/{{ ed.annee }}">{{ ed.nom or (serie.nom ~ ' ' ~ ed.annee) }}</a></td>
+            <td class="right dim">{{ ed.liens | length }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </details>
+  {% endfor %}
+</div>
+{% endif %}
 
 
 <!-- ── Scripts ──────────────────────────────────────────────────────────── -->

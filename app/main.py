@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 
 from database import engine, SessionLocal
 import models
-from app.routes import joueurs, tournois, hallfame
+from app.routes import joueurs, tournois, hallfame, championnats
 from app.routes import pays
 from app.templates_config import templates
 from models import ClassementHistorique, Joueur
@@ -25,6 +25,7 @@ app.include_router(joueurs.router)
 app.include_router(tournois.router)
 app.include_router(hallfame.router)
 app.include_router(pays.router)
+app.include_router(championnats.router)
 
 
 def get_delta_rang(db: Session, semaine: date, regles: str) -> dict:

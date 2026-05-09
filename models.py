@@ -29,8 +29,11 @@ class Tournoi(Base):
     date_fin = Column(Date, nullable=False)
     nb_joueurs = Column(Integer, nullable=False)
     coefficient = Column(Float, nullable=False)    # MERS
-    latitude  = Column(Float, nullable=True)
-    longitude = Column(Float, nullable=True)
+    latitude  = Column(Float, nullable=True)   # déprecié — utiliser ville_id
+    longitude = Column(Float, nullable=True)   # déprecié — utiliser ville_id
+    ville_id  = Column(Integer, ForeignKey("villes.id"), nullable=True)
+
+    ville     = relationship("Ville")
     # normal | wmc | oemc | wrc | oerc  (wmc/wrc exclus du classement)
     type_tournoi = Column(String, nullable=False, default="normal")
     # actif | calendrier | archive
@@ -91,6 +94,65 @@ class ChangementNationalite(Base):
     date_changement = Column(Date, nullable=False)
 
     __table_args__ = (UniqueConstraint("joueur_id", "date_changement"),)
+
+
+class Ville(Base):
+    __tablename__ = "villes"
+
+    id        = Column(Integer, primary_key=True, autoincrement=True)
+    nom       = Column(String, nullable=False)   # ex: "Lyon"
+    pays      = Column(String, nullable=False)   # code ISO ex: "FR"
+    latitude  = Column(Float, nullable=False)
+    longitude = Column(Float, nullable=False)
+
+    __table_args__ = (
+        UniqueConstraint("nom", "pays", name="uq_ville_nom_pays"),
+    )
+
+
+class SerieChampionnat(Base):
+    __tablename__ = "serie_championnat"
+
+    id          = Column(Integer, primary_key=True, autoincrement=True)
+    slug        = Column(String, unique=True, nullable=False)   # ex: "france-mcr"
+    nom         = Column(String, nullable=False)                # ex: "Championnat de France MCR"
+    regles      = Column(String, nullable=False)                # MCR | RCR
+    pays        = Column(String, nullable=False)                # code pays ex: "FR"
+    description = Column(String, nullable=True)
+
+    editions = relationship("Championnat", back_populates="serie", order_by="Championnat.annee.desc()")
+
+
+class Championnat(Base):
+    __tablename__ = "championnat"
+
+    id       = Column(Integer, primary_key=True, autoincrement=True)
+    serie_id = Column(Integer, ForeignKey("serie_championnat.id"), nullable=False)
+    annee    = Column(Integer, nullable=False)
+    nom          = Column(String, nullable=True)       # override optionnel
+    formule      = Column(String, nullable=False, default="moyenne_n_meilleurs")
+    params       = Column(String, nullable=False, default='{"n": 3}')  # JSON
+    champion_id  = Column(String, ForeignKey("joueurs.id"), nullable=True)   # joueur EMA identifié
+    champion_nom = Column(String, nullable=True)   # fallback texte libre (anonyme ou surcharge)
+
+    serie    = relationship("SerieChampionnat", back_populates="editions")
+    liens    = relationship("ChampionnatTournoi", back_populates="championnat")
+    champion = relationship("Joueur", foreign_keys=[champion_id])
+
+
+class ChampionnatTournoi(Base):
+    __tablename__ = "championnat_tournoi"
+
+    id              = Column(Integer, primary_key=True, autoincrement=True)
+    championnat_id  = Column(Integer, ForeignKey("championnat.id"), nullable=False)
+    tournoi_id      = Column(Integer, ForeignKey("tournois.id"), nullable=False)
+
+    championnat = relationship("Championnat", back_populates="liens")
+    tournoi     = relationship("Tournoi")
+
+    __table_args__ = (
+        UniqueConstraint("championnat_id", "tournoi_id", name="uq_champ_tournoi"),
+    )
 
 
 class ClassementHistorique(Base):

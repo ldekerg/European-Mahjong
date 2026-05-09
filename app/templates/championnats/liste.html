@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="ranking-header">
+  <h1>Championnats nationaux</h1>
+</div>
+
+{% if not series %}
+<div class="dim" style="margin:2rem 0;text-align:center">Aucun championnat enregistré.</div>
+{% else %}
+
+{% set par_pays = {} %}
+{% for s in series %}
+  {% if s.pays not in par_pays %}{% set _ = par_pays.update({s.pays: []}) %}{% endif %}
+  {% set _ = par_pays[s.pays].append(s) %}
+{% endfor %}
+
+{% for pays_code, liste in par_pays.items() %}
+<div style="margin-bottom:2rem">
+  <h2 style="display:flex;align-items:center;gap:0.5rem">
+    {{ pays_code | flag }} {{ pays_code }}
+  </h2>
+  <div class="stats-grid">
+    {% for s in liste %}
+    <a href="/championnats/{{ s.slug }}" class="stat-card" style="text-decoration:none;display:block">
+      <div class="stat-label">
+        <span class="badge {% if s.regles == 'MCR' %}badge-mcr{% else %}badge-rcr{% endif %}">{{ s.regles }}</span>
+      </div>
+      <div style="font-weight:700;font-size:1.05rem;margin:0.4rem 0">{{ s.nom }}</div>
+      <div class="dim" style="font-size:0.82rem">{{ s.editions | length }} édition{{ 's' if s.editions | length > 1 }}</div>
+      {% if s.description %}
+      <div class="dim" style="font-size:0.8rem;margin-top:0.3rem">{{ s.description }}</div>
+      {% endif %}
+    </a>
+    {% endfor %}
+  </div>
+</div>
+{% endfor %}
+
+{% endif %}
+
+{% endblock %}
