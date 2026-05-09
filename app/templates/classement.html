@@ -4,12 +4,12 @@
 <div class="ranking-header">
   <h1>EMA Ranking</h1>
   <div class="date-nav">
-    <a href="/{% if joueur_selectionne %}?joueur={{ joueur_selectionne }}{% endif %}" class="nav-arrow nav-today">
+    <a href="/classement{% if joueur_selectionne %}?joueur={{ joueur_selectionne }}{% endif %}" class="nav-arrow nav-today">
       ⟳ {{ aujourd_hui.strftime('%d/%m/%Y') }}
     </a>
 
     {% if semaine_prev %}
-    <a href="/?semaine={{ semaine_prev }}{% if joueur_selectionne %}&joueur={{ joueur_selectionne }}{% endif %}&regles={{ onglet_actif }}" class="nav-arrow">◀</a>
+    <a href="/classement?semaine={{ semaine_prev }}{% if joueur_selectionne %}&joueur={{ joueur_selectionne }}{% endif %}&regles={{ onglet_actif }}" class="nav-arrow">◀</a>
     {% else %}
     <span class="nav-arrow disabled">◀</span>
     {% endif %}
@@ -24,7 +24,7 @@
           <div class="week-group-label">{{ grp.annee }}</div>
           {% for s in grp.semaines %}
           <a class="week-option {% if s.date == semaine %}active{% endif %}"
-             href="/?semaine={{ s.date.isoformat() }}{% if joueur_selectionne %}&joueur={{ joueur_selectionne }}{% endif %}&regles={{ onglet_actif }}">
+             href="/classement?semaine={{ s.date.isoformat() }}{% if joueur_selectionne %}&joueur={{ joueur_selectionne }}{% endif %}&regles={{ onglet_actif }}">
             #{{ s.num }} — {{ s.date.strftime('%d/%m/%Y') }}
           </a>
           {% endfor %}
@@ -34,7 +34,7 @@
     </div>
 
     {% if semaine_next %}
-    <a href="/?semaine={{ semaine_next }}{% if joueur_selectionne %}&joueur={{ joueur_selectionne }}{% endif %}&regles={{ onglet_actif }}" class="nav-arrow">▶</a>
+    <a href="/classement?semaine={{ semaine_next }}{% if joueur_selectionne %}&joueur={{ joueur_selectionne }}{% endif %}&regles={{ onglet_actif }}" class="nav-arrow">▶</a>
     {% else %}
     <span class="nav-arrow disabled">▶</span>
     {% endif %}
@@ -160,7 +160,7 @@ function showTab(name, btn) {
   var reglesUp = name.toUpperCase();
   document.querySelectorAll('a[href*="semaine="], a[href*="regles="], .nav-arrow[href], .nav-today[href]').forEach(function(a) {
     var url = new URL(a.href, window.location.origin);
-    if (url.pathname === '/') {
+    if (url.pathname === '/classement') {
       url.searchParams.set('regles', reglesUp);
       a.href = url.toString();
     }
