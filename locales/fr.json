@@ -87,7 +87,9 @@
     "stat_meilleur": "Meilleur classement",
     "stat_score_max": "Score max",
     "stat_tournois_actifs": "Tournois actifs",
-    "stat_tournois_joues": "Tournois joués"
+    "stat_tournois_joues": "Tournois joués",
+    "stat_max_points": "Max points tournoi",
+    "stat_max_mahjong": "Max score Mahjong"
   },
   "tournois": {
     "contribution": "Contrib.",
@@ -167,7 +169,17 @@
     "podium_title": "Podium",
     "top10_title": "Top 10",
     "top20_title": "Top 20",
-    "top50_title": "Top 50"
+    "top50_title": "Top 50",
+    "records": "🏆 Records",
+    "records_mahjong": "Meilleur score Mahjong",
+    "records_points": "Meilleur score Points (MCR)",
+    "records_joueur": "Joueur",
+    "records_score": "Score",
+    "records_tournoi": "Tournoi",
+    "records_date": "Date",
+    "records_nb": "Joueurs",
+    "records_tous": "Tous formats",
+    "records_2j": "Tournois 2 jours"
   },
   "home": {
     "intro": "Bienvenue sur le classement européen de Mahjong, regroupant les disciplines <strong>MCR</strong> (Mahjong Compétitif Riichi) et <strong>RCR</strong> (Riichi Compétitif). Les points sont calculés à partir des résultats des tournois reconnus par l'<a href=\"http://mahjong-europe.org\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--accent)\">European Mahjong Association (EMA)</a>. Ce site présente les classements hebdomadaires, l'historique des tournois, les palmarès par joueur et par pays, ainsi que le Hall of Fame.",

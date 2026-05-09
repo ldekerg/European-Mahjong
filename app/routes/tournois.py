@@ -1,8 +1,7 @@
 import sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
-from fastapi import APIRouter, Depends, Request, Form, Query
-from fastapi.responses import RedirectResponse
+from fastapi import APIRouter, Depends, Request, Query
 from sqlalchemy.orm import Session
 from typing import Optional
 from datetime import date
@@ -133,34 +132,6 @@ def calendrier(request: Request, db: Session = Depends(get_db)):
     })
 
 
-@router.get("/nouveau")
-def nouveau_tournoi_form(request: Request):
-    return templates.TemplateResponse(request, "tournois/form.html", {"tournoi": None})
-
-
-@router.post("/nouveau")
-def creer_tournoi(
-    request: Request,
-    id: int = Form(...),
-    nom: str = Form(...),
-    lieu: str = Form(...),
-    pays: str = Form(...),
-    date_debut: date = Form(...),
-    date_fin: date = Form(...),
-    nb_joueurs: int = Form(...),
-    coefficient: float = Form(...),
-    regles: str = Form(...),
-    db: Session = Depends(get_db),
-):
-    tournoi = Tournoi(
-        id=id, nom=nom, lieu=lieu, pays=pays,
-        date_debut=date_debut, date_fin=date_fin,
-        nb_joueurs=nb_joueurs, coefficient=coefficient, regles=regles,
-    )
-    db.add(tournoi)
-    db.commit()
-    return RedirectResponse(url="/tournois/", status_code=303)
-
 
 @router.get("/{regles}_{ema_id}")
 def detail_tournoi_ema(regles: str, ema_id: int, request: Request, db: Session = Depends(get_db)):
@@ -192,13 +163,15 @@ def detail_tournoi(tournoi_id: int, request: Request, db: Session = Depends(get_
     # Liste unifiée triée par position : chaque entrée a les champs nécessaires au template
     def _as_row(r, joueur=None):
         return {
-            "position":   r.position,
+            "position":    r.position,
             "nationalite": r.nationalite or "",
-            "joueur":     joueur,       # None si anonyme
-            "ranking":    getattr(r, "ranking", None),
-            "anonyme":    joueur is None,
-            "prenom":     getattr(r, "prenom", None) or (joueur.prenom if joueur else ""),
-            "nom":        getattr(r, "nom", None)    or (joueur.nom    if joueur else ""),
+            "joueur":      joueur,
+            "ranking":     getattr(r, "ranking", None),
+            "points":      getattr(r, "points", None),
+            "mahjong":     getattr(r, "mahjong", None),
+            "anonyme":     joueur is None,
+            "prenom":      getattr(r, "prenom", None) or (joueur.prenom if joueur else ""),
+            "nom":         getattr(r, "nom", None)    or (joueur.nom    if joueur else ""),
         }
 
     resultats_unifies = sorted(
@@ -292,20 +265,3 @@ def detail_tournoi(tournoi_id: int, request: Request, db: Session = Depends(get_
     })
 
 
-@router.post("/{tournoi_id}/resultats")
-def ajouter_resultat(
-    tournoi_id: int,
-    joueur_id: str = Form(...),
-    position: int = Form(...),
-    points: int = Form(...),
-    mahjong: int = Form(...),
-    ranking: int = Form(...),
-    db: Session = Depends(get_db),
-):
-    resultat = Resultat(
-        tournoi_id=tournoi_id, joueur_id=joueur_id,
-        position=position, points=points, mahjong=mahjong, ranking=ranking,
-    )
-    db.add(resultat)
-    db.commit()
-    return RedirectResponse(url=f"/tournois/{tournoi_id}", status_code=303)

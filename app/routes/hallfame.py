@@ -257,10 +257,67 @@ def _compute_hof(db: Session, regles: str, periode: str) -> dict:
     return {"data": data, "medals_data": medals_data, "championnats": championnats}
 
 
+def _records(db: Session, regles: str) -> dict:
+    """Top 20 scores mahjong et (MCR seulement) top 20 points tournoi."""
+    base = db.query(
+        Resultat, Tournoi, Joueur,
+    ).join(Tournoi, Resultat.tournoi_id == Tournoi.id
+    ).join(Joueur, Resultat.joueur_id == Joueur.id
+    ).filter(
+        Tournoi.regles == regles,
+        Tournoi.type_tournoi.notin_(["wmc", "wrc"]),
+    )
+
+    def _row(r, t, j):
+        return {
+            "joueur":        j,
+            "points":        r.points,
+            "mahjong":       r.mahjong,
+            "tournoi_nom":   t.nom,
+            "tournoi_regles": t.regles,
+            "tournoi_ema_id": t.ema_id,
+            "nb_joueurs":    t.nb_joueurs,
+            "date":          t.date_debut,
+        }
+
+    from datetime import timedelta
+
+    seuil_mah = 10000 if regles == "RCR" else 100
+
+    def _top_mahjong(q, limit=20):
+        return [_row(r, t, j) for r, t, j in
+                q.filter(Resultat.mahjong > seuil_mah)
+                 .order_by(Resultat.mahjong.desc())
+                 .limit(limit).all()]
+
+    def _top_points(q, limit=20):
+        return [_row(r, t, j) for r, t, j in
+                q.filter(Resultat.points.between(1, 99))
+                 .order_by(Resultat.points.desc())
+                 .limit(limit).all()]
+
+    # Filtre tournois 2 jours (date_fin - date_debut <= 1 jour)
+    base_2j = base.filter(
+        (func.julianday(Tournoi.date_fin) - func.julianday(Tournoi.date_debut)) <= 1
+    )
+
+    top_mahjong      = _top_mahjong(base)
+    top_mahjong_2j   = _top_mahjong(base_2j)
+    top_points       = _top_points(base)    if regles == "MCR" else []
+    top_points_2j    = _top_points(base_2j) if regles == "MCR" else []
+
+    return {
+        "top_mahjong":    top_mahjong,
+        "top_mahjong_2j": top_mahjong_2j,
+        "top_points":     top_points,
+        "top_points_2j":  top_points_2j,
+    }
+
+
 @router.get("/")
 def hallfame(
     request: Request,
-    vue: str = Query("medailles"),   # medailles | semaines | championnats
+    vue: str = Query("medailles"),   # medailles | semaines | championnats | records
     periode: str = Query("alltime"), # alltime | encours
     db: Session = Depends(get_db),
 ):
@@ -280,6 +337,9 @@ def hallfame(
     tous_ids = [item["tournoi"].id for item in palmares_mcr + palmares_rcr]
     incomplets = _incomplets_ids(db, tous_ids)
 
+    records_mcr = _records(db, "MCR")
+    records_rcr = _records(db, "RCR")
+
     return templates.TemplateResponse(request, "hallfame.html", {
         "mcr":          mcr,
         "rcr":          rcr,
@@ -288,5 +348,7 @@ def hallfame(
         "champions":    champions,
         "palmares_mcr": palmares_mcr,
         "palmares_rcr": palmares_rcr,
-        "incomplets":   incomplets,
+        "incomplets":    incomplets,
+        "records_mcr":   records_mcr,
+        "records_rcr":   records_rcr,
     })

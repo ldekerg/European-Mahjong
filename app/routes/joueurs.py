@@ -1,8 +1,7 @@
 import sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
-from fastapi import APIRouter, Depends, Request, Form
-from fastapi.responses import RedirectResponse
+from fastapi import APIRouter, Depends, Request
 from sqlalchemy.orm import Session
 from datetime import date
 
@@ -86,25 +85,6 @@ def liste_joueurs(
     })
 
 
-@router.get("/nouveau")
-def nouveau_joueur_form(request: Request):
-    return templates.TemplateResponse(request, "joueurs/form.html", {"joueur": None})
-
-
-@router.post("/nouveau")
-def creer_joueur(
-    request: Request,
-    id: str = Form(...),
-    nom: str = Form(...),
-    prenom: str = Form(...),
-    nationalite: str = Form(...),
-    db: Session = Depends(get_db),
-):
-    joueur = Joueur(id=id, nom=nom, prenom=prenom, nationalite=nationalite)
-    db.add(joueur)
-    db.commit()
-    return RedirectResponse(url="/joueurs/", status_code=303)
-
 
 @router.get("/{joueur_id}")
 def detail_joueur(joueur_id: str, request: Request, db: Session = Depends(get_db)):
@@ -183,6 +163,17 @@ def detail_joueur(joueur_id: str, request: Request, db: Session = Depends(get_db
             for h in historique
         ]
 
+        # Meilleur score Mahjong — on exclut les formats inhabituels (han-count < 100, anonymes WRC = 1)
+        best_points = max(
+            (td for td in tournois_data if td["points"] > 0 and td["points"] < 100),
+            key=lambda x: x["points"], default=None,
+        )
+        seuil = 10000 if regles == "RCR" else 100
+        best_mahjong = max(
+            (td for td in tournois_data if td["mahjong"] and td["mahjong"] > seuil),
+            key=lambda x: x["mahjong"], default=None,
+        )
+
         return {
             "rang": rang,
             "meilleur": meilleur,
@@ -193,6 +184,8 @@ def detail_joueur(joueur_id: str, request: Request, db: Session = Depends(get_db
             "historique_chart": historique_chart,
             "tournois": tournois_data,
             "nb_actifs": sum(1 for td in tournois_data if td["actif"]),
+            "best_points":  best_points,
+            "best_mahjong": best_mahjong,
         }
 
     changements = db.query(ChangementNationalite).filter(
@@ -304,23 +297,3 @@ def apercu_joueur(
     })
 
 
-@router.get("/{joueur_id}/modifier")
-def modifier_joueur_form(joueur_id: str, request: Request, db: Session = Depends(get_db)):
-    joueur = db.query(Joueur).filter(Joueur.id == joueur_id).first()
-    return templates.TemplateResponse(request, "joueurs/form.html", {"joueur": joueur})
-
-
-@router.post("/{joueur_id}/modifier")
-def modifier_joueur(
-    joueur_id: str,
-    nom: str = Form(...),
-    prenom: str = Form(...),
-    nationalite: str = Form(...),
-    db: Session = Depends(get_db),
-):
-    joueur = db.query(Joueur).filter(Joueur.id == joueur_id).first()
-    joueur.nom = nom
-    joueur.prenom = prenom
-    joueur.nationalite = nationalite
-    db.commit()
-    return RedirectResponse(url=f"/joueurs/{joueur_id}", status_code=303)

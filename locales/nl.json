@@ -87,7 +87,9 @@
     "stat_meilleur": "Beste ranking",
     "stat_score_max": "Maximale score",
     "stat_tournois_actifs": "Actieve toernooien",
-    "stat_tournois_joues": "Gespeelde toernooien"
+    "stat_tournois_joues": "Gespeelde toernooien",
+    "stat_max_points": "Max. toernooi­punten",
+    "stat_max_mahjong": "Max. Mahjong-score"
   },
   "tournois": {
     "contribution": "Bijdrage",
@@ -167,7 +169,17 @@
     "podium_title": "Podium",
     "top10_title": "Top 10",
     "top20_title": "Top 20",
-    "top50_title": "Top 50"
+    "top50_title": "Top 50",
+    "records": "🏆 Records",
+    "records_mahjong": "Beste Mahjong-score",
+    "records_points": "Beste puntenscore (MCR)",
+    "records_joueur": "Speler",
+    "records_score": "Score",
+    "records_tournoi": "Toernooi",
+    "records_date": "Datum",
+    "records_nb": "Spelers",
+    "records_tous": "Alle formaten",
+    "records_2j": "2-daagse toernooien"
   },
   "home": {
     "intro": "Welkom bij de Europese Mahjong-ranglijst, met de disciplines <strong>MCR</strong> en <strong>RCR</strong>. De punten worden berekend op basis van toernooiresultaten erkend door de <a href=\"http://mahjong-europe.org\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--accent)\">European Mahjong Association (EMA)</a>.",

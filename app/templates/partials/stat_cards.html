@@ -48,4 +48,26 @@
     <div class="stat-label">{{ trad('joueur_detail.stat_tournois_joues') }}</div>
     <div class="stat-value">{{ data.tournois | length }}</div>
   </div>
+  {% if data.best_points and data.best_points.points > 0 and regles == 'mcr' %}
+  <div class="stat-card">
+    <div class="stat-label">{{ trad('joueur_detail.stat_max_points') }}</div>
+    <div class="stat-value">
+      {{ data.best_points.points }}
+      <span class="stat-sub">
+        <a href="/tournois/{{ regles | upper }}_{{ data.best_points.ema_id }}" style="color:var(--text2)">{{ data.best_points.nom[:25] }}</a>
+      </span>
+    </div>
+  </div>
+  {% endif %}
+  {% if data.best_mahjong and data.best_mahjong.mahjong > 0 %}
+  <div class="stat-card">
+    <div class="stat-label">{{ trad('joueur_detail.stat_max_mahjong') }}</div>
+    <div class="stat-value">
+      {{ data.best_mahjong.mahjong }}
+      <span class="stat-sub">
+        <a href="/tournois/{{ regles | upper }}_{{ data.best_mahjong.ema_id }}" style="color:var(--text2)">{{ data.best_mahjong.nom[:25] }}</a>
+      </span>
+    </div>
+  </div>
+  {% endif %}
 </div>

@@ -5,7 +5,7 @@
   <h1>{{ trad('nav.hallfame') }}</h1>
   <div class="t-filters">
     <div class="t-filter-group">
-      {% for v, label in [('medailles', trad('hallfame.medailles')), ('semaines', trad('hallfame.semaines')), ('championnats', trad('hallfame.championnats'))] %}
+      {% for v, label in [('medailles', trad('hallfame.medailles')), ('semaines', trad('hallfame.semaines')), ('championnats', trad('hallfame.championnats')), ('records', trad('hallfame.records'))] %}
       <a href="?vue={{ v }}&periode={{ periode }}" class="filter-btn {% if vue == v %}active{% endif %}">{{ label }}</a>
       {% endfor %}
     </div>
@@ -93,6 +93,12 @@
   </div>
   {% endfor %}
   </div>
+
+  {% elif vue == 'records' %}
+  {% set records = records_mcr if regles_key == 'mcr' else records_rcr %}
+  {% with records=records, regles_key=regles_key %}
+  {% include 'partials/hof_records_table.html' %}
+  {% endwith %}
 
   {% elif vue == 'medailles' %}
   {% with medals_data=tab.medals_data, table_id='hof-medals-' + regles_key %}
