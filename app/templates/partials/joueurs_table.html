@@ -50,7 +50,7 @@
     <col class="col-flag">
     <col class="col-nom">       <!-- Nom -->
     <col class="col-prenom">    <!-- Prénom -->
-    <col class="col-debut">     <!-- Début -->
+    <col class="col-date-lg">     <!-- Début -->
     <col class="col-joueurs">
     <col class="col-joueurs">
     <col class="col-joueurs">
@@ -61,7 +61,7 @@
       {{ th_sort('nationalite', '🌍',    'col-flag center') }}
       {{ th_sort('nom',         trad('common.nom'),            'col-nom') }}
       {{ th_sort('prenom',      trad('common.prenom'),         'col-prenom') }}
-      {{ th_sort('premier',     trad('joueurs.debut'),         'col-debut center') }}
+      {{ th_sort('premier',     trad('joueurs.debut'),         'col-date-lg center') }}
       {{ th_sort_badge('nb_mcr', 'badge-mcr', 'col-joueurs center') }}
       {{ th_sort_badge('nb_rcr', 'badge-rcr', 'col-joueurs center') }}
       {{ th_sort('nb_total',    trad('common.tous'),           'col-joueurs center') }}
@@ -75,9 +75,10 @@
         <a href="/joueurs/{{ j.id }}" {% if _apercu %}onclick="event.stopPropagation()"{% endif %}>{{ j.id }}</a>
       </td>
       <td class="col-flag">{{ j.nationalite | flag_link('joueurs') }}</td>
-      <td class="col-nom">{{ j.nationalite | flag_link('joueurs') }} {{ j.nom | title }}</td>
+      <td class="col-nom">
+        <span class="mobile-flag">{{ j.nationalite | flag_link('joueurs') }}</span> {{ j.nom | title }}</td>
       <td class="col-prenom">{{ j.prenom | prenom }}</td>
-      <td class="col-debut center dim" style="font-size:0.82rem">{{ row.premier.strftime('%m/%Y') if row.premier else '—' }}</td>
+      <td class="col-date-lg center dim" style="font-size:0.82rem">{{ row.premier.strftime('%d/%m/%Y') if row.premier else '—' }}</td>
       <td class="col-joueurs center {% if row.nb_mcr %}rank-num{% else %}dim{% endif %}">{{ row.nb_mcr or '—' }}</td>
       <td class="col-joueurs center {% if row.nb_rcr %}rank-num{% else %}dim{% endif %}">{{ row.nb_rcr or '—' }}</td>
       <td class="col-joueurs center" style="font-weight:600">{{ row.nb_total }}</td>
