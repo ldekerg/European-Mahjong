@@ -22,6 +22,16 @@ db = SessionLocal()
 # ---------------------------------------------------------------------------
 
 serie = db.query(SerieChampionnat).filter_by(slug="rhone-alpes-mcr").first()
+if not serie:
+    serie = SerieChampionnat(
+        slug="rhone-alpes-mcr",
+        nom="Championnat Rhône-Alpes MCR",
+        regles="MCR",
+        pays="FR",
+        description="Championnat régional Rhône-Alpes MCR",
+    )
+    db.add(serie)
+    db.flush()
 print(f"Série : {serie.nom}")
 
 edition = db.query(Championnat).filter_by(serie_id=serie.id, annee=2025).first()
