@@ -94,7 +94,9 @@
 <div id="tab-tournois" class="tab-content hidden">
   <div class="t-layout">
     <div class="t-left">
-      {% include 'partials/tournois_table.html' %}
+      {% with tournois=tournois, actifs_ids=actifs_ids %}
+        {% include 'partials/tournois_table.html' %}
+      {% endwith %}
     </div>
     <div class="t-right">
       {% if cartes | length > 1 %}

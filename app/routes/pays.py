@@ -390,6 +390,7 @@ def pays_detail(
     tous_tournois = (
         db.query(Tournoi)
         .filter(Tournoi.pays == pays_nom)
+        .filter(Tournoi.statut != "calendrier") # Exclure les placeholders de calendrier
         .order_by(Tournoi.date_debut.desc())
         .all()
     )
