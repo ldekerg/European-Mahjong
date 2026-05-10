@@ -12,10 +12,19 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
 
     <script>
-      (function() {
-        if (localStorage.getItem('theme') === 'dark')
+    (function () {
+      const savedTheme = localStorage.getItem('theme');
+
+      if (savedTheme) {
+        document.documentElement.setAttribute('data-theme', savedTheme);
+      } else {
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        if (prefersDark) {
           document.documentElement.setAttribute('data-theme', 'dark');
-      })();
+        }
+      }
+    })();
     </script>
 </head>
 <body>
@@ -39,13 +48,13 @@
             {{ _flags.get(lang, lang | upper) }}
           </button>
           <div class="lang-dropdown" id="lang-dropdown" style="display:none">
+            <a onclick="setLang('en')"><span class="lang-flag">🇬🇧</span><span>English</span></a>
+            <a onclick="setLang('fr')"><span class="lang-flag">🇫🇷</span><span>Français</span></a>
+            <a onclick="setLang('es')"><span class="lang-flag">🇪🇸</span><span>Español</span></a>
+            <a onclick="setLang('it')"><span class="lang-flag">🇮🇹</span><span>Italiano</span></a>
+            <a onclick="setLang('de')"><span class="lang-flag">🇩🇪</span><span>Deutsch</span></a>
             <a onclick="setLang('cs')"><span class="lang-flag">🇨🇿</span><span>Čeština</span></a>
             <a onclick="setLang('da')"><span class="lang-flag">🇩🇰</span><span>Dansk</span></a>
-            <a onclick="setLang('de')"><span class="lang-flag">🇩🇪</span><span>Deutsch</span></a>
-            <a onclick="setLang('en')"><span class="lang-flag">🇬🇧</span><span>English</span></a>
-            <a onclick="setLang('es')"><span class="lang-flag">🇪🇸</span><span>Español</span></a>
-            <a onclick="setLang('fr')"><span class="lang-flag">🇫🇷</span><span>Français</span></a>
-            <a onclick="setLang('it')"><span class="lang-flag">🇮🇹</span><span>Italiano</span></a>
             <a onclick="setLang('lv')"><span class="lang-flag">🇱🇻</span><span>Latviešu</span></a>
             <a onclick="setLang('hu')"><span class="lang-flag">🇭🇺</span><span>Magyar</span></a>
             <a onclick="setLang('nl')"><span class="lang-flag">🇳🇱</span><span>Nederlands</span></a>
