@@ -94,14 +94,14 @@
     <div class="scroll-table">
     <table style="width:100%">
       <colgroup>
-        <col class="col-date">
+        <col class="col-date-opt">
         <col class="col-ville">
         <col class="col-tournoi">
         <col class="col-joueurs">
       </colgroup>
       <thead>
         <tr>
-          <th class="col-date">Date</th>
+          <th class="col-date-opt">Date</th>
           <th class="col-ville">Ville</th>
           <th class="col-tournoi">Tournoi</th>
           <th class="col-joueurs">Joueurs</th>
@@ -110,7 +110,7 @@
       <tbody>
         {% for t in item.tournois %}
         <tr>
-          <td class="col-date" style="font-size:0.85rem;white-space:nowrap">{{ t.date_debut.strftime('%d/%m/%Y') }}</td>
+          <td class="col-date-opt" style="font-size:0.85rem;white-space:nowrap">{{ t.date_debut.strftime('%d/%m/%Y') }}</td>
           <td class="col-ville" style="font-size:0.85rem">{{ t.lieu }}</td>
           <td class="col-tournoi"><a href="/tournois/{{ t.id }}">{{ t.nom }}</a></td>
           <td class="col-joueurs right dim">{{ t.nb_joueurs }}</td>

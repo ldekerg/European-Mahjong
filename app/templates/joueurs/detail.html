@@ -55,7 +55,7 @@
   <h2>{{ trad('joueur_detail.tournois_section') }} {{ regles | upper }}</h2>
   <div class="scroll-table"><table style="table-layout:fixed;width:100%">
     <colgroup>
-      <col class="col-date-tournoi">
+      <col class="col-date-lg">
       <col class="col-duree">
       <col class="col-ville">
       <col>
@@ -68,7 +68,7 @@
     </colgroup>
     <thead>
       <tr>
-        <th class="col-date-tournoi">{{ trad('common.date') }}</th>
+        <th class="col-date-lg">{{ trad('common.date') }}</th>
         <th class="col-duree" title="{{ trad('common.duree') }}">🗓️</th>
         <th class="col-ville">{{ trad('common.ville') }}</th>
         <th>{{ trad('common.tournoi') }}</th>
@@ -84,7 +84,7 @@
       {% for trn in data.tournois %}
       <tr class="t-joueur-row {% if trn.actif %}row-actif{% endif %} {% if trn.type in ['wmc','wrc'] %}row-wmc{% elif trn.type in ['oemc','oerc'] %}row-oemc{% endif %}{% if not trn.actif %} row-inactif row-inactif-{{ regles }} hidden{% endif %}"
           data-ville="{{ trn.lieu }}" data-regles="{{ regles | upper }}">
-        <td class="col-date-tournoi">{{ trn.date.strftime('%d/%m') if trn.date.year != 1900 else '—' }}</td>
+        <td class="col-date-lg">{{ trn.date.strftime('%d/%m/%Y') if trn.date.year != 1900 else '—' }}</td>
         <td class="col-duree center">{{ trn.duree }}j</td>
         <td class="col-ville nowrap">
           {{ trn.pays | pays_flag_link('tournois') }}

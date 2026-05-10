@@ -167,13 +167,13 @@
       <div class="scroll-table">
       <table style="width:100%">
         <colgroup>
-          <col class="col-date-tournoi">
+          <col class="col-date-lg">
           <col class="col-tournoi">
           <col class="col-joueurs">
         </colgroup>
         <thead>
           <tr>
-            <th class="col-date-tournoi">Année</th>
+            <th class="col-date-lg">Année</th>
             <th class="col-tournoi">Édition</th>
             <th class="col-joueurs">Tournois</th>
           </tr>
@@ -181,9 +181,9 @@
         <tbody>
           {% for ed in serie.editions %}
           <tr>
-            <td class="dim">{{ ed.annee }}</td>
+            <td class="col-date-lg">{{ ed.annee }}</td>
             <td><a href="/championnats/{{ serie.slug }}/{{ ed.annee }}">{{ ed.nom or (serie.nom ~ ' ' ~ ed.annee) }}</a></td>
-            <td class="dim">{{ ed.liens | length }}</td>
+            <td class="col-joueurs ">{{ ed.liens | length }}</td>
           </tr>
           {% endfor %}
         </tbody>

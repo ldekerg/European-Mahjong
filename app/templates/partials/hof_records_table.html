@@ -9,8 +9,12 @@
 <div class="scroll-table">
 <table class="hof-records-table" style="table-layout:fixed;width:100%">
   <colgroup>
-    <col class="col-pos"><col class="col-flag"><col class="col-joueur-nom">
-    <col class="col-hof-total"><col class="col-nom"><col class="col-date">
+    <col class="col-pos">
+    <col class="col-flag">
+    <col class="col-joueur-nom">
+    <col class="col-hof-total">
+    <col class="col-nom">
+    <col class="col-date-opt">
   </colgroup>
   <thead>
     <tr>
@@ -19,7 +23,7 @@
       <th class="col-joueur-nom">{{ trad('hallfame.records_joueur') }}</th>
       <th class="col-hof-total right">{{ trad('hallfame.records_score') }}</th>
       <th class="col-nom">{{ trad('hallfame.records_tournoi') }}</th>
-      <th class="col-date center">{{ trad('hallfame.records_date') }}</th>
+      <th class="col-date-opt center">{{ trad('hallfame.records_date') }}</th>
     </tr>
   </thead>
   <tbody>
@@ -32,7 +36,7 @@
       <td class="col-nom" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
         <a href="/tournois/{{ row.tournoi_regles }}_{{ row.tournoi_ema_id }}" title="{{ row.tournoi_nom }}">{{ row.tournoi_nom[:30] }}</a>
       </td>
-      <td class="col-date center dim">{{ row.date.strftime('%d/%m/%Y') if row.date.year != 1900 else '—' }}</td>
+      <td class="col-date-opt center dim">{{ row.date.strftime('%d/%m/%Y') if row.date.year != 1900 else '—' }}</td>
     </tr>
     {% endfor %}
   </tbody>
