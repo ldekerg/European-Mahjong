@@ -12,9 +12,11 @@
 #}
 {% set _qs = qs_extra if qs_extra is defined else '' %}
 <div class="date-nav">
+  <!-- Le bouton "aujourd'hui" introduit un bug car la semaine courante n'est pas encore calculée
   <a href="{{ base_url }}{{ _qs | replace('&', '?', 1) }}" class="nav-arrow nav-today">
     ⟳ {{ aujourd_hui.strftime('%d/%m/%Y') }}
   </a>
+  -->
 
   {% if semaine_prev %}
   <a href="{{ base_url }}?semaine={{ semaine_prev }}{{ _qs }}" class="nav-arrow">◀</a>

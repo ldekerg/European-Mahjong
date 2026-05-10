@@ -4,9 +4,11 @@
 <div class="ranking-header">
   <h1>EMA Ranking</h1>
   <div class="date-nav">
+      <!-- Le bouton "aujourd'hui" introduit un bug car la semaine courante n'est pas encore calculée
     <a href="/classement{% if joueur_selectionne %}?joueur={{ joueur_selectionne }}{% endif %}" class="nav-arrow nav-today">
       ⟳ {{ aujourd_hui.strftime('%d/%m/%Y') }}
     </a>
+  -->
 
     {% if semaine_prev %}
     <a href="/classement?semaine={{ semaine_prev }}{% if joueur_selectionne %}&joueur={{ joueur_selectionne }}{% endif %}&regles={{ onglet_actif }}" class="nav-arrow">◀</a>
