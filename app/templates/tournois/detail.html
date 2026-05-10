@@ -27,7 +27,7 @@
       <span style="display:inline-flex;flex-wrap:wrap;gap:0.3rem;margin-left:0.5rem;vertical-align:middle">
         {% for p in pays_stats %}
         <a href="/pays/{{ p.code }}?onglet=tournois"
-           style="display:inline-flex;align-items:center;gap:0.2rem;background:var(--bg3);border-radius:4px;padding:0.1rem 0.4rem;text-decoration:none;color:var(--text);font-size:0.8rem;white-space:nowrap">
+           class="etiquette-pays">
           {{ p.code | flag }} <span class="dim">{{ p.nb }}</span>
         </a>
         {% endfor %}

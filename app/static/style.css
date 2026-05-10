@@ -1,13 +1,29 @@
 :root {
-    --bg:       #f5f5f5;
-    --bg2:      #fff;
-    --bg3:      #eef2f7;
-    --text:     #222;
-    --text2:    #555;
-    --text3:    #888;
+  --light-1: #e7eeee;
+	--light-2: #c7dcdd;
+	--light-3: #b7cccc;
+	--light-4: #a7bcbb;
+	--light-5: #97acaa;
+  --dark-5: #4783ab;
+  --dark-4: #215f89;
+  --dark-3: #03426d;
+  --dark-2: #002843;
+  --dark-1: #001625;
+
+    --bg:       var(--light-1);
+    --bg2:      var(--light-2);
+    --bg3:      var(--light-3);
+    --bg4:      var(--light-4);
+
+    --text:     var(--dark-1);
+    --text2:    var(--dark-3);
+    --text3:    var(--dark-5);
+
+    --accent:   var(--dark-5);
+    --accent2:  var(--dark-4);
+
     --border:   #e0e0e0;
-    --accent:   #1a3a5c;
-    --accent2:  #254e7a;
+
     --row-actif:#f0f7ff;
     --row-wmc:  #fffbf0;
     --row-oemc: #f3f0ff;
@@ -37,15 +53,21 @@
 }
 
 [data-theme="dark"] {
-    --bg:       #0f1923;
-    --bg2:      #1a2635;
-    --bg3:      #243447;
-    --text:     #e8e8e8;
-    --text2:    #aab4be;
-    --text3:    #667788;
+
+    --bg:       var(--dark-1);
+    --bg2:      var(--dark-2);
+    --bg3:      var(--dark-3);
+    --bg4:      var(--dark-4);
+
+    --text:     var(--light-1);
+    --text2:    var(--light-3);
+    --text3:    var(--light-5);
+
+    --accent:   var(--dark-5);
+    --accent2:  var(--dark-4);
+
     --border:   #2d3f52;
-    --accent:   #2a5a8c;
-    --accent2:  #3a6fa0;
+
     --row-actif:#1a2e42;
     --row-wmc:  #2a2510;
     --row-oemc: #1e1a30;
@@ -89,7 +111,7 @@ nav {
     display: flex;
     align-items: center;
 
-    background: var(--accent);
+    background: var(--dark-3);
     padding: 0.75rem 1.5rem;
 
     position: sticky;
@@ -98,7 +120,7 @@ nav {
 }
 
 nav a {
-    color: #fff;
+    color: var(--text);
     text-decoration: none;
     font-weight: 500;
 }
@@ -428,7 +450,6 @@ a { color: var(--accent); }
 .row-oemc .col-sticky { background: var(--row-oemc); }
 .contrib-100 { color: #2a6a2a; font-weight: 600; }
 .contrib-50  { color: #806020; }
-.dim         { color: #bbb; }
 .pts-actif   { font-weight: 700; color: var(--accent); }
 .badge       { font-size: 0.7rem; background: #e0e8f8; color: var(--accent); padding: 0.1rem 0.4rem; border-radius: 8px; margin-left: 0.3rem; }
 .badge-gold      { background: var(--or-bg); color: var(--or-fg); border: 1px solid var(--or-border); }
@@ -636,6 +657,19 @@ tr.hidden { display: none; }
 .filter-btn:hover { background: var(--bg3); }
 .filter-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
 .t-count { font-size: 0.85rem; color: var(--text3); margin: 0.5rem 0 0.75rem; }
+
+/* ── Page tournois ── */
+.etiquette-pays       { display:inline-flex;
+                        align-items:center;
+                        gap:0.2rem;
+                        background:var(--bg3);
+                        border-radius:4px;
+                        padding:0.1rem 0.4rem;
+                        text-decoration:none;
+                        color:var(--text);
+                        font-size:0.8rem;
+                        white-space:nowrap; }
+.etiquette-pays:hover { background: var(--accent); }
 
 /* ── Page tournois avec carte ── */
 .t-layout { display: grid; grid-template-columns: 1fr 500px; gap: 1.5rem; align-items: start; }
