@@ -780,6 +780,7 @@ col.col-coeff        { width: 2.8rem; }
 col.col-contrib      { width: 4.4rem; }
 col.col-statut-cal   { width: 6rem; }
 col.col-joueurs      { width: 3rem; }
+col.col-joueurs-sort { width: 4rem; }
 col.col-score        { width: 5.5rem; }
 col.col-ema          { width: 3.5rem; }
 col.col-pts          { width: 2.8rem; }
