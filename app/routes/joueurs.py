@@ -283,6 +283,7 @@ def apercu_joueur(
         resultats_actifs = db.query(Resultat).join(T).filter(
             Resultat.joueur_id == joueur_id,
             Resultat.tournoi_id.in_(ids_dict.keys()),
+            T.ema_id.isnot(None)
         ).all()
 
         snapshot = sorted([
