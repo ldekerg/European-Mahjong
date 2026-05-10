@@ -94,26 +94,26 @@
     <div class="scroll-table">
     <table style="width:100%">
       <colgroup>
-        <col class="col-date-lg">
+        <col class="col-date">
         <col class="col-ville">
         <col class="col-tournoi">
         <col class="col-joueurs">
       </colgroup>
       <thead>
         <tr>
-          <th>Date</th>
-          <th>Ville</th>
-          <th>Tournoi</th>
-          <th class="right">Joueurs</th>
+          <th class="col-date">Date</th>
+          <th class="col-ville">Ville</th>
+          <th class="col-tournoi">Tournoi</th>
+          <th class="col-joueurs">Joueurs</th>
         </tr>
       </thead>
       <tbody>
         {% for t in item.tournois %}
         <tr>
-          <td class="dim" style="font-size:0.85rem;white-space:nowrap">{{ t.date_debut.strftime('%d/%m/%Y') }}</td>
-          <td style="font-size:0.85rem">{{ t.lieu }}</td>
-          <td><a href="/tournois/{{ t.id }}">{{ t.nom }}</a></td>
-          <td class="right dim">{{ t.nb_joueurs }}</td>
+          <td class="col-date" style="font-size:0.85rem;white-space:nowrap">{{ t.date_debut.strftime('%d/%m/%Y') }}</td>
+          <td class="col-ville" style="font-size:0.85rem">{{ t.lieu }}</td>
+          <td class="col-tournoi"><a href="/tournois/{{ t.id }}">{{ t.nom }}</a></td>
+          <td class="col-joueurs right dim">{{ t.nb_joueurs }}</td>
         </tr>
         {% endfor %}
       </tbody>

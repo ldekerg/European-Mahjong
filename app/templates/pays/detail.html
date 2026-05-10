@@ -130,6 +130,9 @@
   </div>
 </div>
 
+<!-- ══════════════════════════════════════════════════════════════════════
+     ONGLET CiRCUITS NATIONAUX
+     ══════════════════════════════════════════════════════════════════════ -->
 {% if series_pays %}
 <div id="tab-circuits" class="tab-content hidden">
   {% for serie in series_pays %}
@@ -164,15 +167,15 @@
       <div class="scroll-table">
       <table style="width:100%">
         <colgroup>
-          <col class="col-date">
-          <col>
+          <col class="col-date-tournoi">
+          <col class="col-tournoi">
           <col class="col-joueurs">
         </colgroup>
         <thead>
           <tr>
-            <th>Année</th>
-            <th>Édition</th>
-            <th class="right">Tournois</th>
+            <th class="col-date-tournoi">Année</th>
+            <th class="col-tournoi">Édition</th>
+            <th class="col-joueurs">Tournois</th>
           </tr>
         </thead>
         <tbody>
@@ -180,7 +183,7 @@
           <tr>
             <td class="dim">{{ ed.annee }}</td>
             <td><a href="/championnats/{{ serie.slug }}/{{ ed.annee }}">{{ ed.nom or (serie.nom ~ ' ' ~ ed.annee) }}</a></td>
-            <td class="right dim">{{ ed.liens | length }}</td>
+            <td class="dim">{{ ed.liens | length }}</td>
           </tr>
           {% endfor %}
         </tbody>

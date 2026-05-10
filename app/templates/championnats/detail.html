@@ -91,21 +91,21 @@
 <div class="dim" style="margin:1rem 0">Aucun résultat disponible.</div>
 {% else %}
 <div class="scroll-table">
-<table style="width:100%">
+<table class="table-championnat" style="width:100%" >
   <colgroup>
     <col class="col-pos">
     <col class="col-flag">
-    <col>
+    <col class="col-joueur">
     <col class="col-champ-score">
     <col class="col-champ-t">
   </colgroup>
   <thead>
     <tr>
-      <th class="center">🏅</th>
-      <th class="center" title="Pays">🌍</th>
-      <th>Joueur</th>
-      <th class="right">Moy.</th>
-      <th class="right" title="Tournois participés / comptés">T.</th>
+      <th class="col-pos">🏅</th>
+      <th class="col-flag" title="Pays">🌍</th>
+      <th class="col-joueur" >Joueur</th>
+      <th class="col-champ-score right">Moy.</th>
+      <th class="col-champ-t right" title="Tournois participés / comptés">T.</th>
     </tr>
   </thead>
   <tbody>
@@ -114,8 +114,8 @@
       <td class="td-pos">
         <span class="pos-medal">{% if r.position == 1 %}🥇{% elif r.position == 2 %}🥈{% elif r.position == 3 %}🥉{% else %}{{ r.position }}{% endif %}</span>
       </td>
-      <td class="center">{{ r.nationalite | flag_link('joueurs') }}</td>
-      <td>
+      <td class="col-flag">{{ r.nationalite | flag_link('joueurs') }}</td>
+      <td class="col-joueur">
         {% if r.joueur %}
           <a href="/joueurs/{{ r.joueur.id }}">{{ r.joueur.prenom | prenom }} {{ r.joueur.nom | title }}</a>
         {% else %}
@@ -139,25 +139,25 @@
 <table style="width:100%">
   <colgroup>
     <col class="col-date">
-    <col>
+    <col class="col-tournoi">
     <col class="col-joueurs">
   </colgroup>
   <thead>
     <tr>
-      <th>Date</th>
-      <th>Tournoi</th>
-      <th class="right">Jrs</th>
+      <th class="col-date">Date</th>
+      <th class="col-tournoi">Tournoi</th>
+      <th class="col-joueurs right">Jrs</th>
     </tr>
   </thead>
   <tbody>
     {% for t in tournois %}
     <tr>
-      <td class="dim" style="font-size:0.82rem;white-space:nowrap">{{ t.date_debut.strftime('%d/%m') }}</td>
-      <td>
+      <td class="col-date" style="font-size:0.82rem;white-space:nowrap">{{ t.date_debut.strftime('%d/%m') }}</td>
+      <td class="col-tournoi">
         <a href="/tournois/{{ t.id }}">{{ t.nom }}</a>
         <span class="dim" style="font-size:0.78rem"> — {{ t.lieu }}</span>
       </td>
-      <td class="right dim">{{ t.nb_joueurs }}</td>
+      <td class="col-joueurs right dim">{{ t.nb_joueurs }}</td>
     </tr>
     {% endfor %}
   </tbody>
