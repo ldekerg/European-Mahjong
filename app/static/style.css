@@ -747,6 +747,7 @@ col.col-pts          { width: 2.8rem; }
 col.col-mahj         { width: 3.5rem; }
 col.col-podiums      { width: 7rem; }
 col.col-tournoi      { width: 8rem; }    /* nom de tournoi dans classement */
+col.col-hof-pos      { width: 2.8rem; }  /* position HOF */
 col.col-hof-stat     { width: 3rem; }     /* stat HOF (médailles, semaines) */
 col.col-hof-podium   { width: 3.5rem; }  /* podium HOF */
 col.col-hof-total    { width: 5rem; }     /* total HOF */
@@ -755,6 +756,7 @@ col.col-pays-tournois{ width: 6rem; }    /* tournois org dans liste pays */
 col.col-champ-score  { width: 5rem; }    /* score moyen championnat */
 col.col-champ-t      { width: 4rem; }    /* nb tournois championnat */
 col.col-tournoi      { width: 14rem; }   /* nom tournoi calendrier */
+
 
 td.col-pos, th.col-pos     { text-align: center; width: 2.8rem; }
 td.col-delta, th.col-delta { text-align: center; width: 3rem; white-space: nowrap; }
@@ -771,6 +773,90 @@ td.col-ema, th.col-ema     { text-align: right; }
 td.col-pts, th.col-pts     { text-align: right; }
 td.col-mahj, th.col-mahj   { text-align: right; }
 td.col-podiums             { white-space: nowrap; }
+th.col-hof-pos, td.col-hof-pos   { text-align: center; width: 3.5rem; }
+
+@media (max-width: 768px) {
+  
+  /* ── HoF : masquer pos, total, date .. ────── */
+  col.col-hof-pos,   th.col-hof-pos,   td.col-hof-pos   { display: none; }
+  col.col-hof-total, th.col-hof-total, td.col-hof-total { display: none; }
+  .hof-records-grid { grid-template-columns: 1fr; }
+  .hof-records-2j   { display: none; }
+  col.col-date,      th.col-date,      td.col-date      { display: none; }
+  .hof-records-table col.col-flag,
+  .hof-records-table th.col-flag,
+  .hof-records-table td.col-flag,
+  .hof-table col.col-flag,
+  .hof-table th.col-flag,
+  .hof-table td.col-flag,
+  .tournois-table col.col-flag,
+  .tournois-table th.col-flag,
+  .tournois-table td.col-flag                            { display: none; }
+  .hof-records-table col.col-nom,
+  .hof-records-table th.col-nom,
+  .hof-records-table td.col-nom                          { display: none; }
+
+    /* ── Détail joueur : masquer durée, ville, coeff, contrib ────── */
+    col.col-duree,   th.col-duree,   td.col-duree   { display: none; }
+    col.col-ville,   th.col-ville,   td.col-ville   { display: none; }
+    col.col-regles,     th.col-regles,     td.col-regles     { display: none; }
+    col.col-statut-cal, th.col-statut-cal, td.col-statut-cal { display: none; }
+    col.col-coeff,   th.col-coeff,   td.col-coeff   { display: none; }
+    col.col-contrib, th.col-contrib, td.col-contrib  { display: none; }
+    col.col-pts,     th.col-pts,     td.col-pts     { display: none; }
+    col.col-mahj,    th.col-mahj,    td.col-mahj    { display: none; }
+    col.col-pos-lg,       th.col-pos-lg,       td.col-pos-lg       { display: none; }
+    col.col-pays-tournois,  th.col-pays-tournois,  td.col-pays-tournois  { display: none; }
+    col.col-pays-medailles, th.col-pays-medailles, td.col-pays-medailles { display: none; }
+
+      /* ── Classement général : masquer delta et podiums ───────────── */
+    col.col-delta,
+    th.col-delta, td.col-delta             { display: none; }
+    .ranking-table col.col-joueurs,
+    .ranking-table th.col-joueurs,
+    .ranking-table td.col-joueurs          { display: none; }
+    col.col-podiums,
+    th.col-podiums, td.col-podiums         { display: none; }
+    col.col-hof-sem,
+    th.col-hof-sem,    td.col-hof-sem      { display: none; }
+    col.col-hof-podium,
+    th.col-hof-podium, td.col-hof-podium   { display: none; }
+
+    /* ── Liste joueurs : garder flag, nom, prénom ────────────────── */
+    .joueurs-table col.col-flag,
+    .joueurs-table th.col-flag,
+    .joueurs-table td.col-flag                          { display: none; }
+    .ranking-table col.col-flag,
+    .ranking-table th.col-flag,
+    .ranking-table td.col-flag                          { display: none; }
+    .ranking-table-nat col.col-pos,
+    .ranking-table-nat th.th-rank,
+    .ranking-table-nat td.td-rank                       { display: none; }
+    col.col-ema-id,   th.col-ema-id,  td.col-ema-id   { display: none; }
+    col.col-debut,   th.col-debut,   td.col-debut   { display: none; }
+    .joueurs-table col.col-joueurs,
+    .joueurs-table th.col-joueurs,
+    .joueurs-table td.col-joueurs { display: none; }
+
+    /* ── Détail tournoi : masquer colonne EMA ID ─────────────────── */
+    .ranking-left .scroll-table th:nth-child(2),
+    .ranking-left .scroll-table td:nth-child(2) { display: none; }
+
+    /* ── Edition accordion : simplifier le résumé ───────────────── */
+    .edition-summary-right { display: none; }
+    .edition-summary { gap: 0.5rem; }
+
+    /* ── Podium tournoi : réduire ────────────────────────────────── */
+    .podium-1 { height: 130px; }
+    .podium-2 { height: 100px; }
+    .podium-3 { height: 80px;  }
+}
+
+/* Flag inline dans colonne nom — caché sur desktop, visible mobile */
+.mobile-flag { display: none; }
+@media (max-width: 768px) {
+    .mobile-flag { display: inline-block; font-size: 1.2rem; margin-right: 0.5rem; }
+}
 
 /* --- Éditions championnat expand/collapse --- */
 .edition-block {
@@ -838,8 +924,6 @@ td.col-podiums             { white-space: nowrap; }
     gap: 1rem;
 }
 
-/* Flag inline dans colonne nom — caché sur desktop, visible mobile */
-.mobile-flag { display: none; }
 
 /* Hamburger : caché sur desktop */
 #nav-toggle { display: none; }
@@ -927,25 +1011,6 @@ td.col-podiums             { white-space: nowrap; }
   /* ── Home : tout en vertical ─────────────────────────────────── */
   .home-grid { grid-template-columns: 1fr; }
 
-  /* ── HoF records ─────────────────────────────────────────────── */
-  col.col-hof-pos,   th.col-hof-pos,   td.col-hof-pos   { display: none; }
-  col.col-hof-total, th.col-hof-total, td.col-hof-total { display: none; }
-  .hof-records-grid { grid-template-columns: 1fr; }
-  .hof-records-2j   { display: none; }
-  col.col-date,      th.col-date,      td.col-date      { display: none; }
-  .hof-records-table col.col-flag,
-  .hof-records-table th.col-flag,
-  .hof-records-table td.col-flag,
-  .hof-table col.col-flag,
-  .hof-table th.col-flag,
-  .hof-table td.col-flag,
-  .tournois-table col.col-flag,
-  .tournois-table th.col-flag,
-  .tournois-table td.col-flag                            { display: none; }
-  .hof-records-table col.col-nom,
-  .hof-records-table th.col-nom,
-  .hof-records-table td.col-nom                          { display: none; }
-
   /* ── Liste tournois : cache la carte ────────────────────────── */
   .t-layout { grid-template-columns: 1fr; }
   .t-right  { display: none; }
@@ -964,61 +1029,5 @@ td.col-podiums             { white-space: nowrap; }
 
   /* ── Graphiques ──────────────────────────────────────────────── */
   .chart-section canvas { max-height: 160px; }
-
-  /* ── Classement général : masquer delta et podiums ───────────── */
-  col.col-delta,
-  th.col-delta, td.col-delta             { display: none; }
-  .ranking-table col.col-joueurs,
-  .ranking-table th.col-joueurs,
-  .ranking-table td.col-joueurs          { display: none; }
-  col.col-podiums,
-  th.col-podiums, td.col-podiums         { display: none; }
-  col.col-hof-sem,
-  th.col-hof-sem,    td.col-hof-sem      { display: none; }
-  col.col-hof-podium,
-  th.col-hof-podium, td.col-hof-podium   { display: none; }
-
-  /* ── Détail joueur : masquer durée, ville, coeff, contrib ────── */
-  col.col-duree,   th.col-duree,   td.col-duree   { display: none; }
-  col.col-ville,   th.col-ville,   td.col-ville   { display: none; }
-  col.col-regles,     th.col-regles,     td.col-regles     { display: none; }
-  col.col-statut-cal, th.col-statut-cal, td.col-statut-cal { display: none; }
-  col.col-coeff,   th.col-coeff,   td.col-coeff   { display: none; }
-  col.col-contrib, th.col-contrib, td.col-contrib  { display: none; }
-  col.col-pts,     th.col-pts,     td.col-pts     { display: none; }
-  col.col-mahj,    th.col-mahj,    td.col-mahj    { display: none; }
-  col.col-pos-lg,       th.col-pos-lg,       td.col-pos-lg       { display: none; }
-  col.col-pays-tournois,  th.col-pays-tournois,  td.col-pays-tournois  { display: none; }
-  col.col-pays-medailles, th.col-pays-medailles, td.col-pays-medailles { display: none; }
-
-  /* ── Liste joueurs : garder flag, nom, prénom ────────────────── */
-  .joueurs-table col.col-flag,
-  .joueurs-table th.col-flag,
-  .joueurs-table td.col-flag                          { display: none; }
-  .ranking-table col.col-flag,
-  .ranking-table th.col-flag,
-  .ranking-table td.col-flag                          { display: none; }
-  .mobile-flag                                        { display: inline; }
-  .ranking-table-nat col.col-pos,
-  .ranking-table-nat th.th-rank,
-  .ranking-table-nat td.td-rank                       { display: none; }
-  col.col-ema-id,   th.col-ema-id,  td.col-ema-id   { display: none; }
-  col.col-debut,   th.col-debut,   td.col-debut   { display: none; }
-  .joueurs-table col.col-joueurs,
-  .joueurs-table th.col-joueurs,
-  .joueurs-table td.col-joueurs { display: none; }
-
-  /* ── Détail tournoi : masquer colonne EMA ID ─────────────────── */
-  .ranking-left .scroll-table th:nth-child(2),
-  .ranking-left .scroll-table td:nth-child(2) { display: none; }
-
-  /* ── Edition accordion : simplifier le résumé ───────────────── */
-  .edition-summary-right { display: none; }
-  .edition-summary { gap: 0.5rem; }
-
-  /* ── Podium tournoi : réduire ────────────────────────────────── */
-  .podium-1 { height: 130px; }
-  .podium-2 { height: 100px; }
-  .podium-3 { height: 80px;  }
 
 }
