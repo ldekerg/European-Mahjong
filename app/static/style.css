@@ -117,17 +117,29 @@ nav a:hover {
 }
 
 @media (max-width: 768px) {
-    #nav-links {
+
+  #nav-links {
+    position: static;
+    transform: none;
+    left: auto;
+
     display: none;
     flex-direction: column;
     width: 100%;
+
     order: 10;
+
     background: var(--accent2);
     border-radius: 4px;
-    overflow: hidden;
+    overflow: auto;
     margin-top: 0.25rem;
+    max-height: 20vh;
   }
-  #nav-links.nav-open { display: flex; }
+
+  #nav-links.nav-open {
+    display: flex;
+  }
+
   #nav-links a {
     padding: 0.65rem 1rem;
     border-bottom: 1px solid rgba(255,255,255,0.1);
