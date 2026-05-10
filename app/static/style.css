@@ -259,7 +259,7 @@ a { color: var(--accent); }
     gap: 1.5rem;
     align-items: start;
 }
-.ranking-left  { min-width: 0; }
+.ranking-left  { min-width: 0; overflow-x: hidden; overflow-y: auto;}
 .ranking-right {
     background: var(--bg2);
     border-radius: 8px;
@@ -675,9 +675,16 @@ tbody td { font-size: 0.9rem; padding: 0.4rem 0.6rem; }
 }
 
 /* Conteneur tableau scrollable standard */
-.scroll-table { overflow: auto; max-height: calc(100vh - 14rem); }
+.scroll-table { overflow-y: auto; overflow-x: hidden; max-height: 70vh; }
 .scroll-table table { table-layout: fixed; width: 100%; }
 .scroll-table thead th { background: var(--bg3); }
+
+@media (max-width: 768px) {
+  /* ── Tableaux : pas de dépassement ──────────────────────────── */
+  .scroll-table { overflow-x: hidden; max-height: 50vh;}
+  table { min-width: 0; width: 100%; }
+}
+
 /* ranking-header et page-header sont identiques */
 .ranking-header { /* déjà défini, alias via page-header */ }
 
@@ -983,10 +990,6 @@ th.col-hof-pos, td.col-hof-pos   { text-align: center; width: 3.5rem; }
   main { margin: 0.75rem auto; padding: 0 0.5rem; }
   h1   { font-size: 1.25rem; }
   h2   { font-size: 1.05rem; margin: 1rem 0 0.5rem; }
-
-  /* ── Tableaux : pas de dépassement ──────────────────────────── */
-  .scroll-table { overflow-x: hidden; }
-  table { min-width: 0; width: 100%; }
 
   /* ── Sticky → static sur mobile ─────────────────────────────── */
   .ranking-header { position: static; }
