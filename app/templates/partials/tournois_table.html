@@ -25,7 +25,7 @@ window['{{ _fv }}'] = window['{{ _fv }}'] || function() {};
 <div class="scroll-table t-left-scroll">
 <table id="t-table-{{ _tk if _tk else 'default' }}" class="tournois-table" style="table-layout:fixed;width:100%">
   <colgroup>
-    <col class="col-date-tournoi">
+    <col class="col-date-lg">
     <col class="col-flag">
     <col class="col-ville">
     <col class="col-tournoi-nom">
@@ -51,7 +51,7 @@ window['{{ _fv }}'] = window['{{ _fv }}'] || function() {};
       {% else %}<th class="{{ cls }}" title="{{ title }}">{{ label }}</th>{% endif %}
     {% endmacro %}
     <tr>
-      {{ th_s('date',    trad('common.date'), 'col-date-tournoi') }}
+      {{ th_s('date',    trad('common.date'), 'col-date-lg') }}
       {{ th_s('pays',    '🌍',  'col-flag center', trad('common.pays')) }}
       {{ th_s('lieu',    trad('common.ville'), 'col-ville') }}
       <th class="col-tournoi-nom">{{ trad('common.tournoi') }}</th>
@@ -68,7 +68,7 @@ window['{{ _fv }}'] = window['{{ _fv }}'] || function() {};
   {% set contrib = actifs_ids[trn.id] if actif else 0 %}
   <tr class="t-row t-row-{{ _tk if _tk else 'all' }} {% if actif %}row-actif{% endif %} {% if trn.type_tournoi in ['wmc','wrc'] %}row-wmc{% elif trn.type_tournoi in ['oemc','oerc'] %}row-oemc{% endif %}"
       data-lieu="{{ trn.lieu }}">
-    <td class="col-date-tournoi">{{ trn.date_debut.strftime('%d/%m') }}</td>
+    <td class="col-date-lg">{{ trn.date_debut.strftime('%d/%m/%y') }}</td>
     <td class="col-flag">{{ trn.pays | pays_flag_link('tournois') }}</td>
     <td class="col-ville t-ville" onclick="{{ _fv }}('{{ trn.lieu }}')">{{ trn.lieu }}</td>
     <td class="col-tournoi-nom">
