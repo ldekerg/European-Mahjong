@@ -209,8 +209,14 @@ def accueil(
                 semaine_date = lundi_semaine(date.fromisoformat(semaine))
             except ValueError:
                 semaine_date = lundi_semaine(date.today())
+                ## Temporary : Hide 11/05/2026
+                semaine_date = lundi_semaine(date(2026, 5, 4))
         else:
             semaine_date = lundi_semaine(date.today())
+            ## Temporary : Hide 11/05/2026
+            semaine_date = lundi_semaine(date(2026, 5, 4))
+        
+
 
         mcr = get_classement_semaine(db, semaine_date, "MCR")
         rcr = get_classement_semaine(db, semaine_date, "RCR")
