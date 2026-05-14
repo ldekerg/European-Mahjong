@@ -32,7 +32,7 @@
       {% for grp in semaines_dispo %}
       <div class="week-group">
         <div class="week-group-label">{{ grp.annee }}</div>
-        {% for s in grp.semaines if s != semaine %}
+        {% for s in grp.semaines if s != semaine_actuelle %}
         <a class="week-option {% if s.date == semaine %}active{% endif %}"
            href="{{ base_url }}?semaine={{ s.date.isoformat() }}{{ _qs }}">
           #{{ s.num }} — {{ s.date.strftime('%d/%m/%Y') }}
