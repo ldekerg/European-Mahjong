@@ -91,30 +91,30 @@
 <div class="dim" style="margin:1rem 0">Aucun résultat disponible.</div>
 {% else %}
 <div class="scroll-table">
-<table class="table-championnat" style="width:100%" >
+<table class="table-championnat">
   <colgroup>
     <col class="col-pos">
-    <col class="col-flag">
+    <col class="col-flag col-opt">
     <col class="col-joueur">
-    <col class="col-champ-score">
-    <col class="col-champ-t">
+    <col class="col-champ-score col-sticky">
+    <col class="col-champ-t col-opt">
   </colgroup>
   <thead>
     <tr>
       <th class="col-pos">🏅</th>
-      <th class="col-flag" title="Pays">🌍</th>
-      <th class="col-joueur" >Joueur</th>
-      <th class="col-champ-score right">Moy.</th>
-      <th class="col-champ-t right" title="Tournois participés / comptés">T.</th>
+      <th class="col-flag col-opt" title="Pays">🌍</th>
+      <th class="col-joueur">Joueur</th>
+      <th class="col-champ-score col-sticky right">Moy.</th>
+      <th class="col-champ-t col-opt right" title="Tournois participés / comptés">T.</th>
     </tr>
   </thead>
   <tbody>
     {% for r in classement %}
     <tr class="{% if r.position == 1 %}row-top1{% elif r.position == 2 %}row-top2{% elif r.position == 3 %}row-top3{% endif %}{% if r.anonyme %} row-anonyme{% endif %}">
-      <td class="td-pos">
+      <td class="col-pos">
         <span class="pos-medal">{% if r.position == 1 %}🥇{% elif r.position == 2 %}🥈{% elif r.position == 3 %}🥉{% else %}{{ r.position }}{% endif %}</span>
       </td>
-      <td class="col-flag">{{ r.nationalite | flag_link('joueurs') }}</td>
+      <td class="col-flag col-opt">{{ r.nationalite | flag_link('joueurs') }}</td>
       <td class="col-joueur">
         {% if r.joueur %}
           <a href="/joueurs/{{ r.joueur.id }}">{{ r.joueur.prenom | prenom }} {{ r.joueur.nom | title }}</a>
@@ -122,8 +122,8 @@
           <span class="dim">{{ r.nom_affiche }}</span>
         {% endif %}
       </td>
-      <td class="right" style="font-weight:600">{{ r.score }}</td>
-      <td class="right dim" style="font-size:0.85rem">{{ r.nb_tournois }}/{{ r.nb_comptes }}</td>
+      <td class="col-champ-score col-sticky right" style="font-weight:600">{{ r.score }}</td>
+      <td class="col-champ-t col-opt right dim" style="font-size:0.85rem">{{ r.nb_tournois }}/{{ r.nb_comptes }}</td>
     </tr>
     {% endfor %}
   </tbody>
@@ -136,7 +136,7 @@
 
 <h2>Tournois du circuit</h2>
 <div class="scroll-table">
-<table style="width:100%">
+<table>
   <colgroup>
     <col class="col-date-opt">
     <col class="col-tournoi">

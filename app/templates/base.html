@@ -41,6 +41,7 @@
           <a href="/tournois/calendrier">{{ trad('common.calendrier') }}</a>
           <a href="/hallfame/">{{ trad('nav.hallfame') }}</a>
         </div>
+        <div class="nav-controls">
         <button class="regles-toggle" onclick="toggleRegles()" title="Règle par défaut">MCR</button>
         <div class="lang-picker" id="lang-picker">
           <button class="lang-toggle" onclick="toggleLangDropdown()" title="{{ trad('common.langue') }}">
@@ -69,6 +70,7 @@
           </div>
         </div>
         <button class="theme-toggle" onclick="toggleTheme()" title="{{ trad('common.dark_mode') }}">🌙</button>
+        </div>
     </nav>
     <main>
         {% block content %}{% endblock %}

@@ -4,23 +4,23 @@
    Dépendances JS : sortTable() et le tri DOMContentLoaded définis dans hallfame.html
 #}
 <div class="scroll-table">
-<table id="{{ table_id if table_id is defined else 'hof-table' }}" class="hof-table" style="table-layout:fixed;width:100%">
+<table id="{{ table_id if table_id is defined else 'hof-table' }}" class="hof-table">
   <colgroup>
-    <col class="col-hof-pos"><col class="col-flag"><col class="col-joueur-nom">
+    <col class="col-hof-pos"><col class="col-flag col-opt"><col class="col-joueur-nom">
     <col class="col-hof-stat"><col class="col-hof-stat"><col class="col-hof-stat">
-    <col class="col-hof-podium"><col class="col-hof-total">
+    <col class="col-hof-podium"><col class="col-hof-total col-opt">
   </colgroup>
   <thead>
     <tr>
       <th class="col-hof-pos center">#</th>
-      <th class="col-flag center">🌍</th>
+      <th class="col-flag col-opt center">🌍</th>
       <th class="col-joueur-nom">{{ trad('common.joueurs') }}</th>
       {% set _tid = table_id if table_id is defined else 'hof-table' %}
       <th class="col-hof-stat center sortable" onclick="sortTable(3,'{{ _tid }}')" title="{{ trad('hallfame.victoires_title') }}">🥇 <span class="sort-icon">⇅</span></th>
       <th class="col-hof-stat center sortable" onclick="sortTable(4,'{{ _tid }}')" title="{{ trad('hallfame.deuxiemes_title') }}">🥈 <span class="sort-icon">⇅</span></th>
       <th class="col-hof-stat center sortable" onclick="sortTable(5,'{{ _tid }}')" title="{{ trad('hallfame.troisiemes_title') }}">🥉 <span class="sort-icon">⇅</span></th>
       <th class="col-hof-podium center sortable" onclick="sortTable(6,'{{ _tid }}')" title="{{ trad('hallfame.total_medailles_title') }}">🏅 <span class="sort-icon">⇅</span></th>
-      <th class="col-hof-total center sortable" onclick="sortTable(7,'{{ _tid }}')" title="{{ trad('hallfame.tournois_joues_title') }}">{{ trad('common.tournois') }} <span class="sort-icon">⇅</span></th>
+      <th class="col-hof-total col-opt center sortable" onclick="sortTable(7,'{{ _tid }}')" title="{{ trad('hallfame.tournois_joues_title') }}">{{ trad('common.tournois') }} <span class="sort-icon">⇅</span></th>
     </tr>
   </thead>
   <tbody>
@@ -28,13 +28,13 @@
     {% set total_medals = d.or_t + d.argent_t + d.bronze_t %}
     <tr data-total="{{ d.total_t }}">
       <td class="col-hof-pos center rank-num">{{ loop.index }}</td>
-      <td class="col-flag center">{{ d.joueur.nationalite | flag_link('classement') }}</td>
+      <td class="col-flag col-opt center">{{ d.joueur.nationalite | flag_link('classement') }}</td>
       <td class="col-joueur-nom"><span class="mobile-flag">{{ d.joueur.nationalite | flag_link('classement') }}</span><a href="/joueurs/{{ d.joueur.id }}">{{ d.joueur.prenom | prenom }} {{ d.joueur.nom | title }}</a></td>
       <td class="col-hof-stat center" data-val="{{ d.or_t }}">{% if d.or_t %}<strong>{{ d.or_t }}</strong>{% else %}<span class="dim">—</span>{% endif %}</td>
       <td class="col-hof-stat center" data-val="{{ d.argent_t }}">{{ d.argent_t or '—' }}</td>
       <td class="col-hof-stat center" data-val="{{ d.bronze_t }}">{{ d.bronze_t or '—' }}</td>
-      <td class="col-hof-podium center rank-num" data-val="{{ total_medals }}"><strong>{{ total_medals }}</strong></td>
-      <td class="col-hof-total center dim" data-val="{{ d.total_t }}">{{ d.total_t }}</td>
+      <td class="col-hof-podium center" data-val="{{ total_medals }}"><strong>{{ total_medals }}</strong></td>
+      <td class="col-hof-total col-opt center dim" data-val="{{ d.total_t }}">{{ d.total_t }}</td>
     </tr>
     {% endfor %}
   </tbody>

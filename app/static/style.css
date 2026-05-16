@@ -1,14 +1,27 @@
+/* ═══════════════════════════════════════════════════════════════════
+    Colors & Themes
+   ═══════════════════════════════════════════════════════════════════ */
+
 :root {
   --light-1: #e7eeee;
 	--light-2: #c7dcdd;
 	--light-3: #b7cccc;
 	--light-4: #a7bcbb;
 	--light-5: #97acaa;
+
   --dark-5: #4783ab;
   --dark-4: #215f89;
   --dark-3: #03426d;
   --dark-2: #002843;
   --dark-1: #001625;
+
+    --wmc-bg: #b3e9d0;
+    --wmc-fg: #2f977b;
+    --wmc-border: var(--wmc-fg);
+
+    --oemc-bg: #d8d2ff;
+    --oemc-fg: #8858d4;
+    --oemc-border: var(--oemc-fg);
 
     --bg:       var(--light-1);
     --bg2:      var(--light-2);
@@ -24,10 +37,12 @@
 
     --border:   #e0e0e0;
 
-    --row-actif:#f0f7ff;
-    --row-wmc:  #fffbf0;
-    --row-oemc: #f3f0ff;
+    --row-actif:var(--bg2);
+    --row-wmc:  var(--wmc-bg);
+    --row-oemc: var(--oemc-bg);
+    
     --shadow:   rgba(0,0,0,0.08);
+
     --or-bg:      #fef0a0;
     --or-border:  #c8a000;
     --or-fg:      #7a3a00;
@@ -37,10 +52,12 @@
     --bronze-bg:  #f0ddd0;
     --bronze-border: #a06040;
     --bronze-fg:  #6a2a10;
-    --mcr-bg:   #d0e8ff;
-    --mcr-fg:   #1a3a5c;
-    --rcr-bg:   #ffe0d0;
-    --rcr-fg:   #7a2000;
+
+    --mcr-bg:   #88a3c5;
+    --mcr-fg:   #27286d;
+    --rcr-bg:   #c59886;
+    --rcr-fg:   #602010;
+
     --tout-bg:  #f0d8f8;
     --tout-fg:  #600d6a;
     --chart-mcr:     #4a8fc8;
@@ -50,6 +67,15 @@
     --chart-line2:   var(--chart-rcr);
     --chart-point:   #e03030;
     --chart-grid:    rgba(0,0,0,0.07);
+
+    --ok-bg: #79b979;
+    --ok-fg: #1d611d;
+
+    --nomers-bg: var(--bg3);
+    --nomers-fg: var(--text3);
+
+    --pending-bg: var(--bronze-bg);
+    --pending-fg: var(--bronze-fg);
 }
 
 [data-theme="dark"] {
@@ -68,23 +94,37 @@
 
     --border:   #2d3f52;
 
-    --row-actif:#1a2e42;
-    --row-wmc:  #2a2510;
-    --row-oemc: #1e1a30;
-    --shadow:   rgba(0,0,0,0.3);
-    --or-bg:      #2a2010;
+    --wmc-bg: #04524b;
+    --wmc-fg: #7ab8f0;
+    --wmc-border: var(--wmc-fg);
+
+    --oemc-bg: #2d194d;
+    --oemc-fg: #8e54eb;
+    --oemc-border: var(--oemc-fg);
+
+    --row-actif: var(--bg2);
+    --row-wmc:  var(--wmc-bg);
+    --row-oemc: var(--oemc-bg);
+
+    --shadow:   #0000004d;
+
+    --or-bg:      #554628;
     --or-border:  #c8a800;
     --or-fg:      #f0c840;
-    --argent-bg:  #1e3050;
+    
+    --argent-bg:  #2b504d;
     --argent-border: #6080a8;
     --argent-fg:  #aabbcc;
-    --bronze-bg:  #241810;
+
+    --bronze-bg:  #47302a;
     --bronze-border: #906040;
     --bronze-fg:  #cc9060;
-    --mcr-bg:   #1a3060;
-    --mcr-fg:   #9ec8ff;
+
+    --mcr-bg:   #0a0b61;
+    --mcr-fg:   #5485c5;
     --rcr-bg:   #602010;
-    --rcr-fg:   #ffb090;
+    --rcr-fg:   #b3755c;
+
     --tout-bg:  #3a1a40;
     --tout-fg:  #f797ff;
     --chart-mcr:     #7ab8f0;
@@ -94,10 +134,134 @@
     --chart-line2:   var(--chart-rcr);
     --chart-point:   #e03030;
     --chart-grid:    rgba(255,255,255,0.05);
+
+    --ok-bg: #103310;
+    --ok-fg: #439143;
+
+    --nomers-bg: #333333;
+    --nomers-fg: #999999;
+
+    --pending-bg: #664422;
+    --pending-fg: #ffcc88;
 }
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+/* ═══════════════════════════════════════════════════════════════════
+    Table Columns & Alignment
+   ═══════════════════════════════════════════════════════════════════ */
+/* Col for width and td/th for alignment */
+.col-sticky {
+    position: sticky;
+    right: 0;
+    box-shadow: -2px 0 4px var(--shadow);
+}
 
+.col-sticky-left {
+    position: sticky;
+    left: 0;
+    box-shadow: 2px 0 4px var(--shadow);
+    background: var(--row-bg);
+}
+
+.ema-pts { text-align: right; padding: 0.3rem 0.6rem; border-radius: 4px; }
+
+.col-ema-id       { width: 6rem; }
+.col-pos          { width: 2.8rem; }
+.col-rang-nat     { width: 2rem; }
+.col-pos-lg       { width: 5.5rem; }   /* position avec /nb_joueurs */
+.col-delta        { width: 3rem; }
+.col-flag         { width: 3.5rem; }
+.col-nom          { width: 12rem; }    /* nom de joueur dans classement */
+.col-prenom       { width: 10rem; }
+.col-debut        { width: 5.5rem; }   /* date premier tournoi */
+.col-joueur-nom   { width: 14rem; }    /* nom joueur dans HOF */
+.col-pays-nom     { width: 12rem; }    /* nom de pays */
+.col-date         { width: 3rem; }
+.col-date-lg      { width: 3.5rem; }   /* date avec année complète */
+.col-ville        { width: 5rem; }
+.col-duree        { width: 2.5rem; }
+.col-regles       { width: 4.2rem; }
+.col-coeff        { width: 2.8rem; }
+.col-contrib      { width: 4.4rem; }
+.col-statut-cal   { width: 2.5rem; }
+.col-joueurs      { width: 2rem; }
+.col-joueurs-sort { width: 4rem; }
+.col-score        { width: 3.5rem; }
+.col-ema          { width: 3.5rem; }
+.col-pts          { width: 2.8rem; }
+.col-mahj         { width: 3.5rem; }
+.col-podiums      { width: 7rem; }
+.col-tournoi      { width: 8rem; }    /* nom de tournoi dans classement */
+.col-hof-pos      { width: 2.8rem; }  /* position HOF */
+.col-hof-stat     { width: 3rem; }     /* stat HOF (médailles, semaines) */
+.col-hof-podium   { width: 3.5rem; }  /* podium HOF */
+.col-hof-total    { width: 5rem; }     /* total HOF */
+.col-pays-joueurs { width: 7rem; }     /* joueurs actifs dans liste pays */
+.col-pays-tournois{ width: 6rem; }    /* tournois org dans liste pays */
+.col-champ-score  { width: 5rem; }    /* score moyen championnat */
+.col-champ-t      { width: 4rem; }    /* nb tournois championnat */
+.col-tournoi      { width: 14rem; }   /* nom tournoi calendrier */
+
+/* Alignements spécifiques */
+td.col-delta, 
+th.col-delta        { text-align: center; 
+                      width: 3rem;
+                      white-space: nowrap; }
+td.col-flag, 
+th.col-flag         { text-align: center; 
+                      width: 3.5rem; 
+                      max-width: 3.5rem; 
+                      overflow: hidden; }
+td.col-date, 
+td.col-date-lg      { white-space: nowrap; }
+
+td.col-ville        { overflow: hidden; 
+                      text-overflow: ellipsis; 
+                      white-space: nowrap; }
+
+td.col-pos, 
+th.col-pos,
+th.col-hof-pos, 
+td.col-hof-pos,
+td.col-duree, 
+th.col-duree,
+td.col-regles,
+th.col-regles,    
+td.col-coeff, 
+th.col-coeff,     
+td.col-contrib, 
+th.col-contrib,   
+td.col-joueurs, 
+th.col-joueurs      { text-align: center; }
+
+td.col-score, 
+th.col-score,        
+td.col-ema, 
+th.col-ema,          
+td.col-pts, 
+th.col-pts,          
+td.col-mahj, 
+th.col-mahj         { text-align: right; }
+
+td.col-podiums      { white-space: nowrap; }
+
+
+
+@media (max-width: 768px) {
+  .col-opt { display: none; }
+  
+  /*  HoF : masquer pos, total, date  */
+  .hof-records-grid { grid-template-columns: 1fr; }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════
+    Main Feature
+   ═══════════════════════════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+/* Empêche les enfants de grille de déborder leur cellule */
+[class*="-grid"] > *, [class*="-layout"] > * { min-width: 0; }
+
+/* ── General Styles ── */
 body {
     font-family: system-ui, sans-serif;
     font-size: 15px;
@@ -106,85 +270,33 @@ body {
     transition: background 0.2s, color 0.2s;
 }
 
-/* ── Navigation Barre ── */
-nav {
-    display: flex;
-    align-items: center;
-
-    background: var(--dark-3);
-    padding: 0.75rem 1.5rem;
-
-    position: sticky;
-    top: 0;
-    z-index: 50;
-}
-
-nav a {
-    color: var(--text);
-    text-decoration: none;
-    font-weight: 500;
-}
-
-nav a:hover {
-    transform: scale(1.1);
-}
-
-#nav-links {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-
-    display: flex;
-    gap: 1.5rem;
-}
-
-@media (max-width: 768px) {
-    #nav-links {
-    display: none;
-    flex-direction: column;
-    width: 100%;
-    order: 10;
-    background: var(--accent2);
-    border-radius: 4px;
-    overflow: hidden;
-    margin-top: 0.25rem;
-  }
-  #nav-links.nav-open { display: flex; }
-  #nav-links a {
-    padding: 0.65rem 1rem;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-    font-size: 0.95rem;
-  }
-  #nav-links a:last-child { border-bottom: none; }
-}
-
-
-
 main {
     max-width: 1300px;
     margin: 2rem auto;
     padding: 0 1rem;
 }
-
-.table-scroll { overflow-x: auto; }
-table { min-width: 700px; }
-
-.col-sticky {
+/* Page Header */
+.page-header, .ranking-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
     position: sticky;
-    right: 0;
-    box-shadow: -2px 0 4px var(--shadow);
+    top: var(--sticky-header-top, 3rem);
+    z-index: 40;
+    background: var(--bg);
+    padding: 0.5rem 0;
 }
-.ema-pts { text-align: right; padding: 0.3rem 0.6rem; border-radius: 4px; }
 
-h1 { font-size: 1.6rem; margin-bottom: 1rem; }
-h2 { font-size: 1.2rem; margin: 1.5rem 0 0.75rem; }
-
+/* Tables */
 table {
     width: 100%;
     border-collapse: collapse;
     background: var(--bg2);
     margin-top: 0.75rem;
-}
+    min-width: 700px; }
 
 th, td {
     padding: 0.5rem 0.75rem;
@@ -195,6 +307,19 @@ th, td {
 th { background: var(--bg3); font-weight: 600; }
 tr:hover td { background: var(--bg3); }
 
+thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: var(--bg3);
+    white-space: nowrap;
+    font-size: 0.85rem;
+    padding: 0.4rem 0.6rem;
+}
+tbody td { font-size: 0.9rem; padding: 0.4rem 0.6rem; }
+
+
+/* Forms */
 form {
     display: flex;
     flex-direction: column;
@@ -219,6 +344,14 @@ input, select {
     font-size: 0.95rem;
 }
 
+[data-theme="dark"] input,
+[data-theme="dark"] select {
+    background: var(--bg3);
+    color: var(--text);
+    border-color: var(--border);
+}
+
+/* Buttons */
 button, .btn {
     display: inline-block;
     padding: 0.45rem 1rem;
@@ -233,12 +366,140 @@ button, .btn {
 
 button:hover, .btn:hover { background: var(--accent2); }
 
+/* Lists */
 dl { display: grid; grid-template-columns: 150px 1fr; gap: 0.4rem 1rem; margin-bottom: 1rem; }
 dt { font-weight: 600; color: var(--text2); }
 
+/* Links */
 a { color: var(--accent); }
 
-/* ── Page accueil / classement ── */
+/* Titles */
+h1 { font-size: 1.6rem; margin-bottom: 1rem; }
+h2 { font-size: 1.2rem; margin: 1.5rem 0 0.75rem; }
+
+
+/* ═══════════════════════════════════════════════════════════════════
+    Navigation
+   ═══════════════════════════════════════════════════════════════════ */
+nav {
+    display: flex;
+    align-items: center;
+
+    background: var(--bg3);
+    padding: 0.75rem 1.5rem;
+
+    position: sticky;
+    top: 0;
+    z-index: 50;
+}
+
+nav a {
+    color: var(--text3);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+nav a:hover {
+    transform: scale(1.1);
+}
+
+#nav-links {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+
+    display: flex;
+    gap: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  #nav-links {
+    display: none;
+    position: fixed;
+    top: var(--nav-height, 3rem);
+    left: 0;
+    right: 0;
+    transform: none;
+    flex-direction: column;
+    width: 100%;
+    max-height: 30vh;
+    overflow-y: auto;
+    background: var(--bg3);
+    border-radius: 0 0 4px 4px;
+    z-index: 49;
+  }
+  #nav-links.nav-open { display: flex; }
+  #nav-links a {
+    padding: 0.65rem 1rem;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    font-size: 0.95rem;
+  }
+  #nav-links a:last-child { border-bottom: none; }
+}
+
+/* ── Dark mode extras ── */
+.nav-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-left: auto;
+}
+.theme-toggle, .regles-toggle, .lang-toggle {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.3);
+    color: #fff;
+    padding: 0;
+    width: 3rem;
+    height: 2rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.theme-toggle:hover, .regles-toggle:hover, .lang-toggle:hover { background: rgba(255,255,255,0.1); }
+.regles-toggle { border-color: rgba(255,255,255,0.5); }
+
+.lang-picker   { position: relative; }
+.lang-dropdown {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    z-index: 200;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    box-shadow: 0 4px 12px var(--shadow);
+    min-width: 9rem;
+    overflow: auto;
+    font-size: 15px;
+    font-weight: 400;
+}
+.lang-dropdown a {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0 0.9rem;
+    height: 2.2rem;
+    font-size: 0.88rem;
+    line-height: 1;
+    color: var(--text);
+    text-decoration: none;
+    cursor: pointer;
+    white-space: nowrap;
+    font-weight: 400;
+}
+.lang-flag { font-size: 1rem; line-height: 1; display: inline-block; width: 1.4rem; text-align: center; }
+.lang-dropdown a span:not(.lang-flag) { font-size: 0.88rem; line-height: 1; font-weight: 400; font-family: system-ui, sans-serif; }
+.lang-dropdown a:hover { background: var(--row-actif); }
+
+
+/* ═══════════════════════════════════════════════════════════════════
+    Ranking Pages
+   ═══════════════════════════════════════════════════════════════════ */
 .ranking-header {
     display: flex;
     align-items: center;
@@ -306,6 +567,8 @@ a { color: var(--accent); }
 }
 .week-option:hover { background: var(--row-actif); }
 .week-option.active { font-weight: 700; color: var(--accent); background: var(--row-actif); }
+[data-theme="dark"] .week-option.active { background: var(--row-actif); }
+
 .ranking-layout {
     display: grid;
     grid-template-columns: 1fr 460px;
@@ -322,7 +585,7 @@ a { color: var(--accent); }
     min-height: 200px;
     overflow: visible;
 }
-/* Podium tournoi */
+/* Tournament Podium */
 .podium {
     display: flex;
     align-items: flex-end;
@@ -342,7 +605,7 @@ a { color: var(--accent); }
     border-radius: 8px 8px 0 0;
     padding: 0.75rem 0.4rem;
 }
-/* Ordre visuel : 2e à gauche, 1er au centre, 3e à droite */
+/* Tournament Podium Steps */
 .podium-1 { order: 2; height: 180px; background: var(--or-bg);     border: 1px solid var(--or-border); }
 .podium-2 { order: 1; height: 140px; background: var(--argent-bg); border: 1px solid var(--argent-border); }
 .podium-3 { order: 3; height: 115px; background: var(--bronze-bg); border: 1px solid var(--bronze-border); }
@@ -368,8 +631,6 @@ a { color: var(--accent); }
 .apercu-score   { font-size: 0.85rem; color: var(--text2); }
 .apercu-nbt     { font-size: 0.75rem; color: var(--text3); margin-top: 0.25rem; }
 .apercu-link    { display: block; text-align: center; margin-top: 0.5rem; font-size: 0.9rem; }
-.th-rank  { width: 2.5rem; text-align: center; }
-.td-rank  { text-align: center; font-size: 1.1rem; width: 2.5rem; }
 .rank-num { color: var(--text3); font-size: 0.95rem; }
 .score-val { font-weight: 600; color: var(--accent); font-variant-numeric: tabular-nums; }
 .row-top1 td { background: var(--or-bg); }
@@ -377,7 +638,11 @@ a { color: var(--accent); }
 .row-top3 td { background: var(--bronze-bg); }
 .row-anonyme td { color: var(--text3); }
 
-/* ── Page joueur ── */
+
+
+/* ═══════════════════════════════════════════════════════════════════
+    Player Pages
+   ═══════════════════════════════════════════════════════════════════ */
 .player-header {
     background: var(--bg2);
     border-radius: 8px;
@@ -398,7 +663,7 @@ a { color: var(--accent); }
 .statut-etranger { background: #ffe8d0; color: #804010; }
 .btn-sm { font-size: 0.8rem; padding: 0.3rem 0.7rem; }
 
-/* ── Onglets ── */
+/* tabs */
 .tabs {
     display: flex;
     overflow: auto;
@@ -425,7 +690,7 @@ a { color: var(--accent); }
 .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
 .tab-content.hidden { display: none; }
 
-/* ── Statistiques ── */
+/* ── Statistics ── */
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -438,23 +703,44 @@ a { color: var(--accent); }
     padding: 1rem;
     text-align: center;
 }
+[data-theme="dark"] .stat-card { background: var(--bg2); }
+
 .stat-label { font-size: 0.8rem; color: var(--text3); margin-bottom: 0.4rem; }
 .stat-value { font-size: 1.6rem; font-weight: 700; color: var(--accent); }
 .stat-sub   { font-size: 0.9rem; font-weight: 400; color: #666; display: block; }
 
-/* ── Tableau tournois ── */
+
+/* tournament list */
 .row-actif td  { background: var(--row-actif); }
 .row-wmc td    { background: var(--row-wmc); }
 .row-oemc td   { background: var(--row-oemc); }
-.row-wmc .col-sticky  { background: var(--row-wmc); }
-.row-oemc .col-sticky { background: var(--row-oemc); }
+/* La cellule sticky hérite --row-bg défini sur la ligne */
+td { --row-bg: var(--bg2); }
+.col-sticky { background: var(--row-bg); }
+.col-sticky-left { background: var(--row-bg); }
+
+tr:hover           td { --row-bg: var(--bg3); }
+.row-actif         td { --row-bg: var(--row-actif); }
+.row-wmc           td { --row-bg: var(--row-wmc); }
+.row-oemc          td { --row-bg: var(--row-oemc); }
+.row-top1          td { --row-bg: var(--or-bg); }
+.row-top2          td { --row-bg: var(--argent-bg); }
+.row-top3          td { --row-bg: var(--bronze-bg); }
 .contrib-100 { color: #2a6a2a; font-weight: 600; }
 .contrib-50  { color: #806020; }
 .pts-actif   { font-weight: 700; color: var(--accent); }
 .badge       { font-size: 0.7rem; background: #e0e8f8; color: var(--accent); padding: 0.1rem 0.4rem; border-radius: 8px; margin-left: 0.3rem; }
-.badge-gold      { background: var(--or-bg); color: var(--or-fg); border: 1px solid var(--or-border); }
+.badge-sm    { font-size: 0.65rem; margin-left: 0; margin-right: 0.2rem; }
+
+.badge-wmc    { background: var(--wmc-fg); color: var(--wmc-bg); border: 1px solid var(--wmc-fg); }
+
+.badge-oemc    { background: var(--oemc-fg); color: var(--oemc-bg); border: 1px solid var(--oemc-fg); }
+
 .badge-warning   { background: #fff3cd; color: #7a5c00; border: 1px solid #e6c840; }
 .badge-suspendu  { background: #fde8e8; color: #a00; border: 1px solid #e88; }
+[data-theme="dark"] .badge-warning  { background: #3a2e00; color: #f0c040; border-color: #7a6010; }
+[data-theme="dark"] .badge-suspendu { background: #3a0000; color: #f08080; border-color: #803030; }
+
 .nowrap { white-space: nowrap; }
 .center { text-align: center; }
 .right  { text-align: right; }
@@ -472,81 +758,15 @@ a { color: var(--accent); }
     border-radius: 0 0 4px 4px;
     user-select: none;
 }
+[data-theme="dark"] .expand-row { background: var(--bg3); border-color: var(--border); }
 .expand-row:hover { background: var(--row-actif); }
 tr.hidden { display: none; }
 
-.td-pos    { white-space: nowrap; min-width: 7rem; vertical-align: middle; }
-.td-pos    { display: grid; grid-template-columns: 1.5rem 1fr; align-items: center; }
 .pos-medal { text-align: center; }
 .pos-score { text-align: right; padding-right: 0.25rem; }
-.th-pos    { min-width: 7rem; }
 
-/* ── Dark mode extras ── */
-.theme-toggle, .regles-toggle, .lang-toggle {
-    background: transparent;
-    border: 1px solid rgba(255,255,255,0.3);
-    color: #fff;
-    padding: 0.25rem 0.6rem;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.85rem;
-    font-weight: 700;
-    letter-spacing: 0.03em;
-}
-.regles-toggle { margin-left: auto; }
-.theme-toggle { font-size: 1rem; font-weight: 400; }
-.lang-toggle  { font-size: 1.1rem; font-weight: 400; padding: 0.2rem 0.5rem; }
-.theme-toggle:hover, .regles-toggle:hover, .lang-toggle:hover { background: rgba(255,255,255,0.1); }
-.regles-toggle { border-color: rgba(255,255,255,0.5); }
 
-.lang-picker   { position: relative; }
-.lang-dropdown {
-    position: absolute;
-    top: calc(100% + 6px);
-    right: 0;
-    z-index: 200;
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    box-shadow: 0 4px 12px var(--shadow);
-    min-width: 9rem;
-    overflow: auto;
-    font-size: 15px;
-    font-weight: 400;
-}
-.lang-dropdown a {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0 0.9rem;
-    height: 2.2rem;
-    font-size: 0.88rem;
-    line-height: 1;
-    color: var(--text);
-    text-decoration: none;
-    cursor: pointer;
-    white-space: nowrap;
-    font-weight: 400;
-}
-.lang-flag { font-size: 1rem; line-height: 1; display: inline-block; width: 1.4rem; text-align: center; }
-.lang-dropdown a span:not(.lang-flag) { font-size: 0.88rem; line-height: 1; font-weight: 400; font-family: system-ui, sans-serif; }
-.lang-dropdown a:hover { background: var(--row-actif); }
-
-[data-theme="dark"] input,
-[data-theme="dark"] select {
-    background: var(--bg3);
-    color: var(--text);
-    border-color: var(--border);
-}
-[data-theme="dark"] .stat-card { background: var(--bg2); }
-[data-theme="dark"] .week-option.active { background: var(--row-actif); }
-[data-theme="dark"] .expand-row { background: var(--bg3); border-color: var(--border); }
-[data-theme="dark"] .col-sticky { background: var(--bg2) !important; }
-[data-theme="dark"] .row-actif .col-sticky  { background: var(--row-actif) !important; }
-[data-theme="dark"] .badge-warning  { background: #3a2e00; color: #f0c040; border-color: #7a6010; }
-[data-theme="dark"] .badge-suspendu { background: #3a0000; color: #f08080; border-color: #803030; }
-
-/* ── Changement nationalité ── */
+/* Nationality warnings */
 .nat-warning {
     background: var(--or-bg);
     border: 1px solid var(--or-border);
@@ -562,7 +782,7 @@ tr.hidden { display: none; }
     color: #f0c040;
 }
 
-/* ── Graphique évolution ── */
+/* Ranking Charts */
 .chart-section  { background: var(--bg2); border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; }
 .chart-controls { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; }
 .chart-title    { font-weight: 600; font-size: 0.95rem; color: var(--text2); }
@@ -577,7 +797,10 @@ tr.hidden { display: none; }
 .stat-card-hl { cursor: pointer; transition: box-shadow 0.15s, transform 0.15s; }
 .stat-card-hl:hover { box-shadow: 0 0 0 2px var(--accent); transform: translateY(-1px); }
 
-/* ── Compactage page joueur ── */
+/* ═══════════════════════════════════════════════════════════════════
+    Player Overview & Snapshot
+   ═══════════════════════════════════════════════════════════════════ */
+
 .stats-grid    { gap: 0.6rem; margin-bottom: 0.75rem; }
 .stat-card     { padding: 0.6rem 0.75rem; }
 .stat-value    { font-size: 1.3rem; }
@@ -608,7 +831,7 @@ tr.hidden { display: none; }
 .apercu-table th    { font-size: 0.75rem; padding: 0.25rem 0.4rem; }
 .apercu-table td    { padding: 0.2rem 0.4rem; }
 
-/* ── Harmonisation largeur apercu ── */
+/* Standardization */
 .apercu-stats,
 .apercu-snapshot { width: 100%; }
 
@@ -631,10 +854,7 @@ tr.hidden { display: none; }
     white-space: nowrap;
 }
 
-/* snapshot 4 colonnes : Date | Tournoi | Pos | EMA */
-
-
-/* ── Colonnes snapshot tournois actifs ── */
+/* Snapshot : active tournaments */
 .apercu-table { table-layout: fixed; width: 100%; }
 .apercu-table td:nth-child(1),
 .apercu-table th:nth-child(1) { width: 4.2rem; white-space: nowrap; }
@@ -646,19 +866,27 @@ tr.hidden { display: none; }
 .apercu-table th:nth-child(4) { width: 2.6rem; text-align: right; }
 .nav-today { font-size: 0.85rem; padding: 0.3rem 0.5rem; }
 
-/* ── Liste tournois ── */
+
+/* ═══════════════════════════════════════════════════════════════════
+    Filters
+   ═══════════════════════════════════════════════════════════════════ */
+
 .t-filters      { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; }
 .t-filter-group { display: flex; gap: 0.25rem; align-items: center; }
 .filter-label   { font-size: 0.85rem; color: var(--text3); }
 .filter-btn {
     padding: 0.25rem 0.7rem; border-radius: 12px; font-size: 0.85rem;
-    border: 1px solid var(--border); color: var(--text2); text-decoration: none;
+    border: 1px solid var(--border); color: var(--text2); background: var(--bg2);
 }
 .filter-btn:hover { background: var(--bg3); }
-.filter-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.filter-btn.active { background: var(--bg4); color: var(--text); border-color: var(--bg4); }
 .t-count { font-size: 0.85rem; color: var(--text3); margin: 0.5rem 0 0.75rem; }
 
-/* ── Page tournois ── */
+
+/* ═══════════════════════════════════════════════════════════════════
+    Tournament Pages with Map
+   ═══════════════════════════════════════════════════════════════════ */
+
 .etiquette-pays       { display:inline-flex;
                         align-items:center;
                         gap:0.2rem;
@@ -671,7 +899,7 @@ tr.hidden { display: none; }
                         white-space:nowrap; }
 .etiquette-pays:hover { background: var(--accent); }
 
-/* ── Page tournois avec carte ── */
+/* Tournament page */
 .t-layout { display: grid; grid-template-columns: 1fr 500px; gap: 1.5rem; align-items: start; }
 .t-left   { min-width: 0; }
 .t-right  { position: sticky; top: 7.5rem; }
@@ -703,56 +931,28 @@ caption.t-count {
     text-align: center; padding: 0; flex-shrink: 0;
 }
 .ville-badge-close:hover { background: rgba(255,255,255,0.45); }
-.badge-mcr { background: var(--mcr-bg); color: var(--mcr-fg); }
-.badge-rcr { background: var(--rcr-bg); color: var(--rcr-fg); }
+
+.badge-mcr { background: var(--mcr-bg); color: var(--mcr-fg); border: 1px solid var(--mcr-fg) }
+.badge-rcr { background: var(--rcr-bg); color: var(--rcr-fg); border: 1px solid var(--rcr-fg) }
+
 #t-table { table-layout: fixed; width: 100%; }
 #t-table td, #t-table th { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-#t-table td:nth-child(4), #t-table th:nth-child(4) { white-space: normal; } /* Tournoi peut wrapper */
+#t-table td:nth-child(4), #t-table th:nth-child(4) { white-space: normal; } 
 .badge-mcr, .badge-rcr { padding: 0.1rem 0.35rem; font-size: 0.75rem; }
 #t-table thead th,
 [id^="t-table-cal"] thead th { position: sticky; top: 0; z-index: 2; background: var(--bg3); }
-.t-left .table-scroll { max-height: calc(100vh - 14rem); overflow-y: auto; }
 
-/* ── Harmonisation globale tableaux ── */
-thead th {
-    position: sticky;
-    top: 0;
-    z-index: 2;
-    background: var(--bg3);
-    white-space: nowrap;
-    font-size: 0.85rem;
-    padding: 0.4rem 0.6rem;
-}
-tbody td { font-size: 0.9rem; padding: 0.4rem 0.6rem; }
-
-/* Header de section standard */
-.page-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 1rem;
-    margin-bottom: 1.25rem;
-    position: sticky;
-    top: var(--sticky-header-top, 3rem);
-    z-index: 40;
-    background: var(--bg);
-    padding: 0.5rem 0;
-}
 
 /* Conteneur tableau scrollable standard */
-.scroll-table { overflow-y: auto; overflow-x: hidden; max-height: 70vh; }
+.scroll-table { overflow-y: auto; overflow-x: auto; max-height: 70vh; }
 .scroll-table table { table-layout: fixed; width: 100%; }
 .scroll-table thead th { background: var(--bg3); }
 
 @media (max-width: 768px) {
-  /* ── Tableaux : pas de dépassement ──────────────────────────── */
-  .scroll-table { overflow-x: hidden; max-height: 50vh;}
-  table { min-width: 0; width: 100%; }
+  .scroll-table { overflow-x: auto; max-height: 50vh; max-width: 90vw;}
+  .scroll-table table { table-layout: auto; width: auto; min-width: 100%; }
+  .scroll-table col { width: auto; }
 }
-
-/* ranking-header et page-header sont identiques */
-.ranking-header { /* déjà défini, alias via page-header */ }
 
 /* Sticky imbriqués : top calculé dynamiquement par updateStickyOffsets() dans base.html */
 .tab-content .ranking-header {
@@ -789,206 +989,10 @@ tbody td { font-size: 0.9rem; padding: 0.4rem 0.6rem; }
 .sort-arrow { font-size: 0.75rem; }
 .sort-icon { font-size: 0.7rem; opacity: 0.5; }
 
-/* ── Colonnes standardisées ── */
-/* Utilisées sur <col> pour la largeur et sur <td>/<th> pour l'alignement */
-
-col.col-ema-id       { width: 6rem; }
-col.col-pos          { width: 2.8rem; }
-col.col-rang-nat     { width: 2rem; }
-col.col-pos-lg       { width: 5.5rem; }   /* position avec /nb_joueurs */
-col.col-delta        { width: 3rem; }
-col.col-flag         { width: 3.5rem; }
-col.col-nom          { width: 12rem; }    /* nom de joueur dans classement */
-col.col-prenom       { width: 10rem; }
-col.col-debut        { width: 5.5rem; }   /* date premier tournoi */
-col.col-joueur-nom   { width: 14rem; }    /* nom joueur dans HOF */
-col.col-pays-nom     { width: 12rem; }    /* nom de pays */
-col.col-date         { width: 3rem; }
-col.col-date-opt     { width: 3rem; }
-col.col-date-lg      { width: 6rem; }   /* date avec année complète */
-col.col-date-lg-opt  { width: 6rem; }   /* date avec année complète */
-col.col-ville        { width: 8rem; }
-col.col-duree        { width: 2.5rem; }
-col.col-regles       { width: 4.2rem; }
-col.col-coeff        { width: 2.8rem; }
-col.col-contrib      { width: 4.4rem; }
-col.col-statut-cal   { width: 6rem; }
-col.col-joueurs      { width: 3rem; }
-col.col-joueurs-sort { width: 4rem; }
-col.col-score        { width: 5.5rem; }
-col.col-ema          { width: 3.5rem; }
-col.col-pts          { width: 2.8rem; }
-col.col-mahj         { width: 3.5rem; }
-col.col-podiums      { width: 7rem; }
-col.col-tournoi      { width: 8rem; }    /* nom de tournoi dans classement */
-col.col-hof-pos      { width: 2.8rem; }  /* position HOF */
-col.col-hof-stat     { width: 3rem; }     /* stat HOF (médailles, semaines) */
-col.col-hof-podium   { width: 3.5rem; }  /* podium HOF */
-col.col-hof-total    { width: 5rem; }     /* total HOF */
-col.col-pays-joueurs { width: 7rem; }     /* joueurs actifs dans liste pays */
-col.col-pays-tournois{ width: 6rem; }    /* tournois org dans liste pays */
-col.col-champ-score  { width: 5rem; }    /* score moyen championnat */
-col.col-champ-t      { width: 4rem; }    /* nb tournois championnat */
-col.col-tournoi      { width: 14rem; }   /* nom tournoi calendrier */
-
-
-td.col-pos, 
-th.col-pos          { text-align: center; width: 2.8rem; }
-td.col-delta, 
-th.col-delta        { text-align: center; 
-                      width: 3rem;
-                      white-space: nowrap; }
-td.col-flag, 
-th.col-flag         { text-align: center; 
-                      width: 3.5rem; 
-                      max-width: 3.5rem; 
-                      overflow: hidden; }
-td.col-date, 
-td.col-date-opt,
-td.col-date-lg, 
-td.col-date-lg-opt { white-space: nowrap; }
-
-td.col-ville        { overflow: hidden; 
-                      text-overflow: ellipsis; 
-                      white-space: nowrap; }
-td.col-duree, 
-th.col-duree        { text-align: center; }
-td.col-regles,
-th.col-regles       { text-align: center; }
-td.col-coeff, 
-th.col-coeff        { text-align: center; }
-td.col-contrib, 
-th.col-contrib      { text-align: center; }
-td.col-joueurs, 
-th.col-joueurs      { text-align: center; }
-td.col-score, 
-th.col-score        { text-align: right; }
-td.col-ema, 
-th.col-ema          { text-align: right; }
-td.col-pts, 
-th.col-pts          { text-align: right; }
-td.col-mahj, 
-th.col-mahj         { text-align: right; }
-td.col-podiums      { white-space: nowrap; }
-th.col-hof-pos, 
-td.col-hof-pos      { text-align: center; width: 3.5rem; }
-
 @media (max-width: 768px) {
+  .col-sticky-left { position: sticky; left: 0; }
 
-  col.col-date-opt,      
-  th.col-date-opt,     
-  td.col-date-opt       { display: none; }
-  col.col-date-lg-opt,      
-  th.col-date-lg-opt,     
-  td.col-date-lg-opt       { display: none; }
-  
-  /* ── HoF : masquer pos, total, date .. ────── */
-  col.col-hof-pos,
-  th.col-hof-pos,   
-  td.col-hof-pos    { display: none; }
-  col.col-hof-total, 
-  th.col-hof-total, 
-  td.col-hof-total  { display: none; }
-  .hof-records-grid { grid-template-columns: 1fr; }
-  .hof-records-2j   { display: none; }
-  .hof-records-table 
-  col.col-flag,
-  .hof-records-table 
-  th.col-flag,
-  .hof-records-table 
-  td.col-flag,
-  .hof-table 
-  col.col-flag,
-  .hof-table 
-  th.col-flag,
-  .hof-table 
-  td.col-flag,
-  .tournois-table 
-  col.col-flag,
-  .tournois-table 
-  th.col-flag,
-  .tournois-table 
-  td.col-flag       { display: none; }
-  .hof-records-table 
-  col.col-nom,
-  .hof-records-table 
-  th.col-nom,
-  .hof-records-table 
-  td.col-nom        { display: none; }
-
-  /* ── Détail joueur : masquer durée, ville, coeff, contrib ────── */
-  col.col-duree,  
-  th.col-duree,   
-  td.col-duree      { display: none; }
-  col.col-ville,   
-  th.col-ville,   
-  td.col-ville      { display: none; }
-  col.col-regles,     
-  th.col-regles,     
-  td.col-regles     { display: none; }
-  col.col-statut-cal, 
-  th.col-statut-cal, 
-  td.col-statut-cal { display: none; }
-  col.col-coeff,   
-  th.col-coeff,   
-  td.col-coeff      { display: none; }
-  col.col-contrib, 
-  th.col-contrib, 
-  td.col-contrib    { display: none; }
-  col.col-pts,     
-  th.col-pts,     
-  td.col-pts        { display: none; }
-  col.col-mahj,    
-  th.col-mahj,    
-  td.col-mahj       { display: none; }
-  col.col-pos-lg,       
-  th.col-pos-lg,       
-  td.col-pos-lg     { display: none; }
-  col.col-pays-tournois, 
-  th.col-pays-tournois,  
-  td.col-pays-tournois  { display: none; }
-  col.col-pays-medailles, 
-  th.col-pays-medailles, 
-  td.col-pays-medailles { display: none; }
-
-    /* ── Classement général : masquer delta et podiums ───────────── */
-  col.col-delta,
-  th.col-delta, td.col-delta             { display: none; }
-  .ranking-table col.col-joueurs,
-  .ranking-table th.col-joueurs,
-  .ranking-table td.col-joueurs          { display: none; }
-  col.col-podiums,
-  th.col-podiums, td.col-podiums         { display: none; }
-  col.col-hof-sem,
-  th.col-hof-sem,    td.col-hof-sem      { display: none; }
-  col.col-hof-podium,
-  th.col-hof-podium, td.col-hof-podium   { display: none; }
-
-  /* ── Liste joueurs : garder flag, nom, prénom ────────────────── */
-  .joueurs-table col.col-flag,
-  .joueurs-table th.col-flag,
-  .joueurs-table td.col-flag             { display: none; }
-  .ranking-table col.col-flag,
-  .ranking-table th.col-flag,
-  .ranking-table td.col-flag             { display: none; }
-  .ranking-table-nat col.col-pos,
-  .ranking-table-nat th.th-rank,
-  .ranking-table-nat td.td-rank          { display: none; }
-  col.col-ema-id,   
-  th.col-ema-id,  
-  td.col-ema-id                          { display: none; }
-  col.col-debut,   
-  th.col-debut,   
-  td.col-debut                           { display: none; }
-  .joueurs-table col.col-joueurs,
-  .joueurs-table th.col-joueurs,
-  .joueurs-table td.col-joueurs          { display: none; }
-
-  /* ── Détail tournoi : masquer colonne EMA ID ─────────────────── */
-  .ranking-left .scroll-table th:nth-child(2),
-  .ranking-left .scroll-table td:nth-child(2) { display: none; }
-
-  /* ── Edition accordion : simplifier le résumé ───────────────── */
+/* ── Edition accordion : simplifier le résumé ───────────────── */
   .edition-summary-right { display: none; }
   .edition-summary { gap: 0.5rem; }
 
@@ -1060,6 +1064,22 @@ td.col-hof-pos      { text-align: center; width: 3.5rem; }
 }
 
 /* ═══════════════════════════════════════════════════════════════════
+    Calendrier
+   ═══════════════════════════════════════════════════════════════════ */
+
+.badge-ok { background:var(--ok-bg);
+            color: var(--ok-fg);
+            border:1px solid var(--ok-fg)}
+
+.badge-nomers { background:var(--nomers-bg);
+                color:var(--nomers-fg);
+                border:1px solid var(--nomers-fg)}
+
+.badge-pending { background:var(--pending-bg);
+                color:var(--pending-fg);
+                border:1px solid var(--pending-fg)}
+
+/* ═══════════════════════════════════════════════════════════════════
    RESPONSIVE MOBILE  (≤ 768px)
    ═══════════════════════════════════════════════════════════════════ */
 
@@ -1111,12 +1131,9 @@ td.col-hof-pos      { text-align: center; width: 3.5rem; }
     transition: opacity 0.15s;
   }
 
-  .regles-toggle, .lang-picker, .theme-toggle { order: 2; }
+  .nav-controls { order: 2; }
 
-  /* ── Layout général ──────────────────────────────────────────── */
-  main { margin: 0.75rem auto; padding: 0 0.5rem; }
-  h1   { font-size: 1.25rem; }
-  h2   { font-size: 1.05rem; margin: 1rem 0 0.5rem; }
+
 
   /* ── Sticky → static sur mobile ─────────────────────────────── */
   .ranking-header { position: static; }

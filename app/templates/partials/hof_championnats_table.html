@@ -3,7 +3,7 @@
      championnats — liste de (Resultat, Tournoi, Joueur)
 #}
 <div class="scroll-table">
-<table style="table-layout:fixed;width:100%">
+<table>
   <colgroup>
     <col class="col-joueur-nom"><col class="col-pos"><col class="col-flag">
     <col><col class="col-hof-total"><col class="col-ema">
@@ -19,12 +19,12 @@
     <tr class="{% if trn.type_tournoi in ['wmc','wrc'] %}row-wmc{% else %}row-oemc{% endif %}">
       <td class="nowrap">
         <a href="/tournois/{{ trn.regles }}_{{ trn.ema_id }}">{{ trn.nom[:28] }}</a>
-        {% if trn.type_tournoi == 'wmc' %}<span class="badge badge-gold">WMC</span>
-        {% elif trn.type_tournoi == 'wrc' %}<span class="badge badge-gold">WRC</span>
+        {% if trn.type_tournoi == 'wmc' %}<span class="badge badge-wmc">WMC</span>
+        {% elif trn.type_tournoi == 'wrc' %}<span class="badge badge-wmc">WRC</span>
         {% elif trn.type_tournoi == 'oerc' %}<span class="badge">OERC</span>
         {% else %}<span class="badge">OEMC</span>{% endif %}
       </td>
-      <td class="td-pos">
+      <td class="col-pos">
         <span class="pos-medal">{% if r.position == 1 %}🥇{% elif r.position == 2 %}🥈{% elif r.position == 3 %}🥉{% endif %}</span>
         <span class="pos-score">{{ r.position }}</span>
       </td>

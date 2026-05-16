@@ -44,39 +44,39 @@
 {% endmacro %}
 
 <div class="scroll-table">
-<table class="joueurs-table" style="table-layout:fixed;width:100%">
+<table class="joueurs-table">
   <colgroup>
-    <col class="col-flag">
+    <col class="col-flag col-opt">
     <col class="col-nom">       <!-- Nom -->
     <col class="col-prenom">    <!-- Prénom -->
-    <col class="col-date-lg">     <!-- Début -->
-    <col class="col-joueurs-sort">
-    <col class="col-joueurs-sort">
-    <col class="col-joueurs-sort">
+    <col class="col-date-lg col-opt">     <!-- Début -->
+    <col class="col-joueurs-sort col-opt">
+    <col class="col-joueurs-sort col-opt">
+    <col class="col-joueurs-sort col-opt">
   </colgroup>
   <thead>
     <tr>
-      {{ th_sort('nationalite', '🌍',    'col-flag center') }}
+      {{ th_sort('nationalite', '🌍',    'col-flag col-opt center') }}
       {{ th_sort('nom',         trad('common.nom'),            'col-nom') }}
       {{ th_sort('prenom',      trad('common.prenom'),         'col-prenom') }}
-      {{ th_sort('premier',     trad('joueurs.debut'),         'col-date-lg center') }}
-      {{ th_sort_badge('nb_mcr', 'badge-mcr', 'col-joueurs-sort center') }}
-      {{ th_sort_badge('nb_rcr', 'badge-rcr', 'col-joueurs-sort center') }}
-      {{ th_sort('nb_total',    trad('common.tous'),           'col-joueurs-sort center') }}
+      {{ th_sort('premier',     trad('joueurs.debut'),         'col-date-lg col-opt center') }}
+      {{ th_sort_badge('nb_mcr', 'badge-mcr', 'col-joueurs-sort col-opt center') }}
+      {{ th_sort_badge('nb_rcr', 'badge-rcr', 'col-joueurs-sort col-opt center') }}
+      {{ th_sort('nb_total',    trad('common.tous'),           'col-joueurs-sort col-opt center') }}
     </tr>
   </thead>
   <tbody>
     {% for row in joueurs %}
     {% set j = row.joueur %}
     <tr {% if _apercu %}class="ranking-row" onclick="loadApercu('{{ j.id }}', this)"{% endif %}>
-      <td class="col-flag">{{ j.nationalite | flag_link('joueurs') }}</td>
+      <td class="col-flag col-opt">{{ j.nationalite | flag_link('joueurs') }}</td>
       <td class="col-nom">
         <span class="mobile-flag">{{ j.nationalite | flag_link('joueurs') }}</span> <a href="/joueurs/{{ j.id }}" {% if _apercu %}onclick="event.stopPropagation()"{% endif %}>{{ j.nom | title }}</a></td>
       <td class="col-prenom">{{ j.prenom | prenom }}</td>
-      <td class="col-date-lg center dim" style="font-size:0.82rem">{{ row.premier.strftime('%d/%m/%Y') if row.premier else '—' }}</td>
-      <td class="col-joueurs-sort center {% if row.nb_mcr %}rank-num{% else %}dim{% endif %}">{{ row.nb_mcr or '—' }}</td>
-      <td class="col-joueurs-sort center {% if row.nb_rcr %}rank-num{% else %}dim{% endif %}">{{ row.nb_rcr or '—' }}</td>
-      <td class="col-joueurs-sort center" style="font-weight:600">{{ row.nb_total }}</td>
+      <td class="col-date-lg col-opt center dim" style="font-size:0.82rem">{{ row.premier.strftime('%d/%m/%Y') if row.premier else '—' }}</td>
+      <td class="col-joueurs-sort col-opt center {% if row.nb_mcr %}rank-num{% else %}dim{% endif %}">{{ row.nb_mcr or '—' }}</td>
+      <td class="col-joueurs-sort col-opt center {% if row.nb_rcr %}rank-num{% else %}dim{% endif %}">{{ row.nb_rcr or '—' }}</td>
+      <td class="col-joueurs-sort col-opt center" style="font-weight:600">{{ row.nb_total }}</td>
     </tr>
     {% else %}
     <tr><td colspan="7" class="empty">{{ trad('common.aucun_joueur') }}</td></tr>

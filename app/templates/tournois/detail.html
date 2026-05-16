@@ -8,8 +8,8 @@
       <span>{{ tournoi.pays | pays_flag_link('tournois') }} {{ tournoi.lieu }}</span>
       <span class="dim">{{ tournoi.date_debut.strftime('%d/%m/%Y') }} → {{ tournoi.date_fin.strftime('%d/%m/%Y') }}</span>
       <span class="badge {% if tournoi.regles == 'MCR' %}badge-mcr{% else %}badge-rcr{% endif %}">{{ tournoi.regles }}</span>
-      {% if tournoi.type_tournoi == 'wmc' %}<span class="badge badge-gold">WMC</span>
-      {% elif tournoi.type_tournoi == 'wrc' %}<span class="badge badge-gold">WRC</span>
+      {% if tournoi.type_tournoi == 'wmc' %}<span class="badge badge-wmc">WMC</span>
+      {% elif tournoi.type_tournoi == 'wrc' %}<span class="badge badge-wmc">WRC</span>
       {% elif tournoi.type_tournoi == 'oemc' %}<span class="badge">OEMC</span>
       {% elif tournoi.type_tournoi == 'oerc' %}<span class="badge">OERC</span>{% endif %}
       {% if resultats_incomplets %}
@@ -45,11 +45,11 @@
 <div class="ranking-left">
 <h2>{{ trad('detail_tournoi.resultats') }}</h2>
 <div class="scroll-table">
-<table style="table-layout:fixed;width:100%">
+<table>
   <colgroup>
     <col class="col-pos">
-    <col class="col-ema-id">
-    <col class="col-flag">
+    <col class="col-ema-id col-opt">
+    <col class="col-flag col-opt">
     <col class="col-nom">
     {% if is_mcr %}<col class="col-pts">{% endif %}
     <col class="col-mahj">
@@ -58,8 +58,8 @@
   <thead>
     <tr>
       <th class="center" title="{{ trad('detail_tournoi.position_title') }}">🏅</th>
-      <th class="col-ema-id"></th>
-      <th class="col-flag center" title="{{ trad('common.pays') }}">🌍</th>
+      <th class="col-ema-id col-opt"></th>
+      <th class="col-flag col-opt center" title="{{ trad('common.pays') }}">🌍</th>
       <th class="col-nom">{{ trad('common.joueurs') }}</th>
       {% if is_mcr %}<th class="col-pts right" title="{{ trad('detail_tournoi.points_title') }}">{{ trad('detail_tournoi.points') }}</th>{% endif %}
       <th class="col-mahj right" title="{{ trad('detail_tournoi.score_mcr_title') if is_mcr else trad('common.score') }}">{{ trad('common.score') }}</th>
@@ -69,14 +69,14 @@
   <tbody>
     {% for r in resultats %}
     <tr class="{% if r.anonyme %}row-anonyme{% elif r.position == 1 %}row-top1{% elif r.position == 2 %}row-top2{% elif r.position == 3 %}row-top3{% endif %}">
-      <td class="td-pos">
+      <td class="col-pos">
         <span class="pos-medal">{% if r.position == 1 %}🥇{% elif r.position == 2 %}🥈{% elif r.position == 3 %}🥉{% else %}{{ r.position }}{% endif %}</span>
       </td>
-      <td class="col-ema-id">
+      <td class="col-ema-id col-opt">
         {% if r.joueur %}<a href="/joueurs/{{ r.joueur.id }}">{{ r.joueur.id }}</a>
         {% else %}<span class="dim">—</span>{% endif %}
       </td>
-      <td class="col-flag center">
+      <td class="col-flag col-opt center">
         {% if r.nationalite %}{{ r.nationalite | flag_link('joueurs') }}{% endif %}
       </td>
       <td class="col-nom">

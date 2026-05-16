@@ -64,45 +64,45 @@
   {% for regles_key, equipes in [('mcr', equipes_mcr), ('rcr', equipes_rcr)] %}
   <div id="cl-tab-{{ regles_key }}" class="tab-content {% if regles_key != 'mcr' %}hidden{% endif %}">
     <div class="scroll-table">
-    <table style="table-layout:fixed;width:100%">
+    <table>
       <colgroup>
         <col class="col-pos">
-        <col class="col-flag">
+        <col class="col-flag col-opt">
         <col class="col-pays-nom">
-        <col class="col-score">
-        <col class="col-pays-medailles"><col class="col-pays-medailles"><col class="col-pays-medailles">
+        <col class="col-score col-opt">
+        <col class="col-pays-medailles col-opt"><col class="col-pays-medailles col-opt"><col class="col-pays-medailles col-opt">
       </colgroup>
       <thead>
         <tr>
-          <th class="th-rank">#</th>
-          <th class="col-flag center">🌍</th>
+          <th class="col-pos">#</th>
+          <th class="col-flag col-opt center">🌍</th>
           <th class="col-pays-nom">{{ trad('common.pays') }}</th>
-          <th class="col-score right" title="{{ trad('pays.score_title') }}">{{ trad('common.score') }}</th>
-          <th class="col-pays-medailles center">🥇 {{ trad('common.joueurs') }}</th>
-          <th class="col-pays-medailles center">🥈 {{ trad('common.joueurs') }}</th>
-          <th class="col-pays-medailles center">🥉 {{ trad('common.joueurs') }}</th>
+          <th class="col-score col-opt right" title="{{ trad('pays.score_title') }}">{{ trad('common.score') }}</th>
+          <th class="col-pays-medailles col-opt center">🥇 {{ trad('common.joueurs') }}</th>
+          <th class="col-pays-medailles col-opt center">🥈 {{ trad('common.joueurs') }}</th>
+          <th class="col-pays-medailles col-opt center">🥉 {{ trad('common.joueurs') }}</th>
         </tr>
       </thead>
       <tbody>
         {% for e in equipes %}
         <tr class="{% if e.rang <= 3 %}row-top{{ e.rang }}{% endif %}">
-          <td class="td-rank">
+          <td class="col-pos">
             {% if e.rang == 1 %}🥇{% elif e.rang == 2 %}🥈{% elif e.rang == 3 %}🥉
             {% else %}<span class="rank-num">{{ e.rang }}</span>{% endif %}
           </td>
-          <td class="col-flag center" style="font-size:1.2rem">{{ e.code | flag }}</td>
+          <td class="col-flag col-opt center" style="font-size:1.2rem">{{ e.code | flag }}</td>
           <td class="col-pays-nom"><span class="mobile-flag">{{ e.code | flag }} </span><a href="/pays/{{ e.code }}">{{ e.nom }}</a></td>
-          <td class="col-score right score-val">{{ e.score_equipe }}</td>
+          <td class="col-score col-opt right score-val">{{ e.score_equipe }}</td>
           {% for i in range(3) %}
           {% if i < e.top3 | length %}{% set j = e.top3[i] %}
-          <td class="col-pays-medailles center" style="font-size:0.82rem">
+          <td class="col-pays-medailles col-opt center" style="font-size:0.82rem">
             <a href="/joueurs/{{ j.joueur_id }}" title="#{{ j.position }} mondial · {{ j.score }} pts">
               {{ j.prenom | prenom }} {{ j.nom | title }}
             </a>
             <span class="dim" style="display:block;font-size:0.75rem">#{{ j.position }} · {{ j.score }}</span>
           </td>
           {% else %}
-          <td class="col-pays-medailles center dim">—</td>
+          <td class="col-pays-medailles col-opt center dim">—</td>
           {% endif %}
           {% endfor %}
         </tr>
@@ -119,31 +119,31 @@
      ══════════════════════════════════════════════════════════════════════ -->
 <div id="tab-liste" class="tab-content {% if onglet == 'classement' %}hidden{% endif %}">
   <div class="scroll-table">
-  <table style="table-layout:fixed;width:100%">
+  <table>
     <colgroup>
-      <col class="col-flag">
+      <col class="col-flag col-opt">
       <col class="col-pays-nom">
       <col class="col-pays-joueurs">
-      <col class="col-pays-tournois">
+      <col class="col-pays-tournois col-opt">
     </colgroup>
     <thead>
       <tr>
-        <th class="col-flag center">🌍</th>
+        <th class="col-flag col-opt center">🌍</th>
         <th class="col-pays-nom">{{ trad('common.pays') }}</th>
         <th class="col-pays-joueurs center" title="{{ trad('pays.joueurs_actifs_title') }}">{{ trad('common.joueurs') }}</th>
-        <th class="col-pays-tournois center">{{ trad('pays.tournois_org_abbr') }}</th>
+        <th class="col-pays-tournois col-opt center">{{ trad('pays.tournois_org_abbr') }}</th>
       </tr>
     </thead>
     <tbody>
       {% for p in pays_list %}
       <tr>
-        <td class="col-flag center" style="font-size:1.3rem">{{ p.code | flag }}</td>
+        <td class="col-flag col-opt center" style="font-size:1.3rem">{{ p.code | flag }}</td>
         <td class="col-pays-nom"><a href="/pays/{{ p.code }}">{{ p.nom }}</a></td>
         <td class="col-pays-joueurs center">
           <span class="rank-num">{{ p.nb_actifs }}</span>
           <span class="dim" style="font-size:0.8rem"> / {{ p.nb_joueurs }}</span>
         </td>
-        <td class="col-pays-tournois center {% if p.nb_tournois %}rank-num{% else %}dim{% endif %}">
+        <td class="col-pays-tournois col-opt center {% if p.nb_tournois %}rank-num{% else %}dim{% endif %}">
           {{ p.nb_tournois or '—' }}
         </td>
       </tr>

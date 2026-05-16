@@ -7,36 +7,36 @@
 {% macro records_table(rows, score_key) %}
 {% if rows %}
 <div class="scroll-table">
-<table class="hof-records-table" style="table-layout:fixed;width:100%">
+<table class="hof-records-table">
   <colgroup>
     <col class="col-pos">
-    <col class="col-flag">
+    <col class="col-flag col-opt">
     <col class="col-joueur-nom">
     <col class="col-hof-total">
-    <col class="col-nom">
-    <col class="col-date-opt">
+    <col class="col-nom col-opt">
+    <col class="col-date-opt col-opt">
   </colgroup>
   <thead>
     <tr>
       <th class="col-pos center">#</th>
-      <th class="col-flag center">🌍</th>
+      <th class="col-flag col-opt center">🌍</th>
       <th class="col-joueur-nom">{{ trad('hallfame.records_joueur') }}</th>
       <th class="col-hof-total right">{{ trad('hallfame.records_score') }}</th>
-      <th class="col-nom">{{ trad('hallfame.records_tournoi') }}</th>
-      <th class="col-date-opt center">{{ trad('hallfame.records_date') }}</th>
+      <th class="col-nom col-opt">{{ trad('hallfame.records_tournoi') }}</th>
+      <th class="col-date-opt col-opt center">{{ trad('hallfame.records_date') }}</th>
     </tr>
   </thead>
   <tbody>
     {% for row in rows %}
     <tr class="{% if loop.index == 1 %}row-top1{% elif loop.index == 2 %}row-top2{% elif loop.index == 3 %}row-top3{% endif %}">
       <td class="col-pos center rank-num">{{ loop.index }}</td>
-      <td class="col-flag">{{ row.joueur.nationalite | flag_link('joueurs') }}</td>
+      <td class="col-flag col-opt">{{ row.joueur.nationalite | flag_link('joueurs') }}</td>
       <td class="col-joueur-nom"><span class="mobile-flag">{{ row.joueur.nationalite | flag_link('joueurs') }}</span><a href="/joueurs/{{ row.joueur.id }}">{{ row.joueur.prenom | prenom }} {{ row.joueur.nom | title }}</a></td>
       <td class="col-hof-total right rank-num">{{ row[score_key] }}</td>
-      <td class="col-nom" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+      <td class="col-nom col-opt" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
         <a href="/tournois/{{ row.tournoi_regles }}_{{ row.tournoi_ema_id }}" title="{{ row.tournoi_nom }}">{{ row.tournoi_nom[:30] }}</a>
       </td>
-      <td class="col-date-opt center dim">{{ row.date.strftime('%d/%m/%Y') if row.date.year != 1900 else '—' }}</td>
+      <td class="col-date-opt col-opt center dim">{{ row.date.strftime('%d/%m/%Y') if row.date.year != 1900 else '—' }}</td>
     </tr>
     {% endfor %}
   </tbody>

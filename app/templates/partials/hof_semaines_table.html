@@ -5,17 +5,17 @@
    Dépendances JS : sortTable() et le tri DOMContentLoaded définis dans hallfame.html
 #}
 <div class="scroll-table">
-<table id="{{ table_id if table_id is defined else 'hof-table' }}" class="hof-table" style="table-layout:fixed;width:100%">
+<table id="{{ table_id if table_id is defined else 'hof-table' }}" class="hof-table">
   <colgroup>
-    <col class="col-pos"><col class="col-flag"><col class="col-joueur-nom">
+    <col class="col-pos"><col class="col-flag col-opt"><col class="col-joueur-nom col-sticky-left">
     <col class="col-hof-sem"><col class="col-hof-podium">
     <col class="col-hof-sem"><col class="col-hof-sem"><col>
   </colgroup>
   <thead>
     <tr>
       <th class="col-pos center">#</th>
-      <th class="col-flag center">🌍</th>
-      <th class="col-joueur-nom">{{ trad('common.joueurs') }}</th>
+      <th class="col-flag col-opt center">🌍</th>
+      <th class="col-joueur-nom col-sticky-left">{{ trad('common.joueurs') }}</th>
       {% set _tid = table_id if table_id is defined else 'hof-table' %}
       <th class="col-hof-sem center sortable" onclick="sortTable(3,'{{ _tid }}')" title="{{ trad('hallfame.semaines_1_title') }}">🥇 <span class="sort-icon">⇅</span></th>
       <th class="col-hof-podium center sortable" onclick="sortTable(4,'{{ _tid }}')" title="{{ trad('hallfame.podium_title') }}">{{ trad('hallfame.podium_title') }} <span class="sort-icon">⇅</span></th>
@@ -28,8 +28,8 @@
     {% for d in data %}
     <tr>
       <td class="col-pos center rank-num">{{ loop.index }}</td>
-      <td class="col-flag center">{{ d.joueur.nationalite | flag_link('classement') }}</td>
-      <td class="col-joueur-nom"><span class="mobile-flag">{{ d.joueur.nationalite | flag_link('classement') }}</span><a href="/joueurs/{{ d.joueur.id }}">{{ d.joueur.prenom | prenom }} {{ d.joueur.nom | title }}</a></td>
+      <td class="col-flag col-opt center">{{ d.joueur.nationalite | flag_link('classement') }}</td>
+      <td class="col-joueur-nom col-sticky-left"><span class="mobile-flag">{{ d.joueur.nationalite | flag_link('classement') }}</span><a href="/joueurs/{{ d.joueur.id }}">{{ d.joueur.prenom | prenom }} {{ d.joueur.nom | title }}</a></td>
       <td class="col-hof-sem center" data-val="{{ d.nb_or }}">{% if d.nb_or %}<strong>{{ d.nb_or }}</strong>{% else %}<span class="dim">—</span>{% endif %}</td>
       <td class="col-hof-podium center" data-val="{{ d.nb_bronze }}">{{ d.nb_bronze or '—' }}</td>
       <td class="col-hof-sem center" data-val="{{ d.nb_top10 }}">{{ d.nb_top10 or '—' }}</td>

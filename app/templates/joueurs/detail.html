@@ -53,30 +53,30 @@
     <a id="ville-badge-link-{{ regles }}" href="#" class="ville-badge-link">Voir tous les tournois de <span></span> →</a>
   </div>
   <h2>{{ trad('joueur_detail.tournois_section') }} {{ regles | upper }}</h2>
-  <div class="scroll-table"><table style="table-layout:fixed;width:100%">
+  <div class="scroll-table"><table>
     <colgroup>
       <col class="col-date-lg">
-      <col class="col-duree">
-      <col class="col-ville">
-      <col>
-      <col class="col-coeff">
-      <col class="col-contrib">
+      <col class="col-duree col-opt">
+      <col class="col-ville col-opt">
+      <col class="col-tournoi">
+      <col class="col-coeff col-opt">
+      <col class="col-contrib col-opt">
       <col class="col-pos-lg">
-      {% if regles == 'mcr' %}<col class="col-pts">{% endif %}
-      <col class="col-mahj">
+      {% if regles == 'mcr' %}<col class="col-pts col-opt">{% endif %}
+      <col class="col-mahj col-opt">
       <col class="col-ema">
     </colgroup>
     <thead>
       <tr>
         <th class="col-date-lg">{{ trad('common.date') }}</th>
-        <th class="col-duree" title="{{ trad('common.duree') }}">🗓️</th>
-        <th class="col-ville">{{ trad('common.ville') }}</th>
-        <th>{{ trad('common.tournoi') }}</th>
-        <th class="col-coeff center" title="{{ trad('common.coeff_title') }}">⚖️</th>
-        <th class="col-contrib center" title="{{ trad('tournois.contribution_title') }}">⏱️</th>
-        <th class="col-pos-lg th-pos" title="{{ trad('detail_tournoi.position_title') }}">🏅</th>
-        {% if regles == 'mcr' %}<th class="col-pts right" title="{{ trad('detail_tournoi.points_title') }}">{{ trad('detail_tournoi.points') }}</th>{% endif %}
-        <th class="col-mahj right" title="{{ trad('detail_tournoi.score_mcr_title') if regles == 'mcr' else trad('common.score') }}">#</th>
+        <th class="col-duree col-opt" title="{{ trad('common.duree') }}">🗓️</th>
+        <th class="col-ville col-opt">{{ trad('common.ville') }}</th>
+        <th class="col-tournoi">{{ trad('common.tournoi') }}</th>
+        <th class="col-coeff col-opt center" title="{{ trad('common.coeff_title') }}">⚖️</th>
+        <th class="col-contrib col-opt center" title="{{ trad('tournois.contribution_title') }}">⏱️</th>
+        <th class="col-pos-lg" title="{{ trad('detail_tournoi.position_title') }}">🏅</th>
+        {% if regles == 'mcr' %}<th class="col-pts col-opt right" title="{{ trad('detail_tournoi.points_title') }}">{{ trad('detail_tournoi.points') }}</th>{% endif %}
+        <th class="col-mahj col-opt right" title="{{ trad('detail_tournoi.score_mcr_title') if regles == 'mcr' else trad('common.score') }}">#</th>
         <th class="col-sticky" title="{{ trad('detail_tournoi.ema_pts_title') }}">EMA</th>
       </tr>
     </thead>
@@ -85,35 +85,35 @@
       <tr class="t-joueur-row {% if trn.actif %}row-actif{% endif %} {% if trn.type in ['wmc','wrc'] %}row-wmc{% elif trn.type in ['oemc','oerc'] %}row-oemc{% endif %}{% if not trn.actif %} row-inactif row-inactif-{{ regles }} hidden{% endif %}"
           data-ville="{{ trn.lieu }}" data-regles="{{ regles | upper }}">
         <td class="col-date-lg">{{ trn.date.strftime('%d/%m/%Y') if trn.date.year != 1900 else '—' }}</td>
-        <td class="col-duree center">{{ trn.duree }}j</td>
-        <td class="col-ville nowrap">
+        <td class="col-duree col-opt center">{{ trn.duree }}j</td>
+        <td class="col-ville col-opt nowrap">
           {{ trn.pays | pays_flag_link('tournois') }}
           <span class="t-ville" onclick="filtreJoueurVille('{{ trn.lieu }}', '{{ regles | upper }}', this)">{{ trn.lieu }}</span>
           {% if trn.nat_tournoi != joueur.nationalite %}
           <span title="Nationalité lors du tournoi : {{ trn.nat_tournoi }}">{{ trn.nat_tournoi | flag_link('joueurs') }}</span>
           {% endif %}
         </td>
-        <td>
+        <td class="col-tournoi">
           <a href="/tournois/{{ regles | upper }}_{{ trn.ema_id }}">{{ trn.nom }}</a>
-          {% if trn.type == 'oemc' %}<span class="badge">OEMC</span>
-          {% elif trn.type == 'oerc' %}<span class="badge">OERC</span>
-          {% elif trn.type == 'wmc' %}<span class="badge badge-gold">WMC</span>
-          {% elif trn.type == 'wrc' %}<span class="badge badge-gold">WRC</span>{% endif %}
+          {% if trn.type == 'oemc' %}<span class="badge badge-oemc">OEMC</span>
+          {% elif trn.type == 'oerc' %}<span class="badge badge-oemc">OERC</span>
+          {% elif trn.type == 'wmc' %}<span class="badge badge-wmc">WMC</span>
+          {% elif trn.type == 'wrc' %}<span class="badge badge-wmc">WRC</span>{% endif %}
         </td>
         {% set hors_cl = trn.type in ['wmc', 'wrc'] %}
-        <td class="col-coeff center">{% if not hors_cl %}{{ trn.coeff }}{% else %}<span class="dim">—</span>{% endif %}</td>
-        <td class="col-contrib center">
+        <td class="col-coeff col-opt center">{% if not hors_cl %}{{ trn.coeff }}{% else %}<span class="dim">—</span>{% endif %}</td>
+        <td class="col-contrib col-opt center">
           {% if hors_cl %}<span class="dim">—</span>
           {% elif trn.contrib == 1.0 %}<span class="contrib-100">100%</span>
           {% elif trn.contrib == 0.5 %}<span class="contrib-50">50%</span>
           {% else %}<span class="dim">—</span>{% endif %}
         </td>
-        <td class="col-pos-lg td-pos">
+        <td class="col-pos-lg">
           <span class="pos-medal">{% if trn.position == 1 %}🥇{% elif trn.position == 2 %}🥈{% elif trn.position == 3 %}🥉{% endif %}</span>
           <span class="pos-score">{{ trn.position }}/{{ trn.nb_joueurs }}</span>
         </td>
-        {% if regles == 'mcr' %}<td class="col-pts right">{{ trn.points }}</td>{% endif %}
-        <td class="col-mahj right">{{ trn.mahjong }}</td>
+        {% if regles == 'mcr' %}<td class="col-pts col-opt right">{{ trn.points }}</td>{% endif %}
+        <td class="col-mahj col-opt right">{{ trn.mahjong }}</td>
         <td class="col-ema col-sticky ema-pts" {% if not hors_cl %}style="{{ trn.ranking | ema_color }}"{% endif %}>
           {% if not hors_cl %}{{ trn.ranking }}{% else %}<span class="dim">—</span>{% endif %}
         </td>
