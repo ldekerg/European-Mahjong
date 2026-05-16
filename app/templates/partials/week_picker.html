@@ -12,9 +12,11 @@
 #}
 {% set _qs = qs_extra if qs_extra is defined else '' %}
 <div class="date-nav">
+  <!-- Le bouton "aujourd'hui" introduit un bug car la semaine courante n'est pas encore calculée
   <a href="{{ base_url }}{{ _qs | replace('&', '?', 1) }}" class="nav-arrow nav-today">
     ⟳ {{ aujourd_hui.strftime('%d/%m/%Y') }}
   </a>
+  -->
 
   {% if semaine_prev %}
   <a href="{{ base_url }}?semaine={{ semaine_prev }}{{ _qs }}" class="nav-arrow">◀</a>
@@ -30,7 +32,7 @@
       {% for grp in semaines_dispo %}
       <div class="week-group">
         <div class="week-group-label">{{ grp.annee }}</div>
-        {% for s in grp.semaines %}
+        {% for s in grp.semaines if s != semaine_actuelle %}
         <a class="week-option {% if s.date == semaine %}active{% endif %}"
            href="{{ base_url }}?semaine={{ s.date.isoformat() }}{{ _qs }}">
           #{{ s.num }} — {{ s.date.strftime('%d/%m/%Y') }}

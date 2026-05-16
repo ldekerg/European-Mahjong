@@ -1178,3 +1178,51 @@ caption.t-count {
   .chart-section canvas { max-height: 160px; }
 
 }
+
+
+.site-warning {
+    position: sticky;
+    top: 58px; /* hauteur approximative de la navbar */
+
+    z-index: 40;
+
+    background: #d97706;
+    color: white;
+
+    padding: 0.5rem 1rem;
+
+    text-align: center;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.site-warning a {
+    color: white;
+    font-weight: 700;
+    text-decoration: underline;
+}
+
+.site-warning a:hover {
+    opacity: 0.9;
+}
+
+@media (max-width: 768px) {
+
+  .site-warning {
+    position: static;
+
+    padding: 0.55rem 0.75rem;
+
+    font-size: 0.8rem;
+    line-height: 1.35;
+
+    text-align: center;
+  }
+
+  .site-warning a {
+    display: inline-block;
+    margin-top: 0.25rem;
+    word-break: break-word;
+  }
+
+}
