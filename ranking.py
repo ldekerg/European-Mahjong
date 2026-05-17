@@ -49,8 +49,8 @@ def contribution(date_debut_tournoi: date, semaine_cible: date) -> float:
     """
     debut = semaine_debut_tournoi(date_debut_tournoi)
 
-    # Le tournoi compte à partir de la semaine APRÈS semaine_debut (strict)
-    if semaine_cible <= debut:
+    # Le tournoi compte à partir de semaine_debut (X+1) inclus
+    if semaine_cible < debut:
         return 0.0
 
     n = semaines_actives(debut, semaine_cible)
@@ -74,6 +74,7 @@ def tournois_actifs(db: Session, semaine_cible: date, regles: str):
         .filter(
             Tournoi.regles == regles,
             Tournoi.type_tournoi.notin_(["wmc", "wrc"]),
+            Tournoi.ema_id.isnot(None),
             Tournoi.date_debut >= limite_basse,
             Tournoi.date_debut != date(1900, 1, 1),
         )

@@ -18,11 +18,30 @@ exec >> "$LOG" 2>&1
 
 echo "=== Mise à jour hebdomadaire EMA — $(date) ==="
 
-# Importe les 30 derniers IDs MCR et RCR (couvre les nouveaux tournois)
-echo "--- MCR : 30 derniers IDs ---"
-$PYTHON import_ema.py --start 425 --end 454 
-echo "--- RCR : 30 derniers IDs ---"
-$PYTHON import_ema.py --prefix TR_RCR --start 383 --end 412 
+# Calcule dynamiquement les IDs à partir du dernier en base + 10 de marge
+MCR_MAX=$($PYTHON -c "
+import sys, os; sys.path.insert(0, '..')
+from database import SessionLocal; from models import Tournoi
+db = SessionLocal()
+t = db.query(Tournoi).filter(Tournoi.regles=='MCR', Tournoi.ema_id < 1000000).order_by(Tournoi.ema_id.desc()).first()
+print(t.ema_id if t else 0)
+")
+RCR_MAX=$($PYTHON -c "
+import sys, os; sys.path.insert(0, '..')
+from database import SessionLocal; from models import Tournoi
+db = SessionLocal()
+t = db.query(Tournoi).filter(Tournoi.regles=='RCR', Tournoi.ema_id < 1000000).order_by(Tournoi.ema_id.desc()).first()
+print(t.ema_id if t else 0)
+")
+MCR_START=$((MCR_MAX + 1))
+MCR_END=$((MCR_MAX + 10))
+RCR_START=$((RCR_MAX + 1))
+RCR_END=$((RCR_MAX + 10))
+
+echo "--- MCR : IDs $MCR_START à $MCR_END ---"
+$PYTHON import_ema.py --start $MCR_START --end $MCR_END
+echo "--- RCR : IDs $RCR_START à $RCR_END ---"
+$PYTHON import_ema.py --prefix TR_RCR --start $RCR_START --end $RCR_END
 echo "--- Calendrier ---"
 $PYTHON import_calendar.py
 
