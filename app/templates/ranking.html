@@ -2,7 +2,7 @@
 {% block content %}
 
 <div class="ranking-header">
-  <h1>EMA Ranking</h1>
+  <h1>EMA Ranking <a href="/formulas" class="info-link dim">{{ trad('ranking.formulas_link') }}</a></h1>
   <div class="date-nav">
       <!-- Le bouton "aujourd'hui" introduit un bug car la semaine courante n'est pas encore calculée
     <a href="/ranking{% if selected_player %}?player={{ selected_player }}{% endif %}" class="nav-arrow nav-today">

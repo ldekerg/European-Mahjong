@@ -377,6 +377,7 @@ a { color: var(--accent); }
 
 /* Titles */
 h1 { font-size: 1.6rem; margin-bottom: 1rem; }
+h1 .info-link { font-size: 0.78rem; font-weight: 400; opacity: 0.55; margin-left: 0.5rem; vertical-align: middle; white-space: nowrap; }
 h2 { font-size: 1.2rem; margin: 1.5rem 0 0.75rem; }
 
 

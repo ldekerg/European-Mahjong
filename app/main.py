@@ -12,6 +12,7 @@ from app.database import engine, SessionLocal, get_db
 import app.models as models
 from app.routes import players, tournaments, hof, championships
 from app.routes import countries
+from app.routes import formulas
 from app.i18n import templates
 from app.models import RankingHistory, Player
 from app.ranking import week_monday, ranking
@@ -27,6 +28,7 @@ app.include_router(tournaments.router)
 app.include_router(hof.router)
 app.include_router(countries.router)
 app.include_router(championships.router)
+app.include_router(formulas.router)
 
 
 def get_rank_delta(db: Session, week: date, regles: str) -> dict:

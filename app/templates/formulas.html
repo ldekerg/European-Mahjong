@@ -1,0 +1,326 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="ranking-header">
+  <h1>{{ trad('nav.formulas') }}</h1>
+</div>
+
+<div style="max-width:780px;margin:0 auto;padding:0 1rem 3rem">
+
+  <!-- ── Notes & warnings ─────────────────────────────────────── -->
+  <section id="notes" style="margin-bottom:2.5rem">
+    <h2 style="border-bottom:2px solid var(--accent);padding-bottom:0.4rem;margin-bottom:1rem">
+      {{ trad('formulas.notes_title') }}
+    </h2>
+
+    <div class="note-block note-inferred">
+      <div class="note-label">💡 {{ trad('formulas.note_inferred_label') }}</div>
+      <ul>
+        <li id="note-tiebreak">{{ trad('formulas.note_inferred_tiebreak') }}</li>
+        <li id="note-covid-dates">{{ trad('formulas.note_inferred_covid') }}</li>
+      </ul>
+    </div>
+
+    <div class="note-block note-divergence" style="margin-top:1rem">
+      <div class="note-label">⚠ {{ trad('formulas.note_divergence_label') }}</div>
+      <ul>
+        <li id="note-weekly">{{ trad('formulas.note_divergence_weekly') }}</li>
+        <li id="note-104">{{ trad('formulas.note_divergence_104') }}</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ── 1. Tournament EMA points ─────────────────────────────── -->
+  <section style="margin-bottom:2.5rem">
+    <h2 style="border-bottom:2px solid var(--accent);padding-bottom:0.4rem;margin-bottom:1rem">
+      {{ trad('formulas.tournament_score_title') }}
+    </h2>
+    <p>{{ trad('formulas.tournament_score_intro') }}</p>
+
+    <div class="formula-box">
+      <span class="formula-math">EMA = (N &minus; position) / (N &minus; 1) &times; 1000</span>
+    </div>
+
+    <ul style="margin:0.75rem 0 0.75rem 1.2rem;line-height:1.8">
+      <li><strong>N</strong> — {{ trad('formulas.var_n') }}</li>
+      <li><strong>position</strong> — {{ trad('formulas.var_pos') }}</li>
+    </ul>
+    <p>{{ trad('formulas.tournament_score_examples') }}</p>
+    <div class="scroll-table" style="margin-top:0.5rem">
+    <table>
+      <thead>
+        <tr>
+          <th>{{ trad('formulas.col_position') }}</th>
+          <th>N = 40</th>
+          <th>N = 80</th>
+          <th>N = 120</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>1 <span class="dim"></span></td><td>1000</td><td>1000</td><td>1000</td></tr>
+        <tr><td>10</td><td>769</td><td>873</td><td>916</td></tr>
+        <tr><td>25 <span class="dim"></span></td><td>359</td><td>696</td><td>798</td></tr>
+        <tr><td>{{ trad('formulas.last') }}</td><td>0</td><td>0</td><td>0</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </section>
+
+  <!-- ── 2. Tournament coefficient ────────────────────────────── -->
+  <section style="margin-bottom:2.5rem">
+    <h2 style="border-bottom:2px solid var(--accent);padding-bottom:0.4rem;margin-bottom:1rem">
+      {{ trad('formulas.coefficient_title') }}
+    </h2>
+    <p>{{ trad('formulas.coefficient_intro') }}</p>
+
+    <div class="formula-box">
+      <span class="formula-math">{{ trad('formulas.formula_coeff') }}</span>
+    </div>
+
+    <div class="scroll-table" style="margin-top:0.75rem">
+    <table>
+      <thead>
+        <tr>
+          <th>{{ trad('formulas.criterion') }}</th>
+          <th>{{ trad('formulas.condition') }}</th>
+          <th>{{ trad('formulas.bonus') }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td rowspan="3">{{ trad('formulas.duration') }}</td><td>1 {{ trad('formulas.day') }}</td><td>+1</td></tr>
+        <tr><td>2 {{ trad('formulas.days') }}</td><td>+2</td></tr>
+        <tr><td>≥ 3 {{ trad('formulas.days') }}</td><td>+3</td></tr>
+        <tr><td rowspan="3">{{ trad('formulas.nb_players') }}</td><td>≤ 40</td><td>+0</td></tr>
+        <tr><td>41 – 80</td><td>+0,5</td></tr>
+        <tr><td>&gt; 80</td><td>+1</td></tr>
+        <tr><td rowspan="3">{{ trad('formulas.nb_countries') }}</td><td>≤ 5</td><td>+0</td></tr>
+        <tr><td>6 – 9</td><td>+0,5</td></tr>
+        <tr><td>≥ 10</td><td>+1</td></tr>
+        <tr><td>{{ trad('formulas.qualification') }}</td><td>{{ trad('formulas.ema_supervised') }}</td><td>+1</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <p style="margin-top:0.75rem">{{ trad('formulas.coefficient_examples') }}</p>
+    <div class="scroll-table">
+    <table>
+      <thead>
+        <tr>
+          <th>{{ trad('formulas.tournament') }}</th>
+          <th>{{ trad('formulas.duration') }}</th>
+          <th>{{ trad('formulas.nb_players') }}</th>
+          <th>{{ trad('formulas.nb_countries') }}</th>
+          <th>{{ trad('formulas.qualification') }}</th>
+          <th>{{ trad('formulas.col_coefficient') }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>{{ trad('formulas.local_1d') }}</td><td>1{{ trad('formulas.day_abbr') }}</td><td>36</td><td>3</td><td>{{ trad('formulas.none') }}</td><td><strong>1</strong></td></tr>
+        <tr><td>{{ trad('formulas.regional_2d') }}</td><td>2{{ trad('formulas.day_abbr') }}</td><td>56</td><td>7</td><td>{{ trad('formulas.none') }}</td><td><strong>2,5</strong></td></tr>
+        <tr><td>{{ trad('formulas.open_2d') }}</td><td>2{{ trad('formulas.day_abbr') }}</td><td>92</td><td>7</td><td>{{ trad('formulas.none') }}</td><td><strong>3,5</strong></td></tr>
+        <tr><td>OEMC / WMC</td><td>3{{ trad('formulas.days_plus') }}</td><td>200+</td><td>20+</td><td>{{ trad('formulas.yes') }}</td><td><strong>6</strong></td></tr>
+      </tbody>
+    </table>
+    </div>
+  </section>
+
+  <!-- ── 3. Player ranking score ───────────────────────────────── -->
+  <section style="margin-bottom:2.5rem">
+    <h2 style="border-bottom:2px solid var(--accent);padding-bottom:0.4rem;margin-bottom:1rem">
+      {{ trad('formulas.player_score_title') }}
+    </h2>
+    <p>{{ trad('formulas.player_score_intro') }}</p>
+
+    <div class="formula-box">
+      <span class="formula-math">{{ trad('formulas.formula_score') }}</span>
+    </div>
+
+    <h3 style="margin-top:1.25rem">{{ trad('formulas.part_a_title') }}</h3>
+    <p>{{ trad('formulas.part_a_desc') }}</p>
+    <div class="formula-box">
+      <span class="formula-math">{{ trad('formulas.formula_part_a_n') }}</span>
+    </div>
+
+    <div class="scroll-table" style="margin-top:0.5rem">
+    <table>
+      <thead><tr><th>{{ trad('formulas.nb_tournaments') }}</th><th>{{ trad('formulas.retained_a') }}</th></tr></thead>
+      <tbody>
+        <tr><td>1 – 5</td><td>{{ trad('formulas.all') }}</td></tr>
+        <tr><td>10</td><td>9</td></tr>
+        <tr><td>15</td><td>13</td></tr>
+        <tr><td>20</td><td>17</td></tr>
+        <tr><td>25</td><td>21</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p style="margin-top:0.5rem;font-size:0.85rem" class="dim">
+      {{ trad('formulas.part_a_tiebreak') }}
+      <a href="#note-tiebreak" class="ref-inferred">💡</a>
+    </p>
+
+    <h3 style="margin-top:1.25rem">{{ trad('formulas.part_b_title') }}</h3>
+    <p>{{ trad('formulas.part_b_desc') }}</p>
+    <p style="font-size:0.85rem" class="dim">
+      {{ trad('formulas.part_b_tiebreak') }}
+      <a href="#note-tiebreak" class="ref-inferred">💡</a>
+    </p>
+
+    <h3 style="margin-top:1.25rem">{{ trad('formulas.weighted_avg_title') }}</h3>
+    <p>{{ trad('formulas.weighted_avg_desc') }}</p>
+    <div class="formula-box">
+      <span class="formula-math">{{ trad('formulas.formula_avg') }}</span>
+    </div>
+    <p style="margin-top:0.5rem;font-size:0.85rem" class="dim">{{ trad('formulas.weighted_avg_note') }}</p>
+
+    <h3 style="margin-top:1.25rem">{{ trad('formulas.min_req_title') }}</h3>
+    <p>{{ trad('formulas.min_req_desc') }}</p>
+  </section>
+
+  <!-- ── 4. Weekly ranking update ─────────────────────────────── -->
+  <section style="margin-bottom:2.5rem">
+    <h2 style="border-bottom:2px solid var(--accent);padding-bottom:0.4rem;margin-bottom:1rem">
+      {{ trad('formulas.weekly_title') }}
+    </h2>
+    <p>
+      {{ trad('formulas.weekly_desc') }}
+      <a href="#note-weekly" class="ref-divergence">⚠</a>
+    </p>
+
+    <h3 style="margin-top:1.25rem">{{ trad('formulas.weekly_activation_title') }}</h3>
+    <p>
+      {{ trad('formulas.weekly_activation_desc') }}
+      <a href="#note-104" class="ref-divergence">⚠</a>
+    </p>
+    <p style="font-size:0.85rem" class="dim">{{ trad('formulas.weekly_activation_note') }}</p>
+
+    <h3 style="margin-top:1.25rem">{{ trad('formulas.weekly_examples_title') }}</h3>
+    <div class="scroll-table" style="margin-top:0.5rem">
+    <table>
+      <thead>
+        <tr>
+          <th>{{ trad('formulas.tournament') }}</th>
+          <th>{{ trad('formulas.weekly_ex_col_start') }}</th>
+          <th>{{ trad('formulas.weekly_ex_col_first') }}</th>
+          <th>{{ trad('formulas.weekly_ex_col_last_active') }}</th>
+          <th>{{ trad('formulas.weekly_ex_col_expiry') }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>{{ trad('formulas.weekly_ex_1_label') }}</td><td>08/03/2025</td><td>10/03/2025</td><td>01/03/2027</td><td>08/03/2027</td></tr>
+        <tr><td>{{ trad('formulas.weekly_ex_2_label') }}</td><td>14/03/2025</td><td>17/03/2025</td><td>08/03/2027</td><td>15/03/2027</td></tr>
+        <tr><td>{{ trad('formulas.weekly_ex_3_label') }}</td><td>22/03/2025</td><td>24/03/2025</td><td>15/03/2027</td><td>22/03/2027</td></tr>
+        <tr><td>{{ trad('formulas.weekly_ex_4_label') }}</td><td>02/04/2025</td><td>07/04/2025</td><td>29/03/2027</td><td>05/04/2027</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </section>
+
+  <!-- ── 5. Active period and COVID freeze ─────────────────────── -->
+  <section style="margin-bottom:2.5rem">
+    <h2 style="border-bottom:2px solid var(--accent);padding-bottom:0.4rem;margin-bottom:1rem">
+      {{ trad('formulas.active_period_title') }}
+    </h2>
+    <p>{{ trad('formulas.active_period_desc') }}</p>
+
+    <div class="scroll-table" style="margin-top:0.5rem">
+    <table>
+      <thead>
+        <tr>
+          <th>{{ trad('formulas.age') }}</th>
+          <th>{{ trad('formulas.time_weight') }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>{{ trad('formulas.year_1') }}</td><td>× 1,0</td></tr>
+        <tr><td>{{ trad('formulas.year_2') }}</td><td>× 0,5</td></tr>
+        <tr><td>{{ trad('formulas.year_beyond') }}</td><td>× 0</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="formula-callout" style="margin-top:1rem">
+      <strong>{{ trad('formulas.covid_title') }}</strong>
+      <p style="margin:0.4rem 0 0">{{ trad('formulas.covid_desc') }}</p>
+      <p style="margin:0.4rem 0 0;font-size:0.85rem" class="dim">
+        {{ trad('formulas.covid_dates') }} : 24/02/2020 → 28/03/2022
+        <a href="#note-covid-dates" class="ref-inferred">💡</a>
+      </p>
+    </div>
+  </section>
+
+  <!-- ── 6. World tournaments ──────────────────────────────────── -->
+  <section style="margin-bottom:2.5rem">
+    <h2 style="border-bottom:2px solid var(--accent);padding-bottom:0.4rem;margin-bottom:1rem">
+      {{ trad('formulas.world_title') }}
+    </h2>
+    <p>{{ trad('formulas.world_desc') }}</p>
+  </section>
+
+</div>
+
+<style>
+.formula-box {
+  background: var(--bg2);
+  border-left: 4px solid var(--accent);
+  border-radius: 4px;
+  padding: 0.75rem 1rem;
+  margin: 0.75rem 0;
+  font-family: monospace;
+  font-size: 1rem;
+  overflow-x: auto;
+}
+.formula-math {
+  white-space: nowrap;
+}
+.formula-callout {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+}
+.note-block {
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+.note-block ul {
+  margin: 0.4rem 0 0 1.2rem;
+  padding: 0;
+}
+.note-block li {
+  margin-bottom: 0.3rem;
+}
+.note-label {
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+}
+.note-inferred {
+  background: color-mix(in srgb, #10b981 10%, var(--bg2));
+  border: 1px solid color-mix(in srgb, #10b981 45%, transparent);
+}
+.note-divergence {
+  background: color-mix(in srgb, #f59e0b 8%, var(--bg2));
+  border: 1px solid color-mix(in srgb, #f59e0b 40%, transparent);
+}
+.ref-inferred {
+  font-size: 0.8rem;
+  text-decoration: none;
+  opacity: 1;
+  margin-left: 0.2rem;
+}
+.ref-divergence {
+  font-size: 0.8rem;
+  text-decoration: none;
+  opacity: 1;
+  margin-left: 0.2rem;
+  color: #f59e0b;
+}
+h3 {
+  font-size: 1rem;
+  color: var(--accent);
+  margin-bottom: 0.3rem;
+}
+</style>
+
+{% endblock %}
