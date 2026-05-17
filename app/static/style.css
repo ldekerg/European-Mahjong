@@ -38,6 +38,7 @@
     --border:   #e0e0e0;
 
     --row-actif:var(--bg2);
+    --row-hover:var(--bg3);
     --row-wmc:  var(--wmc-bg);
     --row-oemc: var(--oemc-bg);
     
@@ -103,6 +104,7 @@
     --oemc-border: var(--oemc-fg);
 
     --row-actif: var(--bg2);
+    --row-hover: var(--bg3);
     --row-wmc:  var(--wmc-bg);
     --row-oemc: var(--oemc-bg);
 
@@ -494,7 +496,7 @@ nav a:hover {
 }
 .lang-flag { font-size: 1rem; line-height: 1; display: inline-block; width: 1.4rem; text-align: center; }
 .lang-dropdown a span:not(.lang-flag) { font-size: 0.88rem; line-height: 1; font-weight: 400; font-family: system-ui, sans-serif; }
-.lang-dropdown a:hover { background: var(--row-actif); }
+.lang-dropdown a:hover { background: var(--row-hover); }
 
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -516,11 +518,12 @@ nav a:hover {
 .date-nav  { display: flex; align-items: center; gap: 0.5rem; }
 .nav-arrow {
     font-size: 1rem; padding: 0.3rem 0.6rem;
-    background: var(--accent); color: #fff;
+    background: var(--bg2); color: var(--text);
+    border: 1px solid var(--border);
     border-radius: 4px; text-decoration: none; line-height: 1;
 }
-.nav-arrow:hover { background: var(--accent2); }
-.nav-arrow.disabled { background: #ccc; color: var(--text3); cursor: default; pointer-events: none; }
+.nav-arrow:hover { background: var(--bg3); }
+.nav-arrow.disabled { background: var(--bg2); color: var(--text3); cursor: default; pointer-events: none; opacity: 0.4; }
 
 .week-picker   { position: relative; }
 .week-current  {
@@ -534,7 +537,7 @@ nav a:hover {
     min-width: 14rem;
     text-align: left;
 }
-.week-current:hover { border-color: var(--accent); }
+.week-current:hover { background: var(--bg3); }
 .week-dropdown {
     position: absolute;
     top: calc(100% + 4px);
@@ -553,7 +556,7 @@ nav a:hover {
     font-weight: 700;
     font-size: 0.8rem;
     color: var(--text3);
-    background: var(--bg);
+    background: var(--bg2);
     border-top: 1px solid var(--border);
     position: sticky;
     top: 0;
@@ -565,9 +568,8 @@ nav a:hover {
     color: var(--text);
     text-decoration: none;
 }
-.week-option:hover { background: var(--row-actif); }
-.week-option.active { font-weight: 700; color: var(--accent); background: var(--row-actif); }
-[data-theme="dark"] .week-option.active { background: var(--row-actif); }
+.week-option:hover { background: var(--row-hover); }
+.week-option.active { font-weight: 700; color: var(--accent); background: var(--bg3); }
 
 .ranking-layout {
     display: grid;
@@ -617,8 +619,8 @@ nav a:hover {
 
 .ranking-table { width: 100%; }
 .ranking-row   { cursor: pointer; }
-.ranking-row:hover td { background: var(--row-actif) !important; }
-.row-selected td { background: var(--row-actif) !important; }
+.ranking-row:hover td { background: var(--row-hover) !important; }
+.row-selected td { background: var(--row-hover) !important; }
 
 .apercu-header  { margin-bottom: 1rem; }
 .apercu-name    { font-size: 1.2rem; font-weight: 700; }
@@ -719,7 +721,7 @@ td { --row-bg: var(--bg2); }
 .col-sticky { background: var(--row-bg); }
 .col-sticky-left { background: var(--row-bg); }
 
-tr:hover           td { --row-bg: var(--bg3); }
+tr:hover           td { --row-bg: var(--row-hover); }
 .row-actif         td { --row-bg: var(--row-actif); }
 .row-wmc           td { --row-bg: var(--row-wmc); }
 .row-oemc          td { --row-bg: var(--row-oemc); }
@@ -759,7 +761,7 @@ tr:hover           td { --row-bg: var(--bg3); }
     user-select: none;
 }
 [data-theme="dark"] .expand-row { background: var(--bg3); border-color: var(--border); }
-.expand-row:hover { background: var(--row-actif); }
+.expand-row:hover { background: var(--row-hover); }
 tr.hidden { display: none; }
 
 .pos-medal { text-align: center; }
@@ -794,8 +796,7 @@ tr.hidden { display: none; }
 }
 .range-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
 .range-btn:hover:not(.active) { background: var(--bg3); }
-.stat-card-hl { cursor: pointer; transition: box-shadow 0.15s, transform 0.15s; }
-.stat-card-hl:hover { box-shadow: 0 0 0 2px var(--accent); transform: translateY(-1px); }
+.stat-card-hl { transition: box-shadow 0.15s; }
 
 /* ═══════════════════════════════════════════════════════════════════
     Player Overview & Snapshot
@@ -808,6 +809,8 @@ tr.hidden { display: none; }
 
 .apercu-best {
     display: flex;
+    width: fit-content;
+    margin: 0.2rem auto 0;
     align-items: center;
     justify-content: center;
     gap: 0.3rem;
@@ -821,7 +824,7 @@ tr.hidden { display: none; }
     text-decoration: none;
     cursor: pointer;
 }
-.apercu-best:hover { background: var(--row-actif); }
+.apercu-best:hover { background: var(--row-hover); }
 .apercu-best-date  { font-size: 0.75rem; font-weight: 400; color: var(--text3); }
 
 .apercu-active      { border: 1px solid var(--accent); }
@@ -974,16 +977,13 @@ caption.t-count {
 .ville-badge-link:hover { color: #fff; }
 .t-ville { cursor: pointer; color: var(--accent); }
 .t-ville:hover { text-decoration: underline; }
-.apercu-discipline-btn { cursor: pointer; transition: background 0.15s, box-shadow 0.15s, transform 0.1s; }
-.apercu-discipline-btn:hover { background: var(--row-actif); box-shadow: 0 0 0 2px var(--accent); transform: translateY(-2px); }
-.apercu-discipline-btn:hover .apercu-disc-label { color: var(--accent); }
 .delta-up   { color: #22aa44; font-size: 0.8rem; font-weight: 600; }
 .delta-down { color: #cc3333; font-size: 0.8rem; font-weight: 600; }
 .delta-new  { color: #cc9900; font-size: 0.75rem; font-weight: 700; white-space: nowrap; }
 .sortable { cursor: pointer; user-select: none; }
-.sortable:hover { background: var(--row-actif); }
+.sortable:hover { background: var(--row-hover); }
 .sortable-th { cursor: pointer; user-select: none; white-space: nowrap; }
-.sortable-th:hover { background: var(--row-actif); }
+.sortable-th:hover { background: var(--row-hover); }
 .th-sort-link { color: inherit; text-decoration: none; display: flex; align-items: center; gap: 0.3rem; }
 .th-sort-link:hover { color: var(--accent); }
 .sort-arrow { font-size: 0.75rem; }
