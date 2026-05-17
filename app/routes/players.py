@@ -6,165 +6,165 @@ from sqlalchemy.orm import Session
 from datetime import date
 
 from app.database import get_db
-from app.models import Joueur, Tournoi, Resultat, ClassementHistorique, ChangementNationalite
-from app.ranking import lundi_semaine, tournois_actifs, _resultats_actifs, contribution, FREEZE_DEBUT, FREEZE_FIN
+from app.models import Player, Tournament, Result, RankingHistory, NationalityChange
+from app.ranking import week_monday, active_tournaments, _player_results, contribution, FREEZE_START, FREEZE_END
 
-router = APIRouter(prefix="/joueurs")
+router = APIRouter(prefix="/players")
 from app.i18n import templates
 
 
 @router.get("/")
 def liste_joueurs(
     request: Request,
-    tri: str = "nom",          # id | nom | prenom | nationalite | nb_mcr | nb_rcr | nb_total
-    asc: int = 1,              # 1 = ascendant, 0 = descendant
-    regles: str = "tous",      # tous | MCR | RCR
-    q: str = "",               # recherche textuelle
+    sort: str = "name",        # id | name | first_name | nationality | nb_mcr | nb_rcr | nb_total
+    asc: int = 1,              # 1 = ascending, 0 = descending
+    rules: str = "all",        # all | MCR | RCR
+    q: str = "",               # text search
     db: Session = Depends(get_db),
 ):
-    from app.models import Resultat, Tournoi as T
+    from app.models import Result, Tournament as T
     from sqlalchemy import func
 
-    # Sous-requêtes pour compter les tournois par joueur/règle + date premier tournoi
+    # Subqueries to count tournaments per player/rules + date of first tournament
     mcr_count = (
-        db.query(Resultat.joueur_id, func.count(Resultat.id).label("nb"))
-        .join(T).filter(T.regles == "MCR").group_by(Resultat.joueur_id).subquery()
+        db.query(Result.player_id, func.count(Result.id).label("nb"))
+        .join(T).filter(T.rules == "MCR").group_by(Result.player_id).subquery()
     )
     rcr_count = (
-        db.query(Resultat.joueur_id, func.count(Resultat.id).label("nb"))
-        .join(T).filter(T.regles == "RCR").group_by(Resultat.joueur_id).subquery()
+        db.query(Result.player_id, func.count(Result.id).label("nb"))
+        .join(T).filter(T.rules == "RCR").group_by(Result.player_id).subquery()
     )
     premier_tournoi = (
-        db.query(Resultat.joueur_id, func.min(T.date_debut).label("premier"))
-        .join(T).filter(T.date_debut != date(1900, 1, 1))
-        .group_by(Resultat.joueur_id).subquery()
+        db.query(Result.player_id, func.min(T.start_date).label("premier"))
+        .join(T).filter(T.start_date != date(1900, 1, 1))
+        .group_by(Result.player_id).subquery()
     )
 
     qr = db.query(
-        Joueur,
+        Player,
         func.coalesce(mcr_count.c.nb, 0).label("nb_mcr"),
         func.coalesce(rcr_count.c.nb, 0).label("nb_rcr"),
         premier_tournoi.c.premier.label("premier"),
-    ).outerjoin(mcr_count, Joueur.id == mcr_count.c.joueur_id
-    ).outerjoin(rcr_count, Joueur.id == rcr_count.c.joueur_id
-    ).outerjoin(premier_tournoi, Joueur.id == premier_tournoi.c.joueur_id)
+    ).outerjoin(mcr_count, Player.id == mcr_count.c.player_id
+    ).outerjoin(rcr_count, Player.id == rcr_count.c.player_id
+    ).outerjoin(premier_tournoi, Player.id == premier_tournoi.c.player_id)
 
-    if regles == "MCR":
+    if rules == "MCR":
         qr = qr.filter(mcr_count.c.nb > 0)
-    elif regles == "RCR":
+    elif rules == "RCR":
         qr = qr.filter(rcr_count.c.nb > 0)
 
     if q:
         like = f"%{q.upper()}%"
-        qr = qr.filter((Joueur.nom.ilike(like)) | (Joueur.prenom.ilike(like)) | (Joueur.id.ilike(like)))
+        qr = qr.filter((Player.last_name.ilike(like)) | (Player.first_name.ilike(like)) | (Player.id.ilike(like)))
 
     col_map = {
-        "id":          Joueur.id,
-        "nom":         Joueur.nom,
-        "prenom":      Joueur.prenom,
-        "nationalite": Joueur.nationalite,
+        "id":          Player.id,
+        "name":         Player.last_name,
+        "first_name":      Player.first_name,
+        "nationality": Player.nationality,
         "nb_mcr":      func.coalesce(mcr_count.c.nb, 0),
         "nb_rcr":      func.coalesce(rcr_count.c.nb, 0),
         "nb_total":    func.coalesce(mcr_count.c.nb, 0) + func.coalesce(rcr_count.c.nb, 0),
         "premier":     premier_tournoi.c.premier,
     }
-    col = col_map.get(tri, Joueur.nom)
+    col = col_map.get(sort, Player.last_name)
     qr = qr.order_by(col if asc else col.desc())
 
     rows = qr.all()
-    joueurs_list = [{"joueur": r[0], "nb_mcr": r[1], "nb_rcr": r[2], "nb_total": r[1]+r[2], "premier": r[3]} for r in rows]
+    joueurs_list = [{"player": r[0], "nb_mcr": r[1], "nb_rcr": r[2], "nb_total": r[1]+r[2], "premier": r[3]} for r in rows]
 
-    return templates.TemplateResponse(request, "joueurs/liste.html", {
-        "joueurs":          joueurs_list,
-        "tri":              tri,
+    return templates.TemplateResponse(request, "players/list.html", {
+        "players":          joueurs_list,
+        "sort":             sort,
         "asc":              asc,
-        "regles":           regles,
+        "rules":            rules,
         "q":                q,
         "total":            len(joueurs_list),
-        "semaine_actuelle": lundi_semaine(date.today()),
+        "current_week": week_monday(date.today()),
     })
 
 
 
-@router.get("/{joueur_id}")
-def detail_joueur(joueur_id: str, request: Request, db: Session = Depends(get_db)):
-    joueur = db.query(Joueur).filter(Joueur.id == joueur_id).first()
+@router.get("/{player_id}")
+def detail_joueur(player_id: str, request: Request, db: Session = Depends(get_db)):
+    joueur = db.query(Player).filter(Player.id == player_id).first()
     if not joueur:
         return templates.TemplateResponse(request, "404.html", status_code=404)
 
-    semaine = lundi_semaine(date.today())
+    week = week_monday(date.today())
 
     def build_tab(regles: str):
-        # Classement actuel
-        rang = db.query(ClassementHistorique).filter(
-            ClassementHistorique.joueur_id == joueur_id,
-            ClassementHistorique.regles == regles,
-            ClassementHistorique.semaine == semaine,
+        # Current ranking
+        rang = db.query(RankingHistory).filter(
+            RankingHistory.player_id == player_id,
+            RankingHistory.rules == regles,
+            RankingHistory.week == week,
         ).first()
 
-        # Historique classement (toutes les semaines)
+        # Ranking history (all weeks)
         historique = (
-            db.query(ClassementHistorique)
+            db.query(RankingHistory)
             .filter(
-                ClassementHistorique.joueur_id == joueur_id,
-                ClassementHistorique.regles == regles,
+                RankingHistory.player_id == player_id,
+                RankingHistory.rules == regles,
             )
-            .order_by(ClassementHistorique.semaine)
+            .order_by(RankingHistory.week)
             .all()
         )
 
-        # Meilleur classement et score max
+        # Best ranking and max score
         meilleur = min((h.position for h in historique), default=None)
         score_max = max((h.score for h in historique), default=None)
         score_max = round(score_max, 2) if score_max else None
-        # Dates des maxima pour le graphique
-        date_meilleur = next((h.semaine.isoformat() for h in historique if h.position == meilleur), None)
-        date_score_max = next((h.semaine.isoformat() for h in historique if score_max and round(h.score,2) == score_max), None)
+        # Dates of maxima for the chart
+        date_meilleur = next((h.week.isoformat() for h in historique if h.position == meilleur), None)
+        date_score_max = next((h.week.isoformat() for h in historique if score_max and round(h.score,2) == score_max), None)
 
-        # Tournois joués avec détails
-        actifs = {t.id: (t, c) for t, c in tournois_actifs(db, semaine, regles)}
-        resultats = (
-            db.query(Resultat)
-            .join(Tournoi)
-            .filter(Resultat.joueur_id == joueur_id, Tournoi.regles == regles,
-                    Tournoi.ema_id.isnot(None))
-            .order_by(Tournoi.date_debut.desc())
+        # Played tournaments with details
+        actifs = {t.id: (t, c) for t, c in active_tournaments(db, week, regles)}
+        results = (
+            db.query(Result)
+            .join(Tournament)
+            .filter(Result.player_id == player_id, Tournament.rules == regles,
+                    Tournament.ema_id.isnot(None))
+            .order_by(Tournament.start_date.desc())
             .all()
         )
 
         tournois_data = []
-        for r in resultats:
-            t = r.tournoi
-            c = contribution(t.date_debut, semaine) if t.date_debut.year != 1900 else 0.0
+        for r in results:
+            t = r.tournament
+            c = contribution(t.start_date, week) if t.start_date.year != 1900 else 0.0
             tournois_data.append({
-                "date": t.date_debut,
-                "duree": max(1, (t.date_fin - t.date_debut).days + 1) if t.date_fin and t.date_debut.year != 1900 else 1,
-                "nom": t.nom,
-                "lieu": t.lieu,
-                "pays": t.pays,
+                "date": t.start_date,
+                "duree": max(1, (t.end_date - t.start_date).days + 1) if t.end_date and t.start_date.year != 1900 else 1,
+                "name": t.name,
+                "city": t.city,
+                "country": t.country,
                 "ema_id": t.ema_id,
                 "contrib": c,
                 "coeff": t.coefficient,
                 "points": r.points,
                 "mahjong": r.mahjong,
                 "position": r.position,
-                "nb_joueurs": t.nb_joueurs,
+                "nb_players": t.nb_players,
                 "ranking": r.ranking,
-                "type": t.type_tournoi,
+                "type": t.tournament_type,
                 "actif": t.id in actifs or (
-                    t.type_tournoi in ("wmc", "wrc") and
-                    t.date_debut.year != 1900 and
-                    (semaine - t.date_debut).days <= 730
+                    t.tournament_type in ("wmc", "wrc") and
+                    t.start_date.year != 1900 and
+                    (week - t.start_date).days <= 730
                 ),
-                "nat_tournoi": r.nationalite or joueur.nationalite,
+                "nat_tournoi": r.nationality or joueur.nationality,
             })
 
         historique_chart = [
-            {"semaine": h.semaine.isoformat(), "position": h.position, "score": round(h.score, 2)}
+            {"week": h.week.isoformat(), "position": h.position, "score": round(h.score, 2)}
             for h in historique
         ]
 
-        # Meilleur score Mahjong — on exclut les formats inhabituels (han-count < 100, anonymes WRC = 1)
+        # Best Mahjong score — exclude unusual formats (han-count < 100, anonymous WRC = 1)
         best_points = max(
             (td for td in tournois_data if td["points"] > 0 and td["points"] < 100),
             key=lambda x: x["points"], default=None,
@@ -183,78 +183,78 @@ def detail_joueur(joueur_id: str, request: Request, db: Session = Depends(get_db
             "date_score_max": date_score_max,
             "historique": historique,
             "historique_chart": historique_chart,
-            "tournois": tournois_data,
+            "tournaments": tournois_data,
             "nb_actifs": sum(1 for td in tournois_data if td["actif"]),
             "best_points":  best_points,
             "best_mahjong": best_mahjong,
         }
 
-    changements = db.query(ChangementNationalite).filter(
-        ChangementNationalite.joueur_id == joueur_id
-    ).order_by(ChangementNationalite.date_changement).all()
+    changements = db.query(NationalityChange).filter(
+        NationalityChange.player_id == player_id
+    ).order_by(NationalityChange.change_date).all()
 
-    return templates.TemplateResponse(request, "joueurs/detail.html", {
-        "joueur": joueur,
+    return templates.TemplateResponse(request, "players/detail.html", {
+        "player": joueur,
         "mcr": build_tab("MCR"),
         "rcr": build_tab("RCR"),
-        "semaine": semaine,
+        "week": week,
         "changements_nat": changements,
-        "freeze_debut": FREEZE_DEBUT.isoformat(),
-        "freeze_fin": FREEZE_FIN.isoformat(),
+        "freeze_debut": FREEZE_START.isoformat(),
+        "freeze_fin": FREEZE_END.isoformat(),
     })
 
 
-@router.get("/{joueur_id}/apercu")
+@router.get("/{player_id}/apercu")
 def apercu_joueur(
-    joueur_id: str, request: Request,
-    semaine: str = None,
-    regles: str = "MCR",
+    player_id: str, request: Request,
+    week: str = None,
+    rules: str = "MCR",
     pays_code: str = None,
     db: Session = Depends(get_db)
 ):
-    """Fragment HTML pour le panneau latéral du classement."""
-    joueur = db.query(Joueur).filter(Joueur.id == joueur_id).first()
+    """HTML fragment for the ranking side panel."""
+    joueur = db.query(Player).filter(Player.id == player_id).first()
     if not joueur:
-        return templates.TemplateResponse(request, "joueurs/apercu.html", {"joueur": None})
+        return templates.TemplateResponse(request, "players/preview.html", {"player": None})
     try:
-        semaine_date = lundi_semaine(date.fromisoformat(semaine)) if semaine else lundi_semaine(date.today())
+        week_date = week_monday(date.fromisoformat(week)) if week else week_monday(date.today())
     except ValueError:
-        semaine_date = lundi_semaine(date.today())
-    semaine = semaine_date
+        week_date = week_monday(date.today())
+    week = week_date
 
-    actifs_mcr = {t.id: (t, c) for t, c in tournois_actifs(db, semaine, "MCR")}
-    actifs_rcr = {t.id: (t, c) for t, c in tournois_actifs(db, semaine, "RCR")}
+    actifs_mcr = {t.id: (t, c) for t, c in active_tournaments(db, week, "MCR")}
+    actifs_rcr = {t.id: (t, c) for t, c in active_tournaments(db, week, "RCR")}
 
-    def stats(regles_key):
-        from app.models import ClassementHistorique, Resultat, Tournoi as T
-        rang_actuel = db.query(ClassementHistorique).filter(
-            ClassementHistorique.joueur_id == joueur_id,
-            ClassementHistorique.regles == regles_key,
-            ClassementHistorique.semaine == semaine,
+    def stats(rules_key):
+        from app.models import RankingHistory, Result, Tournament as T
+        rang_actuel = db.query(RankingHistory).filter(
+            RankingHistory.player_id == player_id,
+            RankingHistory.rules == rules_key,
+            RankingHistory.week == week,
         ).first()
 
         if pays_code:
-            # Meilleur rang national : pour chaque semaine du joueur, compter les compatriotes devant
-            from app.models import ClassementHistorique as CH, Joueur as J
+            # Best national rank: for each week of the player, count compatriots ranked above
+            from app.models import RankingHistory as CH, Player as J
             from sqlalchemy import func
-            # Positions du joueur par semaine
-            joueur_rows = db.query(CH.semaine, CH.position, CH.score).filter(
-                CH.joueur_id == joueur_id,
-                CH.regles == regles_key,
+            # Player positions per week
+            joueur_rows = db.query(CH.week, CH.position, CH.score).filter(
+                CH.player_id == player_id,
+                CH.rules == rules_key,
             ).all()
-            # Compatriotes classés (tous joueurs du même pays)
+            # Ranked compatriots (all players from the same country)
             compatriotes = {
                 r[0]: r[1] for r in
-                db.query(J.id, J.nationalite).filter(J.nationalite == joueur.nationalite).all()
+                db.query(J.id, J.nationality).filter(J.nationality == joueur.nationality).all()
             }
             compatriote_ids = list(compatriotes.keys())
             meilleur = None
             best_rang_nat = None
             for row in joueur_rows:
-                nb_devant = db.query(func.count(CH.joueur_id)).filter(
-                    CH.regles == regles_key,
-                    CH.semaine == row.semaine,
-                    CH.joueur_id.in_(compatriote_ids),
+                nb_devant = db.query(func.count(CH.player_id)).filter(
+                    CH.rules == rules_key,
+                    CH.week == row.week,
+                    CH.player_id.in_(compatriote_ids),
                     CH.position < row.position,
                 ).scalar() or 0
                 rang_nat = nb_devant + 1
@@ -262,39 +262,39 @@ def apercu_joueur(
                     best_rang_nat = rang_nat
                     meilleur = type('MeilleurNat', (), {
                         'position': rang_nat,
-                        'semaine': row.semaine,
+                        'week': row.week,
                         'score': row.score,
                     })()
 
         else:
-            meilleur = db.query(ClassementHistorique).filter(
-                ClassementHistorique.joueur_id == joueur_id,
-                ClassementHistorique.regles == regles_key,
-            ).order_by(ClassementHistorique.position).first()
+            meilleur = db.query(RankingHistory).filter(
+                RankingHistory.player_id == player_id,
+                RankingHistory.rules == rules_key,
+            ).order_by(RankingHistory.position).first()
 
-        nb_total = db.query(Resultat).join(T).filter(
-            Resultat.joueur_id == joueur_id,
-            T.regles == regles_key,
-            T.type_tournoi.notin_(["wmc", "wrc"]),
+        nb_total = db.query(Result).join(T).filter(
+            Result.player_id == player_id,
+            T.rules == rules_key,
+            T.tournament_type.notin_(["wmc", "wrc"]),
             T.ema_id.isnot(None),
         ).count()
 
-        ids_dict = actifs_mcr if regles_key == "MCR" else actifs_rcr
-        resultats_actifs = db.query(Resultat).join(T).filter(
-            Resultat.joueur_id == joueur_id,
-            Resultat.tournoi_id.in_(ids_dict.keys()),
+        ids_dict = actifs_mcr if rules_key == "MCR" else actifs_rcr
+        resultats_actifs = db.query(Result).join(T).filter(
+            Result.player_id == player_id,
+            Result.tournament_id.in_(ids_dict.keys()),
             T.ema_id.isnot(None)
         ).all()
 
         snapshot = sorted([
             {
-                "date":      ids_dict[r.tournoi_id][0].date_debut,
-                "nom":       ids_dict[r.tournoi_id][0].nom,
-                "ema_id":    ids_dict[r.tournoi_id][0].ema_id,
-                "contrib":   ids_dict[r.tournoi_id][1],
-                "coeff":     ids_dict[r.tournoi_id][0].coefficient,
+                "date":      ids_dict[r.tournament_id][0].start_date,
+                "name":       ids_dict[r.tournament_id][0].name,
+                "ema_id":    ids_dict[r.tournament_id][0].ema_id,
+                "contrib":   ids_dict[r.tournament_id][1],
+                "coeff":     ids_dict[r.tournament_id][0].coefficient,
                 "position":  r.position,
-                "nb_joueurs":ids_dict[r.tournoi_id][0].nb_joueurs,
+                "nb_players":ids_dict[r.tournament_id][0].nb_players,
                 "ranking":   r.ranking,
             }
             for r in resultats_actifs
@@ -308,17 +308,16 @@ def apercu_joueur(
             "snapshot": snapshot,
         }
 
-    regles_active = regles.upper() if regles else "MCR"
-    # URL de base pour les liens du meilleur classement
-    base_classement = f"/pays/{pays_code}" if pays_code else "/classement"
+    active_rules = rules.upper() if rules else "MCR"
+    # Base URL for best ranking links
+    base_ranking = f"/countries/{pays_code}" if pays_code else "/ranking"
 
-    return templates.TemplateResponse(request, "joueurs/apercu.html", {
-        "joueur":           joueur,
+    return templates.TemplateResponse(request, "players/preview.html", {
+        "player":           joueur,
         "mcr":              stats("MCR"),
         "rcr":              stats("RCR"),
-        "regles":           regles_active,
-        "semaine":          semaine,
-        "base_classement":  base_classement,
+        "rules":           active_rules,
+        "week":          week,
+        "base_ranking":  base_ranking,
     })
-
 

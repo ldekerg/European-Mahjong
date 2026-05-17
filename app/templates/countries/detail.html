@@ -1,0 +1,318 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!-- ── En-tête pays ─────────────────────────────────────────────────────── -->
+<div class="ranking-header">
+  <h1 style="display:flex;align-items:center;gap:0.5rem">
+    <span style="font-size:2rem">{{ code | flag }}</span>
+    {{ nom_pays }}
+    {% if code in ['RU', 'BY'] %}
+    <span class="badge badge-suspendu" title="{{ trad('country.suspended_title') }}">{{ trad('country.suspended') }}</span>
+    {% endif %}
+  </h1>
+</div>
+
+<!-- ── Stats fixes ──────────────────────────────────────────────────────── -->
+<div class="stats-grid" style="margin-bottom:1.25rem">
+  <div class="stat-card">
+    <div class="stat-label">{{ trad('common.players') }}</div>
+    <div class="stat-value">{{ nb_players }}</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">{{ trad('country.ranked_mcr') }}</div>
+    <div class="stat-value">
+      {{ nb_classes_mcr }}
+      {% if meilleur_actuel_mcr %}<span class="stat-sub">{{ trad('country.best', n=meilleur_actuel_mcr) }}</span>{% endif %}
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">{{ trad('country.ranked_rcr') }}</div>
+    <div class="stat-value">
+      {{ nb_classes_rcr }}
+      {% if meilleur_actuel_rcr %}<span class="stat-sub">{{ trad('country.best', n=meilleur_actuel_rcr) }}</span>{% endif %}
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">{{ trad('country.tournaments_org') }}</div>
+    <div class="stat-value">{{ nb_tournois_org }}</div>
+  </div>
+</div>
+
+<!-- Graphique évolution joueurs actifs -->
+{% with chart_id='chart-joueurs-detail' %}
+{% include 'partials/active_players_chart.html' %}
+{% endwith %}
+
+<!-- ── Onglets principaux ────────────────────────────────────────────────── -->
+<div class="tabs" id="main-tabs">
+  <button class="tab-btn active"  onclick="showMainTab('ranking', this)">{{ trad('country.tab_ranking') }}</button>
+  <button class="tab-btn"        onclick="showMainTab('tournaments', this)">{{ trad('country.tab_tournaments') }}</button>
+  <button class="tab-btn"        onclick="showMainTab('players', this)">{{ trad('country.tab_players') }}</button>
+  {% if series_pays %}
+  <button class="tab-btn"        onclick="showMainTab('circuits', this)">Circuits nationaux</button>
+  {% endif %}
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     ONGLET CLASSEMENT
+     ══════════════════════════════════════════════════════════════════════ -->
+<div id="tab-ranking" class="tab-content">
+
+  <div class="ranking-header" style="padding-top:0.5rem">
+    {% with base_url='/countries/' + code, qs_extra='&rules=' + active_tab %}
+    {% include 'partials/week_picker.html' %}
+    {% endwith %}
+  </div>
+
+  <!-- Sous-onglets MCR / RCR -->
+  <div class="tabs">
+    <button class="tab-btn {% if active_tab == 'MCR' %}active{% endif %}" onclick="showTab('mcr', this)"><span class="badge badge-mcr">MCR</span> ({{ mcr | length }})</button>
+    <button class="tab-btn {% if active_tab == 'RCR' %}active{% endif %}" onclick="showTab('rcr', this)"><span class="badge badge-rcr">RCR</span> ({{ rcr | length }})</button>
+  </div>
+
+  <div class="ranking-layout">
+    <div class="ranking-left">
+      {% for regles_key, data in [('mcr', mcr), ('rcr', rcr)] %}
+      <div id="tab-{{ regles_key }}" class="tab-content {% if active_tab|lower != regles_key %}hidden{% endif %}">
+        {% with ranking_data=data, show_apercu=true, show_rang_national=true, rang_national_flag=code %}
+        {% include 'partials/ranking_table.html' %}
+        {% endwith %}
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="ranking-right" id="apercu-panel">
+      <p class="empty">{{ trad('common.click_player') }}</p>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     ONGLET TOURNOIS
+     ══════════════════════════════════════════════════════════════════════ -->
+<div id="tab-tournaments" class="tab-content hidden">
+  <div class="t-layout">
+    <div class="t-left">
+      {% with tournois=tournaments, actifs_ids=active_ids %}
+        {% include 'partials/tournaments_table.html' %}
+      {% endwith %}
+    </div>
+    <div class="t-right">
+      {% if cartes | length > 1 %}
+        {% for grp in cartes %}
+          {% with cities=grp.cities, carte_bounds=grp.bounds, ville_filtre=ville_filtre,
+                  carte_id='t-map-pays-' + loop.index|string %}
+          {% include 'partials/tournaments_map.html' %}
+          {% endwith %}
+          {% if not loop.last %}<div style="height:0.75rem"></div>{% endif %}
+        {% endfor %}
+      {% else %}
+        {% with cities=cities, carte_bounds=carte_bounds, ville_filtre=ville_filtre %}
+        {% include 'partials/tournaments_map.html' %}
+        {% endwith %}
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     ONGLET JOUEURS
+     ══════════════════════════════════════════════════════════════════════ -->
+<div id="tab-players" class="tab-content hidden">
+  <div class="ranking-layout">
+    <div class="ranking-left">
+      {% with show_apercu=true %}
+      {% include 'partials/players_table.html' %}
+      {% endwith %}
+    </div>
+    <div class="ranking-right" id="apercu-panel-players">
+      <p class="empty">{{ trad('common.click_player') }}</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     ONGLET CiRCUITS NATIONAUX
+     ══════════════════════════════════════════════════════════════════════ -->
+{% if series_pays %}
+<div id="tab-circuits" class="tab-content hidden">
+  {% for serie in series_pays %}
+  <details class="edition-block" {% if loop.first %}open{% endif %}>
+    <summary class="edition-summary">
+      <div class="edition-summary-left">
+        <a href="/championships/{{ serie.slug }}" class="edition-summary-title" onclick="event.stopPropagation()">{{ serie.name }}</a>
+        <span class="dim" style="font-size:0.82rem">
+          <span class="badge {% if serie.rules == 'MCR' %}badge-mcr{% else %}badge-rcr{% endif %}">{{ serie.rules }}</span>
+          {{ serie.editions | length }} édition{{ 's' if serie.editions | length > 1 }}
+        </span>
+      </div>
+      <div class="edition-summary-right">
+        {% if serie.editions %}
+          {% set ed = serie.editions[0] %}
+          {% set cl = [] %}
+          {# Champion de la dernière édition #}
+          {% if ed.champion %}
+            {% set c = ed.champion %}
+            <span style="display:inline-flex;align-items:center;gap:0.3rem;font-size:0.85rem">
+              🏆
+              {% if c.nationality %}{{ c.nationality | flag }}{% endif %}
+              {% if c.player %}{{ c.player.first_name | first_name }} {{ c.player.last_name | title }}
+              {% else %}{{ c.nom_affiche }}{% endif %}
+              <span class="dim">({{ ed.year }})</span>
+            </span>
+          {% endif %}
+        {% endif %}
+      </div>
+    </summary>
+    <div class="edition-body">
+      <div class="scroll-table">
+      <table style="width:100%">
+        <colgroup>
+          <col class="col-date-lg">
+          <col class="col-tournoi">
+          <col class="col-joueurs">
+        </colgroup>
+        <thead>
+          <tr>
+            <th class="col-date-lg">Année</th>
+            <th class="col-tournoi">Édition</th>
+            <th class="col-joueurs">Tournois</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for ed in serie.editions %}
+          <tr>
+            <td class="col-date-lg">{{ ed.year }}</td>
+            <td><a href="/championships/{{ serie.slug }}/{{ ed.year }}">{{ ed.name or (serie.name ~ ' ' ~ ed.year) }}</a></td>
+            <td class="col-joueurs ">{{ ed.tournament_links | length }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </details>
+  {% endfor %}
+</div>
+{% endif %}
+
+
+<!-- ── Scripts ──────────────────────────────────────────────────────────── -->
+<script>
+var _I18N = {
+  clique_joueur: "{{ trad('common.click_player') }}",
+  chargement:    "{{ trad('common.loading') }}",
+  erreur:        "{{ trad('common.error') }}",
+  erreur_chargement: "{{ trad('common.load_error') }}"
+};
+// Player preview — used by Ranking tab AND Players tab
+var _activeJoueurRow = null;
+
+// Main tabs (Ranking / Tournaments / Players)
+function showMainTab(name, btn) {
+  document.querySelectorAll('#main-tabs + .tab-content, #main-tabs ~ .tab-content')
+    .forEach(el => el.classList.add('hidden'));
+  document.querySelectorAll('#main-tabs .tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.remove('hidden');
+  btn.classList.add('active');
+}
+
+// MCR / RCR sub-tabs within Ranking tab
+var _activeRow = null;
+var _joueurDefautMCR = '{{ player_defaut_mcr or "" }}';
+var _joueurDefautRCR = '{{ player_defaut_rcr or "" }}';
+var _joueurPersiste  = '';
+
+function fetchApercu(joueurId, rules) {
+  var panel = document.getElementById('apercu-panel');
+  panel.innerHTML = '<p class="empty">' + _I18N.chargement + '</p>';
+  var week = '{{ week.isoformat() }}';
+  var r = rules || document.querySelector('#tab-ranking .tab-btn.active').textContent.trim().split(' ')[0];
+  fetch('/players/' + joueurId + '/apercu?week=' + week + '&rules=' + r + '&pays_code={{ code }}')
+    .then(function(res){ return res.text(); })
+    .then(function(html){ panel.innerHTML = html; })
+    .catch(function(){ panel.innerHTML = '<p class="empty">' + _I18N.erreur_chargement + '</p>'; });
+}
+
+function loadApercu(joueurId, row) {
+  var inJoueurs = row.closest('#tab-players') !== null;
+
+  if (inJoueurs) {
+    var panel = document.getElementById('apercu-panel-players');
+    if (_activeJoueurRow === row) {
+      row.classList.remove('row-selected');
+      _activeJoueurRow = null;
+      panel.innerHTML = '<p class="empty">' + _I18N.clique_joueur + '</p>';
+      return;
+    }
+    if (_activeJoueurRow) _activeJoueurRow.classList.remove('row-selected');
+    _activeJoueurRow = row;
+    row.classList.add('row-selected');
+    panel.innerHTML = '<p class="empty">' + _I18N.chargement + '</p>';
+    fetch('/players/' + joueurId + '/apercu?week={{ week.isoformat() }}')
+      .then(function(r) { return r.text(); })
+      .then(function(html) { panel.innerHTML = html; })
+      .catch(function() { panel.innerHTML = '<p class="empty">' + _I18N.erreur + '</p>'; });
+  } else {
+    if (_activeRow === row) {
+      row.classList.remove('row-selected');
+      _activeRow = null;
+      _joueurPersiste = '';
+      var defaut = '{{ active_tab }}' === 'RCR' ? _joueurDefautRCR : _joueurDefautMCR;
+      fetchApercu(defaut);
+      return;
+    }
+    if (_activeRow) _activeRow.classList.remove('row-selected');
+    _activeRow = row;
+    row.classList.add('row-selected');
+    _joueurPersiste = joueurId;
+    fetchApercu(joueurId);
+  }
+}
+
+function switchRegles(label) {
+  var name = label.toLowerCase();
+  var btns = document.querySelectorAll('#tab-ranking .tabs:last-of-type .tab-btn');
+  var btn = null;
+  btns.forEach(function(b) { if (b.textContent.trim().startsWith(label)) btn = b; });
+  if (btn) showTab(name, btn);
+}
+
+function showTab(name, btn) {
+  ['mcr','rcr'].forEach(function(r) {
+    var el = document.getElementById('tab-' + r);
+    if (el) el.classList.add('hidden');
+  });
+  document.querySelectorAll('#tab-ranking .tabs .tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.remove('hidden');
+  btn.classList.add('active');
+  // Update rules in all week navigation links
+  var reglesUp = name.toUpperCase();
+  document.querySelectorAll('.date-nav a[href], .week-option').forEach(function(a) {
+    try {
+      var url = new URL(a.href, window.location.origin);
+      url.searchParams.set('rules', reglesUp);
+      a.href = url.toString();
+    } catch(e) {}
+  });
+  var defaut = name === 'mcr' ? _joueurDefautMCR : _joueurDefautRCR;
+  var joueurId = _joueurPersiste || defaut;
+  if (joueurId) fetchApercu(joueurId, name.toUpperCase());
+}
+
+window.addEventListener('DOMContentLoaded', function() {
+  // Activate main tab requested by URL (?tab=ranking|tournaments|players)
+  var ongletUrl = new URLSearchParams(window.location.search).get('tab');
+  if (ongletUrl && ongletUrl !== 'ranking') {
+    var btn = document.querySelector('#main-tabs .tab-btn[onclick*="' + ongletUrl + '"]');
+    if (btn) showMainTab(ongletUrl, btn);
+  }
+
+  // Charger l'aperçu par défaut dans l'onglet classement
+  var defaut = '{{ active_tab }}' === 'RCR' ? _joueurDefautRCR : _joueurDefautMCR;
+  if (defaut) fetchApercu(defaut, '{{ active_tab }}');
+});
+</script>
+
+{% endblock %}

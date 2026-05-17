@@ -1,10 +1,10 @@
 """
-Migration : crée les tables serie_championnat, championnat, championnat_tournoi.
+Migration: creates the serie_championnat, championnat, championnat_tournoi tables.
 """
 
 import sqlite3, os
 
-DB_PATH = os.path.join(os.path.dirname(__file__), "..", "data", "ema_ranking.db")
+DB_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "data", "ema_ranking.db")
 con = sqlite3.connect(DB_PATH)
 
 for sql in [
@@ -35,8 +35,8 @@ for sql in [
         con.execute(sql)
         print(f"OK : {sql[:60]}...")
     except sqlite3.OperationalError as e:
-        print(f"(ignoré) {e}")
+        print(f"(ignored) {e}")
 
 con.commit()
 con.close()
-print("\nMigration championnats terminée.")
+print("\nChampionships migration complete.")

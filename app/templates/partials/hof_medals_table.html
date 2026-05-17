@@ -1,7 +1,7 @@
 {# Tableau Hall of Fame — médailles de tournois.
    Variables requises :
      medals_data — liste de {joueur, or_t, argent_t, bronze_t, total_t}
-   Dépendances JS : sortTable() et le tri DOMContentLoaded définis dans hallfame.html
+   Dépendances JS : sortTable() et le tri DOMContentLoaded définis dans hof.html
 #}
 <div class="scroll-table">
 <table id="{{ table_id if table_id is defined else 'hof-table' }}" class="hof-table">
@@ -28,8 +28,8 @@
     {% set total_medals = d.or_t + d.argent_t + d.bronze_t %}
     <tr data-total="{{ d.total_t }}">
       <td class="col-hof-pos center rank-num">{{ loop.index }}</td>
-      <td class="col-flag col-opt center">{{ d.joueur.nationalite | flag_link('classement') }}</td>
-      <td class="col-joueur-nom"><span class="mobile-flag">{{ d.joueur.nationalite | flag_link('classement') }}</span><a href="/joueurs/{{ d.joueur.id }}">{{ d.joueur.prenom | prenom }} {{ d.joueur.nom | title }}</a></td>
+      <td class="col-flag col-opt center">{{ d.player.nationality | flag_link('ranking') }}</td>
+      <td class="col-joueur-nom"><span class="mobile-flag">{{ d.player.nationality | flag_link('ranking') }}</span><a href="/players/{{ d.player.id }}">{{ d.player.first_name | first_name }} {{ d.player.last_name | title }}</a></td>
       <td class="col-hof-stat center" data-val="{{ d.or_t }}">{% if d.or_t %}<strong>{{ d.or_t }}</strong>{% else %}<span class="dim">—</span>{% endif %}</td>
       <td class="col-hof-stat center" data-val="{{ d.argent_t }}">{{ d.argent_t or '—' }}</td>
       <td class="col-hof-stat center" data-val="{{ d.bronze_t }}">{{ d.bronze_t or '—' }}</td>

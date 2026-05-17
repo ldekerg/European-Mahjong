@@ -38,8 +38,8 @@
   <tbody>
     {% for r in ranking_data %}
     <tr class="ranking-row {% if loop.index <= 3 %}row-top{{ loop.index }}{% endif %}"
-        data-joueur="{{ r.joueur_id }}"
-        {% if show_apercu %}onclick="loadApercu('{{ r.joueur_id }}', this)"{% endif %}>
+        data-joueur="{{ r.player_id }}"
+        {% if show_apercu %}onclick="loadApercu('{{ r.player_id }}', this)"{% endif %}>
       {% if _show_nat %}
       <td class="col-rang-nat center rank-num" style="font-size:0.8rem">{{ loop.index }}</td>
       {% endif %}
@@ -56,12 +56,12 @@
         {% elif r.delta < 0 %}<span class="delta-down">▼{{ r.delta | abs }}</span>
         {% else %}<span class="dim">—</span>{% endif %}
       </td>
-      <td class="col-flag col-opt">{{ r.nationalite | flag_link('classement') }}</td>
-      <td class="col-nom"><span class="mobile-flag">{{ r.nationalite | flag_link('classement') }}</span><a href="/joueurs/{{ r.joueur_id }}" {% if show_apercu %}onclick="event.stopPropagation()"{% endif %}>{{ r.prenom | prenom }} {{ r.nom | title }}</a></td>
+      <td class="col-flag col-opt">{{ r.nationality | flag_link('ranking') }}</td>
+      <td class="col-nom"><span class="mobile-flag">{{ r.nationality | flag_link('ranking') }}</span><a href="/players/{{ r.player_id }}" {% if show_apercu %}onclick="event.stopPropagation()"{% endif %}>{{ r.first_name | first_name }} {{ r.name | title }}</a></td>
       <td class="col-score col-sticky score-val">{{ r.score | round(2) }}</td>
-      <td class="col-joueurs rank-num">{{ r.nb_tournois }}</td>
+      <td class="col-joueurs rank-num">{{ r.nb_tournaments }}</td>
       <td class="col-podiums col-opt">
-        {{ '🥇' * r.nb_or }}{{ '🥈' * r.nb_argent }}{{ '🥉' * r.nb_bronze }}
+        {{ '🥇' * r.nb_gold }}{{ '🥈' * r.nb_silver }}{{ '🥉' * r.nb_bronze }}
       </td>
     </tr>
     {% endfor %}

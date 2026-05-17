@@ -1,8 +1,9 @@
 """
-Logique métier pour le calcul et le stockage du classement historique.
-Appelable depuis un script CLI ou depuis l'application FastAPI.
+Business logic for calculating and storing weekly ranking history.
+Can be called from a CLI script or from the FastAPI application.
 """
 
+import os
 import threading
 from datetime import date, timedelta
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -12,89 +13,109 @@ from sqlalchemy.dialects.sqlite import insert
 from sqlalchemy.orm import Session
 
 from app.database import SessionLocal, engine
-from app.models import Base, ClassementHistorique
-from app.ranking import classement, lundi_semaine, FREEZE_DEBUT, FREEZE_FIN
+from app.models import Base, RankingHistory
+from app.ranking import ranking, week_monday, FREEZE_START, FREEZE_END
 
-Base.metadata.create_all(bind=engine)
+if os.getenv("DATABASE_URL"):
+    Base.metadata.create_all(bind=engine)
 
-with engine.connect() as conn:
-    conn.execute(text("PRAGMA journal_mode=WAL"))
+if os.getenv("DATABASE_URL"):
+    with engine.connect() as conn:
+        conn.execute(text("PRAGMA journal_mode=WAL"))
 
-PREMIERE_SEMAINE = date(2005, 6, 27)
+FIRST_WEEK = date(2005, 6, 27)  # Monday before the first known MCR tournament
 
 _write_lock = threading.Lock()
 
-
-def semaines_entre(debut: date, fin: date):
-    s = lundi_semaine(debut)
-    while s <= fin:
-        yield s
-        s += timedelta(weeks=1)
+# Alias for backward compatibility
+PREMIERE_SEMAINE = FIRST_WEEK
 
 
-def semaines_actives(semaines: list[date]) -> list[date]:
-    return [s for s in semaines if not (FREEZE_DEBUT <= s < FREEZE_FIN)]
+def weeks_between(start: date, end: date):
+    """Yield each Monday from start's week to end (inclusive)."""
+    w = week_monday(start)
+    while w <= end:
+        yield w
+        w += timedelta(weeks=1)
 
 
-def semaines_manquantes(db: Session, regles: str) -> list[date]:
-    existantes = {row[0] for row in db.query(ClassementHistorique.semaine)
-                  .filter(ClassementHistorique.regles == regles).distinct().all()}
-    fin = lundi_semaine(date.today())
-    toutes = list(semaines_entre(PREMIERE_SEMAINE, fin))
-    return [s for s in semaines_actives(toutes) if s not in existantes]
+def filter_active_weeks(weeks: list[date]) -> list[date]:
+    """Filter out weeks that fall within the COVID freeze period."""
+    return [w for w in weeks if not (FREEZE_START <= w < FREEZE_END)]
 
 
-def calculer_semaine(semaine: date, regles: str) -> int:
-    """Calcule et stocke le classement pour une semaine donnée. Retourne le nombre de joueurs classés."""
+def missing_weeks(db: Session, rules: str) -> list[date]:
+    """Return all active weeks not yet stored in RankingHistory for the given rules."""
+    existing = {row[0] for row in db.query(RankingHistory.week)
+                .filter(RankingHistory.rules == rules).distinct().all()}
+    end = week_monday(date.today())
+    all_weeks = list(weeks_between(FIRST_WEEK, end))
+    return [w for w in filter_active_weeks(all_weeks) if w not in existing]
+
+
+def compute_week(week: date, rules: str) -> int:
+    """Calculate and store ranking for one week. Returns number of ranked players."""
     db = SessionLocal()
     try:
-        resultats = classement(db, semaine, regles)
-        if not resultats:
+        results = ranking(db, week, rules)
+        if not results:
             return 0
 
         rows = [
             {
-                "semaine":     semaine,
-                "regles":      regles,
-                "joueur_id":   r["joueur_id"],
-                "position":    r["position"],
-                "score":       r["score"],
-                "nb_tournois": r["nb_tournois"],
-                "nb_or":       r["nb_or"],
-                "nb_argent":   r["nb_argent"],
-                "nb_bronze":   r["nb_bronze"],
+                "week":           week,
+                "rules":          rules,
+                "player_id":      r["player_id"],
+                "position":       r["position"],
+                "score":          r["score"],
+                "nb_tournaments": r["nb_tournaments"],
+                "nb_gold":        r["nb_gold"],
+                "nb_silver":      r["nb_silver"],
+                "nb_bronze":      r["nb_bronze"],
             }
-            for r in resultats
+            for r in results
         ]
 
         with _write_lock:
             for row in rows:
-                stmt = insert(ClassementHistorique).values(**row).on_conflict_do_update(
-                    index_elements=["semaine", "regles", "joueur_id"],
-                    set_={"position": row["position"], "score": row["score"],
-                          "nb_tournois": row["nb_tournois"],
-                          "nb_or": row["nb_or"], "nb_argent": row["nb_argent"], "nb_bronze": row["nb_bronze"]},
+                stmt = insert(RankingHistory).values(**row).on_conflict_do_update(
+                    index_elements=["week", "rules", "player_id"],
+                    set_={
+                        "position":       row["position"],
+                        "score":          row["score"],
+                        "nb_tournaments": row["nb_tournaments"],
+                        "nb_gold":        row["nb_gold"],
+                        "nb_silver":      row["nb_silver"],
+                        "nb_bronze":      row["nb_bronze"],
+                    },
                 )
                 db.execute(stmt)
             db.commit()
 
-        return len(resultats)
+        return len(results)
     finally:
         db.close()
 
 
-def calculer_semaines(semaines: list[date], regles: str, workers: int = 4,
-                      on_progress=None) -> None:
-    """Calcule et stocke le classement pour une liste de semaines en parallèle.
-
-    on_progress(semaine, n_joueurs, done, total) — callback optionnel appelé tous les 50 pas.
+def compute_weeks(weeks: list[date], rules: str, workers: int = 4,
+                  on_progress=None) -> None:
     """
-    total = len(semaines)
+    Calculate and store ranking for a list of weeks in parallel.
+    on_progress(week, nb_players, done, total) — optional callback every 50 steps.
+    """
+    total = len(weeks)
     done = 0
 
     with ThreadPoolExecutor(max_workers=workers) as pool:
-        futures = {pool.submit(calculer_semaine, s, regles): s for s in semaines}
+        futures = {pool.submit(compute_week, w, rules): w for w in weeks}
         for future in as_completed(futures):
             done += 1
             if on_progress and (done % 50 == 0 or done == total):
                 on_progress(futures[future], future.result(), done, total)
+
+
+# Aliases for backward compatibility
+semaines_entre      = weeks_between
+semaines_manquantes = missing_weeks
+calculer_semaine    = compute_week
+calculer_semaines   = compute_weeks

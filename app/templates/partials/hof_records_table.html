@@ -30,11 +30,11 @@
     {% for row in rows %}
     <tr class="{% if loop.index == 1 %}row-top1{% elif loop.index == 2 %}row-top2{% elif loop.index == 3 %}row-top3{% endif %}">
       <td class="col-pos center rank-num">{{ loop.index }}</td>
-      <td class="col-flag col-opt">{{ row.joueur.nationalite | flag_link('joueurs') }}</td>
-      <td class="col-joueur-nom"><span class="mobile-flag">{{ row.joueur.nationalite | flag_link('joueurs') }}</span><a href="/joueurs/{{ row.joueur.id }}">{{ row.joueur.prenom | prenom }} {{ row.joueur.nom | title }}</a></td>
+      <td class="col-flag col-opt">{{ row.player.nationality | flag_link('players') }}</td>
+      <td class="col-joueur-nom"><span class="mobile-flag">{{ row.player.nationality | flag_link('players') }}</span><a href="/players/{{ row.player.id }}">{{ row.player.first_name | first_name }} {{ row.player.last_name | title }}</a></td>
       <td class="col-hof-total right rank-num">{{ row[score_key] }}</td>
       <td class="col-nom col-opt" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
-        <a href="/tournois/{{ row.tournoi_regles }}_{{ row.tournoi_ema_id }}" title="{{ row.tournoi_nom }}">{{ row.tournoi_nom[:30] }}</a>
+        <a href="/tournaments/{{ row.tournoi_regles }}_{{ row.tournoi_ema_id }}" title="{{ row.tournoi_nom }}">{{ row.tournoi_nom[:30] }}</a>
       </td>
       <td class="col-date-opt col-opt center dim">{{ row.date.strftime('%d/%m/%Y') if row.date.year != 1900 else '—' }}</td>
     </tr>

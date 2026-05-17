@@ -1,48 +1,51 @@
 """
-Importe les résultats des tournois qui étaient dans le calendrier
-et qui ont maintenant un ema_id (résultats disponibles sur le site EMA).
+Imports results for tournaments that were in the calendar
+and now have an ema_id (results available on the EMA website).
 """
 import sys, os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../.."))
 
 from app.database import SessionLocal
-from app.models import Tournoi, Resultat
-from scripts.import import ema as import_ema
+from app.models import Tournament, Result
+import importlib.util as _ilu
+_spec = _ilu.spec_from_file_location("ema", os.path.join(os.path.dirname(__file__), "ema.py"))
+import_ema = _ilu.module_from_spec(_spec)
+_spec.loader.exec_module(import_ema)
 
 db = SessionLocal()
 
-# Tournois calendrier avec un ema_id mais sans résultats importés
+# Calendar tournaments with an ema_id but no imported results
 candidats = (
-    db.query(Tournoi)
+    db.query(Tournament)
     .filter(
-        Tournoi.statut == "calendrier",
-        Tournoi.ema_id.isnot(None),
+        Tournament.status == "calendrier",
+        Tournament.ema_id.isnot(None),
     )
     .all()
 )
 
 a_importer = []
 for t in candidats:
-    nb = db.query(Resultat).filter(Resultat.tournoi_id == t.id).count()
+    nb = db.query(Result).filter(Result.tournament_id == t.id).count()
     if nb == 0:
         a_importer.append(t)
 
 if not a_importer:
-    print("Aucun nouveau tournoi à importer.")
+    print("No new tournaments to import.")
     db.close()
     sys.exit(0)
 
 for t in a_importer:
-    prefix = "TR_RCR" if t.regles == "RCR" else "TR"
+    prefix = "TR_RCR" if t.rules == "RCR" else "TR"
     tid = str(t.ema_id)
-    print(f"Import {prefix}_{tid} — {t.nom} ({t.date_debut})")
+    print(f"Import {prefix}_{tid} — {t.name} ({t.start_date})")
     html = import_ema.fetch_page(tid, prefix)
     if not html:
-        print(f"  [ERREUR] page introuvable pour {prefix}_{tid}")
+        print(f"  [ERROR] page not found for {prefix}_{tid}")
         continue
     data = import_ema.parse_tournament(html, t.ema_id)
     if not data:
-        print(f"  [ERREUR] parse échoué pour {prefix}_{tid}")
+        print(f"  [ERROR] parse failed for {prefix}_{tid}")
         continue
     import_ema.import_tournament(db, data)
     print(f"  OK")

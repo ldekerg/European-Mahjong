@@ -12,7 +12,7 @@ from datetime import date
 
 # ── importers/calendar.py ────────────────────────────────────────────────────
 
-from scripts.importers.calendar import type_from_nom, parse_dates, _mois_suivant
+from scripts.importers.import_calendar import type_from_nom, parse_dates, _mois_suivant
 
 
 class TestTypeFromNom:
@@ -48,30 +48,30 @@ class TestMoisSuivant:
 
 class TestParseDates:
     def test_un_seul_jour(self):
-        debut, fin = parse_dates("15", 5, 2026)
-        assert debut == date(2026, 5, 15)
-        assert fin == date(2026, 5, 15)
+        start, end = parse_dates("15", 5, 2026)
+        assert start == date(2026, 5, 15)
+        assert end == date(2026, 5, 15)
 
     def test_deux_jours_meme_mois(self):
-        debut, fin = parse_dates("9-10", 5, 2026)
-        assert debut == date(2026, 5, 9)
-        assert fin == date(2026, 5, 10)
+        start, end = parse_dates("9-10", 5, 2026)
+        assert start == date(2026, 5, 9)
+        assert end == date(2026, 5, 10)
 
     def test_chevauchement_mois(self):
         # 31 mai - 1 juin
-        debut, fin = parse_dates("31-01", 5, 2026)
-        assert debut == date(2026, 5, 31)
-        assert fin == date(2026, 6, 1)
+        start, end = parse_dates("31-01", 5, 2026)
+        assert start == date(2026, 5, 31)
+        assert end == date(2026, 6, 1)
 
     def test_plusieurs_jours(self):
-        debut, fin = parse_dates("2-3-4-5", 6, 2026)
-        assert debut == date(2026, 6, 2)
-        assert fin == date(2026, 6, 5)
+        start, end = parse_dates("2-3-4-5", 6, 2026)
+        assert start == date(2026, 6, 2)
+        assert end == date(2026, 6, 5)
 
     def test_suffixes_mois_litteraux(self):
-        debut, fin = parse_dates("31oct-01nov", 10, 2026)
-        assert debut == date(2026, 10, 31)
-        assert fin == date(2026, 11, 1)
+        start, end = parse_dates("31oct-01nov", 10, 2026)
+        assert start == date(2026, 10, 31)
+        assert end == date(2026, 11, 1)
 
 
 # ── importers/ema.py ─────────────────────────────────────────────────────────
@@ -107,16 +107,16 @@ class TestParseTournament:
 
 # ── app/ranking_history.py ───────────────────────────────────────────────────
 
-from app.ranking_history import semaines_entre, semaines_actives, PREMIERE_SEMAINE
-from app.ranking import FREEZE_DEBUT, FREEZE_FIN
+from app.ranking_history import semaines_entre, filter_active_weeks, PREMIERE_SEMAINE
+from app.ranking import FREEZE_START, FREEZE_END
 from datetime import timedelta
 
 
 class TestSemainesEntre:
     def test_deux_semaines(self):
-        debut = date(2026, 5, 11)
-        fin = date(2026, 5, 18)
-        result = list(semaines_entre(debut, fin))
+        start = date(2026, 5, 11)
+        end = date(2026, 5, 18)
+        result = list(semaines_entre(start, end))
         assert result == [date(2026, 5, 11), date(2026, 5, 18)]
 
     def test_meme_semaine(self):
@@ -125,22 +125,22 @@ class TestSemainesEntre:
         assert result == [d]
 
     def test_debut_non_lundi(self):
-        # Ramène au lundi
+        # Snaps back to Monday
         result = list(semaines_entre(date(2026, 5, 13), date(2026, 5, 18)))
         assert result[0] == date(2026, 5, 11)
 
 
-class TestSemainesActives:
+class TestFilterActiveWeeks:
     def test_hors_freeze(self):
-        semaines = [date(2026, 5, 11), date(2026, 5, 18)]
-        assert semaines_actives(semaines) == semaines
+        weeks = [date(2026, 5, 11), date(2026, 5, 18)]
+        assert filter_active_weeks(weeks) == weeks
 
     def test_pendant_freeze(self):
-        semaines = [FREEZE_DEBUT, FREEZE_DEBUT + timedelta(weeks=1)]
-        assert semaines_actives(semaines) == []
+        weeks = [FREEZE_START, FREEZE_START + timedelta(weeks=1)]
+        assert filter_active_weeks(weeks) == []
 
     def test_mixte(self):
         hors = date(2026, 5, 11)
-        dans = FREEZE_DEBUT
-        result = semaines_actives([hors, dans])
+        dans = FREEZE_START
+        result = filter_active_weeks([hors, dans])
         assert result == [hors]

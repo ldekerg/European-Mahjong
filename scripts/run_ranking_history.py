@@ -1,12 +1,13 @@
 """
-CLI pour le calcul du classement historique.
+CLI for ranking history calculation.
 
-Usage :
-  python3 run_ranking_history.py                        # toutes les semaines
-  python3 run_ranking_history.py --depuis 2022-01-03    # depuis une date précise (lundi)
-  python3 run_ranking_history.py --semaine 2026-04-27   # une seule semaine
-  python3 run_ranking_history.py --update               # uniquement les semaines manquantes
-  python3 run_ranking_history.py --workers 8            # paralléliser sur N threads
+Usage:
+  python3 run_ranking_history.py                      # all weeks
+  python3 run_ranking_history.py --from 2022-01-03    # from a specific date (Monday)
+  python3 run_ranking_history.py --week 2026-04-27    # a single week
+  python3 run_ranking_history.py --update             # missing weeks only
+  python3 run_ranking_history.py --workers 8          # parallelise on N threads
+  python3 run_ranking_history.py --rules RCR          # MCR, RCR, or all (default)
 """
 
 import sys, os
@@ -16,51 +17,51 @@ import argparse
 from datetime import date
 
 from app.database import SessionLocal
-from app.ranking import lundi_semaine
+from app.ranking import week_monday
 from app.ranking_history import (
-    PREMIERE_SEMAINE,
-    semaines_entre,
-    semaines_actives,
-    semaines_manquantes,
-    calculer_semaines,
+    FIRST_WEEK,
+    weeks_between,
+    filter_active_weeks,
+    missing_weeks,
+    compute_weeks,
 )
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--depuis",  type=date.fromisoformat)
-    parser.add_argument("--semaine", type=date.fromisoformat)
+    parser.add_argument("--from",    dest="from_date", type=date.fromisoformat)
+    parser.add_argument("--week",    type=date.fromisoformat)
     parser.add_argument("--update",  action="store_true")
-    parser.add_argument("--regles",  choices=["MCR", "RCR", "all"], default="all")
+    parser.add_argument("--rules",   choices=["MCR", "RCR", "all"], default="all")
     parser.add_argument("--workers", type=int, default=4)
     args = parser.parse_args()
 
-    regles_list = ["MCR", "RCR"] if args.regles == "all" else [args.regles]
+    rules_list = ["MCR", "RCR"] if args.rules == "all" else [args.rules]
 
-    for regles in regles_list:
-        print(f"\n=== {regles} ===")
+    for rules in rules_list:
+        print(f"\n=== {rules} ===")
 
         db = SessionLocal()
-        if args.semaine:
-            semaines = [lundi_semaine(args.semaine)]
+        if args.week:
+            weeks = [week_monday(args.week)]
         elif args.update:
-            semaines = semaines_manquantes(db, regles)
-        elif args.depuis:
-            fin = lundi_semaine(date.today())
-            semaines = semaines_actives(list(semaines_entre(args.depuis, fin)))
+            weeks = missing_weeks(db, rules)
+        elif args.from_date:
+            end = week_monday(date.today())
+            weeks = filter_active_weeks(list(weeks_between(args.from_date, end)))
         else:
-            fin = lundi_semaine(date.today())
-            semaines = semaines_actives(list(semaines_entre(PREMIERE_SEMAINE, fin)))
+            end = week_monday(date.today())
+            weeks = filter_active_weeks(list(weeks_between(FIRST_WEEK, end)))
         db.close()
 
-        print(f"{len(semaines)} semaines à calculer (workers={args.workers})")
+        print(f"{len(weeks)} weeks to compute (workers={args.workers})")
 
-        def progress(semaine, n, done, total):
-            print(f"  {semaine}  {n:4} joueurs  ({done}/{total})", flush=True)
+        def progress(week, n, done, total):
+            print(f"  {week}  {n:4} players  ({done}/{total})", flush=True)
 
-        calculer_semaines(semaines, regles, workers=args.workers, on_progress=progress)
+        compute_weeks(weeks, rules, workers=args.workers, on_progress=progress)
 
-    print("\nTerminé.")
+    print("\nDone.")
 
 
 if __name__ == "__main__":

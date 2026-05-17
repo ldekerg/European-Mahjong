@@ -13,19 +13,19 @@
 
 <!-- ── Stats globales ────────────────────────────────────────────────────── -->
 <div class="stats-grid" style="margin-bottom:1.5rem">
-  <a href="/joueurs/" class="stat-card stat-card-hl" style="text-decoration:none;color:inherit">
+  <a href="/players/" class="stat-card stat-card-hl" style="text-decoration:none;color:inherit">
     <div class="stat-label">{{ trad('common.players') }}</div>
-    <div class="stat-value">{{ nb_joueurs }}</div>
+    <div class="stat-value">{{ nb_players }}</div>
   </a>
-  <a href="/tournois/" class="stat-card stat-card-hl" style="text-decoration:none;color:inherit">
+  <a href="/tournaments/" class="stat-card stat-card-hl" style="text-decoration:none;color:inherit">
     <div class="stat-label">{{ trad('common.tournaments') }}</div>
-    <div class="stat-value">{{ nb_tournois }}</div>
+    <div class="stat-value">{{ nb_tournaments }}</div>
   </a>
-  <a href="/classement" class="stat-card stat-card-hl" style="text-decoration:none;color:inherit">
+  <a href="/ranking" class="stat-card stat-card-hl" style="text-decoration:none;color:inherit">
     <div class="stat-label">{{ trad('country.ranked_mcr') }}</div>
     <div class="stat-value">{{ nb_classes_mcr }}</div>
   </a>
-  <a href="/classement?regles=RCR" class="stat-card stat-card-hl" style="text-decoration:none;color:inherit">
+  <a href="/ranking?rules=RCR" class="stat-card stat-card-hl" style="text-decoration:none;color:inherit">
     <div class="stat-label">{{ trad('country.ranked_rcr') }}</div>
     <div class="stat-value">{{ nb_classes_rcr }}</div>
   </a>
@@ -34,7 +34,7 @@
 <!-- ── Champions en titre ────────────────────────────────────────────────── -->
 <h2 style="margin-bottom:0.75rem">
   {{ trad('hof.champions') }}
-  <a href="/hallfame/?vue=championnats" class="dim" style="font-size:0.78rem;font-weight:400;margin-left:0.5rem">{{ trad('hof.link') }}</a>
+  <a href="/hof/?view=championnats" class="dim" style="font-size:0.78rem;font-weight:400;margin-left:0.5rem">{{ trad('hof.link') }}</a>
 </h2>
 <div class="stats-grid" style="margin-bottom:1.5rem">
   {% for type_key, label in [('oemc','🇪🇺 OEMC'), ('wmc','🌍 WMC'), ('oerc','🇪🇺 OERC'), ('wrc','🌍 WRC')] %}
@@ -42,11 +42,11 @@
   <div class="stat-card" style="text-align:center">
     <div class="stat-label" style="font-size:0.8rem;margin-bottom:0.4rem">{{ label }}</div>
     {% if c %}
-    <div style="font-size:1.5rem">{{ c.joueur.nationalite | flag }}</div>
-    <a href="/joueurs/{{ c.joueur.id }}" style="font-weight:700;display:block;margin:0.2rem 0;font-size:0.88rem">
-      {{ c.joueur.prenom | prenom }} {{ c.joueur.nom | title }}
+    <div style="font-size:1.5rem">{{ c.player.nationality | flag }}</div>
+    <a href="/players/{{ c.player.id }}" style="font-weight:700;display:block;margin:0.2rem 0;font-size:0.88rem">
+      {{ c.player.first_name | first_name }} {{ c.player.last_name | title }}
     </a>
-    <div class="dim" style="font-size:0.75rem">{{ c.tournoi.nom[:30] }}</div>
+    <div class="dim" style="font-size:0.75rem">{{ c.tournament.name[:30] }}</div>
     <div style="margin-top:0.3rem;font-size:0.82rem">
       {% if c.est_champion %}<span style="color:var(--or-fg);font-weight:700">{{ trad('hof.winner') }}</span>
       {% elif c.est_vice %}<span style="color:var(--argent-fg);font-weight:700">{{ trad('hof.runner_up') }}</span>
@@ -69,14 +69,14 @@
   <div>
     <h2 style="margin-bottom:0.5rem">
       {{ trad('home.top5') }} <span class="badge badge-mcr">MCR</span>
-      <a href="/classement" class="dim" style="font-size:0.78rem;font-weight:400;margin-left:0.5rem">{{ trad('common.see_all') }}</a>
+      <a href="/ranking" class="dim" style="font-size:0.78rem;font-weight:400;margin-left:0.5rem">{{ trad('common.see_all') }}</a>
     </h2>
     <div style="display:flex;flex-direction:column;gap:0.3rem">
       {% for r in top_mcr %}
-      <a href="/joueurs/{{ r.joueur.id }}" style="display:flex;align-items:center;gap:0.6rem;padding:0.4rem 0.6rem;background:var(--bg2);border-radius:6px;text-decoration:none;color:inherit;border:1px solid var(--border)">
+      <a href="/players/{{ r.player.id }}" style="display:flex;align-items:center;gap:0.6rem;padding:0.4rem 0.6rem;background:var(--bg2);border-radius:6px;text-decoration:none;color:inherit;border:1px solid var(--border)">
         <span style="width:1.4rem;text-align:right;font-weight:700;color:{% if r.position==1 %}var(--or-fg){% elif r.position==2 %}var(--argent-fg){% elif r.position==3 %}var(--bronze-fg){% else %}var(--text3){% endif %}">{{ r.position }}</span>
-        <span>{{ r.joueur.nationalite | flag }}</span>
-        <span style="flex:1;font-size:0.88rem">{{ r.joueur.prenom | prenom }} {{ r.joueur.nom | title }}</span>
+        <span>{{ r.player.nationality | flag }}</span>
+        <span style="flex:1;font-size:0.88rem">{{ r.player.first_name | first_name }} {{ r.player.last_name | title }}</span>
         <span class="dim" style="font-size:0.8rem">{{ r.score | round(1) }}</span>
       </a>
       {% endfor %}
@@ -87,14 +87,14 @@
   <div>
     <h2 style="margin-bottom:0.5rem">
       {{ trad('home.top5') }} <span class="badge badge-rcr">RCR</span>
-      <a href="/classement?regles=RCR" class="dim" style="font-size:0.78rem;font-weight:400;margin-left:0.5rem">{{ trad('common.see_all') }}</a>
+      <a href="/ranking?rules=RCR" class="dim" style="font-size:0.78rem;font-weight:400;margin-left:0.5rem">{{ trad('common.see_all') }}</a>
     </h2>
     <div style="display:flex;flex-direction:column;gap:0.3rem">
       {% for r in top_rcr %}
-      <a href="/joueurs/{{ r.joueur.id }}" style="display:flex;align-items:center;gap:0.6rem;padding:0.4rem 0.6rem;background:var(--bg2);border-radius:6px;text-decoration:none;color:inherit;border:1px solid var(--border)">
+      <a href="/players/{{ r.player.id }}" style="display:flex;align-items:center;gap:0.6rem;padding:0.4rem 0.6rem;background:var(--bg2);border-radius:6px;text-decoration:none;color:inherit;border:1px solid var(--border)">
         <span style="width:1.4rem;text-align:right;font-weight:700;color:{% if r.position==1 %}var(--or-fg){% elif r.position==2 %}var(--argent-fg){% elif r.position==3 %}var(--bronze-fg){% else %}var(--text3){% endif %}">{{ r.position }}</span>
-        <span>{{ r.joueur.nationalite | flag }}</span>
-        <span style="flex:1;font-size:0.88rem">{{ r.joueur.prenom | prenom }} {{ r.joueur.nom | title }}</span>
+        <span>{{ r.player.nationality | flag }}</span>
+        <span style="flex:1;font-size:0.88rem">{{ r.player.first_name | first_name }} {{ r.player.last_name | title }}</span>
         <span class="dim" style="font-size:0.8rem">{{ r.score | round(1) }}</span>
       </a>
       {% endfor %}
@@ -110,10 +110,10 @@
   <div>
     <h2 style="margin-bottom:0.5rem">
       {{ trad('home.recent_tournaments') }}
-      <a href="/tournois/" class="dim" style="font-size:0.78rem;font-weight:400;margin-left:0.5rem">{{ trad('common.see_all') }}</a>
+      <a href="/tournaments/" class="dim" style="font-size:0.78rem;font-weight:400;margin-left:0.5rem">{{ trad('common.see_all') }}</a>
     </h2>
-    {% with tournois=derniers, actifs_ids={}, ville_filtre=None, tab_key='derniers' %}
-    {% include 'partials/tournois_table.html' %}
+    {% with tournois=recent, actifs_ids={}, ville_filtre=None, tab_key='recent' %}
+    {% include 'partials/tournaments_table.html' %}
     {% endwith %}
   </div>
 
@@ -121,10 +121,10 @@
   <div>
     <h2 style="margin-bottom:0.5rem">
       {{ trad('home.upcoming_tournaments') }}
-      <a href="/tournois/calendrier" class="dim" style="font-size:0.78rem;font-weight:400;margin-left:0.5rem">{{ trad('home.calendar_link') }}</a>
+      <a href="/tournaments/calendar" class="dim" style="font-size:0.78rem;font-weight:400;margin-left:0.5rem">{{ trad('home.calendar_link') }}</a>
     </h2>
-    {% with tournois_par_mois=calendrier_par_mois, compact=true, compact_max=8 %}
-    {% include 'partials/calendrier_liste.html' %}
+    {% with tournois_par_mois=calendar_by_month, compact=true, compact_max=8 %}
+    {% include 'partials/calendar_list.html' %}
     {% endwith %}
   </div>
 

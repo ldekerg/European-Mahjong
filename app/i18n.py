@@ -19,7 +19,7 @@ DEFAULT_LANG = "fr"
 
 
 def _detect_lang(request: Request) -> str:
-    """Priorité : cookie lang → Accept-Language → défaut."""
+    """Priority: lang cookie → Accept-Language header → default."""
     # 1. Cookie
     lang = request.cookies.get("lang", "").lower()[:2]
     if lang in _LOCALES:
@@ -34,7 +34,7 @@ def _detect_lang(request: Request) -> str:
 
 
 def trad(key: str, lang: str, **kwargs) -> str:
-    """Résout 'section.clé' dans le catalogue de la langue donnée."""
+    """Resolve 'section.key' in the language catalogue."""
     catalogue = _LOCALES.get(lang, _LOCALES.get(DEFAULT_LANG, {}))
     parts = key.split(".")
     val = catalogue
@@ -68,7 +68,7 @@ templates = Jinja2Templates(directory=_TEMPLATES_DIR)
 _orig_response = templates.TemplateResponse
 
 def _patched_response(request_or_name, *args, **kwargs):
-    # Compatibilité avec les deux signatures (request, name, context) et (name, context, request)
+    # Compatible with both signatures: (request, name, context) and (name, context, request)
     if isinstance(request_or_name, Request):
         request = request_or_name
         name = args[0]
@@ -94,7 +94,7 @@ templates.TemplateResponse = _patched_response
 
 
 def _to_iso(value: str) -> str | None:
-    """Résout un code ISO ou un nom de pays → code ISO 2 lettres, ou None."""
+    """Resolve an ISO code or country name → 2-letter ISO code, or None."""
     if not value:
         return None
     v = value.strip()
@@ -122,8 +122,8 @@ PAYS_EMA = {
 }
 
 
-def flag_link(value: str, onglet: str = "joueurs") -> Markup:
-    """Code ISO OU nom de pays → drapeau cliquable (EMA uniquement) vers /pays/{ISO}?onglet=X."""
+def flag_link(value: str, tab: str = "players") -> Markup:
+    """ISO code or country name → clickable flag (EMA only) linking to /countries/{ISO}?tab=X."""
     if not value or value.upper() in ("GUEST", "OTHER", "XX"):
         return Markup(flag_emoji(value))
     iso = _to_iso(value)
@@ -132,7 +132,7 @@ def flag_link(value: str, onglet: str = "joueurs") -> Markup:
     emoji = flag_emoji(iso)
     if iso not in PAYS_EMA:
         return Markup(emoji)
-    url = f"/pays/{iso}?onglet={onglet}"
+    url = f"/countries/{iso}?tab={tab}"
     return Markup(f'<a href="{url}" title="{value}" onclick="event.stopPropagation()">{emoji}</a>')
 
 
@@ -169,13 +169,13 @@ _PAYS_ISO = {
     "bosnia and h.": "BA", "luxembourg": "LU", "ireland": "IE",
 }
 
-# Alias rétrocompatibles — même comportement que flag / flag_link
+# Backward-compatible aliases — same behaviour as flag / flag_link
 templates.env.filters["pays_flag"]      = flag_emoji
 templates.env.filters["pays_flag_link"] = flag_link
 
 
 def ema_color(value: int, max_val: int = 1000) -> str:
-    """Retourne un style CSS background+color pour un dégradé rouge→vert."""
+    """Return a CSS background+color style for a red→green gradient."""
     ratio = max(0.0, min(1.0, value / max_val))
     hue = ratio * 120           # 0 = rouge, 120 = vert
     bg  = f"hsl({hue:.0f}, 75%, 88%)"
@@ -193,7 +193,7 @@ def fmt_date(iso: str) -> str:
 
 templates.env.filters["fmt_date"] = fmt_date
 
-# Corrections d'accents sur les prénoms courants
+# Accent corrections for common French first names
 _ACCENTS = {
     "loic": "Loïc", "loïc": "Loïc",
     "noel": "Noël", "noël": "Noël",
@@ -232,7 +232,7 @@ _ACCENTS = {
 }
 
 def prenom_propre(s: str) -> str:
-    """Titre-case + corrections d'accents pour les prénoms."""
+    """Title-case + accent corrections for first names."""
     if not s:
         return s
     mots = s.strip().title().split()
@@ -242,4 +242,4 @@ def prenom_propre(s: str) -> str:
         result.append(_ACCENTS.get(key, mot))
     return " ".join(result)
 
-templates.env.filters["prenom"] = prenom_propre
+templates.env.filters["first_name"] = prenom_propre

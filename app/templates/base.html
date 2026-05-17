@@ -29,20 +29,20 @@
 </head>
 <body>
     <nav>
-        <a href="/accueil">{{ trad('nav.home') }}</a>
+        <a href="/home">{{ trad('nav.home') }}</a>
         <button id="nav-toggle" aria-label="Menu" aria-expanded="false">
           <span></span><span></span><span></span>
         </button>
         <div id="nav-links">
-          <a href="/classement">{{ trad('nav.ranking') }}</a>
-          <a href="/joueurs/">{{ trad('nav.players') }}</a>
-          <a href="/pays/">{{ trad('nav.countries') }}</a>
-          <a href="/tournois/">{{ trad('nav.tournaments') }}</a>
-          <a href="/tournois/calendrier">{{ trad('common.calendar') }}</a>
-          <a href="/hallfame/">{{ trad('nav.hallfame') }}</a>
+          <a href="/ranking">{{ trad('nav.ranking') }}</a>
+          <a href="/players/">{{ trad('nav.players') }}</a>
+          <a href="/countries/">{{ trad('nav.countries') }}</a>
+          <a href="/tournaments/">{{ trad('nav.tournaments') }}</a>
+          <a href="/tournaments/calendar">{{ trad('common.calendar') }}</a>
+          <a href="/hof/">{{ trad('nav.hallfame') }}</a>
         </div>
         <div class="nav-controls">
-        <button class="regles-toggle" onclick="toggleRegles()" title="Règle par défaut">MCR</button>
+        <button class="rules-toggle" onclick="toggleRegles()" title="Règle par défaut">MCR</button>
         <div class="lang-picker" id="lang-picker">
           <button class="lang-toggle" onclick="toggleLangDropdown()" title="{{ trad('common.language') }}">
             {% set _flags = {'fr':'🇫🇷','en':'🇬🇧','de':'🇩🇪','nl':'🇳🇱','pl':'🇵🇱','sv':'🇸🇪','fi':'🇫🇮','it':'🇮🇹','es':'🇪🇸','uk':'🇺🇦','hu':'🇭🇺','da':'🇩🇰','pt':'🇵🇹','ro':'🇷🇴','cs':'🇨🇿','sk':'🇸🇰','no':'🇳🇴','lv':'🇱🇻'} %}
@@ -134,18 +134,18 @@
 
     // ── Règle par défaut (MCR/RCR) ───────────────────────────────────────────
     function _getRegles() {
-        return localStorage.getItem('regles') || 'MCR';
+        return localStorage.getItem('rules') || 'MCR';
     }
 
     function toggleRegles() {
         var r = _getRegles() === 'MCR' ? 'RCR' : 'MCR';
-        localStorage.setItem('regles', r);
+        localStorage.setItem('rules', r);
         _applyReglesPref();
     }
 
     function _applyReglesPref() {
         var r = _getRegles();
-        var btn = document.querySelector('.regles-toggle');
+        var btn = document.querySelector('.rules-toggle');
         if (btn) btn.textContent = r;
 
         // Réordonner et activer les onglets MCR/RCR sur la page
@@ -171,7 +171,7 @@
             }
 
             // Ne pas forcer si l'URL contient un paramètre regles explicite (navigation intentionnelle)
-            var urlRegles = new URLSearchParams(window.location.search).get('regles');
+            var urlRegles = new URLSearchParams(window.location.search).get('rules');
             if (urlRegles) return;
 
             // Activer la règle préférée si aucun onglet n'est actif via URL/serveur

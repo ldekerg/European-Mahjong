@@ -7,45 +7,45 @@ from sqlalchemy import func, case
 from typing import Optional
 
 from app.database import get_db
-from app.models import ClassementHistorique, Joueur, Resultat, ResultatAnonyme, Tournoi
+from app.models import RankingHistory, Player, Result, AnonymousResult, Tournament
 from app.i18n import templates, PAYS_EMA
 
-router = APIRouter(prefix="/hallfame")
+router = APIRouter(prefix="/hof")
 
 
-def _hof_data(db: Session, regles: str, actifs_ids=None):
-    """Calcule les stats Hall of Fame pour une discipline."""
-    # Agrégations sur classement_historique
+def _hof_data(db: Session, regles: str, active_ids=None):
+    """Computes Hall of Fame stats for a discipline."""
+    # Aggregations on classement_historique
     stats = db.query(
-        ClassementHistorique.joueur_id,
-        func.count(ClassementHistorique.id).label("nb_semaines"),
-        func.sum(case((ClassementHistorique.position == 1,  1), else_=0)).label("nb_or"),
-        func.sum(case((ClassementHistorique.position <= 2,  1), else_=0)).label("nb_argent"),
-        func.sum(case((ClassementHistorique.position <= 3,  1), else_=0)).label("nb_bronze"),
-        func.sum(case((ClassementHistorique.position <= 10, 1), else_=0)).label("nb_top10"),
-        func.sum(case((ClassementHistorique.position <= 20, 1), else_=0)).label("nb_top20"),
-        func.sum(case((ClassementHistorique.position <= 50, 1), else_=0)).label("nb_top50"),
-        func.min(case((ClassementHistorique.position == 1, ClassementHistorique.semaine), else_=None)).label("premiere_1"),
-        func.min(case((ClassementHistorique.position <= 10, ClassementHistorique.semaine), else_=None)).label("premiere_top10"),
-        func.min(ClassementHistorique.position).label("meilleur_rang"),
-        func.max(ClassementHistorique.score).label("score_max"),
+        RankingHistory.player_id,
+        func.count(RankingHistory.id).label("nb_semaines"),
+        func.sum(case((RankingHistory.position == 1,  1), else_=0)).label("nb_gold"),
+        func.sum(case((RankingHistory.position <= 2,  1), else_=0)).label("nb_silver"),
+        func.sum(case((RankingHistory.position <= 3,  1), else_=0)).label("nb_bronze"),
+        func.sum(case((RankingHistory.position <= 10, 1), else_=0)).label("nb_top10"),
+        func.sum(case((RankingHistory.position <= 20, 1), else_=0)).label("nb_top20"),
+        func.sum(case((RankingHistory.position <= 50, 1), else_=0)).label("nb_top50"),
+        func.min(case((RankingHistory.position == 1, RankingHistory.week), else_=None)).label("premiere_1"),
+        func.min(case((RankingHistory.position <= 10, RankingHistory.week), else_=None)).label("premiere_top10"),
+        func.min(RankingHistory.position).label("meilleur_rang"),
+        func.max(RankingHistory.score).label("score_max"),
     ).filter(
-        ClassementHistorique.regles == regles,
-    ).group_by(ClassementHistorique.joueur_id).subquery()
+        RankingHistory.rules == regles,
+    ).group_by(RankingHistory.player_id).subquery()
 
-    qr = db.query(stats, Joueur).join(Joueur, stats.c.joueur_id == Joueur.id)
-    if actifs_ids is not None:
-        qr = qr.filter(stats.c.joueur_id.in_(actifs_ids))
+    qr = db.query(stats, Player).join(Player, stats.c.player_id == Player.id)
+    if active_ids is not None:
+        qr = qr.filter(stats.c.player_id.in_(active_ids))
     rows = qr.all()
 
     result = []
     for row in rows:
-        j = row.Joueur
+        j = row.Player
         result.append({
-            "joueur":        j,
+            "player":        j,
             "nb_semaines":   row.nb_semaines or 0,
-            "nb_or":         row.nb_or or 0,
-            "nb_argent":     row.nb_argent or 0,
+            "nb_gold":         row.nb_gold or 0,
+            "nb_silver":     row.nb_silver or 0,
             "nb_bronze":     row.nb_bronze or 0,
             "nb_top10":      row.nb_top10 or 0,
             "nb_top20":      row.nb_top20 or 0,
@@ -59,50 +59,50 @@ def _hof_data(db: Session, regles: str, actifs_ids=None):
 
 
 def _championnats(db: Session, regles: str):
-    """Résultats OEMC/WMC/OERC/WRC."""
+    """OEMC/WMC/OERC/WRC results."""
     types = ["wmc", "oemc"] if regles == "MCR" else ["wrc", "oerc"]
-    rows = db.query(Resultat, Tournoi, Joueur).join(
-        Tournoi, Resultat.tournoi_id == Tournoi.id
+    rows = db.query(Result, Tournament, Player).join(
+        Tournament, Result.tournament_id == Tournament.id
     ).join(
-        Joueur, Resultat.joueur_id == Joueur.id
+        Player, Result.player_id == Player.id
     ).filter(
-        Tournoi.type_tournoi.in_(types),
-        Tournoi.date_debut.isnot(None),
-    ).order_by(Tournoi.date_debut.desc(), Resultat.position).all()
+        Tournament.tournament_type.in_(types),
+        Tournament.start_date.isnot(None),
+    ).order_by(Tournament.start_date.desc(), Result.position).all()
     return rows
 
 
 def _meilleur_europeen(db: Session, type_tournoi: str):
-    """Meilleur joueur européen du dernier tournoi de ce type."""
+    """Best European player from the last tournament of this type."""
     from sqlalchemy import func
-    # Date du dernier tournoi de ce type AVEC des résultats
-    dernier = db.query(func.max(Tournoi.date_debut)).join(
-        Resultat, Resultat.tournoi_id == Tournoi.id
+    # Date of the last tournament of this type WITH results
+    dernier = db.query(func.max(Tournament.start_date)).join(
+        Result, Result.tournament_id == Tournament.id
     ).filter(
-        Tournoi.type_tournoi == type_tournoi
+        Tournament.tournament_type == type_tournoi
     ).scalar()
     if not dernier:
         return None
 
-    tournoi = db.query(Tournoi).filter(
-        Tournoi.type_tournoi == type_tournoi,
-        Tournoi.date_debut == dernier,
+    tournoi = db.query(Tournament).filter(
+        Tournament.tournament_type == type_tournoi,
+        Tournament.start_date == dernier,
     ).first()
 
-    resultat = db.query(Resultat, Joueur).join(
-        Joueur, Resultat.joueur_id == Joueur.id
+    result = db.query(Result, Player).join(
+        Player, Result.player_id == Player.id
     ).filter(
-        Resultat.tournoi_id == tournoi.id,
-        Joueur.statut == "europeen",
-    ).order_by(Resultat.position).first()
+        Result.tournament_id == tournoi.id,
+        Player.status == "europeen",
+    ).order_by(Result.position).first()
 
-    if not resultat:
+    if not result:
         return None
 
-    r, j = resultat
+    r, j = result
     return {
-        "tournoi":  tournoi,
-        "joueur":   j,
+        "tournament": tournoi,
+        "player":     j,
         "position": r.position,
         "est_champion": r.position == 1,
         "est_vice":     r.position == 2,
@@ -111,41 +111,41 @@ def _meilleur_europeen(db: Session, type_tournoi: str):
 
 
 def _palmares_championnats(db: Session, regles: str) -> list:
-    """Pour chaque tournoi majeur avec résultats, retourne les 3 meilleurs (identifiés + anonymes fusionnés)."""
+    """For each major tournament with results, returns the top 3 (identified + anonymous merged)."""
     types = ["wmc", "oemc"] if regles == "MCR" else ["wrc", "oerc"]
-    tournois = db.query(Tournoi).filter(
-        Tournoi.type_tournoi.in_(types),
-        Tournoi.date_debut.isnot(None),
-        Tournoi.date_debut != __import__('datetime').date(1900, 1, 1),
-    ).order_by(Tournoi.date_debut.desc()).all()
+    tournois = db.query(Tournament).filter(
+        Tournament.tournament_type.in_(types),
+        Tournament.start_date.isnot(None),
+        Tournament.start_date != __import__('datetime').date(1900, 1, 1),
+    ).order_by(Tournament.start_date.desc()).all()
 
     result = []
     for t in tournois:
-        identifies = db.query(Resultat, Joueur).join(
-            Joueur, Resultat.joueur_id == Joueur.id
+        identifies = db.query(Result, Player).join(
+            Player, Result.player_id == Player.id
         ).filter(
-            Resultat.tournoi_id == t.id,
-            Joueur.statut == "europeen",
-        ).order_by(Resultat.position).all()
+            Result.tournament_id == t.id,
+            Player.status == "europeen",
+        ).order_by(Result.position).all()
 
-        anonymes = db.query(ResultatAnonyme).filter(
-            ResultatAnonyme.tournoi_id == t.id,
-            ResultatAnonyme.nationalite.in_(PAYS_EMA),
-        ).order_by(ResultatAnonyme.position).all()
+        anonymes = db.query(AnonymousResult).filter(
+            AnonymousResult.tournament_id == t.id,
+            AnonymousResult.nationality.in_(PAYS_EMA),
+        ).order_by(AnonymousResult.position).all()
 
-        # Fusionner et trier par position, garder top3
+        # Merge and sort by position, keep top 3
         all_entries = [
-            {"joueur": j, "position": r.position, "nationalite": r.nationalite, "anonyme": False}
+            {"player": j, "position": r.position, "nationality": r.nationality, "anonyme": False}
             for r, j in identifies
         ] + [
-            {"joueur": None, "position": a.position, "nationalite": a.nationalite,
-             "prenom": a.prenom, "nom": a.nom, "anonyme": True}
+            {"player": None, "position": a.position, "nationality": a.nationality,
+             "first_name": a.first_name, "name": a.last_name, "anonyme": True}
             for a in anonymes
         ]
         all_entries.sort(key=lambda x: x["position"])
 
         if not all_entries:
-            continue  # Tournoi sans résultats
+            continue  # Tournament with no results
 
         result.append({
             "tournoi": t,
@@ -155,38 +155,38 @@ def _palmares_championnats(db: Session, regles: str) -> list:
 
 
 def _compute_hof(db: Session, regles: str, periode: str) -> dict:
-    """Calcule toutes les données HoF pour une discipline et une période."""
-    from app.ranking import lundi_semaine, FREEZE_DEBUT, FREEZE_FIN
+    """Computes all HoF data for a discipline and a period."""
+    from app.ranking import week_monday, FREEZE_START, FREEZE_END
     from datetime import date as dt
     from collections import defaultdict
 
-    semaine_actuelle = lundi_semaine(dt.today())
-    actifs_ids = None
+    current_week = week_monday(dt.today())
+    active_ids = None
     streak_map = {}
 
     if periode == "encours":
-        toutes = db.query(
-            ClassementHistorique.joueur_id,
-            ClassementHistorique.semaine,
+        all_weeks = db.query(
+            RankingHistory.player_id,
+            RankingHistory.week,
         ).filter(
-            ClassementHistorique.regles == regles,
+            RankingHistory.rules == regles,
         ).order_by(
-            ClassementHistorique.joueur_id,
-            ClassementHistorique.semaine.desc(),
+            RankingHistory.player_id,
+            RankingHistory.week.desc(),
         ).all()
 
-        par_joueur = defaultdict(list)
-        for jid, sem in toutes:
-            par_joueur[jid].append(sem)
+        by_player = defaultdict(list)
+        for jid, sem in all_weeks:
+            by_player[jid].append(sem)
 
-        freeze_gap = (FREEZE_FIN - FREEZE_DEBUT).days // 7 + 1
+        freeze_gap = (FREEZE_END - FREEZE_START).days // 7 + 1
 
-        for jid, semaines in par_joueur.items():
-            if semaines[0] != semaine_actuelle:
+        for jid, weeks in by_player.items():
+            if weeks[0] != current_week:
                 continue
             streak = 1
-            for k in range(1, len(semaines)):
-                diff = (semaines[k-1] - semaines[k]).days // 7
+            for k in range(1, len(weeks)):
+                diff = (weeks[k-1] - weeks[k]).days // 7
                 if diff == 1:
                     streak += 1
                 elif diff == freeze_gap:
@@ -195,24 +195,24 @@ def _compute_hof(db: Session, regles: str, periode: str) -> dict:
                     break
             streak_map[jid] = streak
 
-        actifs_ids = set(streak_map.keys())
+        active_ids = set(streak_map.keys())
 
-    data = _hof_data(db, regles, actifs_ids)
+    data = _hof_data(db, regles, active_ids)
     championnats = _championnats(db, regles)
 
     medals_q = db.query(
-        Resultat.joueur_id,
-        func.sum(case((Resultat.position == 1, 1), else_=0)).label("or_t"),
-        func.sum(case((Resultat.position == 2, 1), else_=0)).label("argent_t"),
-        func.sum(case((Resultat.position == 3, 1), else_=0)).label("bronze_t"),
-        func.count(Resultat.id).label("total_t"),
-    ).join(Tournoi, Resultat.tournoi_id == Tournoi.id
-    ).filter(Tournoi.regles == regles
-    ).group_by(Resultat.joueur_id).subquery()
+        Result.player_id,
+        func.sum(case((Result.position == 1, 1), else_=0)).label("or_t"),
+        func.sum(case((Result.position == 2, 1), else_=0)).label("argent_t"),
+        func.sum(case((Result.position == 3, 1), else_=0)).label("bronze_t"),
+        func.count(Result.id).label("total_t"),
+    ).join(Tournament, Result.tournament_id == Tournament.id
+    ).filter(Tournament.rules == regles
+    ).group_by(Result.player_id).subquery()
 
-    medals_rows = db.query(medals_q, Joueur).join(Joueur, medals_q.c.joueur_id == Joueur.id).all()
+    medals_rows = db.query(medals_q, Player).join(Player, medals_q.c.player_id == Player.id).all()
     medals_data = [{
-        "joueur":   row.Joueur,
+        "player":   row.Player,
         "or_t":     row.or_t or 0,
         "argent_t": row.argent_t or 0,
         "bronze_t": row.bronze_t or 0,
@@ -229,55 +229,55 @@ def _compute_hof(db: Session, regles: str, periode: str) -> dict:
             return s
 
         for d in data:
-            jid = d["joueur"].id
+            jid = d["player"].id
             total_streak = streak_map.get(jid, 0)
-            toutes_serie = db.query(
-                ClassementHistorique.semaine,
-                ClassementHistorique.position,
+            all_series = db.query(
+                RankingHistory.week,
+                RankingHistory.position,
             ).filter(
-                ClassementHistorique.joueur_id == jid,
-                ClassementHistorique.regles == regles,
-            ).order_by(ClassementHistorique.semaine.desc()).limit(total_streak).all()
+                RankingHistory.player_id == jid,
+                RankingHistory.rules == regles,
+            ).order_by(RankingHistory.week.desc()).limit(total_streak).all()
 
             d["nb_semaines"] = total_streak
-            d["nb_or"]    = streak_for(toutes_serie, 1)
-            d["nb_argent"] = streak_for(toutes_serie, 2)
-            d["nb_bronze"] = streak_for(toutes_serie, 3)
-            d["nb_top10"]  = streak_for(toutes_serie, 10)
-            d["nb_top20"]  = streak_for(toutes_serie, 20)
-            d["nb_top50"]  = streak_for(toutes_serie, 50)
+            d["nb_gold"]    = streak_for(all_series, 1)
+            d["nb_silver"] = streak_for(all_series, 2)
+            d["nb_bronze"] = streak_for(all_series, 3)
+            d["nb_top10"]  = streak_for(all_series, 10)
+            d["nb_top20"]  = streak_for(all_series, 20)
+            d["nb_top50"]  = streak_for(all_series, 50)
 
     if periode == "encours":
-        data.sort(key=lambda x: (-x["nb_or"], -x["nb_bronze"], -x["nb_top10"], -x["nb_top20"], -x["nb_top50"]))
+        data.sort(key=lambda x: (-x["nb_gold"], -x["nb_bronze"], -x["nb_top10"], -x["nb_top20"], -x["nb_top50"]))
         data = [d for d in data if d["nb_top50"] > 0]
     else:
-        data.sort(key=lambda x: (-x["nb_or"], -x["nb_argent"], -x["nb_bronze"]))
+        data.sort(key=lambda x: (-x["nb_gold"], -x["nb_silver"], -x["nb_bronze"]))
         data = [d for d in data if d["nb_semaines"] > 0]
 
     return {"data": data, "medals_data": medals_data, "championnats": championnats}
 
 
 def _records(db: Session, regles: str) -> dict:
-    """Top 20 scores mahjong et (MCR seulement) top 20 points tournoi."""
+    """Top 20 mahjong scores and (MCR only) top 20 tournament points."""
     base = db.query(
-        Resultat, Tournoi, Joueur,
-    ).join(Tournoi, Resultat.tournoi_id == Tournoi.id
-    ).join(Joueur, Resultat.joueur_id == Joueur.id
+        Result, Tournament, Player,
+    ).join(Tournament, Result.tournament_id == Tournament.id
+    ).join(Player, Result.player_id == Player.id
     ).filter(
-        Tournoi.regles == regles,
-        Tournoi.type_tournoi.notin_(["wmc", "wrc"]),
+        Tournament.rules == regles,
+        Tournament.tournament_type.notin_(["wmc", "wrc"]),
     )
 
     def _row(r, t, j):
         return {
-            "joueur":        j,
+            "player":        j,
             "points":        r.points,
             "mahjong":       r.mahjong,
-            "tournoi_nom":   t.nom,
-            "tournoi_regles": t.regles,
+            "tournoi_nom":   t.name,
+            "tournoi_regles": t.rules,
             "tournoi_ema_id": t.ema_id,
-            "nb_joueurs":    t.nb_joueurs,
-            "date":          t.date_debut,
+            "nb_players":    t.nb_players,
+            "date":          t.start_date,
         }
 
     from datetime import timedelta
@@ -286,19 +286,19 @@ def _records(db: Session, regles: str) -> dict:
 
     def _top_mahjong(q, limit=20):
         return [_row(r, t, j) for r, t, j in
-                q.filter(Resultat.mahjong > seuil_mah)
-                 .order_by(Resultat.mahjong.desc())
+                q.filter(Result.mahjong > seuil_mah)
+                 .order_by(Result.mahjong.desc())
                  .limit(limit).all()]
 
     def _top_points(q, limit=20):
         return [_row(r, t, j) for r, t, j in
-                q.filter(Resultat.points.between(1, 99))
-                 .order_by(Resultat.points.desc())
+                q.filter(Result.points.between(1, 99))
+                 .order_by(Result.points.desc())
                  .limit(limit).all()]
 
-    # Filtre tournois 2 jours (date_fin - date_debut <= 1 jour)
+    # Filter 2-day tournaments (end_date - start_date <= 1 day)
     base_2j = base.filter(
-        (func.julianday(Tournoi.date_fin) - func.julianday(Tournoi.date_debut)) <= 1
+        (func.julianday(Tournament.end_date) - func.julianday(Tournament.start_date)) <= 1
     )
 
     top_mahjong      = _top_mahjong(base)
@@ -317,7 +317,7 @@ def _records(db: Session, regles: str) -> dict:
 @router.get("/")
 def hallfame(
     request: Request,
-    vue: str = Query("medailles"),   # medailles | semaines | championnats | records
+    view: str = Query("medals"),     # medals | weeks | championships | records
     periode: str = Query("alltime"), # alltime | encours
     db: Session = Depends(get_db),
 ):
@@ -333,22 +333,22 @@ def hallfame(
     palmares_mcr = _palmares_championnats(db, "MCR")
     palmares_rcr = _palmares_championnats(db, "RCR")
 
-    from app.routes.tournois import _incomplets_ids
+    from app.routes.tournaments import _incomplets_ids
     tous_ids = [item["tournoi"].id for item in palmares_mcr + palmares_rcr]
-    incomplets = _incomplets_ids(db, tous_ids)
+    incomplete = _incomplets_ids(db, tous_ids)
 
     records_mcr = _records(db, "MCR")
     records_rcr = _records(db, "RCR")
 
-    return templates.TemplateResponse(request, "hallfame.html", {
+    return templates.TemplateResponse(request, "hof.html", {
         "mcr":          mcr,
         "rcr":          rcr,
-        "vue":          vue,
+        "view":         view,
         "periode":      periode,
         "champions":    champions,
         "palmares_mcr": palmares_mcr,
         "palmares_rcr": palmares_rcr,
-        "incomplets":    incomplets,
+        "incomplete":    incomplete,
         "records_mcr":   records_mcr,
         "records_rcr":   records_rcr,
     })

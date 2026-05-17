@@ -2,7 +2,7 @@
    Variables requises :
      data   — dict {rang, meilleur, date_meilleur, score_max, date_score_max, nb_actifs, tournois}
      regles — 'mcr' ou 'rcr'
-   Dépendance JS : highlightDate() et clearHighlight() définis dans joueurs/detail.html
+   Dépendance JS : highlightDate() et clearHighlight() définis dans players/detail.html
 #}
 <div class="stats-grid">
   <div class="stat-card">
@@ -15,14 +15,14 @@
     </div>
   </div>
   <div class="stat-card stat-card-hl"
-       onmouseenter="highlightDate('{{ regles }}','pos','{{ data.date_meilleur }}')"
-       onmouseleave="clearHighlight('{{ regles }}')">
+       onmouseenter="highlightDate('{{ rules }}','pos','{{ data.date_meilleur }}')"
+       onmouseleave="clearHighlight('{{ rules }}')">
     <div class="stat-label">{{ trad('player.best_ranking') }}</div>
     <div class="stat-value">
       {% if data.meilleur %}
         {{ data.meilleur }}
         {% if data.date_meilleur %}
-        <a class="apercu-best" href="/classement?semaine={{ data.date_meilleur }}&joueur={{ joueur.id }}&regles={{ regles | upper }}"
+        <a class="apercu-best" href="/ranking?week={{ data.date_meilleur }}&player={{ player.id }}&rules={{ rules | upper }}"
            title="{{ trad('player.best_ranking') }}">
           🏆 <span class="apercu-best-date">{{ data.date_meilleur | fmt_date }}</span>
         </a>
@@ -32,14 +32,14 @@
   </div>
 
   <div class="stat-card stat-card-hl"
-       onmouseenter="highlightDate('{{ regles }}','score','{{ data.date_score_max }}')"
-       onmouseleave="clearHighlight('{{ regles }}')">
+       onmouseenter="highlightDate('{{ rules }}','score','{{ data.date_score_max }}')"
+       onmouseleave="clearHighlight('{{ rules }}')">
     <div class="stat-label">{{ trad('player.best_score') }}</div>
     <div class="stat-value">
       {% if data.score_max %}
         {{ data.score_max }}
         {% if data.date_score_max %}
-        <a class="apercu-best" href="/classement?semaine={{ data.date_score_max }}&joueur={{ joueur.id }}&regles={{ regles | upper }}"
+        <a class="apercu-best" href="/ranking?week={{ data.date_score_max }}&player={{ player.id }}&rules={{ rules | upper }}"
            title="{{ trad('player.best_score') }}">
           🏆 <span class="apercu-best-date">{{ data.date_score_max | fmt_date }}</span>
         </a>
@@ -53,15 +53,15 @@
   </div>
   <div class="stat-card">
     <div class="stat-label">{{ trad('common.tournaments_played') }}</div>
-    <div class="stat-value">{{ data.tournois | length }}</div>
+    <div class="stat-value">{{ data.tournaments | length }}</div>
   </div>
-  {% if data.best_points and data.best_points.points > 0 and regles == 'mcr' %}
+  {% if data.best_points and data.best_points.points > 0 and rules == 'mcr' %}
   <div class="stat-card">
     <div class="stat-label">{{ trad('player.best_points') }}</div>
     <div class="stat-value">
       {{ data.best_points.points }}
       <span class="stat-sub">
-        <a href="/tournois/{{ regles | upper }}_{{ data.best_points.ema_id }}" style="color:var(--text2)">{{ data.best_points.nom[:25] }}</a>
+        <a href="/tournaments/{{ rules | upper }}_{{ data.best_points.ema_id }}" style="color:var(--text2)">{{ data.best_points.name[:25] }}</a>
       </span>
     </div>
   </div>
@@ -72,7 +72,7 @@
     <div class="stat-value">
       {{ data.best_mahjong.mahjong }}
       <span class="stat-sub">
-        <a href="/tournois/{{ regles | upper }}_{{ data.best_mahjong.ema_id }}" style="color:var(--text2)">{{ data.best_mahjong.nom[:25] }}</a>
+        <a href="/tournaments/{{ rules | upper }}_{{ data.best_mahjong.ema_id }}" style="color:var(--text2)">{{ data.best_mahjong.name[:25] }}</a>
       </span>
     </div>
   </div>

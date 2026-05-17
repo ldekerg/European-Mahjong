@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request, Query
+from fastapi import FastAPI, Request, Query, Depends
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 import sys, os
@@ -8,15 +8,16 @@ from datetime import date
 from typing import Optional
 from sqlalchemy.orm import Session
 
-from app.database import engine, SessionLocal
+from app.database import engine, SessionLocal, get_db
 import app.models as models
 from app.routes import players, tournaments, hof, championships
 from app.routes import countries
 from app.i18n import templates
-from app.models import ClassementHistorique, Joueur
-from app.ranking import lundi_semaine, classement
+from app.models import RankingHistory, Player
+from app.ranking import week_monday, ranking
 
-models.Base.metadata.create_all(bind=engine)
+if os.getenv("DATABASE_URL"):
+    models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="EMA Ranking")
 app.mount("/static", StaticFiles(directory=os.path.join(os.path.dirname(__file__), "static")), name="static")
@@ -28,149 +29,148 @@ app.include_router(countries.router)
 app.include_router(championships.router)
 
 
-def get_delta_rang(db: Session, semaine: date, regles: str) -> dict:
-    """Retourne {joueur_id: position_semaine_precedente} pour calculer le Δ rang."""
+def get_rank_delta(db: Session, week: date, regles: str) -> dict:
+    """Returns {player_id: previous_week_position} to compute the rank delta."""
     from datetime import timedelta
-    semaine_prec = semaine - timedelta(weeks=1)
-    rows = db.query(ClassementHistorique.joueur_id, ClassementHistorique.position).filter(
-        ClassementHistorique.semaine == semaine_prec,
-        ClassementHistorique.regles == regles,
+    prev_week = week - timedelta(weeks=1)
+    rows = db.query(RankingHistory.player_id, RankingHistory.position).filter(
+        RankingHistory.week == prev_week,
+        RankingHistory.rules == regles,
     ).all()
     return {r[0]: r[1] for r in rows}
 
 
-def get_classement_semaine(db: Session, semaine: date, regles: str) -> list:
-    """Récupère le classement depuis l'historique ou le calcule en direct."""
+def get_week_ranking(db: Session, week: date, regles: str) -> list:
+    """Retrieves the ranking from history or computes it on the fly."""
     rows = (
-        db.query(ClassementHistorique, Joueur)
-        .join(Joueur, ClassementHistorique.joueur_id == Joueur.id)
+        db.query(RankingHistory, Player)
+        .join(Player, RankingHistory.player_id == Player.id)
         .filter(
-            ClassementHistorique.semaine == semaine,
-            ClassementHistorique.regles == regles,
+            RankingHistory.week == week,
+            RankingHistory.rules == regles,
         )
-        .order_by(ClassementHistorique.position)
+        .order_by(RankingHistory.position)
         .all()
     )
     if rows:
         return [
             {
                 "position":    ch.position,
-                "joueur_id":   ch.joueur_id,
-                "nom":         j.nom,
-                "prenom":      j.prenom,
-                "nationalite": j.nationalite,
+                "player_id":   ch.player_id,
+                "name":         j.last_name,
+                "first_name":      j.first_name,
+                "nationality": j.nationality,
                 "score":       ch.score,
-                "nb_tournois": ch.nb_tournois or 0,
-                "nb_or":       ch.nb_or or 0,
-                "nb_argent":   ch.nb_argent or 0,
+                "nb_tournaments": ch.nb_tournaments or 0,
+                "nb_gold":       ch.nb_gold or 0,
+                "nb_silver":   ch.nb_silver or 0,
                 "nb_bronze":   ch.nb_bronze or 0,
-                "delta":       None,  # rempli après
+                "delta":       None,  # filled in later
             }
             for ch, j in rows
         ]
-    # Calcul en direct si semaine non encore stockée
-    raw = classement(db, semaine, regles)
-    joueurs_map = {j.id: j for j in db.query(Joueur).all()}
+    # On-the-fly computation if week not yet stored
+    raw = ranking(db, week, regles)
+    players_map = {j.id: j for j in db.query(Player).all()}
     return [
         {
             "position":    r["position"],
-            "joueur_id":   r["joueur_id"],
-            "nom":         joueurs_map[r["joueur_id"]].nom,
-            "prenom":      joueurs_map[r["joueur_id"]].prenom,
-            "nationalite": joueurs_map[r["joueur_id"]].nationalite,
+            "player_id":   r["player_id"],
+            "name":         players_map[r["player_id"]].last_name,
+            "first_name":      players_map[r["player_id"]].first_name,
+            "nationality": players_map[r["player_id"]].nationality,
             "score":       r["score"],
-            "nb_tournois": r["nb_tournois"],
-            "nb_or":       r["nb_or"],
-            "nb_argent":   r["nb_argent"],
+            "nb_tournaments": r["nb_tournaments"],
+            "nb_gold":       r["nb_gold"],
+            "nb_silver":   r["nb_silver"],
             "nb_bronze":   r["nb_bronze"],
         }
         for r in raw
-        if r["joueur_id"] in joueurs_map
+        if r["player_id"] in players_map
     ]
 
 
-@app.get("/accueil")
-def home(request: Request):
-    from app.models import Tournoi, Resultat, ResultatAnonyme
+@app.get("/home")
+def home(request: Request, db: Session = Depends(get_db)):
+    from app.models import Tournament, Result, AnonymousResult
     from app.routes.hof import _meilleur_europeen
     from sqlalchemy import func, exists
-    db = SessionLocal()
     try:
         today = date.today()
-        semaine_date = lundi_semaine(today)
+        week_date = week_monday(today)
 
-        # Stats globales
-        nb_joueurs   = db.query(Joueur).filter(Joueur.statut == "europeen").count()
-        nb_tournois  = db.query(Tournoi).count()
-        nb_classes_mcr = db.query(ClassementHistorique.joueur_id).filter(
-            ClassementHistorique.semaine == semaine_date,
-            ClassementHistorique.regles  == "MCR",
+        # Global stats
+        nb_players   = db.query(Player).filter(Player.status == "europeen").count()
+        nb_tournaments  = db.query(Tournament).count()
+        nb_classes_mcr = db.query(RankingHistory.player_id).filter(
+            RankingHistory.week == week_date,
+            RankingHistory.rules  == "MCR",
         ).distinct().count()
-        nb_classes_rcr = db.query(ClassementHistorique.joueur_id).filter(
-            ClassementHistorique.semaine == semaine_date,
-            ClassementHistorique.regles  == "RCR",
+        nb_classes_rcr = db.query(RankingHistory.player_id).filter(
+            RankingHistory.week == week_date,
+            RankingHistory.rules  == "RCR",
         ).distinct().count()
 
-        # Top 5 MCR et RCR
-        def top5(regles):
+        # Top 5 MCR and RCR
+        def top5(rules):
             rows = (
-                db.query(ClassementHistorique, Joueur)
-                .join(Joueur, ClassementHistorique.joueur_id == Joueur.id)
+                db.query(RankingHistory, Player)
+                .join(Player, RankingHistory.player_id == Player.id)
                 .filter(
-                    ClassementHistorique.semaine == semaine_date,
-                    ClassementHistorique.regles  == regles,
+                    RankingHistory.week == week_date,
+                    RankingHistory.rules  == rules,
                 )
-                .order_by(ClassementHistorique.position)
+                .order_by(RankingHistory.position)
                 .limit(5).all()
             )
-            return [{"position": ch.position, "joueur": j, "score": ch.score} for ch, j in rows]
+            return [{"position": ch.position, "player": j, "score": ch.score} for ch, j in rows]
 
-        # Derniers tournois joués : avec résultats ET date passée
-        has_resultats = exists().where(Resultat.tournoi_id == Tournoi.id)
+        # Last played tournaments: with results AND past date
+        has_resultats = exists().where(Result.tournament_id == Tournament.id)
         from datetime import date as _date
-        derniers = (
-            db.query(Tournoi)
+        recent = (
+            db.query(Tournament)
             .filter(
-                Tournoi.date_debut <= today,
-                Tournoi.date_debut != _date(1900, 1, 1),
+                Tournament.start_date <= today,
+                Tournament.start_date != _date(1900, 1, 1),
                 has_resultats,
             )
-            .order_by(Tournoi.date_debut.desc())
+            .order_by(Tournament.start_date.desc())
             .limit(6).all()
         )
 
-        # Prochains tournois : date future ET sans résultats
-        has_no_resultats = ~exists().where(Resultat.tournoi_id == Tournoi.id)
-        prochains = (
-            db.query(Tournoi)
+        # Upcoming tournaments: future date AND no results
+        has_no_resultats = ~exists().where(Result.tournament_id == Tournament.id)
+        upcoming = (
+            db.query(Tournament)
             .filter(
-                Tournoi.date_debut > today,
+                Tournament.start_date > today,
                 has_no_resultats,
-                Tournoi.type_tournoi == "normal",
+                Tournament.tournament_type == "normal",
             )
-            .order_by(Tournoi.date_debut)
+            .order_by(Tournament.start_date)
             .limit(6).all()
         )
 
-        # Calendrier (pour le partial compact de la home)
+        # Calendar (for the compact home partial)
         from collections import defaultdict
-        MOIS_FR = ["", "Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
+        MONTHS_FR = ["", "Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
                    "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"]
-        cal_tournois = (
-            db.query(Tournoi)
-            .filter(Tournoi.statut == "calendrier")
-            .order_by(Tournoi.date_debut)
+        cal_tournaments = (
+            db.query(Tournament)
+            .filter(Tournament.status == "calendrier")
+            .order_by(Tournament.start_date)
             .all()
         )
-        cal_par_mois_raw = defaultdict(list)
-        for t in cal_tournois:
-            cal_par_mois_raw[(t.date_debut.year, t.date_debut.month)].append(t)
-        calendrier_par_mois = [
-            {"label": f"{MOIS_FR[m]} {y}", "tournois": ts}
-            for (y, m), ts in sorted(cal_par_mois_raw.items())
+        cal_by_month = defaultdict(list)
+        for t in cal_tournaments:
+            cal_by_month[(t.start_date.year, t.start_date.month)].append(t)
+        calendar_by_month = [
+            {"label": f"{MONTHS_FR[m]} {y}", "tournaments": ts}
+            for (y, m), ts in sorted(cal_by_month.items())
         ]
 
-        # Champions en titre
+        # Reigning champions
         champions = {
             "oemc": _meilleur_europeen(db, "oemc"),
             "wmc":  _meilleur_europeen(db, "wmc"),
@@ -179,96 +179,96 @@ def home(request: Request):
         }
 
     finally:
-        db.close()
+        pass
 
     return templates.TemplateResponse(request, "home.html", {
-        "nb_joueurs":    nb_joueurs,
-        "nb_tournois":   nb_tournois,
+        "nb_players":    nb_players,
+        "nb_tournaments":   nb_tournaments,
         "nb_classes_mcr": nb_classes_mcr,
         "nb_classes_rcr": nb_classes_rcr,
         "top_mcr":       top5("MCR"),
         "top_rcr":       top5("RCR"),
-        "derniers":           derniers,
-        "prochains":          prochains,
+        "recent":           recent,
+        "upcoming":          upcoming,
         "champions":          champions,
-        "calendrier_par_mois": calendrier_par_mois,
+        "calendar_by_month": calendar_by_month,
     })
 
 
-@app.get("/classement")
+@app.get("/ranking")
 def accueil(
     request: Request,
-    semaine: Optional[str] = Query(None),
-    joueur: Optional[str] = Query(None),
-    regles: Optional[str] = Query(None),  # onglet actif à afficher (MCR ou RCR)
+    week: Optional[str] = Query(None),
+    player_filter: Optional[str] = Query(None),
+    rules: Optional[str] = Query(None),  # active tab to display (MCR or RCR)
+    db: Session = Depends(get_db),
 ):
-    db = SessionLocal()
     try:
-        if semaine:
+        if week:
             try:
-                semaine_date = lundi_semaine(date.fromisoformat(semaine))
+                week_date = week_monday(date.fromisoformat(week))
             except ValueError:
-                semaine_date = lundi_semaine(date.today())
+                week_date = week_monday(date.today())
         else:
-            semaine_date = lundi_semaine(date.today())
+            week_date = week_monday(date.today())
 
-        mcr = get_classement_semaine(db, semaine_date, "MCR")
-        rcr = get_classement_semaine(db, semaine_date, "RCR")
+        mcr = get_week_ranking(db, week_date, "MCR")
+        rcr = get_week_ranking(db, week_date, "RCR")
 
-        # Calculer le Δ rang
-        for lst, regles_key in [(mcr, "MCR"), (rcr, "RCR")]:
-            prev = get_delta_rang(db, semaine_date, regles_key)
+        # Compute rank delta
+        for lst, rules_key in [(mcr, "MCR"), (rcr, "RCR")]:
+            prev = get_rank_delta(db, week_date, rules_key)
             for r in lst:
-                p = prev.get(r["joueur_id"])
-                r["delta"] = (p - r["position"]) if p else None  # positif = montée
+                p = prev.get(r["player_id"])
+                r["delta"] = (p - r["position"]) if p else None  # positive = moved up
 
-        # Toutes les semaines pour navigation prev/next
-        semaines_raw = [
+        # All weeks for prev/next navigation
+        weeks_raw = [
             row[0] for row in
-            db.query(ClassementHistorique.semaine)
-            .filter(ClassementHistorique.regles == "MCR")
+            db.query(RankingHistory.week)
+            .filter(RankingHistory.rules == "MCR")
             .distinct()
-            .order_by(ClassementHistorique.semaine)
+            .order_by(RankingHistory.week)
             .all()
         ]
-        total = len(semaines_raw)
-        idx_courant = next((i for i, s in enumerate(semaines_raw) if s == semaine_date), total - 1)
-        semaine_prev = semaines_raw[idx_courant - 1].isoformat() if idx_courant > 0 else None
-        semaine_next = semaines_raw[idx_courant + 1].isoformat() if idx_courant < total - 1 else None
+        total = len(weeks_raw)
+        current_idx = next((i for i, s in enumerate(weeks_raw) if s == week_date), total - 1)
+        week_prev = weeks_raw[current_idx - 1].isoformat() if current_idx > 0 else None
+        week_next = weeks_raw[current_idx + 1].isoformat() if current_idx < total - 1 else None
 
-        # Dropdown : toutes les semaines, groupées par année
+        # Dropdown: all weeks grouped by year
         from collections import defaultdict
-        par_annee: dict = defaultdict(list)
-        for i, s in enumerate(semaines_raw):
-            par_annee[s.year].append({"date": s, "num": i + 1})
-        semaines_dispo = [
-            {"annee": yr, "semaines": list(reversed(wks))}
-            for yr, wks in sorted(par_annee.items(), reverse=True)
+        by_year: dict = defaultdict(list)
+        for i, s in enumerate(weeks_raw):
+            by_year[s.year].append({"date": s, "num": i + 1})
+        available_weeks = [
+            {"year": yr, "weeks": list(reversed(wks))}
+            for yr, wks in sorted(by_year.items(), reverse=True)
         ]
     finally:
-        db.close()
+        pass
 
-    semaine_actuelle = lundi_semaine(date.today())
-    aujourd_hui = date.today()
+    current_week = week_monday(date.today())
+    today_date = date.today()
 
-    return templates.TemplateResponse(request, "classement.html", {
+    return templates.TemplateResponse(request, "ranking.html", {
         "mcr": mcr,
         "rcr": rcr,
-        "semaine_actuelle": semaine_actuelle,
-        "aujourd_hui": aujourd_hui,
-        "semaine": semaine_date,
-        "semaine_num": idx_courant + 1,
-        "semaine_prev": semaine_prev,
-        "semaine_next": semaine_next,
-        "semaines_dispo": semaines_dispo,
-        "joueur_selectionne": joueur,
-        "onglet_actif": (regles or "MCR").upper(),
-        "joueur_defaut": mcr[0]["joueur_id"] if mcr else None,
-        "joueur_defaut_mcr": mcr[0]["joueur_id"] if mcr else None,
-        "joueur_defaut_rcr": rcr[0]["joueur_id"] if rcr else None,
+        "current_week": current_week,
+        "today_date": today_date,
+        "week": week_date,
+        "week_num": current_idx + 1,
+        "week_prev": week_prev,
+        "week_next": week_next,
+        "available_weeks": available_weeks,
+        "selected_player": player_filter,
+        "active_tab": (rules or "MCR").upper(),
+        "default_player": mcr[0]["player_id"] if mcr else None,
+        "default_player_mcr": mcr[0]["player_id"] if mcr else None,
+        "default_player_rcr": rcr[0]["player_id"] if rcr else None,
     })
 
 
 @app.get("/")
 def root():
-    return RedirectResponse(url="/accueil")
+    return RedirectResponse(url="/home")

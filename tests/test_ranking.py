@@ -39,24 +39,24 @@ def test_lundi_semaine_debut_annee():
 # ── semaine_debut_tournoi ────────────────────────────────────────────────────
 
 def test_semaine_debut_tournoi_lundi():
-    # Tournoi un lundi → actif le lundi suivant
+    # Tournament un lundi → actif le lundi suivant
     assert semaine_debut_tournoi(date(2026, 5, 11)) == date(2026, 5, 18)
 
 def test_semaine_debut_tournoi_milieu_semaine():
-    # Tournoi un mercredi → lundi de la semaine suivante
+    # Tournament un mercredi → lundi de la week suivante
     assert semaine_debut_tournoi(date(2026, 5, 13)) == date(2026, 5, 18)
 
 
 # ── semaines_actives ─────────────────────────────────────────────────────────
 
 def test_semaines_actives_hors_freeze():
-    # Deux semaines consécutives hors freeze
-    debut = date(2026, 5, 11)
-    cible = date(2026, 5, 18)
-    assert semaines_actives(debut, cible) == 2
+    # Two consecutive weeks outside freeze
+    start = date(2026, 5, 11)
+    target = date(2026, 5, 18)
+    assert semaines_actives(start, target) == 2
 
 def test_semaines_actives_pendant_freeze():
-    # Toute la période freeze → 0 semaines actives
+    # Entire freeze period → 0 active weeks
     assert semaines_actives(FREEZE_DEBUT, FREEZE_FIN - __import__('datetime').timedelta(weeks=1)) == 0
 
 def test_semaines_actives_une_semaine():
@@ -66,32 +66,32 @@ def test_semaines_actives_une_semaine():
 # ── contribution ─────────────────────────────────────────────────────────────
 
 def test_contribution_semaine_1():
-    # Tournoi le lundi 11 mai, contribution à la semaine 18 mai (semaine 1) → 1.0
+    # Tournament on Monday May 11, contribution at week May 18 (week 1) → 1.0
     assert contribution(date(2026, 5, 11), date(2026, 5, 18)) == 1.0
 
 def test_contribution_avant_activation():
-    # Cible = même semaine que debut_tournoi → 0.0
+    # Target = same week as tournament start → 0.0
     assert contribution(date(2026, 5, 11), date(2026, 5, 11)) == 0.0
 
 def test_contribution_semaine_52():
-    debut = date(2025, 5, 12)
-    # 52 semaines actives après semaine_debut → contribution 1.0
-    cible = date(2026, 5, 11)
-    c = contribution(debut, cible)
+    start = date(2025, 5, 12)
+    # 52 active weeks after first_week → contribution 1.0
+    target = date(2026, 5, 11)
+    c = contribution(start, target)
     assert c == 1.0
 
 def test_contribution_semaine_53():
     # Semaine 53 → 0.5
-    debut = date(2025, 5, 5)
-    cible = date(2026, 5, 11)
-    c = contribution(debut, cible)
+    start = date(2025, 5, 5)
+    target = date(2026, 5, 11)
+    c = contribution(start, target)
     assert c == 0.5
 
 def test_contribution_apres_104():
-    # Plus de 104 semaines → 0.0
-    debut = date(2024, 1, 1)
-    cible = date(2026, 5, 11)
-    assert contribution(debut, cible) == 0.0
+    # Plus de 104 weeks → 0.0
+    start = date(2024, 1, 1)
+    target = date(2026, 5, 11)
+    assert contribution(start, target) == 0.0
 
 
 # ── points_ema_tournoi ───────────────────────────────────────────────────────
@@ -140,7 +140,7 @@ def test_moyenne_ponderee_simple():
     assert _moyenne_ponderee(entries, 0) == 750.0
 
 def test_moyenne_ponderee_avec_manquants():
-    # 1 résultat de 1000, 1 manquant (0) → (1000) / (1 + 1) = 500
+    # 1 result of 1000, 1 missing (0) → (1000) / (1 + 1) = 500
     entries = [(1000, 1.0)]
     assert _moyenne_ponderee(entries, 1) == 500.0
 

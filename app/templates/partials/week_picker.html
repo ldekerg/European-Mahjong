@@ -1,40 +1,40 @@
-{# Navigation semaine (prev/next/dropdown).
-   Variables requises :
-     base_url      — URL de base sans query string (ex: '/' ou '/pays/FR')
-     semaine       — date courante
-     semaine_num   — numéro de la semaine
-     semaine_prev  — isoformat semaine précédente ou None
-     semaine_next  — isoformat semaine suivante ou None
-     semaines_dispo — liste groupées par année
-     aujourd_hui   — date du jour
-   Variable optionnelle :
-     qs_extra — query string supplémentaire à ajouter après semaine= (ex: '&regles=MCR')
+{# Week navigation (prev/next/dropdown).
+   Required variables:
+     base_url      — base URL without query string (e.g. '/' or '/countries/FR')
+     week          — current date
+     week_num      — week number
+     week_prev     — isoformat of previous week or None
+     week_next     — isoformat of next week or None
+     available_weeks — list grouped by year
+     today_date    — today's date
+   Optional variable:
+     qs_extra — extra query string to append after week= (e.g. '&rules=MCR')
 #}
 {% set _qs = qs_extra if qs_extra is defined else '' %}
 <div class="date-nav">
   <!-- Le bouton "aujourd'hui" introduit un bug car la semaine courante n'est pas encore calculée
   <a href="{{ base_url }}{{ _qs | replace('&', '?', 1) }}" class="nav-arrow nav-today">
-    ⟳ {{ aujourd_hui.strftime('%d/%m/%Y') }}
+    ⟳ {{ today_date.strftime('%d/%m/%Y') }}
   </a>
   -->
 
-  {% if semaine_prev %}
-  <a href="{{ base_url }}?semaine={{ semaine_prev }}{{ _qs }}" class="nav-arrow">◀</a>
+  {% if week_prev %}
+  <a href="{{ base_url }}?week={{ week_prev }}{{ _qs }}" class="nav-arrow">◀</a>
   {% else %}
   <span class="nav-arrow disabled">◀</span>
   {% endif %}
 
   <div class="week-picker" id="week-picker">
     <button type="button" class="week-current" onclick="togglePicker()">
-      #{{ semaine_num }} — {{ semaine.strftime('%d/%m/%Y') }} ▾
+      #{{ week_num }} — {{ week.strftime('%d/%m/%Y') }} ▾
     </button>
     <div class="week-dropdown" id="week-dropdown" style="display:none">
-      {% for grp in semaines_dispo %}
+      {% for grp in available_weeks %}
       <div class="week-group">
-        <div class="week-group-label">{{ grp.annee }}</div>
-        {% for s in grp.semaines %}
-        <a class="week-option {% if s.date == semaine %}active{% endif %}"
-           href="{{ base_url }}?semaine={{ s.date.isoformat() }}{{ _qs }}">
+        <div class="week-group-label">{{ grp.year }}</div>
+        {% for s in grp.weeks %}
+        <a class="week-option {% if s.date == week %}active{% endif %}"
+           href="{{ base_url }}?week={{ s.date.isoformat() }}{{ _qs }}">
           #{{ s.num }} — {{ s.date.strftime('%d/%m/%Y') }}
         </a>
         {% endfor %}
@@ -43,8 +43,8 @@
     </div>
   </div>
 
-  {% if semaine_next %}
-  <a href="{{ base_url }}?semaine={{ semaine_next }}{{ _qs }}" class="nav-arrow">▶</a>
+  {% if week_next %}
+  <a href="{{ base_url }}?week={{ week_next }}{{ _qs }}" class="nav-arrow">▶</a>
   {% else %}
   <span class="nav-arrow disabled">▶</span>
   {% endif %}

@@ -18,18 +18,18 @@ export PYTHONPATH="$APP_DIR"
 echo "=== Import championnats — $(date) ==="
 
 echo "--- Migration tables championnats ---"
-$PYTHON migrate_championnats.py
+$PYTHON migrate/championships.py
 
 echo "--- Golden League MCR ---"
-$PYTHON import_golden_league.py
+$PYTHON importers/golden_league.py
 
 echo "--- Rhône-Alpes MCR 2023-2024 ---"
-$PYTHON import_rhone_alpes_2324.py
+$PYTHON importers/rhone_alpes_2324.py
 
 echo "--- Rhône-Alpes MCR 2024-2025 ---"
-$PYTHON import_rhone_alpes_2425.py
+$PYTHON importers/rhone_alpes_2425.py
 
 echo "--- Rhône-Alpes MCR (courant) ---"
-$PYTHON import_rhone_alpes.py
+$PYTHON importers/rhone_alpes.py
 
 echo "=== Terminé — $(date) ==="

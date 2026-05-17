@@ -4,72 +4,72 @@ from fastapi import APIRouter, Depends, Request, HTTPException
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.models import Championnat, ChampionnatTournoi, Joueur, Resultat, ResultatAnonyme, SerieChampionnat, Tournoi
+from app.models import Championship, ChampionshipTournament, Player, Result, AnonymousResult, ChampionshipSeries, Tournament
 from app.i18n import templates
-from app.ranking import points_ema_tournoi
+from app.ranking import ema_points
 
-router = APIRouter(prefix="/championnats")
+router = APIRouter(prefix="/championships")
 
 FORMULE_MOYENNE = "moyenne_n_meilleurs"
 
 
-def _classement_championnat(db: Session, championnat: Championnat) -> list:
+def _ranking_championnat(db: Session, championnat: Championship) -> list:
     params = json.loads(championnat.params or '{}')
-    tournoi_ids = [lien.tournoi_id for lien in championnat.liens]
+    tournoi_ids = [lien.tournament_id for lien in championnat.tournament_links]
 
-    if not tournoi_ids or championnat.formule != FORMULE_MOYENNE:
+    if not tournoi_ids or championnat.formula != FORMULE_MOYENNE:
         return []
 
-    # Pré-charger les tournois pour éviter le N+1 sur nb_joueurs
-    tournois_map = {t.id: t for t in db.query(Tournoi).filter(Tournoi.id.in_(tournoi_ids)).all()}
+    # Pre-load tournaments to avoid N+1 on nb_players
+    tournaments_map = {t.id: t for t in db.query(Tournament).filter(Tournament.id.in_(tournoi_ids)).all()}
 
     par_joueur_id: dict[str, dict[int, int]] = {}
-    for r in db.query(Resultat.joueur_id, Resultat.ranking, Resultat.tournoi_id
-                      ).filter(Resultat.tournoi_id.in_(tournoi_ids)).all():
-        par_joueur_id.setdefault(r.joueur_id, {})[r.tournoi_id] = r.ranking
+    for r in db.query(Result.player_id, Result.ranking, Result.tournament_id
+                      ).filter(Result.tournament_id.in_(tournoi_ids)).all():
+        par_joueur_id.setdefault(r.player_id, {})[r.tournament_id] = r.ranking
 
-    # Anonymes : meta séparée des résultats par tournoi
-    par_anon: dict[tuple, dict] = {}
-    for r in db.query(ResultatAnonyme.prenom, ResultatAnonyme.nom,
-                      ResultatAnonyme.nationalite, ResultatAnonyme.tournoi_id,
-                      ResultatAnonyme.position
-                      ).filter(ResultatAnonyme.tournoi_id.in_(tournoi_ids)).all():
-        ranking = points_ema_tournoi(r.position, tournois_map[r.tournoi_id].nb_joueurs)
-        key = ((r.prenom or "").strip().upper(), (r.nom or "").strip().upper(), r.nationalite or "")
-        entry = par_anon.setdefault(key, {"nationalite": r.nationalite, "prenom": r.prenom, "nom": r.nom, "results": {}})
-        entry["results"][r.tournoi_id] = ranking
+    # Anonymous: separate meta from results per tournament
+    by_anonymous: dict[tuple, dict] = {}
+    for r in db.query(AnonymousResult.first_name, AnonymousResult.last_name,
+                      AnonymousResult.nationality, AnonymousResult.tournament_id,
+                      AnonymousResult.position
+                      ).filter(AnonymousResult.tournament_id.in_(tournoi_ids)).all():
+        ranking = ema_points(r.position, tournaments_map[r.tournament_id].nb_players)
+        key = ((r.first_name or "").strip().upper(), (r.last_name or "").strip().upper(), r.nationality or "")
+        entry = by_anonymous.setdefault(key, {"nationality": r.nationality, "first_name": r.first_name, "name": r.last_name, "results": {}})
+        entry["results"][r.tournament_id] = ranking
 
     n = params.get("n", 3)
     scores = []
 
-    joueurs_map = {j.id: j for j in db.query(Joueur).filter(Joueur.id.in_(par_joueur_id.keys())).all()}
-    for jid, par_tournoi in par_joueur_id.items():
-        j = joueurs_map.get(jid)
+    players_map = {j.id: j for j in db.query(Player).filter(Player.id.in_(par_joueur_id.keys())).all()}
+    for jid, by_tournament in par_joueur_id.items():
+        j = players_map.get(jid)
         if not j:
             continue
-        all_rankings = [par_tournoi.get(tid, 0) for tid in tournoi_ids]
+        all_rankings = [by_tournament.get(tid, 0) for tid in tournoi_ids]
         top_n = sorted(all_rankings, reverse=True)[:n]
         scores.append({
-            "joueur_id": jid, "joueur": j, "nom_affiche": None,
-            "nationalite": j.nationalite, "anonyme": False,
+            "player_id": jid, "player": j, "nom_affiche": None,
+            "nationality": j.nationality, "anonyme": False,
             "score": round(sum(top_n) / n, 1),
-            "nb_tournois": len(par_tournoi), "nb_comptes": n,
+            "nb_tournaments": len(by_tournament), "nb_comptes": n,
         })
 
-    for key, data in par_anon.items():
-        par_tournoi = data["results"]
-        all_rankings = [par_tournoi.get(tid, 0) for tid in tournoi_ids]
+    for key, data in by_anonymous.items():
+        by_tournament = data["results"]
+        all_rankings = [by_tournament.get(tid, 0) for tid in tournoi_ids]
         top_n = sorted(all_rankings, reverse=True)[:n]
         prenom, nom = data.get("prenom") or "", data.get("nom") or ""
         scores.append({
-            "joueur_id": None, "joueur": None,
+            "player_id": None, "player": None,
             "nom_affiche": f"{prenom} {nom}".strip(),
-            "nationalite": data.get("nationalite") or "", "anonyme": True,
+            "nationality": data.get("nationalite") or "", "anonyme": True,
             "score": round(sum(top_n) / n, 1),
-            "nb_tournois": len(par_tournoi), "nb_comptes": n,
+            "nb_tournaments": len(by_tournament), "nb_comptes": n,
         })
 
-    scores.sort(key=lambda x: (-x["score"], x["nom_affiche"] or (x["joueur"].nom if x["joueur"] else "")))
+    scores.sort(key=lambda x: (-x["score"], x["nom_affiche"] or (x["player"].last_name if x["player"] else "")))
     for pos, s in enumerate(scores, 1):
         s["position"] = pos
 
@@ -77,80 +77,80 @@ def _classement_championnat(db: Session, championnat: Championnat) -> list:
 
 
 def _resolve_champion(db: Session, edition) -> dict | None:
-    """Retourne les infos du champion : joueur identifié, ou texte libre, ou None."""
+    """Returns the champion's info: identified player, free text, or None."""
     if edition.champion_id:
-        j = db.query(Joueur).filter_by(id=edition.champion_id).first()
+        j = db.query(Player).filter_by(id=edition.champion_id).first()
         if j:
-            return {"joueur": j, "nom_affiche": None, "nationalite": j.nationalite}
-    if edition.champion_nom:
-        return {"joueur": None, "nom_affiche": edition.champion_nom, "nationalite": None}
+            return {"player": j, "nom_affiche": None, "nationality": j.nationality}
+    if edition.champion_name:
+        return {"player": None, "nom_affiche": edition.champion_name, "nationality": None}
     return None
 
 
 @router.get("/")
 def liste_series(request: Request, db: Session = Depends(get_db)):
-    series = db.query(SerieChampionnat).order_by(SerieChampionnat.pays, SerieChampionnat.nom).all()
-    return templates.TemplateResponse(request, "championnats/liste.html", {"series": series})
+    series = db.query(ChampionshipSeries).order_by(ChampionshipSeries.country, ChampionshipSeries.name).all()
+    return templates.TemplateResponse(request, "championships/list.html", {"series": series})
 
 
 @router.get("/{slug}")
 def detail_serie(slug: str, request: Request, db: Session = Depends(get_db)):
-    serie = db.query(SerieChampionnat).filter(SerieChampionnat.slug == slug).first()
+    serie = db.query(ChampionshipSeries).filter(ChampionshipSeries.slug == slug).first()
     if not serie:
         raise HTTPException(status_code=404)
 
-    palmares = []
+    hall_of_fame = []
     for edition in serie.editions:
-        cl = _classement_championnat(db, edition)
-        tournois = [lien.tournoi for lien in edition.liens]
-        tournois.sort(key=lambda t: t.date_debut)
-        palmares.append({
+        cl = _ranking_championnat(db, edition)
+        tournois = [lien.tournament for lien in edition.tournament_links]
+        tournois.sort(key=lambda t: t.start_date)
+        hall_of_fame.append({
             "edition": edition,
-            "classement": cl,
+            "ranking": cl,
             "podium": cl[:3],
             "champion": _resolve_champion(db, edition),
-            "tournois": tournois,
+            "tournaments": tournois,
         })
 
-    return templates.TemplateResponse(request, "championnats/serie.html", {
+    return templates.TemplateResponse(request, "championships/series.html", {
         "serie": serie,
-        "palmares": palmares,
+        "hall_of_fame": hall_of_fame,
     })
 
 
-@router.get("/{slug}/{annee}")
-def detail_edition(slug: str, annee: int, request: Request, db: Session = Depends(get_db)):
-    serie = db.query(SerieChampionnat).filter(SerieChampionnat.slug == slug).first()
+@router.get("/{slug}/{year}")
+def detail_edition(slug: str, year: int, request: Request, db: Session = Depends(get_db)):
+    serie = db.query(ChampionshipSeries).filter(ChampionshipSeries.slug == slug).first()
     if not serie:
         raise HTTPException(status_code=404)
 
-    edition = db.query(Championnat).filter(
-        Championnat.serie_id == serie.id,
-        Championnat.annee == annee,
+    edition = db.query(Championship).filter(
+        Championship.series_id == serie.id,
+        Championship.year == year,
     ).first()
     if not edition:
         raise HTTPException(status_code=404)
 
-    classement = _classement_championnat(db, edition)
-    tournois = [lien.tournoi for lien in edition.liens]
-    tournois.sort(key=lambda t: t.date_debut)
+    ranking = _ranking_championnat(db, edition)
+    tournois = [lien.tournament for lien in edition.tournament_links]
+    tournois.sort(key=lambda t: t.start_date)
 
     params = json.loads(edition.params or '{}')
 
-    nats = [r["nationalite"] for r in classement if r.get("nationalite")]
+    nats = [r["nationality"] for r in ranking if r.get("nationalite")]
     pays_stats = sorted(
         [{"code": k, "nb": v} for k, v in Counter(nats).items() if k],
         key=lambda x: -x["nb"],
     )
 
-    return templates.TemplateResponse(request, "championnats/detail.html", {
+    return templates.TemplateResponse(request, "championships/detail.html", {
         "serie": serie,
         "edition": edition,
-        "classement": classement,
-        "podium": classement[:3],
+        "ranking": ranking,
+        "podium": ranking[:3],
 
         "champion": _resolve_champion(db, edition),
-        "tournois": tournois,
+        "tournaments": tournois,
         "params": params,
         "pays_stats": pays_stats,
     })

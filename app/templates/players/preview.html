@@ -1,0 +1,19 @@
+{% if not player %}
+<p class="empty">{{ trad('common.click_player') }}</p>
+{% else %}
+<div class="apercu-header">
+  <div class="apercu-name">{{ player.first_name | first_name }} {{ player.last_name | title }}</div>
+  <div class="apercu-meta">
+    {{ player.nationality | flag_link('players') }} {{ player.nationality }}
+    {% if player.status != 'europeen' %}<span class="statut statut-{{ player.status }}">{{ player.status }}</span>{% endif %}
+  </div>
+  <div class="apercu-id">{{ player.id }}</div>
+</div>
+
+{% include 'partials/preview_discipline_cards.html' %}
+
+{% set data = mcr if rules == 'MCR' else rcr %}
+{% include 'partials/preview_snapshot.html' %}
+
+<a href="/players/{{ player.id }}" class="btn apercu-link">{{ trad('players.full_profile') }}</a>
+{% endif %}

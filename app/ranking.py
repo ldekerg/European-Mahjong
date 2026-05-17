@@ -1,59 +1,57 @@
+import math
 from datetime import date, timedelta
 from sqlalchemy.orm import Session
-from app.models import Tournoi
+from app.models import Tournament, Result
 
-# Période COVID : semaines exclues du décompte des 104 semaines
-FREEZE_DEBUT = date(2020, 2, 24)  # début réel du freeze (tournois annulés)
-FREEZE_FIN   = date(2022, 3, 28)  # reprise des tournois
-FREEZE_SEMAINES = (FREEZE_FIN - FREEZE_DEBUT).days // 7
+# COVID freeze: weeks excluded from the 104-week active count
+FREEZE_START = date(2020, 2, 24)  # actual start of freeze (tournaments cancelled)
+FREEZE_END   = date(2022, 3, 28)  # resumption of tournaments
+FREEZE_WEEKS = (FREEZE_END - FREEZE_START).days // 7
+
+# Aliases for backward compatibility
+FREEZE_DEBUT = FREEZE_START
+FREEZE_FIN   = FREEZE_END
 
 
-def lundi_semaine(d: date) -> date:
-    """Retourne le lundi de la semaine contenant d."""
+def week_monday(d: date) -> date:
+    """Return the Monday of the week containing d."""
     return d - timedelta(days=d.weekday())
 
 
-def semaine_debut_tournoi(date_debut: date) -> date:
-    """Lundi de la semaine X+1 : première semaine où le tournoi compte."""
-    return lundi_semaine(date_debut) + timedelta(weeks=1)
+def tournament_first_week(start_date: date) -> date:
+    """Monday of week X+1: first week the tournament counts toward ranking."""
+    return week_monday(start_date) + timedelta(weeks=1)
 
 
-def semaines_actives(debut: date, cible: date) -> int:
-    """
-    Nombre de semaines non-freeze entre debut (inclus) et cible (inclus).
-    Chaque semaine est identifiée par son lundi.
-    """
-    if cible < debut:
+def active_weeks(start: date, target: date) -> int:
+    """Count non-freeze weeks between start (inclusive) and target (inclusive)."""
+    if target < start:
         return 0
-    total = (cible - debut).days // 7 + 1  # semaines de debut à cible incluses
+    total = (target - start).days // 7 + 1
 
-    # Semaines freeze qui chevauchent l'intervalle [debut, cible]
-    overlap_debut = max(debut, FREEZE_DEBUT)
-    overlap_fin   = min(cible, FREEZE_FIN - timedelta(weeks=1))  # dernière semaine freeze
-    if overlap_fin >= overlap_debut:
-        freeze = (overlap_fin - overlap_debut).days // 7 + 1
-    else:
-        freeze = 0
+    # Freeze weeks overlapping [start, target]
+    overlap_start = max(start, FREEZE_START)
+    overlap_end   = min(target, FREEZE_END - timedelta(weeks=1))
+    freeze = (overlap_end - overlap_start).days // 7 + 1 if overlap_end >= overlap_start else 0
 
     return total - freeze
 
 
-def contribution(date_debut_tournoi: date, semaine_cible: date) -> float:
+def contribution(tournament_start: date, target_week: date) -> float:
     """
-    Contribution d'un tournoi pour une semaine cible (un lundi).
-    Basé sur le nombre de semaines actives (hors freeze) depuis semaine_debut.
-    Le freeze prolonge la durée de vie des tournois (les semaines freeze ne comptent pas).
-    - Semaines actives 1-52  : 1.0
-    - Semaines actives 53-104 : 0.5
-    - Au-delà de 104          : 0.0
+    Weight of a tournament for a given target week (a Monday).
+    Based on the number of active (non-freeze) weeks since the tournament's first week.
+    The freeze extends tournament lifetime (freeze weeks don't count).
+    - Active weeks 1-52  : 1.0
+    - Active weeks 53-104: 0.5
+    - Beyond 104         : 0.0
     """
-    debut = semaine_debut_tournoi(date_debut_tournoi)
+    first_week = tournament_first_week(tournament_start)
 
-    # Le tournoi compte à partir de semaine_debut (X+1) inclus
-    if semaine_cible < debut:
+    if target_week < first_week:
         return 0.0
 
-    n = semaines_actives(debut, semaine_cible)
+    n = active_weeks(first_week, target_week)
     if n <= 52:
         return 1.0
     if n <= 104:
@@ -61,163 +59,168 @@ def contribution(date_debut_tournoi: date, semaine_cible: date) -> float:
     return 0.0
 
 
-def tournois_actifs(db: Session, semaine_cible: date, regles: str):
-    """
-    Retourne [(tournoi, contribution)] pour tous les tournois actifs
-    à semaine_cible, filtrés par règles (MCR ou RCR), hors WMC/WRC.
-    """
-    # Borne basse large : 104 semaines actives + 122 semaines freeze max
-    limite_basse = semaine_cible - timedelta(weeks=104 + FREEZE_SEMAINES)
+def active_tournaments(db: Session, target_week: date, rules: str):
+    """Return [(tournament, contribution)] for all tournaments active at target_week."""
+    # Wide lower bound: 104 active weeks + max freeze weeks
+    lower_bound = target_week - timedelta(weeks=104 + FREEZE_WEEKS)
 
-    tournois = (
-        db.query(Tournoi)
+    tournaments = (
+        db.query(Tournament)
         .filter(
-            Tournoi.regles == regles,
-            Tournoi.type_tournoi.notin_(["wmc", "wrc"]),
-            Tournoi.ema_id.isnot(None),
-            Tournoi.date_debut >= limite_basse,
-            Tournoi.date_debut != date(1900, 1, 1),
+            Tournament.rules == rules,
+            Tournament.tournament_type.notin_(["wmc", "wrc"]),
+            Tournament.ema_id.isnot(None),
+            Tournament.start_date >= lower_bound,
+            Tournament.start_date != date(1900, 1, 1),
         )
         .all()
     )
 
-    result = []
-    for t in tournois:
-        c = contribution(t.date_debut, semaine_cible)
-        if c > 0:
-            result.append((t, c))
-
-    return result
+    return [
+        (t, c) for t in tournaments
+        if (c := contribution(t.start_date, target_week)) > 0
+    ]
 
 
-import math
-
-
-def _nb_tournois_part_a(n: int) -> int:
-    """Nombre de tournois retenus pour la Part A : 5 + ceil(80% du reste)."""
+def _part_a_count(n: int) -> int:
+    """Number of tournaments retained for Part A: 5 + ceil(80% of the remainder)."""
     return 5 + math.ceil(0.8 * max(0, n - 5))
 
 
-def _moyenne_ponderee(entries: list, manquants: int) -> float:
+def _weighted_average(entries: list, missing: int) -> float:
     """
-    Moyenne pondérée sur entries = [(ranking, poids)] avec `manquants`
-    tournois virtuels (ranking=0, poids=1) ajoutés au dénominateur.
+    Weighted average over entries = [(ranking, weight)] with `missing`
+    virtual tournaments (ranking=0, weight=1) added to the denominator.
     """
-    numerateur   = sum(r * p for r, p in entries)
-    denominateur = sum(p for _, p in entries) + manquants
-    return numerateur / denominateur if denominateur > 0 else 0.0
+    numerator   = sum(r * w for r, w in entries)
+    denominator = sum(w for _, w in entries) + missing
+    return numerator / denominator if denominator > 0 else 0.0
 
 
-def _resultats_actifs(db, joueur_id: str, actifs: dict):
-    """Retourne les résultats du joueur dans les tournois actifs."""
-    from app.models import Resultat
+def _player_results(db, player_id: str, actives: dict):
+    """Return results for a player in the active tournaments."""
     return (
-        db.query(Resultat)
+        db.query(Result)
         .filter(
-            Resultat.joueur_id == joueur_id,
-            Resultat.tournoi_id.in_(actifs.keys()),
+            Result.player_id == player_id,
+            Result.tournament_id.in_(actives.keys()),
         )
         .all()
     )
 
 
-def _score_pour_joueur(resultats: list, actifs: dict) -> float:
-    """Calcule le score à partir des résultats et du dict actifs déjà chargés."""
-    n = len(resultats)
-    garder = _nb_tournois_part_a(n)
-    def poids(r): return actifs[r.tournoi_id][0].coefficient * actifs[r.tournoi_id][1]
-    def date_t(r): return actifs[r.tournoi_id][0].date_debut
-    # Part A : à ranking égal, garder le plus récent (date DESC)
-    top_a = sorted(resultats, key=lambda r: (-r.ranking, -date_t(r).toordinal()))
-    # Part B : à ranking égal, garder le plus lourd (poids DESC)
-    top_b = sorted(resultats, key=lambda r: (-r.ranking, -poids(r)))
+def _player_score(results: list, actives: dict) -> float:
+    """Compute player score from results and pre-loaded active tournaments dict."""
+    n    = len(results)
+    keep = _part_a_count(n)
+
+    def weight(r): return actives[r.tournament_id][0].coefficient * actives[r.tournament_id][1]
+    def date_of(r): return actives[r.tournament_id][0].start_date
+
+    # Part A: on equal ranking, prefer most recent (date DESC)
+    top_a = sorted(results, key=lambda r: (-r.ranking, -date_of(r).toordinal()))
+    # Part B: on equal ranking, prefer highest weight (weight DESC)
+    top_b = sorted(results, key=lambda r: (-r.ranking, -weight(r)))
 
     def entries(subset):
-        return [(r.ranking, actifs[r.tournoi_id][0].coefficient * actifs[r.tournoi_id][1])
+        return [(r.ranking, actives[r.tournament_id][0].coefficient * actives[r.tournament_id][1])
                 for r in subset]
 
-    part_a = _moyenne_ponderee(entries(top_a[:garder]), max(0, garder - n))
-    part_b = _moyenne_ponderee(entries(top_b[:4]),      max(0, 4 - n))
+    part_a = _weighted_average(entries(top_a[:keep]), max(0, keep - n))
+    part_b = _weighted_average(entries(top_b[:4]),    max(0, 4 - n))
     return 0.5 * part_a + 0.5 * part_b
 
 
-def calcul_score(db: Session, joueur_id: str, semaine_cible: date, regles: str) -> float | None:
+def compute_score(db: Session, player_id: str, target_week: date, rules: str) -> float | None:
     """
-    Score final = 0.5 * Part A + 0.5 * Part B.
-    Retourne None si le joueur a moins de 2 tournois actifs.
+    Final score = 0.5 * Part A + 0.5 * Part B.
+    Returns None if the player has fewer than 2 active tournaments.
     """
-    actifs = {t.id: (t, c) for t, c in tournois_actifs(db, semaine_cible, regles)}
-    resultats = _resultats_actifs(db, joueur_id, actifs)
-    if len(resultats) < 2:
+    actives = {t.id: (t, c) for t, c in active_tournaments(db, target_week, rules)}
+    results = _player_results(db, player_id, actives)
+    if len(results) < 2:
         return None
-    return _score_pour_joueur(resultats, actifs)
+    return _player_score(results, actives)
 
 
-def classement(db: Session, semaine_cible: date, regles: str) -> list[dict]:
+def ranking(db: Session, target_week: date, rules: str) -> list[dict]:
     """
-    Retourne le classement complet pour une semaine et une discipline.
-    Seuls les joueurs avec ≥2 tournois actifs apparaissent.
-    Les tournois actifs sont calculés une seule fois.
+    Return the full ranking for a given week and discipline.
+    Only players with ≥2 active tournaments appear.
+    Active tournaments are computed once.
     """
-    from app.models import Resultat
     from sqlalchemy import func
 
-    actifs = {t.id: (t, c) for t, c in tournois_actifs(db, semaine_cible, regles)}
-    if not actifs:
+    actives = {t.id: (t, c) for t, c in active_tournaments(db, target_week, rules)}
+    if not actives:
         return []
 
-    # Joueurs éligibles en une seule requête SQL
-    eligibles = (
-        db.query(Resultat.joueur_id)
-        .filter(Resultat.tournoi_id.in_(actifs.keys()))
-        .group_by(Resultat.joueur_id)
-        .having(func.count(Resultat.tournoi_id) >= 2)
+    # Eligible players in a single SQL query
+    eligible = (
+        db.query(Result.player_id)
+        .filter(Result.tournament_id.in_(actives.keys()))
+        .group_by(Result.player_id)
+        .having(func.count(Result.tournament_id) >= 2)
         .all()
     )
-    joueur_ids = [row[0] for row in eligibles]
+    player_ids = [row[0] for row in eligible]
 
-    # Charger tous les résultats actifs en une seule requête
-    tous_resultats = (
-        db.query(Resultat)
+    # Load all active results in a single query
+    all_results = (
+        db.query(Result)
         .filter(
-            Resultat.joueur_id.in_(joueur_ids),
-            Resultat.tournoi_id.in_(actifs.keys()),
+            Result.player_id.in_(player_ids),
+            Result.tournament_id.in_(actives.keys()),
         )
         .all()
     )
 
-    # Regrouper par joueur
-    par_joueur: dict[str, list] = {jid: [] for jid in joueur_ids}
-    for r in tous_resultats:
-        par_joueur[r.joueur_id].append(r)
+    # Group by player
+    by_player: dict[str, list] = {pid: [] for pid in player_ids}
+    for r in all_results:
+        by_player[r.player_id].append(r)
 
-    # Calculer les scores + podiums dans les tournois actifs
+    # Compute scores and podiums
     scores = []
-    for joueur_id, resultats in par_joueur.items():
-        score = _score_pour_joueur(resultats, actifs)
+    for player_id, results in by_player.items():
+        score = _player_score(results, actives)
         scores.append({
-            "joueur_id":   joueur_id,
-            "score":       score,
-            "nb_tournois": len(resultats),
-            "nb_or":       sum(1 for r in resultats if r.position == 1),
-            "nb_argent":   sum(1 for r in resultats if r.position == 2),
-            "nb_bronze":   sum(1 for r in resultats if r.position == 3),
+            "player_id":      player_id,
+            "score":          score,
+            "nb_tournaments": len(results),
+            "nb_gold":        sum(1 for r in results if r.position == 1),
+            "nb_silver":      sum(1 for r in results if r.position == 2),
+            "nb_bronze":      sum(1 for r in results if r.position == 3),
         })
 
-    # Tri : score DESC, puis EMA ID ASC pour les égalités exactes
-    scores.sort(key=lambda x: (-x["score"], x["joueur_id"]))
+    # Sort: score DESC, then EMA ID ASC for exact ties
+    scores.sort(key=lambda x: (-x["score"], x["player_id"]))
     for i, s in enumerate(scores):
         s["position"] = i + 1
 
     return scores
 
 
-def points_ema_tournoi(position: int, nb_joueurs: int) -> int:
+def ema_points(position: int, nb_players: int) -> int:
     """
-    Calcule les points EMA attribués à un joueur selon sa position dans un tournoi.
-    Formule : EMA = (NB - POS) / (NB - 1) * 1000, arrondi à l'entier.
-    1er → 1000, dernier → 0. Retourne 0 si nb_joueurs <= 1.
+    EMA points for a player given their position in a tournament.
+    Formula: EMA = (NB - POS) / (NB - 1) * 1000, rounded to integer.
+    1st → 1000, last → 0. Returns 0 if nb_players <= 1.
     """
-    if nb_joueurs <= 1:
+    if nb_players <= 1:
         return 0
-    return round((nb_joueurs - position) / (nb_joueurs - 1) * 1000)
+    return round((nb_players - position) / (nb_players - 1) * 1000)
+
+
+# Aliases for backward compatibility
+lundi_semaine         = week_monday
+semaine_debut_tournoi = tournament_first_week
+semaines_actives      = active_weeks
+tournois_actifs       = active_tournaments
+calcul_score          = compute_score
+classement            = ranking
+points_ema_tournoi    = ema_points
+_nb_tournois_part_a   = _part_a_count
+_moyenne_ponderee     = _weighted_average
+_resultats_actifs     = _player_results
+_score_pour_joueur    = _player_score

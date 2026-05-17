@@ -5,54 +5,54 @@ Formule : moyenne des 3 meilleurs rankings EMA (gradient 0-1000).
 """
 
 import json, os, sys
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../.."))
 
 from datetime import date as _date
 from app.database import SessionLocal
 from app.models import (
-    ChampionnatTournoi, Joueur, Resultat, ResultatAnonyme,
-    SerieChampionnat, Championnat, Tournoi,
+    ChampionshipTournament, Player, Result, AnonymousResult,
+    ChampionshipSeries, Championship, Tournament,
 )
-from app.ranking import points_ema_tournoi
+from app.ranking import ema_points
 
 db = SessionLocal()
 
 # ---------------------------------------------------------------------------
-# 1. Série et édition
+# 1. Series and edition
 # ---------------------------------------------------------------------------
 
-serie = db.query(SerieChampionnat).filter_by(slug="golden-league-mcr").first()
+serie = db.query(ChampionshipSeries).filter_by(slug="golden-league-mcr").first()
 if not serie:
-    serie = SerieChampionnat(
+    serie = ChampionshipSeries(
         slug="golden-league-mcr",
-        nom="Golden League MCR",
-        regles="MCR",
-        pays="FR",
+        name="Golden League MCR",
+        rules="MCR",
+        country="FR",
         description="Circuit national MCR, organisé par la Fédération française de Mahjong.",
     )
     db.add(serie)
     db.flush()
-    print(f"Série créée : {serie.nom}")
+    print(f"Série créée : {serie.name}")
 else:
-    print(f"Série existante : {serie.nom}")
+    print(f"Série existante : {serie.name}")
 
-edition = db.query(Championnat).filter_by(serie_id=serie.id, annee=2025).first()
+edition = db.query(Championship).filter_by(series_id=serie.id, year=2025).first()
 if not edition:
-    edition = Championnat(
-        serie_id=serie.id,
-        annee=2025,
-        nom="Golden League MCR 2024-2025",
-        formule="moyenne_n_meilleurs",
+    edition = Championship(
+        series_id=serie.id,
+        year=2025,
+        name="Golden League MCR 2024-2025",
+        formula="moyenne_n_meilleurs",
         params=json.dumps({"n": 3}),
     )
     db.add(edition)
     db.flush()
-    print(f"Édition créée : {edition.nom}")
+    print(f"Édition créée : {edition.name}")
 else:
-    print(f"Édition existante : {edition.nom}")
+    print(f"Édition existante : {edition.name}")
 
 # ---------------------------------------------------------------------------
-# 2. Mapping NOM Prénom (format site) → joueur_id
+# 2. Mapping LAST_NAME First_Name (website format) → player_id
 # ---------------------------------------------------------------------------
 
 MAPPING: dict[str, str | None] = {
@@ -152,17 +152,17 @@ MAPPING: dict[str, str | None] = {
 }
 
 # ---------------------------------------------------------------------------
-# 3. Données des tournois (format: position, nom_site, mahjong, points)
+# 3. Tournament data (format: position, website_name, mahjong, points)
 # Note: sur ce site, "Points de table" = points MCR, "Points" = mahjong (score brut)
 # ---------------------------------------------------------------------------
 
 TOURNOIS = [
     {
-        "nom": "Golden League MCR - Coupe des pirates",
-        "lieu": "Paris",
-        "date_debut": "2025-02-08",
-        "date_fin":   "2025-02-08",
-        "resultats": [
+        "name": "Golden League MCR - Coupe des pirates",
+        "city": "Paris",
+        "start_date": "2025-02-08",
+        "end_date":   "2025-02-08",
+        "results": [
             (1,  "BAPTISTE Nicolas",          669,  21),
             (2,  "RAK Cyrille",               763,  20),
             (3,  "ROY Olivier",               208,  20),
@@ -206,11 +206,11 @@ TOURNOIS = [
         ],
     },
     {
-        "nom": "Golden League MCR - East en ILL",
-        "lieu": "Paris",
-        "date_debut": "2025-03-08",
-        "date_fin":   "2025-03-08",
-        "resultats": [
+        "name": "Golden League MCR - East en ILL",
+        "city": "Paris",
+        "start_date": "2025-03-08",
+        "end_date":   "2025-03-08",
+        "results": [
             (1,  "DE KERGOMMEAUX Loïc",        766,  23),
             (2,  "GUERIN Guillaume",            579,  21),
             (3,  "ARNAUD Caroline",             436,  21),
@@ -258,11 +258,11 @@ TOURNOIS = [
         ],
     },
     {
-        "nom": "Golden League MCR - Round 3",
-        "lieu": "Pelleautier",
-        "date_debut": "2025-04-19",
-        "date_fin":   "2025-04-19",
-        "resultats": [
+        "name": "Golden League MCR - Round 3",
+        "city": "Pelleautier",
+        "start_date": "2025-04-19",
+        "end_date":   "2025-04-19",
+        "results": [
             (1,  "BAPTISTE Nicolas",           869,  24),
             (2,  "EBLE Catherine",             326,  21),
             (3,  "ARNAUD Caroline",            772,  20),
@@ -290,11 +290,11 @@ TOURNOIS = [
         ],
     },
     {
-        "nom": "Golden League MCR - Round 4",
-        "lieu": "Nancy",
-        "date_debut": "2025-06-08",
-        "date_fin":   "2025-06-08",
-        "resultats": [
+        "name": "Golden League MCR - Round 4",
+        "city": "Nancy",
+        "start_date": "2025-06-08",
+        "end_date":   "2025-06-08",
+        "results": [
             (1,  "BAPTISTE Nicolas",           849,  23),
             (2,  "MATHERN Claire",             393,  18),
             (3,  "HEINIS Eloïse",              143,  18),
@@ -332,67 +332,67 @@ TOURNOIS = [
 # ---------------------------------------------------------------------------
 
 for t_data in TOURNOIS:
-    nb = len(t_data["resultats"])
+    nb = len(t_data["results"])
 
-    tournoi = db.query(Tournoi).filter_by(nom=t_data["nom"], pays="FR").first()
+    tournoi = db.query(Tournament).filter_by(name=t_data["name"], country="FR").first()
     if not tournoi:
-        tournoi = Tournoi(
+        tournoi = Tournament(
             ema_id=None,
-            regles="MCR",
-            nom=t_data["nom"],
-            lieu=t_data["lieu"],
-            pays="FR",
-            date_debut=_date.fromisoformat(t_data["date_debut"]),
-            date_fin=_date.fromisoformat(t_data["date_fin"]),
-            nb_joueurs=nb,
+            rules="MCR",
+            name=t_data["name"],
+            city=t_data["city"],
+            country="FR",
+            start_date=_date.fromisoformat(t_data["start_date"]),
+            end_date=_date.fromisoformat(t_data["end_date"]),
+            nb_players=nb,
             coefficient=0.0,
-            type_tournoi="normal",
-            statut="actif",
-            approbation=None,
+            tournament_type="normal",
+            status="actif",
+            approval=None,
         )
         db.add(tournoi)
         db.flush()
-        print(f"\nTournoi créé : [{tournoi.id}] {tournoi.nom}")
+        print(f"\nTournament créé : [{tournoi.id}] {tournoi.name}")
     else:
-        print(f"\nTournoi existant : [{tournoi.id}] {tournoi.nom}")
-        db.query(Resultat).filter_by(tournoi_id=tournoi.id).delete()
-        db.query(ResultatAnonyme).filter_by(tournoi_id=tournoi.id).delete()
+        print(f"\nTournament existant : [{tournoi.id}] {tournoi.name}")
+        db.query(Result).filter_by(tournament_id=tournoi.id).delete()
+        db.query(AnonymousResult).filter_by(tournament_id=tournoi.id).delete()
 
-    lien = db.query(ChampionnatTournoi).filter_by(
-        championnat_id=edition.id, tournoi_id=tournoi.id
+    lien = db.query(ChampionshipTournament).filter_by(
+        championship_id=edition.id, tournament_id=tournoi.id
     ).first()
     if not lien:
-        db.add(ChampionnatTournoi(championnat_id=edition.id, tournoi_id=tournoi.id))
+        db.add(ChampionshipTournament(championship_id=edition.id, tournament_id=tournoi.id))
 
     nb_id = nb_anon = 0
-    for pos, nom_site, mahjong, points in t_data["resultats"]:
-        ranking = points_ema_tournoi(pos, nb)
-        joueur_id = MAPPING.get(nom_site)
+    for pos, nom_site, mahjong, points in t_data["results"]:
+        ranking = ema_points(pos, nb)
+        player_id = MAPPING.get(nom_site)
 
-        if joueur_id:
-            joueur = db.query(Joueur).filter_by(id=joueur_id).first()
+        if player_id:
+            joueur = db.query(Player).filter_by(id=player_id).first()
             if joueur:
-                db.add(Resultat(
-                    tournoi_id=tournoi.id,
-                    joueur_id=joueur_id,
+                db.add(Result(
+                    tournament_id=tournoi.id,
+                    player_id=player_id,
                     position=pos,
                     points=points,
                     mahjong=mahjong,
                     ranking=ranking,
-                    nationalite=joueur.nationalite,
+                    nationality=joueur.nationality,
                 ))
                 nb_id += 1
                 continue
             else:
-                print(f"  WARN: {joueur_id} introuvable pour {nom_site}")
+                print(f"  WARN: {player_id} introuvable pour {nom_site}")
 
         parts = nom_site.split(" ", 1)
-        db.add(ResultatAnonyme(
-            tournoi_id=tournoi.id,
+        db.add(AnonymousResult(
+            tournament_id=tournoi.id,
             position=pos,
-            nationalite="FR",
-            nom=parts[0],
-            prenom=parts[1] if len(parts) > 1 else "",
+            nationality="FR",
+            last_name=parts[0],
+            first_name=parts[1] if len(parts) > 1 else "",
         ))
         nb_anon += 1
 

@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="player-header">
+  <div>
+    <div class="player-name">{{ serie.last_name }}</div>
+    <div class="player-meta">
+      <span>{{ serie.country | flag }} {{ serie.country }}</span>
+      <span class="badge {% if serie.rules == 'MCR' %}badge-mcr{% else %}badge-rcr{% endif %}">{{ serie.rules }}</span>
+      <span class="dim">{{ hall_of_fame | length }} édition{{ 's' if hall_of_fame | length > 1 }}</span>
+    </div>
+    {% if serie.description %}
+    <div class="dim" style="margin-top:0.5rem;font-size:0.85rem">{{ serie.description }}</div>
+    {% endif %}
+  </div>
+</div>
+
+{% if not hall_of_fame %}
+<div class="dim" style="margin:2rem 0;text-align:center">Aucune édition enregistrée.</div>
+{% else %}
+
+{% for item in hall_of_fame %}
+{% set ed = item.edition %}
+<details class="edition-block">
+  <summary class="edition-summary">
+    <div class="edition-summary-left">
+      <a href="/championships/{{ serie.slug }}/{{ ed.year }}" class="edition-summary-title" onclick="event.stopPropagation()">{{ ed.last_name or (serie.last_name ~ ' ' ~ ed.year) }}</a>
+      <span class="dim" style="font-size:0.82rem">{{ item.tournaments | length }} tournoi{{ 's' if item.tournaments | length > 1 }}</span>
+    </div>
+      <span style="display:inline-flex;align-items:center;gap:0.3rem;width:13rem;flex-shrink:0">
+        {% if item.champion %}
+          {% set c = item.champion %}
+          <span style="font-size:1.1rem">🏆</span>
+          {% if c.nationality %}{{ c.nationality | flag }}{% endif %}
+          <span style="font-size:0.85rem;font-weight:700">
+            {% if c.player %}{{ c.player.first_name | first_name }} {{ c.player.last_name | title }}{% else %}{{ c.nom_affiche }}{% endif %}
+          </span>
+        {% endif %}
+      </span>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:0.75rem">
+        {% set medals = ['🥇','🥈','🥉'] %}
+        {% for idx in range([item.podium|length, 3]|min) %}
+          {% set p = item.podium[idx] %}
+          <span style="display:inline-flex;align-items:center;gap:0.25rem;font-size:0.85rem">
+            {{ medals[idx] }}
+            {% if p.nationality %}{{ p.nationality | flag }}{% endif %}
+            {% if p.player %}{{ p.player.first_name | first_name }} {{ p.player.last_name | title }}
+            {% else %}{{ p.nom_affiche }}{% endif %}
+          </span>
+        {% endfor %}
+      </div>
+  </summary>
+
+  <div class="edition-body">
+
+    <!-- Podium -->
+    {% if item.podium %}
+    <div style="display:flex;gap:0.75rem;flex-wrap:wrap;margin-bottom:1.25rem">
+      {% set medals = ['🥇','🥈','🥉'] %}
+      {% for idx in range([item.podium|length, 3]|min) %}
+      {% set p = item.podium[idx] %}
+      <div class="stat-card" style="text-align:center;min-width:110px;padding:0.6rem 0.8rem">
+        <div style="font-size:1.3rem">{{ medals[idx] }}</div>
+        {% if p.nationality %}<div>{{ p.nationality | flag }}</div>{% endif %}
+        {% if p.player %}
+        <a href="/players/{{ p.player.id }}" style="font-size:0.82rem;font-weight:600;display:block;margin-top:0.2rem">
+          {{ p.player.first_name | first_name }} {{ p.player.last_name | title }}
+        </a>
+        {% else %}
+        <div style="font-size:0.82rem;font-weight:600;margin-top:0.2rem;color:var(--text2)">{{ p.nom_affiche }}</div>
+        {% endif %}
+        <div class="dim" style="font-size:0.78rem">{{ p.score }}</div>
+      </div>
+      {% endfor %}
+      {% if item.champion and (not item.podium or item.champion.player != item.podium[0].joueur or item.champion.nom_affiche != item.podium[0].nom_affiche) %}
+      <div class="stat-card" style="text-align:center;min-width:110px;padding:0.6rem 0.8rem;border-color:var(--accent)">
+        <div style="font-size:1.3rem">🏆</div>
+        {% set c = item.champion %}
+        {% if c.nationality %}<div>{{ c.nationality | flag }}</div>{% endif %}
+        {% if c.player %}
+        <a href="/players/{{ c.player.id }}" style="font-size:0.82rem;font-weight:600;display:block;margin-top:0.2rem">
+          {{ c.player.first_name | first_name }} {{ c.player.last_name | title }}
+        </a>
+        {% else %}
+        <div style="font-size:0.82rem;font-weight:600;margin-top:0.2rem;color:var(--text2)">{{ c.nom_affiche }}</div>
+        {% endif %}
+        <div class="dim" style="font-size:0.78rem">Champion</div>
+      </div>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- Liste des tournois -->
+    <div class="scroll-table">
+    <table style="width:100%">
+      <colgroup>
+        <col class="col-date-opt">
+        <col class="col-ville">
+        <col class="col-tournoi">
+        <col class="col-joueurs">
+      </colgroup>
+      <thead>
+        <tr>
+          <th class="col-date-opt">Date</th>
+          <th class="col-ville">Ville</th>
+          <th class="col-tournoi">Tournoi</th>
+          <th class="col-joueurs">Joueurs</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for t in item.tournaments %}
+        <tr>
+          <td class="col-date-opt" style="font-size:0.85rem;white-space:nowrap">{{ t.start_date.strftime('%d/%m/%Y') }}</td>
+          <td class="col-ville" style="font-size:0.85rem">{{ t.city }}</td>
+          <td class="col-tournoi"><a href="/tournaments/{{ t.id }}">{{ t.name }}</a></td>
+          <td class="col-joueurs right dim">{{ t.nb_players }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    </div>
+
+    <div style="margin-top:0.75rem;text-align:right">
+      <a href="/championships/{{ serie.slug }}/{{ ed.year }}" style="font-size:0.85rem">
+        Classement complet →
+      </a>
+    </div>
+
+  </div>
+</details>
+{% endfor %}
+
+{% endif %}
+
+{% endblock %}

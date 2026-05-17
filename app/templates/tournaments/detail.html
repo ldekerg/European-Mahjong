@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="player-header">
+  <div>
+    <div class="player-name">{{ tournoi.name }}</div>
+    <div class="player-meta">
+      <span>{{ tournoi.country | pays_flag_link('tournaments') }} {{ tournoi.city }}</span>
+      <span class="dim">{{ tournoi.start_date.strftime('%d/%m/%Y') }} → {{ tournoi.end_date.strftime('%d/%m/%Y') }}</span>
+      <span class="badge {% if tournoi.rules == 'MCR' %}badge-mcr{% else %}badge-rcr{% endif %}">{{ tournoi.rules }}</span>
+      {% if tournoi.tournament_type == 'wmc' %}<span class="badge badge-wmc">WMC</span>
+      {% elif tournoi.tournament_type == 'wrc' %}<span class="badge badge-wmc">WRC</span>
+      {% elif tournoi.tournament_type == 'oemc' %}<span class="badge">OEMC</span>
+      {% elif tournoi.tournament_type == 'oerc' %}<span class="badge">OERC</span>{% endif %}
+      {% if resultats_incomplets %}
+      <span class="badge badge-warning" title="{{ trad('common.missing_players', n=nb_anon_europeens) }}">{{ trad('common.partial_results') }}</span>
+      {% endif %}
+    </div>
+  </div>
+  <dl style="font-size:0.85rem;margin:0">
+    <dt>{{ trad('common.players') }}</dt><dd>{{ tournoi.nb_players }}</dd>
+    {% if not is_mondial %}<dt>{{ trad('common.coeff') }}</dt><dd>{{ tournoi.coefficient }}</dd>{% endif %}
+    <dt>{{ trad('common.country') }}</dt>
+    <dd>
+      {{ nb_pays }}
+      {% if pays_stats %}
+      <span style="display:inline-flex;flex-wrap:wrap;gap:0.3rem;margin-left:0.5rem;vertical-align:middle">
+        {% for p in pays_stats %}
+        <a href="/countries/{{ p.code }}?tab=tournois"
+           class="etiquette-pays">
+          {{ p.code | flag }} <span class="dim">{{ p.nb }}</span>
+        </a>
+        {% endfor %}
+      </span>
+      {% endif %}
+    </dd>
+  </dl>
+</div>
+
+{% set is_mcr = tournoi.rules == 'MCR' %}
+{% set show_ema_col = not is_mondial %}
+{% set ncols = (6 if is_mcr else 5) if show_ema_col else (5 if is_mcr else 4) %}
+
+<div class="ranking-layout" style="align-items:start;margin-top:1.5rem">
+<div class="ranking-left">
+<h2>{{ trad('tournament.results') }}</h2>
+<div class="scroll-table">
+<table>
+  <colgroup>
+    <col class="col-pos">
+    <col class="col-ema-id col-opt">
+    <col class="col-flag col-opt">
+    <col class="col-nom">
+    {% if is_mcr %}<col class="col-pts">{% endif %}
+    <col class="col-mahj">
+    {% if show_ema_col %}<col class="col-ema">{% endif %}
+  </colgroup>
+  <thead>
+    <tr>
+      <th class="center" title="{{ trad('tournament.position_title') }}">🏅</th>
+      <th class="col-ema-id col-opt"></th>
+      <th class="col-flag col-opt center" title="{{ trad('common.country') }}">🌍</th>
+      <th class="col-nom">{{ trad('common.players') }}</th>
+      {% if is_mcr %}<th class="col-pts right" title="{{ trad('tournament.points_title') }}">{{ trad('tournament.points') }}</th>{% endif %}
+      <th class="col-mahj right" title="{{ trad('tournament.mahjong_score_title') if is_mcr else trad('common.score') }}">{{ trad('common.score') }}</th>
+      {% if show_ema_col %}<th class="right col-sticky" title="{{ trad('tournament.ema_pts_title') }}">{{ trad('tournament.ema_pts') }}</th>{% endif %}
+    </tr>
+  </thead>
+  <tbody>
+    {% for r in results %}
+    <tr class="{% if r.anonyme %}row-anonyme{% elif r.position == 1 %}row-top1{% elif r.position == 2 %}row-top2{% elif r.position == 3 %}row-top3{% endif %}">
+      <td class="col-pos">
+        <span class="pos-medal">{% if r.position == 1 %}🥇{% elif r.position == 2 %}🥈{% elif r.position == 3 %}🥉{% else %}{{ r.position }}{% endif %}</span>
+      </td>
+      <td class="col-ema-id col-opt">
+        {% if r.player %}<a href="/players/{{ r.player.id }}">{{ r.player.id }}</a>
+        {% else %}<span class="dim">—</span>{% endif %}
+      </td>
+      <td class="col-flag col-opt center">
+        {% if r.nationality %}{{ r.nationality | flag_link('players') }}{% endif %}
+      </td>
+      <td class="col-nom">
+        <span class="mobile-flag">{% if r.nationality %}{{ r.nationality | flag_link('players') }}{% endif %}</span>
+        {% if r.player %}
+          {{ r.player.first_name | first_name }} {{ r.player.last_name | title }}
+        {% elif r.first_name or r.last_name %}
+          <span class="dim">{{ r.first_name }} {{ r.last_name }}</span>
+        {% else %}
+          <span class="dim">—</span>
+        {% endif %}
+      </td>
+      {% if is_mcr %}<td class="col-pts right">{% if not r.anonyme %}{{ r.points }}{% endif %}</td>{% endif %}
+      <td class="col-mahj right">{% if not r.anonyme %}{{ r.mahjong }}{% endif %}</td>
+      {% if show_ema_col %}
+      <td class="right col-sticky ema-pts" style="{% if not r.anonyme %}{{ r.ranking | ema_color }}{% endif %}">
+        {% if not r.anonyme %}{{ r.ranking }}{% endif %}
+      </td>
+      {% endif %}
+    </tr>
+    {% else %}
+    <tr><td colspan="{{ ncols }}">{{ trad('common.no_results') }}</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+</div><!-- ranking-left -->
+
+<!-- Panneau droit : podium -->
+<div style="margin-top:calc(1.5rem + 1.2rem * 1.4 + 0.75rem + 0.75rem)">
+<div class="ranking-right" style="padding:1.25rem;min-height:0">
+  {% if podium %}
+  <div class="podium">
+    {% for p in podium %}
+    {% set medal = '🥇' if p.position == 1 else ('🥈' if p.position == 2 else '🥉') %}
+    <div class="podium-step podium-{{ p.position }}">
+      <div class="podium-medal">{{ medal }}</div>
+      {% if p.anonyme %}
+      <div class="podium-flag">{{ p.nationality | flag }}</div>
+      <span class="podium-name dim">
+        {% if p.first_name or p.last_name %}{{ p.first_name }} {{ p.last_name }}{% else %}—{% endif %}
+      </span>
+      {% else %}
+      <div class="podium-flag">{{ p.player.nationality | flag }}</div>
+      <a href="/players/{{ p.player.id }}" class="podium-name">
+        {{ p.player.first_name | first_name }}<br>{{ p.player.last_name | title }}
+      </a>
+      <div class="podium-stat dim">{{ medal }} ({{ p.rang_medaille }})</div>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if circuit_serie and circuit_tournois %}
+  <div style="margin-top:1rem">
+    <div style="font-size:0.82rem;margin-bottom:0.4rem">
+      Circuit : <a href="/championships/{{ circuit_serie.slug }}/{{ circuit_edition.year }}">{{ circuit_edition.name or circuit_serie.name }}</a>
+    </div>
+    {% set carte_pts = [] %}
+    {% for t in circuit_tournois %}{% set _ = carte_pts.append({'lat': t.ville.latitude, 'lon': t.ville.longitude, 'city': t.city, 'country': t.country, 'current': t.id == tournoi.id}) %}{% endfor %}
+    {% set carte_simple_id = 'tournoi-map' %}
+    {% include 'partials/map_simple.html' %}
+  </div>
+  {% elif tournoi.ville %}
+  <div style="margin-top:1rem">
+    {% set carte_pts = [{'lat': tournoi.ville.latitude, 'lon': tournoi.ville.longitude, 'lieu': tournoi.city, 'country': tournoi.country}] %}
+    {% set carte_simple_id = 'tournoi-map' %}
+    {% set carte_simple_zoom = 8 %}
+    {% include 'partials/map_simple.html' %}
+  </div>
+  {% endif %}
+</div><!-- ranking-right -->
+</div><!-- margin wrapper -->
+</div><!-- ranking-layout -->
+
+{% endblock %}

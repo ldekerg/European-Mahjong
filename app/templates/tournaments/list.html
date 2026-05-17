@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="ranking-header">
+  <h1>{{ trad('common.tournaments') }}</h1>
+  <div class="t-filters">
+    <div class="t-filter-group">
+      {% for v, label in [('actifs', trad('common.active')), ('tous', trad('common.all')), ('speciaux', trad('common.special'))] %}
+      <a href="?view={{ v }}&sort={{ sort }}" class="filter-btn {% if view == v %}active{% endif %}">{{ label }}</a>
+      {% endfor %}
+    </div>
+    {% if city_filter %}
+    <span class="filter-btn active">📍 {{ city_filter }}</span>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Onglets MCR / RCR -->
+<div class="tabs">
+  <button class="tab-btn active" onclick="showTab('mcr', this)"><span class="badge badge-mcr">MCR</span> ({{ mcr.tournaments | length }})</button>
+  <button class="tab-btn"       onclick="showTab('rcr', this)"><span class="badge badge-rcr">RCR</span> ({{ rcr.tournaments | length }})</button>
+</div>
+
+{% for regles_key, tab in [('mcr', mcr), ('rcr', rcr)] %}
+<div id="tab-{{ regles_key }}" class="tab-content {% if regles_key != 'mcr' %}hidden{% endif %}">
+  <div class="t-layout">
+    <div class="t-left">
+      {% with tournois=tab.tournaments, actifs_ids=tab.active_ids, incomplets=tab.incomplete, city_filter=city_filter,
+              tab_key=regles_key, sort_url_base='?view=' + view, asc=asc %}
+      {% include 'partials/tournaments_table.html' %}
+      {% endwith %}
+    </div>
+    <div class="t-right">
+      {% set _cb = carte_bounds_mcr if regles_key == 'mcr' else carte_bounds_rcr %}
+      {% with cities=tab.cities, city_filter=city_filter, tab_key=regles_key, carte_bounds=_cb %}
+      {% include 'partials/tournaments_map.html' %}
+      {% endwith %}
+    </div>
+  </div>
+</div>
+{% endfor %}
+
+<script>
+function showTab(name, btn) {
+  ['mcr','rcr'].forEach(function(r) {
+    document.getElementById('tab-' + r).classList.add('hidden');
+  });
+  document.querySelectorAll('.tabs .tab-btn').forEach(function(b) { b.classList.remove('active'); });
+  document.getElementById('tab-' + name).classList.remove('hidden');
+  btn.classList.add('active');
+}
+</script>
+{% endblock %}

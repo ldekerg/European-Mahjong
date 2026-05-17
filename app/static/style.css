@@ -446,7 +446,7 @@ nav a:hover {
     gap: 0.4rem;
     margin-left: auto;
 }
-.theme-toggle, .regles-toggle, .lang-toggle {
+.theme-toggle, .rules-toggle, .lang-toggle {
     background: transparent;
     border: 1px solid rgba(255,255,255,0.3);
     color: #fff;
@@ -462,8 +462,7 @@ nav a:hover {
     align-items: center;
     justify-content: center;
 }
-.theme-toggle:hover, .regles-toggle:hover, .lang-toggle:hover { background: rgba(255,255,255,0.1); }
-.regles-toggle { border-color: rgba(255,255,255,0.5); }
+.theme-toggle:hover, .rules-toggle:hover, .lang-toggle:hover { background: rgba(255,255,255,0.1); }
 
 .lang-picker   { position: relative; }
 .lang-dropdown {

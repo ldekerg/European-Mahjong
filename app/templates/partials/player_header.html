@@ -5,10 +5,10 @@
      show_edit — bool (défaut false) : affiche le bouton Modifier
 #}
 <div class="player-header">
-  <div class="player-id">{{ joueur.id }}</div>
-  <div class="player-name">{{ joueur.prenom | prenom }} {{ joueur.nom | title }}</div>
+  <div class="player-id">{{ player.id }}</div>
+  <div class="player-name">{{ player.first_name | first_name }} {{ player.last_name | title }}</div>
   <div class="player-meta">
-    <span class="flag">{{ joueur.nationalite | flag_link('joueurs') }} {{ joueur.nationalite }}</span>
-    {% if joueur.statut != 'europeen' %}<span class="statut statut-{{ joueur.statut }}">{{ joueur.statut }}</span>{% endif %}
+    <span class="flag">{{ player.nationality | flag_link('players') }} {{ player.nationality }}</span>
+    {% if player.status != 'europeen' %}<span class="statut statut-{{ player.status }}">{{ player.status }}</span>{% endif %}
   </div>
 </div>

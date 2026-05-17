@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="player-header">
+  <div>
+    <div class="player-name">{{ edition.last_name or (serie.last_name ~ ' ' ~ edition.year) }}</div>
+    <div class="player-meta">
+      <span>{{ serie.country | flag }} {{ serie.country }}</span>
+      <span class="badge {% if serie.rules == 'MCR' %}badge-mcr{% else %}badge-rcr{% endif %}">{{ serie.rules }}</span>
+      <span class="dim">{{ tournaments | length }} tournoi{{ 's' if tournaments | length > 1 }}</span>
+    </div>
+    <div class="dim" style="font-size:0.82rem;margin-top:0.3rem">
+      <a href="/championships/{{ serie.slug }}">{{ serie.last_name }}</a>
+    </div>
+  </div>
+  <dl style="font-size:0.85rem;margin:0">
+    <dt>Formule</dt>
+    <dd>
+      {% if edition.formula == 'moyenne_n_meilleurs' %}
+        Moyenne des {{ params.get('n', 3) }} meilleurs résultats
+      {% else %}
+        {{ edition.formula }}
+      {% endif %}
+    </dd>
+    <dt>Joueurs classés</dt>
+    <dd>{{ ranking | length }}</dd>
+    {% if pays_stats %}
+    <dt>Nationalités</dt>
+    <dd>
+      {{ pays_stats | length }}
+      <span style="display:inline-flex;flex-wrap:wrap;gap:0.3rem;margin-left:0.4rem;vertical-align:middle">
+        {% for p in pays_stats %}
+        <span style="display:inline-flex;align-items:center;gap:0.2rem;background:var(--bg3);border-radius:4px;padding:0.1rem 0.4rem;font-size:0.8rem;white-space:nowrap">
+          {{ p.code | flag }} <span class="dim">{{ p.nb }}</span>
+        </span>
+        {% endfor %}
+      </span>
+    </dd>
+    {% endif %}
+  </dl>
+</div>
+
+<div class="ranking-layout" style="align-items:start;margin-top:1.5rem">
+<div class="ranking-left">
+
+{% if champion or podium %}
+<div style="display:flex;gap:1.5rem;flex-wrap:wrap;align-items:flex-start;margin-bottom:1.5rem">
+
+  {% if champion %}
+  <div class="stat-card" style="text-align:center;min-width:160px">
+    <div class="stat-label" style="font-size:0.78rem;margin-bottom:0.4rem">🏆 Champion</div>
+    {% if champion.nationality %}
+    <div style="font-size:1.6rem">{{ champion.nationality | flag }}</div>
+    {% endif %}
+    {% if champion.player %}
+    <a href="/players/{{ champion.player.id }}" style="font-weight:700;display:block;margin:0.25rem 0;font-size:0.92rem">
+      {{ champion.player.first_name | first_name }} {{ champion.player.last_name | title }}
+    </a>
+    {% else %}
+    <div style="font-weight:700;margin:0.25rem 0;font-size:0.92rem">{{ champion.nom_affiche }}</div>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  {% if podium %}
+  <div style="display:flex;gap:0.75rem;flex-wrap:wrap;align-items:flex-end">
+    {% for medal, r in [('🥇', podium[0])] + ([('🥈', podium[1])] if podium|length > 1 else []) + ([('🥉', podium[2])] if podium|length > 2 else []) %}
+    <div class="stat-card" style="text-align:center;min-width:120px">
+      <div style="font-size:1.4rem">{{ medal }}</div>
+      {% if r.nationality %}
+      <div>{{ r.nationality | flag }}</div>
+      {% endif %}
+      {% if r.player %}
+      <a href="/players/{{ r.player.id }}" style="font-size:0.82rem;font-weight:600;display:block;margin-top:0.2rem">
+        {{ r.player.first_name | first_name }} {{ r.player.last_name | title }}
+      </a>
+      {% else %}
+      <div style="font-size:0.82rem;font-weight:600;margin-top:0.2rem;color:var(--dim)">{{ r.nom_affiche }}</div>
+      {% endif %}
+      <div class="dim" style="font-size:0.78rem">{{ r.score }}</div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+</div>
+{% endif %}
+
+<h2>Classement général</h2>
+{% if not ranking %}
+<div class="dim" style="margin:1rem 0">Aucun résultat disponible.</div>
+{% else %}
+<div class="scroll-table">
+<table class="table-championnat">
+  <colgroup>
+    <col class="col-pos">
+    <col class="col-flag col-opt">
+    <col class="col-joueur">
+    <col class="col-champ-score col-sticky">
+    <col class="col-champ-t col-opt">
+  </colgroup>
+  <thead>
+    <tr>
+      <th class="col-pos">🏅</th>
+      <th class="col-flag col-opt" title="Pays">🌍</th>
+      <th class="col-joueur">Joueur</th>
+      <th class="col-champ-score col-sticky right">Moy.</th>
+      <th class="col-champ-t col-opt right" title="Tournois participés / comptés">T.</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for r in ranking %}
+    <tr class="{% if r.position == 1 %}row-top1{% elif r.position == 2 %}row-top2{% elif r.position == 3 %}row-top3{% endif %}{% if r.anonyme %} row-anonyme{% endif %}">
+      <td class="col-pos">
+        <span class="pos-medal">{% if r.position == 1 %}🥇{% elif r.position == 2 %}🥈{% elif r.position == 3 %}🥉{% else %}{{ r.position }}{% endif %}</span>
+      </td>
+      <td class="col-flag col-opt">{{ r.nationality | flag_link('players') }}</td>
+      <td class="col-joueur">
+        {% if r.player %}
+          <a href="/players/{{ r.player.id }}">{{ r.player.first_name | first_name }} {{ r.player.last_name | title }}</a>
+        {% else %}
+          <span class="dim">{{ r.nom_affiche }}</span>
+        {% endif %}
+      </td>
+      <td class="col-champ-score col-sticky right" style="font-weight:600">{{ r.score }}</td>
+      <td class="col-champ-t col-opt right dim" style="font-size:0.85rem">{{ r.nb_tournaments }}/{{ r.nb_comptes }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endif %}
+
+</div>
+<div class="ranking-right">
+
+<h2>Tournois du circuit</h2>
+<div class="scroll-table">
+<table>
+  <colgroup>
+    <col class="col-date-opt">
+    <col class="col-tournoi">
+    <col class="col-joueurs">
+  </colgroup>
+  <thead>
+    <tr>
+      <th class="col-date-opt">Date</th>
+      <th class="col-tournoi">Tournoi</th>
+      <th class="col-joueurs right">Jrs</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for t in tournaments %}
+    <tr>
+      <td class="col-date-opt" style="font-size:0.82rem;white-space:nowrap">{{ t.start_date.strftime('%d/%m') }}</td>
+      <td class="col-tournoi">
+        <a href="/tournaments/{{ t.id }}">{{ t.name }}</a>
+        <span class="dim" style="font-size:0.78rem"> — {{ t.city }}</span>
+      </td>
+      <td class="col-joueurs right dim">{{ t.nb_players }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+
+{% set tournaments_carte = tournaments | selectattr('ville_id') | list %}
+{% if tournaments_carte %}
+<div style="margin-top:1rem">
+{% set carte_pts = tournaments_carte | map(attribute='ville') | list %}
+{% set carte_pts = [] %}
+{% for t in tournaments_carte %}{% set _ = carte_pts.append({'lat': t.ville.latitude, 'lon': t.ville.longitude, 'city': t.city, 'country': t.country}) %}{% endfor %}
+{% set carte_simple_id = 'champ-map' %}
+{% include 'partials/map_simple.html' %}
+</div>
+{% endif %}
+
+</div>
+</div>
+
+{% endblock %}

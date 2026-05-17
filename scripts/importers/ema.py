@@ -1,17 +1,17 @@
 """
-Script d'import des tournois EMA depuis mahjong-europe.org
+Script to import EMA tournaments from mahjong-europe.org
 Usage : python3 import_ema.py [--start 0] [--end 453] [--delay 0.3] [--prefix TR]
         python3 import_ema.py --prefix TR_RCR --end 411        # Riichi
         python3 import_ema.py --prefix TR_RCR --ids 1000004    # WRC 2025
 
-Les joueurs sans numéro EMA sont stockés dans resultats_anonymes.
-Les mappings dans PRENOM_TO_ID_OVERRIDES convertissent automatiquement
-les anonymes identifiables en résultats liés à leur joueur EMA.
+Players without an EMA number are stored in resultats_anonymes.
+Mappings in PRENOM_TO_ID_OVERRIDES automatically convert
+identifiable anonymous entries into results linked to their EMA player.
 """
 
 import sys
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../.."))
 
 import time
 import argparse
@@ -23,14 +23,14 @@ from bs4 import BeautifulSoup
 from sqlalchemy.orm import Session
 
 from app.database import engine, SessionLocal
-from app.models import Base, Joueur, Tournoi, Resultat, ResultatAnonyme
+from app.models import Base, Player, Tournament, Result, AnonymousResult
 
 Base.metadata.create_all(bind=engine)
 
 BASE_URL = "http://mahjong-europe.org/ranking/Tournament/{}_{}.html"
 
-# Mappings prenom_complet -> joueur_id pour les tournois sans numéro EMA dans les résultats.
-# Clé : (ema_id, regles), valeur : dict {prenom_affiché: joueur_id}
+# Mappings full_first_name -> player_id for tournaments without EMA number in results.
+# Key: (ema_id, regles), value: dict {displayed_first_name: player_id}
 PRENOM_TO_ID_OVERRIDES: dict[tuple, dict[str, str]] = {
     (1000004, "RCR"): {
         "Mikko Aarnos":     "14990053",
@@ -56,25 +56,25 @@ def fetch_page(tournament_id, prefix: str = "TR") -> str | None:
                 continue
         return raw.decode("latin-1", errors="replace")
     except Exception as e:
-        print(f"  [ERREUR] {url} : {e}")
+        print(f"  [ERROR] {url} : {e}")
         return None
 
 
 def parse_date(raw: str) -> tuple[date, date]:
     """
-    Parse les formats de date EMA variés. Retourne (date_debut, date_fin).
-    Formats connus :
+    Parses various EMA date formats. Returns (start_date, end_date).
+    Known formats:
       '11-12 Mar.2023', '5 Oct.2019', '28 Sep.-1 Oct.2022'
       '06/10/2024', '31 May - 1 June 2008'
-      '15-mars-15' (mois français, année 2 chiffres)
-      '9 Feb. 25'  (année 2 chiffres)
-      '2-3 February' (sans année)
+      '15-mars-15' (French month, 2-digit year)
+      '9 Feb. 25'  (2-digit year)
+      '2-3 February' (no year)
     """
     import re
     months = {
         "jan": 1, "feb": 2, "mar": 3, "apr": 4, "may": 5, "jun": 6,
         "jul": 7, "aug": 8, "sep": 9, "oct": 10, "nov": 11, "dec": 12,
-        # Mois français
+        # French months
         "janvier": 1, "février": 2, "fevrier": 2, "mars": 3, "avril": 4,
         "mai": 5, "juin": 6, "juillet": 7, "août": 8, "aout": 8,
         "septembre": 9, "octobre": 10, "novembre": 11, "décembre": 12, "decembre": 12,
@@ -86,7 +86,7 @@ def parse_date(raw: str) -> tuple[date, date]:
             d, m, y = int(raw[:2]), int(raw[3:5]), int(raw[6:])
             return date(y, m, d), date(y, m, d)
 
-        # Trouver l'année : 4 chiffres ou 2 chiffres en fin
+        # Find the year: 4 digits or 2 digits at the end
         year_m4 = re.search(r'\b(20\d{2}|19\d{2})\b', raw)
         year_m2 = re.search(r'\b(\d{2})$', raw.strip())
 
@@ -99,7 +99,7 @@ def parse_date(raw: str) -> tuple[date, date]:
         else:
             return date(1900, 1, 1), date(1900, 1, 1)
 
-        # Trouver le mois (dernier token alphabétique)
+        # Find the month (last alphabetic token)
         tokens = re.split(r"[\s.\-/]+", raw_body)
         month = None
         for t in reversed(tokens):
@@ -118,7 +118,7 @@ def parse_date(raw: str) -> tuple[date, date]:
         if not days:
             return date(1900, 1, 1), date(1900, 1, 1)
         day_start = days[0]
-        # Si plusieurs mois détectés (ex: "31 May - 1 June"), utiliser le premier mois/jour
+        # If multiple months detected (e.g. "31 May - 1 June"), use the first month/day
         all_months = []
         for t in tokens:
             key = t.lower().rstrip(".")
@@ -127,7 +127,7 @@ def parse_date(raw: str) -> tuple[date, date]:
             elif len(key) >= 3 and key[:3] in months:
                 all_months.append(months[key[:3]])
         if len(all_months) >= 2:
-            # Multi-mois : start = premier mois/jour, end = dernier mois/dernier jour
+            # Multi-month: start = first month/day, end = last month/last day
             month_start = all_months[0]
             month_end = all_months[-1]
             day_end = days[-1] if len(days) > 1 else days[0]
@@ -139,13 +139,13 @@ def parse_date(raw: str) -> tuple[date, date]:
 
 
 def inferer_annee(ema_id: int, regles: str) -> int | None:
-    """Infère l'année d'un tournoi depuis les tournois voisins en base."""
+    """Infers the year of a tournament from neighboring tournaments in the database."""
     import sqlite3, os
     db_path = os.path.join(os.path.dirname(__file__), "..", "data", "ema_ranking.db")
     con = sqlite3.connect(db_path)
     row = con.execute("""
-        SELECT date_debut FROM tournois
-        WHERE regles=? AND date_debut != '1900-01-01'
+        SELECT date_debut FROM tournaments
+        WHERE rules=? AND date_debut != '1900-01-01'
           AND ema_id BETWEEN ? AND ?
         ORDER BY ABS(ema_id - ?) LIMIT 1
     """, (regles, ema_id - 10, ema_id + 10, ema_id)).fetchone()
@@ -156,7 +156,7 @@ def inferer_annee(ema_id: int, regles: str) -> int | None:
 def parse_tournament(html: str, tournament_id: int) -> dict | None:
     soup = BeautifulSoup(html, "html.parser")
 
-    # Vérifier que la page contient bien un tournoi
+    # Check that the page actually contains a tournament
     cells = soup.find_all("td", class_="PlayerBloc_2")
     if not cells:
         return None
@@ -170,7 +170,7 @@ def parse_tournament(html: str, tournament_id: int) -> dict | None:
     if "Number" not in data:
         return None
 
-    # Infos tournoi (certains tournois spéciaux ont "-" comme numéro)
+    # Tournament info (some special tournaments have "-" as number)
     raw_number = data.get("Number", str(tournament_id))
     try:
         t_id = int(raw_number)
@@ -183,7 +183,7 @@ def parse_tournament(html: str, tournament_id: int) -> dict | None:
     regles_raw = data.get("Rules", "").strip().upper()
     regles = "RCR" if ("RCR" in regles_raw or "RIICHI" in regles_raw) else "MCR"
 
-    # Lieu + pays depuis la ligne Place
+    # City + country from the Place line
     lieu = ""
     pays = ""
     for td in soup.find_all("td"):
@@ -201,19 +201,19 @@ def parse_tournament(html: str, tournament_id: int) -> dict | None:
                     lieu = parts
             break
 
-    # Coefficient (premier nombre dans MERS)
+    # Coefficient (first number in MERS)
     import re
     coeff_match = re.search(r"[\d.,]+", mers_raw)
     coefficient = float(coeff_match.group().replace(",", ".")) if coeff_match else 0.0
 
     try:
-        nb_joueurs = int(nb_joueurs_raw)
+        nb_players = int(nb_joueurs_raw)
     except ValueError:
-        nb_joueurs = 0
+        nb_players = 0
 
     date_debut, date_fin = parse_date(date_raw)
 
-    # Si date inconnue, tenter d'inférer l'année depuis les tournois voisins
+    # If date unknown, try to infer the year from neighboring tournaments
     if date_debut.year == 1900:
         annee = inferer_annee(t_id, regles)
         if annee:
@@ -221,20 +221,20 @@ def parse_tournament(html: str, tournament_id: int) -> dict | None:
             if d2.year != 1900:
                 date_debut, date_fin = d2, d3
 
-    # Normaliser les règles (déjà fait, mais conserver pour la suite)
+    # Normalize rules (already done, but keep for the rest)
     if "RCR" in regles or "RIICHI" in regles:
         regles = "RCR"
     else:
-        regles = "MCR"  # MCR, CHINESE OFFICIAL et variantes
+        regles = "MCR"  # MCR, CHINESE OFFICIAL and variants
 
-    # Résultats
-    resultats = []
+    # Results
+    results = []
     lignes = soup.find_all("div", class_=["TCTT_ligne", "TCTT_ligneG"])
     for ligne in lignes:
         cellules = ligne.find_all("p")
         if len(cellules) < 7:
             continue
-        # Ignorer l'en-tête
+        # Skip the header
         if "TCTT_contenuEntete" in (cellules[0].get("class") or [""])[0]:
             continue
 
@@ -244,7 +244,7 @@ def parse_tournament(html: str, tournament_id: int) -> dict | None:
         position = int(pos_text.group())
 
         ema_link = cellules[1].find("a")
-        joueur_id = ema_link.get_text(strip=True) if ema_link else None
+        player_id = ema_link.get_text(strip=True) if ema_link else None
 
         nom_joueur    = cellules[2].get_text(strip=True)
         prenom_joueur = cellules[3].get_text(strip=True)
@@ -253,14 +253,14 @@ def parse_tournament(html: str, tournament_id: int) -> dict | None:
         if prenom_joueur == "-":
             prenom_joueur = ""
 
-        # Nationalité depuis l'image du drapeau
+        # Nationality from the flag image
         flag_img = cellules[4].find("img")
-        nationalite = ""
+        nationality = ""
         if flag_img:
             src = flag_img.get("src", "")
             import os
             nat = os.path.basename(src).replace(".png", "").upper()
-            nationalite = nat
+            nationality = nat
 
         def to_int(s: str) -> int:
             s = s.strip().replace(",", ".")
@@ -276,27 +276,27 @@ def parse_tournament(html: str, tournament_id: int) -> dict | None:
         except IndexError:
             continue
 
-        # Ligne de pagination ou artefact HTML : nationalite vide et nom/prenom sont des chiffres
-        if not nationalite and not joueur_id and (nom_joueur + prenom_joueur).isdigit():
+        # Pagination row or HTML artifact: empty nationality and name/first_name are digits
+        if not nationality and not player_id and (nom_joueur + prenom_joueur).isdigit():
             continue
 
-        if joueur_id:
-            resultats.append({
-                "joueur_id":  joueur_id,
-                "nom":        nom_joueur,
-                "prenom":     prenom_joueur,
-                "nationalite": nationalite,
+        if player_id:
+            results.append({
+                "player_id":  player_id,
+                "name":        nom_joueur,
+                "first_name":     prenom_joueur,
+                "nationality": nationality,
                 "position":   position,
                 "points":     points,
                 "mahjong":    mahjong,
                 "ranking":    ranking,
             })
         else:
-            resultats.append({
-                "joueur_id":  None,
-                "nom":        nom_joueur,
-                "prenom":     prenom_joueur,
-                "nationalite": nationalite,
+            results.append({
+                "player_id":  None,
+                "name":        nom_joueur,
+                "first_name":     prenom_joueur,
+                "nationality": nationality,
                 "position":   position,
                 "points":     points,
                 "mahjong":    mahjong,
@@ -305,141 +305,141 @@ def parse_tournament(html: str, tournament_id: int) -> dict | None:
 
     return {
         "ema_id": t_id,
-        "nom": nom,
-        "lieu": lieu,
-        "pays": pays,
-        "date_debut": date_debut,
-        "date_fin": date_fin,
-        "nb_joueurs": nb_joueurs,
+        "name": nom,
+        "city": lieu,
+        "country": pays,
+        "start_date": date_debut,
+        "end_date": date_fin,
+        "nb_players": nb_players,
         "coefficient": coefficient,
-        "regles": regles,
-        "resultats": resultats,
+        "rules": regles,
+        "results": results,
     }
 
 
-def reset_tournament(db: Session, tournoi_id: int):
-    """Supprime tous les résultats (identifiés + anonymes) d'un tournoi."""
-    db.query(Resultat).filter(Resultat.tournoi_id == tournoi_id).delete()
-    db.query(ResultatAnonyme).filter(ResultatAnonyme.tournoi_id == tournoi_id).delete()
+def reset_tournament(db: Session, tournament_id: int):
+    """Deletes all results (identified + anonymous) for a tournament."""
+    db.query(Result).filter(Result.tournament_id == tournament_id).delete()
+    db.query(AnonymousResult).filter(AnonymousResult.tournament_id == tournament_id).delete()
     db.commit()
 
 
 def import_tournament(db: Session, data: dict, reset: bool = False):
-    # Upsert tournoi via (ema_id, regles)
-    tournoi = db.query(Tournoi).filter(
-        Tournoi.ema_id == data["ema_id"],
-        Tournoi.regles == data["regles"],
+    # Upsert tournament via (ema_id, regles)
+    tournoi = db.query(Tournament).filter(
+        Tournament.ema_id == data["ema_id"],
+        Tournament.rules == data["rules"],
     ).first()
     if tournoi and reset:
         reset_tournament(db, tournoi.id)
     if not tournoi:
-        tournoi = Tournoi(
-            ema_id=data["ema_id"], nom=data["nom"], lieu=data["lieu"], pays=data["pays"],
-            date_debut=data["date_debut"], date_fin=data["date_fin"],
-            nb_joueurs=data["nb_joueurs"], coefficient=data["coefficient"],
-            regles=data["regles"],
+        tournoi = Tournament(
+            ema_id=data["ema_id"], name=data["name"], city=data["city"], country=data["country"],
+            start_date=data["start_date"], end_date=data["end_date"],
+            nb_players=data["nb_players"], coefficient=data["coefficient"],
+            rules=data["rules"],
         )
         db.add(tournoi)
-        db.flush()  # pour obtenir tournoi.id
-        # Supprimer le doublon calendrier s'il existe (même nom+regles+date)
-        doublon_cal = db.query(Tournoi).filter(
-            Tournoi.statut == "calendrier",
-            Tournoi.regles == data["regles"],
-            Tournoi.nom == data["nom"],
-            Tournoi.date_debut == data["date_debut"],
-            Tournoi.id != tournoi.id,
+        db.flush()  # to get tournoi.id
+        # Delete calendar duplicate if it exists (same name+rules+date)
+        doublon_cal = db.query(Tournament).filter(
+            Tournament.status == "calendrier",
+            Tournament.rules == data["rules"],
+            Tournament.name == data["name"],
+            Tournament.start_date == data["start_date"],
+            Tournament.id != tournoi.id,
         ).first()
         if doublon_cal:
             db.delete(doublon_cal)
     else:
-        tournoi.nom = data["nom"]
-        tournoi.lieu = data["lieu"]
-        tournoi.pays = data["pays"]
-        tournoi.date_debut = data["date_debut"]
-        tournoi.date_fin = data["date_fin"]
-        tournoi.nb_joueurs = data["nb_joueurs"]
+        tournoi.name = data["name"]
+        tournoi.city = data["city"]
+        tournoi.country = data["country"]
+        tournoi.start_date = data["start_date"]
+        tournoi.end_date = data["end_date"]
+        tournoi.nb_players = data["nb_players"]
         tournoi.coefficient = data["coefficient"]
 
-    # Upsert joueurs + résultats
-    for r in data["resultats"]:
-        if r["joueur_id"] is None:
-            # Joueur sans numéro EMA → resultats_anonymes
-            existing_anon = db.query(ResultatAnonyme).filter(
-                ResultatAnonyme.tournoi_id == tournoi.id,
-                ResultatAnonyme.position   == r["position"],
+    # Upsert players + results
+    for r in data["results"]:
+        if r["player_id"] is None:
+            # Player without EMA number → resultats_anonymes
+            existing_anon = db.query(AnonymousResult).filter(
+                AnonymousResult.tournament_id == tournoi.id,
+                AnonymousResult.position   == r["position"],
             ).first()
             if not existing_anon:
-                db.add(ResultatAnonyme(
-                    tournoi_id  = tournoi.id,
+                db.add(AnonymousResult(
+                    tournament_id  = tournoi.id,
                     position    = r["position"],
-                    nationalite = r["nationalite"] or None,
-                    nom         = r["nom"] or None,
-                    prenom      = r["prenom"] or None,
+                    nationality = r["nationality"] or None,
+                    last_name   = r["name"] or None,
+                    first_name  = r["first_name"] or None,
                 ))
             else:
-                if not existing_anon.nationalite and r["nationalite"]:
-                    existing_anon.nationalite = r["nationalite"]
-                if not existing_anon.nom and r["nom"]:
-                    existing_anon.nom = r["nom"]
-                if not existing_anon.prenom and r["prenom"]:
-                    existing_anon.prenom = r["prenom"]
+                if not existing_anon.nationality and r["nationality"]:
+                    existing_anon.nationality = r["nationality"]
+                if not existing_anon.last_name and r["name"]:
+                    existing_anon.last_name = r["name"]
+                if not existing_anon.first_name and r["first_name"]:
+                    existing_anon.first_name = r["first_name"]
             continue
 
-        joueur = db.query(Joueur).filter(Joueur.id == r["joueur_id"]).first()
+        joueur = db.query(Player).filter(Player.id == r["player_id"]).first()
         if not joueur:
-            joueur = Joueur(
-                id=r["joueur_id"],
-                nom=r["nom"],
-                prenom=r["prenom"],
-                nationalite=r["nationalite"],
+            joueur = Player(
+                id=r["player_id"],
+                last_name=r["name"],
+                first_name=r["first_name"],
+                nationality=r["nationality"],
             )
             db.add(joueur)
 
-        # Eviter les doublons de résultat
-        existing = db.query(Resultat).filter(
-            Resultat.tournoi_id == tournoi.id,
-            Resultat.joueur_id  == r["joueur_id"],
+        # Avoid duplicate results
+        existing = db.query(Result).filter(
+            Result.tournament_id == tournoi.id,
+            Result.player_id  == r["player_id"],
         ).first()
         if not existing:
-            db.add(Resultat(
-                tournoi_id  = tournoi.id,
-                joueur_id   = r["joueur_id"],
+            db.add(Result(
+                tournament_id  = tournoi.id,
+                player_id   = r["player_id"],
                 position    = r["position"],
                 points      = r["points"],
                 mahjong     = r["mahjong"],
                 ranking     = r["ranking"],
-                nationalite = r["nationalite"],
+                nationality = r["nationality"],
             ))
         else:
-            if not existing.nationalite and r["nationalite"]:
-                existing.nationalite = r["nationalite"]
+            if not existing.nationality and r["nationality"]:
+                existing.nationality = r["nationality"]
 
-    # Convertir les anonymes identifiables par prénom (overrides connus)
+    # Convert identifiable anonymous entries by first name (known overrides)
     db.flush()
-    override_map = PRENOM_TO_ID_OVERRIDES.get((data["ema_id"], data["regles"]), {})
-    for prenom_complet, joueur_id in override_map.items():
-        anon = db.query(ResultatAnonyme).filter(
-            ResultatAnonyme.tournoi_id == tournoi.id,
-            ResultatAnonyme.prenom     == prenom_complet,
+    override_map = PRENOM_TO_ID_OVERRIDES.get((data["ema_id"], data["rules"]), {})
+    for prenom_complet, player_id in override_map.items():
+        anon = db.query(AnonymousResult).filter(
+            AnonymousResult.tournament_id == tournoi.id,
+            AnonymousResult.first_name     == prenom_complet,
         ).first()
         if not anon:
             continue
-        joueur = db.query(Joueur).filter(Joueur.id == joueur_id).first()
+        joueur = db.query(Player).filter(Player.id == player_id).first()
         if not joueur:
             continue
-        existing = db.query(Resultat).filter(
-            Resultat.tournoi_id == tournoi.id,
-            Resultat.joueur_id  == joueur_id,
+        existing = db.query(Result).filter(
+            Result.tournament_id == tournoi.id,
+            Result.player_id  == player_id,
         ).first()
         if not existing:
-            db.add(Resultat(
-                tournoi_id  = tournoi.id,
-                joueur_id   = joueur_id,
+            db.add(Result(
+                tournament_id  = tournoi.id,
+                player_id   = player_id,
                 position    = anon.position,
                 points      = 1,
                 mahjong     = 1,
                 ranking     = 0,
-                nationalite = anon.nationalite,
+                nationality = anon.nationality,
             ))
         db.delete(anon)
 
@@ -447,7 +447,7 @@ def import_tournament(db: Session, data: dict, reset: bool = False):
 
 
 def _fetch_one(args_tuple):
-    """Appelé dans un thread : fetch + parse, sans accès DB."""
+    """Called in a thread: fetch + parse, without DB access."""
     tid, prefix = args_tuple
     html = fetch_page(tid, prefix)
     if not html:
@@ -463,16 +463,16 @@ def main():
     parser = argparse.ArgumentParser(description="Import EMA tournaments")
     parser.add_argument("--start", type=int, default=0)
     parser.add_argument("--end", type=int, default=453)
-    parser.add_argument("--ids", nargs="+", help="IDs explicites (ex: 01 02 1000001)")
-    parser.add_argument("--prefix", type=str, default="TR", help="Préfixe URL (TR ou TR_RCR)")
-    parser.add_argument("--reset", action="store_true", help="Vider les résultats existants avant reimport")
-    parser.add_argument("--threads", type=int, default=8, help="Nombre de threads fetch (défaut: 8)")
+    parser.add_argument("--ids", nargs="+", help="Explicit IDs (e.g.: 01 02 1000001)")
+    parser.add_argument("--prefix", type=str, default="TR", help="URL prefix (TR or TR_RCR)")
+    parser.add_argument("--reset", action="store_true", help="Clear existing results before reimport")
+    parser.add_argument("--threads", type=int, default=8, help="Number of fetch threads (default: 8)")
     args = parser.parse_args()
 
     if args.ids:
         id_list = args.ids
     else:
-        # Formater les IDs < 10 avec zéro initial (format EMA : 01, 02, ...)
+        # Format IDs < 10 with leading zero (EMA format: 01, 02, ...)
         id_list = [f"{i:02d}" if i < 10 else str(i) for i in range(args.start, args.end + 1)]
 
     from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -491,25 +491,25 @@ def main():
             tid, data, status = future.result()
             results[str(tid)] = (data, status)
 
-    # Import dans l'ordre original pour une sortie lisible
+    # Import in original order for readable output
     for tid in id_list:
         data, status = results[str(tid)]
         print(f"[{str(tid):>8}] ", end="", flush=True)
         if status == "error":
             errors += 1
         elif status == "empty":
-            print("(vide)")
+            print("(empty)")
             skip += 1
         else:
             import_tournament(db, data, reset=args.reset)
-            nb_id  = sum(1 for r in data["resultats"] if r["joueur_id"])
-            nb_ano = sum(1 for r in data["resultats"] if not r["joueur_id"])
+            nb_id  = sum(1 for r in data["results"] if r["player_id"])
+            nb_ano = sum(1 for r in data["results"] if not r["player_id"])
             suffix = f"  ({nb_id} id, {nb_ano} anon)" if nb_ano else ""
-            print(f"{data['regles']:3}  {data['date_debut']}  {len(data['resultats']):3} joueurs  {data['nom']}{suffix}")
+            print(f"{data['rules']:3}  {data['start_date']}  {len(data['results']):3} players  {data['name']}{suffix}")
             ok += 1
 
     db.close()
-    print(f"\nTerminé : {ok} importés, {skip} vides, {errors} erreurs.")
+    print(f"\nDone: {ok} imported, {skip} empty, {errors} errors.")
 
 
 if __name__ == "__main__":

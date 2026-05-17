@@ -1,48 +1,48 @@
 """
-Import Championnat Rhône-Alpes MCR 2023-2024.
-6 tournois : 3 amicaux (Villefranche/Valence/Lyon) + 3 numérotés (4/6, 5/6, 6/6)
+Import Championship Rhône-Alpes MCR 2023-2024.
+6 tournois : 3 amicaux (Cityfranche/Valence/Lyon) + 3 numérotés (4/6, 5/6, 6/6)
 """
 
 import json, os, sys
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../.."))
 
 from datetime import date as _date
 from app.database import SessionLocal
 from app.models import (
-    ChampionnatTournoi, Joueur, Resultat, ResultatAnonyme,
-    SerieChampionnat, Championnat, Tournoi, Ville,
+    ChampionshipTournament, Player, Result, AnonymousResult,
+    ChampionshipSeries, Championship, Tournament, City,
 )
-from app.ranking import points_ema_tournoi
+from app.ranking import ema_points
 
 db = SessionLocal()
 
-serie = db.query(SerieChampionnat).filter_by(slug="rhone-alpes-mcr").first()
+serie = db.query(ChampionshipSeries).filter_by(slug="rhone-alpes-mcr").first()
 if not serie:
-    serie = SerieChampionnat(
+    serie = ChampionshipSeries(
         slug="rhone-alpes-mcr",
-        nom="Championnat Rhône-Alpes MCR",
-        regles="MCR",
-        pays="FR",
-        description="Championnat régional Rhône-Alpes MCR",
+        name="Championship Rhône-Alpes MCR",
+        rules="MCR",
+        country="FR",
+        description="Championship régional Rhône-Alpes MCR",
     )
     db.add(serie)
     db.flush()
-print(f"Série : {serie.nom}")
+print(f"Série : {serie.name}")
 
-edition = db.query(Championnat).filter_by(serie_id=serie.id, annee=2024).first()
+edition = db.query(Championship).filter_by(series_id=serie.id, year=2024).first()
 if not edition:
-    edition = Championnat(
-        serie_id=serie.id,
-        annee=2024,
-        nom="Championnat Rhône-Alpes MCR 2023-2024",
-        formule="moyenne_n_meilleurs",
+    edition = Championship(
+        series_id=serie.id,
+        year=2024,
+        name="Championship Rhône-Alpes MCR 2023-2024",
+        formula="moyenne_n_meilleurs",
         params=json.dumps({"n": 3}),
     )
     db.add(edition)
     db.flush()
-    print(f"Édition créée : {edition.nom}")
+    print(f"Édition créée : {edition.name}")
 else:
-    print(f"Édition existante : {edition.nom}")
+    print(f"Édition existante : {edition.name}")
 
 MAPPING: dict[str, str | None] = {
     "CHARVIN Thierry":          "04460016",
@@ -89,11 +89,11 @@ MAPPING: dict[str, str | None] = {
 
 TOURNOIS = [
     {
-        "nom": "Championnat Rhône-Alpes 23/24 (1)",
-        "lieu": "Villefranche",
-        "date_debut": "2023-12-16",
-        "date_fin":   "2023-12-16",
-        "resultats": [
+        "name": "Championship Rhône-Alpes 23/24 (1)",
+        "city": "Cityfranche",
+        "start_date": "2023-12-16",
+        "end_date":   "2023-12-16",
+        "results": [
             (1,  "CHARVIN Thierry",         14,  483),
             (2,  "BOIVIN Olivier",          13,  474),
             (3,  "SANTOS Manuel",           10,  290),
@@ -117,11 +117,11 @@ TOURNOIS = [
         ],
     },
     {
-        "nom": "Championnat Rhône-Alpes 23/24 (2)",
-        "lieu": "Valence",
-        "date_debut": "2024-01-20",
-        "date_fin":   "2024-01-20",
-        "resultats": [
+        "name": "Championship Rhône-Alpes 23/24 (2)",
+        "city": "Valence",
+        "start_date": "2024-01-20",
+        "end_date":   "2024-01-20",
+        "results": [
             (1,  "SANTOS Isabelle",         12,  263),
             (2,  "SANTOS Manuel",           11,  614),
             (3,  "HUGOT Emmanuelle",        11,  374),
@@ -141,11 +141,11 @@ TOURNOIS = [
         ],
     },
     {
-        "nom": "Championnat Rhône-Alpes 23/24 (3)",
-        "lieu": "Lyon",
-        "date_debut": "2024-03-02",
-        "date_fin":   "2024-03-02",
-        "resultats": [
+        "name": "Championship Rhône-Alpes 23/24 (3)",
+        "city": "Lyon",
+        "start_date": "2024-03-02",
+        "end_date":   "2024-03-02",
+        "results": [
             (1,  "CHHOR Sylvie",            13,  388),
             (2,  "BERTHOMMIER Sandra",      13,  315),
             (3,  "DE KERGOMMEAUX Erwan",    12,  802),
@@ -173,11 +173,11 @@ TOURNOIS = [
         ],
     },
     {
-        "nom": "Championnat Rhône-Alpes 23/24 (4)",
-        "lieu": "Villefranche",
-        "date_debut": "2024-04-13",
-        "date_fin":   "2024-04-13",
-        "resultats": [
+        "name": "Championship Rhône-Alpes 23/24 (4)",
+        "city": "Cityfranche",
+        "start_date": "2024-04-13",
+        "end_date":   "2024-04-13",
+        "results": [
             (1,  "BERTHOMMIER Sandra",      13,  835),
             (2,  "DE KERGOMMEAUX Loïc",     12,  796),
             (3,  "DEPRAZ Olivier",          12,  254),
@@ -205,11 +205,11 @@ TOURNOIS = [
         ],
     },
     {
-        "nom": "Championnat Rhône-Alpes 23/24 (5)",
-        "lieu": "Valence",
-        "date_debut": "2024-05-25",
-        "date_fin":   "2024-05-25",
-        "resultats": [
+        "name": "Championship Rhône-Alpes 23/24 (5)",
+        "city": "Valence",
+        "start_date": "2024-05-25",
+        "end_date":   "2024-05-25",
+        "results": [
             (1,  "BOIVIN Olivier",          12,  727),
             (2,  "MARTINET Pascale",        12,  408),
             (3,  "PARRIAUD Jean-François",  12,  262),
@@ -233,11 +233,11 @@ TOURNOIS = [
         ],
     },
     {
-        "nom": "Championnat Rhône-Alpes 23/24 (6)",
-        "lieu": "Lyon",
-        "date_debut": "2024-06-29",
-        "date_fin":   "2024-06-29",
-        "resultats": [
+        "name": "Championship Rhône-Alpes 23/24 (6)",
+        "city": "Lyon",
+        "start_date": "2024-06-29",
+        "end_date":   "2024-06-29",
+        "results": [
             (1,  "PARRIAUD Jean-François",  11,  264),
             (2,  "CHAPUY Catherine",        10,  308),
             (3,  "DE KERGOMMEAUX Loïc",     10,  154),
@@ -263,58 +263,58 @@ TOURNOIS = [
 ]
 
 for t_data in TOURNOIS:
-    nb = len(t_data["resultats"])
-    tournoi = db.query(Tournoi).filter_by(nom=t_data["nom"], pays="FR").first()
+    nb = len(t_data["results"])
+    tournoi = db.query(Tournament).filter_by(name=t_data["name"], country="FR").first()
     if not tournoi:
-        tournoi = Tournoi(
-            ema_id=None, regles="MCR",
-            nom=t_data["nom"], lieu=t_data["lieu"], pays="FR",
-            date_debut=_date.fromisoformat(t_data["date_debut"]),
-            date_fin=_date.fromisoformat(t_data["date_fin"]),
-            nb_joueurs=nb, coefficient=0.0,
-            type_tournoi="normal", statut="actif", approbation=None,
+        tournoi = Tournament(
+            ema_id=None, rules="MCR",
+            name=t_data["name"], city=t_data["city"], country="FR",
+            start_date=_date.fromisoformat(t_data["start_date"]),
+            end_date=_date.fromisoformat(t_data["end_date"]),
+            nb_players=nb, coefficient=0.0,
+            tournament_type="normal", status="actif", approval=None,
         )
         db.add(tournoi)
         db.flush()
-        print(f"\nTournoi créé : [{tournoi.id}] {tournoi.nom}")
+        print(f"\nTournament créé : [{tournoi.id}] {tournoi.name}")
     else:
-        print(f"\nTournoi existant : [{tournoi.id}] {tournoi.nom}")
-        db.query(Resultat).filter_by(tournoi_id=tournoi.id).delete()
-        db.query(ResultatAnonyme).filter_by(tournoi_id=tournoi.id).delete()
+        print(f"\nTournament existant : [{tournoi.id}] {tournoi.name}")
+        db.query(Result).filter_by(tournament_id=tournoi.id).delete()
+        db.query(AnonymousResult).filter_by(tournament_id=tournoi.id).delete()
 
-    v = db.query(Ville).filter_by(nom=tournoi.lieu, pays="FR").first()
+    v = db.query(City).filter_by(name=tournoi.city, country="FR").first()
     if not v:
-        v = db.query(Ville).filter(Ville.nom.like(f"%{tournoi.lieu}%")).first()
+        v = db.query(City).filter(City.name.like(f"%{tournoi.city}%")).first()
     if v:
-        tournoi.ville_id = v.id
+        tournoi.city_id = v.id
 
-    lien = db.query(ChampionnatTournoi).filter_by(
-        championnat_id=edition.id, tournoi_id=tournoi.id
+    lien = db.query(ChampionshipTournament).filter_by(
+        championship_id=edition.id, tournament_id=tournoi.id
     ).first()
     if not lien:
-        db.add(ChampionnatTournoi(championnat_id=edition.id, tournoi_id=tournoi.id))
+        db.add(ChampionshipTournament(championship_id=edition.id, tournament_id=tournoi.id))
 
     nb_id = nb_anon = 0
-    for pos, nom_site, points, mahjong in t_data["resultats"]:
-        ranking = points_ema_tournoi(pos, nb)
-        joueur_id = MAPPING.get(nom_site)
+    for pos, nom_site, points, mahjong in t_data["results"]:
+        ranking = ema_points(pos, nb)
+        player_id = MAPPING.get(nom_site)
 
-        if joueur_id:
-            joueur = db.query(Joueur).filter_by(id=joueur_id).first()
+        if player_id:
+            joueur = db.query(Player).filter_by(id=player_id).first()
             if joueur:
-                db.add(Resultat(
-                    tournoi_id=tournoi.id, joueur_id=joueur_id,
+                db.add(Result(
+                    tournament_id=tournoi.id, player_id=player_id,
                     position=pos, points=points, mahjong=mahjong,
-                    ranking=ranking, nationalite=joueur.nationalite,
+                    ranking=ranking, nationality=joueur.nationality,
                 ))
                 nb_id += 1
                 continue
-            print(f"  WARN: {joueur_id} introuvable pour {nom_site}")
+            print(f"  WARN: {player_id} introuvable pour {nom_site}")
 
         parts = nom_site.split(" ", 1)
-        db.add(ResultatAnonyme(
-            tournoi_id=tournoi.id, position=pos, nationalite="FR",
-            nom=parts[0], prenom=parts[1] if len(parts) > 1 else "",
+        db.add(AnonymousResult(
+            tournament_id=tournoi.id, position=pos, nationality="FR",
+            last_name=parts[0], first_name=parts[1] if len(parts) > 1 else "",
         ))
         nb_anon += 1
 
