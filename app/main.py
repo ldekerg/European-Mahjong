@@ -136,7 +136,7 @@ def home(request: Request, db: Session = Depends(get_db)):
                 has_resultats,
             )
             .order_by(Tournament.start_date.desc())
-            .limit(6).all()
+            .limit(8).all()
         )
 
         # Upcoming tournaments: future date AND no results
