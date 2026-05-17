@@ -13,14 +13,14 @@
       {% elif tournoi.type_tournoi == 'oemc' %}<span class="badge">OEMC</span>
       {% elif tournoi.type_tournoi == 'oerc' %}<span class="badge">OERC</span>{% endif %}
       {% if resultats_incomplets %}
-      <span class="badge badge-warning" title="{{ trad('detail_tournoi.joueurs_manquants', n=nb_anon_europeens) }}">{{ trad('common.resultats_partiels') }}</span>
+      <span class="badge badge-warning" title="{{ trad('common.missing_players', n=nb_anon_europeens) }}">{{ trad('common.partial_results') }}</span>
       {% endif %}
     </div>
   </div>
   <dl style="font-size:0.85rem;margin:0">
-    <dt>{{ trad('common.joueurs') }}</dt><dd>{{ tournoi.nb_joueurs }}</dd>
+    <dt>{{ trad('common.players') }}</dt><dd>{{ tournoi.nb_joueurs }}</dd>
     {% if not is_mondial %}<dt>{{ trad('common.coeff') }}</dt><dd>{{ tournoi.coefficient }}</dd>{% endif %}
-    <dt>{{ trad('common.pays') }}</dt>
+    <dt>{{ trad('common.country') }}</dt>
     <dd>
       {{ nb_pays }}
       {% if pays_stats %}
@@ -43,7 +43,7 @@
 
 <div class="ranking-layout" style="align-items:start;margin-top:1.5rem">
 <div class="ranking-left">
-<h2>{{ trad('detail_tournoi.resultats') }}</h2>
+<h2>{{ trad('tournament.results') }}</h2>
 <div class="scroll-table">
 <table>
   <colgroup>
@@ -57,13 +57,13 @@
   </colgroup>
   <thead>
     <tr>
-      <th class="center" title="{{ trad('detail_tournoi.position_title') }}">🏅</th>
+      <th class="center" title="{{ trad('tournament.position_title') }}">🏅</th>
       <th class="col-ema-id col-opt"></th>
-      <th class="col-flag col-opt center" title="{{ trad('common.pays') }}">🌍</th>
-      <th class="col-nom">{{ trad('common.joueurs') }}</th>
-      {% if is_mcr %}<th class="col-pts right" title="{{ trad('detail_tournoi.points_title') }}">{{ trad('detail_tournoi.points') }}</th>{% endif %}
-      <th class="col-mahj right" title="{{ trad('detail_tournoi.score_mcr_title') if is_mcr else trad('common.score') }}">{{ trad('common.score') }}</th>
-      {% if show_ema_col %}<th class="right col-sticky" title="{{ trad('detail_tournoi.ema_pts_title') }}">{{ trad('detail_tournoi.ema_pts') }}</th>{% endif %}
+      <th class="col-flag col-opt center" title="{{ trad('common.country') }}">🌍</th>
+      <th class="col-nom">{{ trad('common.players') }}</th>
+      {% if is_mcr %}<th class="col-pts right" title="{{ trad('tournament.points_title') }}">{{ trad('tournament.points') }}</th>{% endif %}
+      <th class="col-mahj right" title="{{ trad('tournament.mahjong_score_title') if is_mcr else trad('common.score') }}">{{ trad('common.score') }}</th>
+      {% if show_ema_col %}<th class="right col-sticky" title="{{ trad('tournament.ema_pts_title') }}">{{ trad('tournament.ema_pts') }}</th>{% endif %}
     </tr>
   </thead>
   <tbody>
@@ -98,7 +98,7 @@
       {% endif %}
     </tr>
     {% else %}
-    <tr><td colspan="{{ ncols }}">{{ trad('detail_tournoi.aucun') }}</td></tr>
+    <tr><td colspan="{{ ncols }}">{{ trad('common.no_results') }}</td></tr>
     {% endfor %}
   </tbody>
 </table>

@@ -15,13 +15,13 @@
     <tr>
       <th class="col-pos center">#</th>
       <th class="col-flag col-opt center">🌍</th>
-      <th class="col-joueur-nom col-sticky-left">{{ trad('common.joueurs') }}</th>
+      <th class="col-joueur-nom col-sticky-left">{{ trad('common.players') }}</th>
       {% set _tid = table_id if table_id is defined else 'hof-table' %}
-      <th class="col-hof-sem center sortable" onclick="sortTable(3,'{{ _tid }}')" title="{{ trad('hallfame.semaines_1_title') }}">🥇 <span class="sort-icon">⇅</span></th>
-      <th class="col-hof-podium center sortable" onclick="sortTable(4,'{{ _tid }}')" title="{{ trad('hallfame.podium_title') }}">{{ trad('hallfame.podium_title') }} <span class="sort-icon">⇅</span></th>
-      <th class="col-hof-sem center sortable" onclick="sortTable(5,'{{ _tid }}')" title="{{ trad('hallfame.top10_title') }}">{{ trad('hallfame.top10_title') }} <span class="sort-icon">⇅</span></th>
-      <th class="col-hof-sem center sortable" onclick="sortTable(6,'{{ _tid }}')" title="{{ trad('hallfame.top20_title') }}">{{ trad('hallfame.top20_title') }} <span class="sort-icon">⇅</span></th>
-      <th class="center sortable" onclick="sortTable(7,'{{ _tid }}')" title="{{ trad('hallfame.top50_title') }}">{{ trad('hallfame.top50_title') }} <span class="sort-icon">⇅</span></th>
+      <th class="col-hof-sem center sortable" onclick="sortTable(3,'{{ _tid }}')" title="{{ trad('hof.weeks_1_title') }}">🥇 <span class="sort-icon">⇅</span></th>
+      <th class="col-hof-podium center sortable" onclick="sortTable(4,'{{ _tid }}')" title="{{ trad('hof.podium_title') }}">{{ trad('hof.podium_title') }} <span class="sort-icon">⇅</span></th>
+      <th class="col-hof-sem center sortable" onclick="sortTable(5,'{{ _tid }}')" title="{{ trad('hof.top10_title') }}">{{ trad('hof.top10_title') }} <span class="sort-icon">⇅</span></th>
+      <th class="col-hof-sem center sortable" onclick="sortTable(6,'{{ _tid }}')" title="{{ trad('hof.top20_title') }}">{{ trad('hof.top20_title') }} <span class="sort-icon">⇅</span></th>
+      <th class="center sortable" onclick="sortTable(7,'{{ _tid }}')" title="{{ trad('hof.top50_title') }}">{{ trad('hof.top50_title') }} <span class="sort-icon">⇅</span></th>
     </tr>
   </thead>
   <tbody>

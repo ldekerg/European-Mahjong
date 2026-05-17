@@ -7,11 +7,11 @@
 #}
 {% if data.snapshot %}
 <div class="apercu-snapshot">
-  <div class="apercu-snapshot-title">{{ trad('apercu.titre', regles=regles, date=semaine.strftime('%d/%m/%Y')) }}</div>
+  <div class="apercu-snapshot-title">{{ trad('preview.title', regles=regles, date=semaine.strftime('%d/%m/%Y')) }}</div>
   <div class="apercu-scroll">
   <table class="apercu-table">
     <thead>
-      <tr><th>{{ trad('common.date') }}</th><th>{{ trad('common.tournoi') }}</th><th>{{ trad('apercu.position') }}</th><th>{{ trad('detail_tournoi.ema_pts') }}</th></tr>
+      <tr><th>{{ trad('common.date') }}</th><th>{{ trad('common.tournament') }}</th><th>{{ trad('preview.position') }}</th><th>{{ trad('tournament.ema_pts') }}</th></tr>
     </thead>
     <tbody>
     {% for trn in data.snapshot %}

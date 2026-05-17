@@ -34,17 +34,17 @@
           <span></span><span></span><span></span>
         </button>
         <div id="nav-links">
-          <a href="/classement">{{ trad('nav.classement') }}</a>
-          <a href="/joueurs/">{{ trad('nav.joueurs') }}</a>
-          <a href="/pays/">{{ trad('nav.pays') }}</a>
-          <a href="/tournois/">{{ trad('nav.tournois') }}</a>
-          <a href="/tournois/calendrier">{{ trad('common.calendrier') }}</a>
+          <a href="/classement">{{ trad('nav.ranking') }}</a>
+          <a href="/joueurs/">{{ trad('nav.players') }}</a>
+          <a href="/pays/">{{ trad('nav.countries') }}</a>
+          <a href="/tournois/">{{ trad('nav.tournaments') }}</a>
+          <a href="/tournois/calendrier">{{ trad('common.calendar') }}</a>
           <a href="/hallfame/">{{ trad('nav.hallfame') }}</a>
         </div>
         <div class="nav-controls">
         <button class="regles-toggle" onclick="toggleRegles()" title="Règle par défaut">MCR</button>
         <div class="lang-picker" id="lang-picker">
-          <button class="lang-toggle" onclick="toggleLangDropdown()" title="{{ trad('common.langue') }}">
+          <button class="lang-toggle" onclick="toggleLangDropdown()" title="{{ trad('common.language') }}">
             {% set _flags = {'fr':'🇫🇷','en':'🇬🇧','de':'🇩🇪','nl':'🇳🇱','pl':'🇵🇱','sv':'🇸🇪','fi':'🇫🇮','it':'🇮🇹','es':'🇪🇸','uk':'🇺🇦','hu':'🇭🇺','da':'🇩🇰','pt':'🇵🇹','ro':'🇷🇴','cs':'🇨🇿','sk':'🇸🇰','no':'🇳🇴','lv':'🇱🇻'} %}
             {{ _flags.get(lang, lang | upper) }}
           </button>

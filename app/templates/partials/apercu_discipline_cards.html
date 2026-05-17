@@ -16,7 +16,7 @@
     {% else %}
     <div class="apercu-rank dim">—</div>
     {% endif %}
-    <div class="apercu-nbt">{{ data.nb_actifs }} {{ trad('joueurs.actifs') }} · {{ data.nb_total }} {{ trad('joueurs.total_label') }}</div>
+    <div class="apercu-nbt">{{ data.nb_actifs }} {{ trad('common.active') }} · {{ data.nb_total }} {{ trad('players.total') }}</div>
     {% if data.meilleur %}
     <a class="apercu-best" href="{{ base_classement | default('/classement') }}?semaine={{ data.meilleur.semaine.isoformat() }}&joueur={{ joueur.id }}&regles={{ label }}"
        title="Voir le classement à cette date">

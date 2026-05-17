@@ -10,8 +10,8 @@
   </colgroup>
   <thead>
     <tr>
-      <th>{{ trad('common.tournoi') }}</th><th class="center">🏅</th><th class="center">🌍</th>
-      <th>{{ trad('common.joueurs') }}</th><th>{{ trad('common.date') }}</th><th class="center">EMA</th>
+      <th>{{ trad('common.tournament') }}</th><th class="center">🏅</th><th class="center">🌍</th>
+      <th>{{ trad('common.players') }}</th><th>{{ trad('common.date') }}</th><th class="center">EMA</th>
     </tr>
   </thead>
   <tbody>
@@ -34,7 +34,7 @@
       <td class="right ema-pts" style="{{ r.ranking | ema_color }}">{{ r.ranking }}</td>
     </tr>
     {% else %}
-    <tr><td colspan="6" class="empty">{{ trad('common.aucun_resultat') }}</td></tr>
+    <tr><td colspan="6" class="empty">{{ trad('common.no_results') }}</td></tr>
     {% endfor %}
   </tbody>
 </table>

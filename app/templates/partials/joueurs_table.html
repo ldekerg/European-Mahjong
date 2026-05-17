@@ -57,12 +57,12 @@
   <thead>
     <tr>
       {{ th_sort('nationalite', '🌍',    'col-flag col-opt center') }}
-      {{ th_sort('nom',         trad('common.nom'),            'col-nom') }}
-      {{ th_sort('prenom',      trad('common.prenom'),         'col-prenom') }}
-      {{ th_sort('premier',     trad('joueurs.debut'),         'col-date-lg col-opt center') }}
+      {{ th_sort('nom',         trad('common.name'),            'col-nom') }}
+      {{ th_sort('prenom',      trad('common.first_name'),         'col-prenom') }}
+      {{ th_sort('premier',     trad('players.first_tournament'),         'col-date-lg col-opt center') }}
       {{ th_sort_badge('nb_mcr', 'badge-mcr', 'col-joueurs-sort col-opt center') }}
       {{ th_sort_badge('nb_rcr', 'badge-rcr', 'col-joueurs-sort col-opt center') }}
-      {{ th_sort('nb_total',    trad('common.tous'),           'col-joueurs-sort col-opt center') }}
+      {{ th_sort('nb_total',    trad('common.all'),           'col-joueurs-sort col-opt center') }}
     </tr>
   </thead>
   <tbody>
@@ -79,7 +79,7 @@
       <td class="col-joueurs-sort col-opt center" style="font-weight:600">{{ row.nb_total }}</td>
     </tr>
     {% else %}
-    <tr><td colspan="7" class="empty">{{ trad('common.aucun_joueur') }}</td></tr>
+    <tr><td colspan="7" class="empty">{{ trad('common.no_players') }}</td></tr>
     {% endfor %}
   </tbody>
 </table>

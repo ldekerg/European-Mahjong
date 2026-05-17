@@ -27,12 +27,12 @@
     <tr>
       {% if _show_nat %}<th class="col-rang-nat center" title="Rang au sein du pays">{{ _nat_flag | flag }}</th>{% endif %}
       <th class="col-pos">#</th>
-      <th class="col-delta col-opt center" title="{{ trad('classement.delta_title') }}">Δ</th>
+      <th class="col-delta col-opt center" title="{{ trad('ranking.delta_title') }}">Δ</th>
       <th class="col-flag col-opt"></th>
-      <th class="col-nom">{{ trad('common.joueurs') }}</th>
+      <th class="col-nom">{{ trad('common.players') }}</th>
       <th class="col-score col-sticky right">{{ trad('common.score') }}</th>
-      <th class="col-joueurs center" title="{{ trad('classement.tournois_actifs_title') }}">T</th>
-      <th class="col-podiums col-opt center" title="{{ trad('classement.podiums_title') }}">🏆</th>
+      <th class="col-joueurs center" title="{{ trad('common.active_tournaments') }}">T</th>
+      <th class="col-podiums col-opt center" title="{{ trad('ranking.podiums_title') }}">🏆</th>
     </tr>
   </thead>
   <tbody>
@@ -51,7 +51,7 @@
         {% endif %}
       </td>
       <td class="col-delta col-opt center delta-rang">
-        {% if r.delta is none %}<span class="delta-new">▶ {{ trad('classement.nouveau') }}</span>
+        {% if r.delta is none %}<span class="delta-new">▶ {{ trad('ranking.new') }}</span>
         {% elif r.delta > 0 %}<span class="delta-up">▲{{ r.delta }}</span>
         {% elif r.delta < 0 %}<span class="delta-down">▼{{ r.delta | abs }}</span>
         {% else %}<span class="dim">—</span>{% endif %}
@@ -69,5 +69,5 @@
 </table>
 </div>
 {% else %}
-<p class="empty">{{ trad('classement.aucun') }}</p>
+<p class="empty">{{ trad('ranking.none') }}</p>
 {% endif %}

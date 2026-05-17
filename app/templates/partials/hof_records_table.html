@@ -20,10 +20,10 @@
     <tr>
       <th class="col-pos center">#</th>
       <th class="col-flag col-opt center">🌍</th>
-      <th class="col-joueur-nom">{{ trad('hallfame.records_joueur') }}</th>
-      <th class="col-hof-total right">{{ trad('hallfame.records_score') }}</th>
-      <th class="col-nom col-opt">{{ trad('hallfame.records_tournoi') }}</th>
-      <th class="col-date-opt col-opt center">{{ trad('hallfame.records_date') }}</th>
+      <th class="col-joueur-nom">{{ trad('hof.records_player') }}</th>
+      <th class="col-hof-total right">{{ trad('common.score') }}</th>
+      <th class="col-nom col-opt">{{ trad('common.tournament') }}</th>
+      <th class="col-date-opt col-opt center">{{ trad('common.date') }}</th>
     </tr>
   </thead>
   <tbody>
@@ -43,7 +43,7 @@
 </table>
 </div>
 {% else %}
-<p class="empty">{{ trad('common.aucun_resultat') }}</p>
+<p class="empty">{{ trad('common.no_results') }}</p>
 {% endif %}
 {% endmacro %}
 
@@ -52,18 +52,18 @@
 <h3 style="margin:1rem 0 0.5rem;font-size:1rem">{{ title }}</h3>
 <div class="hof-records-grid">
   <div>
-    <div class="dim" style="font-size:0.78rem;margin-bottom:0.3rem">{{ trad('hallfame.records_tous') }}</div>
+    <div class="dim" style="font-size:0.78rem;margin-bottom:0.3rem">{{ trad('hof.records_all') }}</div>
     {{ records_table(rows_all, score_key) }}
   </div>
   <div class="hof-records-2j">
-    <div class="dim" style="font-size:0.78rem;margin-bottom:0.3rem">{{ trad('hallfame.records_2j') }}</div>
+    <div class="dim" style="font-size:0.78rem;margin-bottom:0.3rem">{{ trad('hof.records_2d') }}</div>
     {{ records_table(rows_2j, score_key) }}
   </div>
 </div>
 {% endif %}
 {% endmacro %}
 
-{{ section(trad('hallfame.records_mahjong'), records.top_mahjong, records.top_mahjong_2j, 'mahjong') }}
+{{ section(trad('hof.records_mahjong'), records.top_mahjong, records.top_mahjong_2j, 'mahjong') }}
 {% if records.top_points %}
-{{ section(trad('hallfame.records_points'), records.top_points, records.top_points_2j, 'points') }}
+{{ section(trad('hof.records_points'), records.top_points, records.top_points_2j, 'points') }}
 {% endif %}

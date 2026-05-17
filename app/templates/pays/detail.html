@@ -7,7 +7,7 @@
     <span style="font-size:2rem">{{ code | flag }}</span>
     {{ nom_pays }}
     {% if code in ['RU', 'BY'] %}
-    <span class="badge badge-suspendu" title="{{ trad('pays.suspendu_title') }}">{{ trad('pays.suspendu') }}</span>
+    <span class="badge badge-suspendu" title="{{ trad('country.suspended_title') }}">{{ trad('country.suspended') }}</span>
     {% endif %}
   </h1>
 </div>
@@ -15,25 +15,25 @@
 <!-- ── Stats fixes ──────────────────────────────────────────────────────── -->
 <div class="stats-grid" style="margin-bottom:1.25rem">
   <div class="stat-card">
-    <div class="stat-label">{{ trad('common.joueurs') }}</div>
+    <div class="stat-label">{{ trad('common.players') }}</div>
     <div class="stat-value">{{ nb_joueurs }}</div>
   </div>
   <div class="stat-card">
-    <div class="stat-label">{{ trad('pays.classes_mcr') }}</div>
+    <div class="stat-label">{{ trad('country.ranked_mcr') }}</div>
     <div class="stat-value">
       {{ nb_classes_mcr }}
-      {% if meilleur_actuel_mcr %}<span class="stat-sub">{{ trad('pays.meilleur', n=meilleur_actuel_mcr) }}</span>{% endif %}
+      {% if meilleur_actuel_mcr %}<span class="stat-sub">{{ trad('country.best', n=meilleur_actuel_mcr) }}</span>{% endif %}
     </div>
   </div>
   <div class="stat-card">
-    <div class="stat-label">{{ trad('pays.classes_rcr') }}</div>
+    <div class="stat-label">{{ trad('country.ranked_rcr') }}</div>
     <div class="stat-value">
       {{ nb_classes_rcr }}
-      {% if meilleur_actuel_rcr %}<span class="stat-sub">{{ trad('pays.meilleur', n=meilleur_actuel_rcr) }}</span>{% endif %}
+      {% if meilleur_actuel_rcr %}<span class="stat-sub">{{ trad('country.best', n=meilleur_actuel_rcr) }}</span>{% endif %}
     </div>
   </div>
   <div class="stat-card">
-    <div class="stat-label">{{ trad('pays.tournois_org') }}</div>
+    <div class="stat-label">{{ trad('country.tournaments_org') }}</div>
     <div class="stat-value">{{ nb_tournois_org }}</div>
   </div>
 </div>
@@ -45,9 +45,9 @@
 
 <!-- ── Onglets principaux ────────────────────────────────────────────────── -->
 <div class="tabs" id="main-tabs">
-  <button class="tab-btn active"  onclick="showMainTab('classement', this)">{{ trad('pays.tab_classement') }}</button>
-  <button class="tab-btn"        onclick="showMainTab('tournois', this)">{{ trad('pays.tab_tournois') }}</button>
-  <button class="tab-btn"        onclick="showMainTab('joueurs', this)">{{ trad('pays.tab_joueurs') }}</button>
+  <button class="tab-btn active"  onclick="showMainTab('classement', this)">{{ trad('country.tab_ranking') }}</button>
+  <button class="tab-btn"        onclick="showMainTab('tournois', this)">{{ trad('country.tab_tournaments') }}</button>
+  <button class="tab-btn"        onclick="showMainTab('joueurs', this)">{{ trad('country.tab_players') }}</button>
   {% if series_pays %}
   <button class="tab-btn"        onclick="showMainTab('circuits', this)">Circuits nationaux</button>
   {% endif %}
@@ -82,7 +82,7 @@
     </div>
 
     <div class="ranking-right" id="apercu-panel">
-      <p class="empty">{{ trad('common.clique_joueur') }}</p>
+      <p class="empty">{{ trad('common.click_player') }}</p>
     </div>
   </div>
 
@@ -127,7 +127,7 @@
       {% endwith %}
     </div>
     <div class="ranking-right" id="apercu-panel-joueurs">
-      <p class="empty">{{ trad('common.clique_joueur') }}</p>
+      <p class="empty">{{ trad('common.click_player') }}</p>
     </div>
   </div>
 </div>
@@ -201,10 +201,10 @@
 <!-- ── Scripts ──────────────────────────────────────────────────────────── -->
 <script>
 var _I18N = {
-  clique_joueur: "{{ trad('common.clique_joueur') }}",
-  chargement:    "{{ trad('common.chargement') }}",
-  erreur:        "{{ trad('common.erreur') }}",
-  erreur_chargement: "{{ trad('common.erreur_chargement') }}"
+  clique_joueur: "{{ trad('common.click_player') }}",
+  chargement:    "{{ trad('common.loading') }}",
+  erreur:        "{{ trad('common.error') }}",
+  erreur_chargement: "{{ trad('common.load_error') }}"
 };
 // Aperçu joueur — utilisé par l'onglet Classement ET l'onglet Joueurs
 var _activeJoueurRow = null;

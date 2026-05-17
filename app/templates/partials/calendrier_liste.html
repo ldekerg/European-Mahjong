@@ -24,10 +24,10 @@
   <thead>
     <tr>
       <th class="col-date-lg">{{ trad('common.date') }}</th>
-      <th class="col-tournoi">{{ trad('common.tournoi') }}</th>
-      <th class="col-ville col-opt">{{ trad('common.ville') }}</th>
-      <th class="col-duree center col-opt" title="{{ trad('common.duree') }}">🗓️</th>
-      <th class="col-statut-cal center col-sticky">{{ trad('calendrier.statut') }}</th>
+      <th class="col-tournoi">{{ trad('common.tournament') }}</th>
+      <th class="col-ville col-opt">{{ trad('common.city') }}</th>
+      <th class="col-duree center col-opt" title="{{ trad('common.duration') }}">🗓️</th>
+      <th class="col-statut-cal center col-sticky">{{ trad('calendar.status') }}</th>
     </tr>
   </thead>
   <tbody>
@@ -49,15 +49,15 @@
       {% set duree = ((trn.date_fin - trn.date_debut).days + 1) if trn.date_fin and trn.date_fin != trn.date_debut else 1 %}
       <td class="col-duree center col-opt">{{ [duree, 1] | max }}j</td>
       <td class="col-statut-cal center col-sticky" style="white-space:nowrap">
-        {% if trn.approbation == 'ok' %}<span class="badge badge-ok">{{ trad('calendrier.ok') }}</span>
-        {% elif trn.approbation == 'pending' %}<span class="badge badge-pending">{{ trad('calendrier.pending') }}</span>
-        {% elif trn.approbation == 'no_mers' %}<span class="badge badge-nomers">{{ trad('calendrier.no_mers') }}</span>
+        {% if trn.approbation == 'ok' %}<span class="badge badge-ok">{{ trad('calendar.ok') }}</span>
+        {% elif trn.approbation == 'pending' %}<span class="badge badge-pending">{{ trad('calendar.pending') }}</span>
+        {% elif trn.approbation == 'no_mers' %}<span class="badge badge-nomers">{{ trad('calendar.no_mers') }}</span>
         {% endif %}
       </td>
     </tr>
     {% endfor %}
     {% if not tournois %}
-    <tr><td colspan="5" class="empty">{{ trad('common.aucun_tournoi') }}</td></tr>
+    <tr><td colspan="5" class="empty">{{ trad('common.no_tournaments') }}</td></tr>
     {% endif %}
   </tbody>
 </table>
@@ -69,7 +69,7 @@
 {{ calendar_table(_all[:_max]) }}
 {% if _all | length > _max %}
 <a href="/tournois/calendrier" class="dim" style="font-size:0.8rem;display:block;margin-top:0.4rem;text-align:right">
-  {{ trad('calendrier.autres', n=_all | length - _max) }}
+  {{ trad('calendar.more', n=_all | length - _max) }}
 </a>
 {% endif %}
 

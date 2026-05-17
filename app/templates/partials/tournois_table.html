@@ -19,7 +19,7 @@ window['{{ _fv }}'] = window['{{ _fv }}'] || function() {};
 
 <div id="{{ _badge_id }}" style="{% if not ville_filtre %}display:none{% endif %}" class="ville-badge">
   📍 <span id="{{ _badge_nom_id }}">{{ ville_filtre or '' }}</span>
-  <button onclick="{{ _fv }}(null)" class="ville-badge-close" title="{{ trad('tournois.effacer_filtre') }}">✕</button>
+  <button onclick="{{ _fv }}(null)" class="ville-badge-close" title="{{ trad('tournament.clear_filter') }}">✕</button>
 </div>
 
 <div class="scroll-table">
@@ -51,14 +51,14 @@ window['{{ _fv }}'] = window['{{ _fv }}'] || function() {};
     {% endmacro %}
     <tr>
       {{ th_s('date',    trad('common.date'),          'col-date-lg') }}
-      <th class="col-tournoi">{{ trad('common.tournoi') }}</th>
-      {{ th_s('lieu',    trad('common.ville'),          'col-ville col-opt') }}
-      <th class="col-duree col-opt center" title="{{ trad('common.duree') }}">🗓️</th>
+      <th class="col-tournoi">{{ trad('common.tournament') }}</th>
+      {{ th_s('lieu',    trad('common.city'),          'col-ville col-opt') }}
+      <th class="col-duree col-opt center" title="{{ trad('common.duration') }}">🗓️</th>
       {{ th_s('coeff',   '⚖️', 'col-coeff col-opt center',   trad('common.coeff_title')) }}
-      {% if actifs_ids %}{{ th_s('joueurs', '👥', 'col-joueurs center', trad('common.nb_joueurs')) }} {% endif %}
-      {% if not actifs_ids %}{{ th_s('joueurs', '👥', 'col-joueurs col-sticky center', trad('common.nb_joueurs')) }}
+      {% if actifs_ids %}{{ th_s('joueurs', '👥', 'col-joueurs center', trad('common.nb_players')) }} {% endif %}
+      {% if not actifs_ids %}{{ th_s('joueurs', '👥', 'col-joueurs col-sticky center', trad('common.nb_players')) }}
       {% endif %}
-      {% if actifs_ids %}<th class="col-contrib col-opt col-sticky center" title="{{ trad('tournois.contribution_title') }}">⏱️</th>{% endif %}
+      {% if actifs_ids %}<th class="col-contrib col-opt col-sticky center" title="{{ trad('tournament.contribution_title') }}">⏱️</th>{% endif %}
     </tr>
   </thead>
   <tbody>
@@ -74,7 +74,7 @@ window['{{ _fv }}'] = window['{{ _fv }}'] || function() {};
       {% elif trn.type_tournoi == 'wrc' %}<span class="badge badge-wmc">WRC</span>
       {% elif trn.type_tournoi == 'oemc' %}<span class="badge badge-oemc">OEMC</span>
       {% elif trn.type_tournoi == 'oerc' %}<span class="badge badge-oerc">OERC</span>{% endif %}
-      {% if incomplets is defined and trn.id in incomplets %}<span class="badge badge-warning">{{ trad('common.resultats_partiels') }}</span>{% endif %}
+      {% if incomplets is defined and trn.id in incomplets %}<span class="badge badge-warning">{{ trad('common.partial_results') }}</span>{% endif %}
     </td>
     <td class="col-ville col-opt t-ville" onclick="{{ _fv }}('{{ trn.lieu }}')">{{ trn.lieu }}</td>
     {% set duree = ((trn.date_fin - trn.date_debut).days + 1) if trn.date_fin and trn.date_debut.year != 1900 else 1 %}
@@ -91,7 +91,7 @@ window['{{ _fv }}'] = window['{{ _fv }}'] || function() {};
     {% endif %}
   </tr>
   {% else %}
-  <tr><td class="empty">{{ trad('common.aucun_tournoi') }}</td></tr>
+  <tr><td class="empty">{{ trad('common.no_tournaments') }}</td></tr>
   {% endfor %}
   </tbody>
 </table>

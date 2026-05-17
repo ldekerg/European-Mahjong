@@ -53,9 +53,9 @@
   });
 
   var _I18N = {
-    clique_joueur: "{{ trad('common.clique_joueur') }}",
-    chargement:    "{{ trad('common.chargement') }}",
-    erreur_chargement: "{{ trad('common.erreur_chargement') }}"
+    clique_joueur: "{{ trad('common.click_player') }}",
+    chargement:    "{{ trad('common.loading') }}",
+    erreur_chargement: "{{ trad('common.load_error') }}"
   };
   var _activeRow = null;
   var _joueurPersiste  = '{{ joueur_selectionne or "" }}';
@@ -138,7 +138,7 @@
   </div>
 
   <div class="ranking-right" id="apercu-panel">
-    <p class="empty">{{ trad('common.clique_joueur') }}</p>
+    <p class="empty">{{ trad('common.click_player') }}</p>
   </div>
 </div>
 

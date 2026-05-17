@@ -8,11 +8,11 @@
 
 {% if changements_nat %}
 <div class="nat-warning">
-  {{ trad('joueur_detail.nat_warning') }}
+  {{ trad('player.nat_warning') }}
   {% for c in changements_nat %}
     {{ c.nationalite_avant | flag }} {{ c.nationalite_avant }}
     → {{ c.nationalite_apres | flag }} {{ c.nationalite_apres }}
-    {{ trad('joueur_detail.nat_a_partir') }} {{ c.date_changement.strftime('%d/%m/%Y') }}{% if not loop.last %}, {% endif %}
+    {{ trad('player.nat_from') }} {{ c.date_changement.strftime('%d/%m/%Y') }}{% if not loop.last %}, {% endif %}
   {% endfor %}
 </div>
 {% endif %}
@@ -33,11 +33,11 @@
   {% if data.historique_chart %}
   <div class="chart-section">
     <div class="chart-controls">
-      <span class="chart-title">{{ trad('joueur_detail.evolution') }}</span>
+      <span class="chart-title">{{ trad('player.ranking_evolution') }}</span>
       <div class="chart-range-btns">
-        <button onclick="setRange('{{ regles }}', 52)"  class="range-btn">{{ trad('common.range_1an') }}</button>
-        <button onclick="setRange('{{ regles }}', 156)" class="range-btn">{{ trad('common.range_3ans') }}</button>
-        <button onclick="setRange('{{ regles }}', 0)"   class="range-btn active">{{ trad('common.range_tout') }}</button>
+        <button onclick="setRange('{{ regles }}', 52)"  class="range-btn">{{ trad('common.range_1y') }}</button>
+        <button onclick="setRange('{{ regles }}', 156)" class="range-btn">{{ trad('common.range_3y') }}</button>
+        <button onclick="setRange('{{ regles }}', 0)"   class="range-btn active">{{ trad('common.range_all') }}</button>
       </div>
     </div>
     <canvas id="chart-{{ regles }}" height="100"></canvas>
@@ -52,7 +52,7 @@
     <button onclick="filtreJoueurVille(null,'{{ regles | upper }}',null)" class="ville-badge-close" title="Effacer">✕</button>
     <a id="ville-badge-link-{{ regles }}" href="#" class="ville-badge-link">Voir tous les tournois de <span></span> →</a>
   </div>
-  <h2>{{ trad('joueur_detail.tournois_section') }} {{ regles | upper }}</h2>
+  <h2>{{ trad('common.tournaments') }} {{ regles | upper }}</h2>
   <div class="scroll-table"><table>
     <colgroup>
       <col class="col-date-lg">
@@ -69,15 +69,15 @@
     <thead>
       <tr>
         <th class="col-date-lg">{{ trad('common.date') }}</th>
-        <th class="col-duree col-opt" title="{{ trad('common.duree') }}">🗓️</th>
-        <th class="col-ville col-opt">{{ trad('common.ville') }}</th>
-        <th class="col-tournoi">{{ trad('common.tournoi') }}</th>
+        <th class="col-duree col-opt" title="{{ trad('common.duration') }}">🗓️</th>
+        <th class="col-ville col-opt">{{ trad('common.city') }}</th>
+        <th class="col-tournoi">{{ trad('common.tournament') }}</th>
         <th class="col-coeff col-opt center" title="{{ trad('common.coeff_title') }}">⚖️</th>
-        <th class="col-contrib col-opt center" title="{{ trad('tournois.contribution_title') }}">⏱️</th>
-        <th class="col-pos-lg" title="{{ trad('detail_tournoi.position_title') }}">🏅</th>
-        {% if regles == 'mcr' %}<th class="col-pts col-opt right" title="{{ trad('detail_tournoi.points_title') }}">{{ trad('detail_tournoi.points') }}</th>{% endif %}
-        <th class="col-mahj col-opt right" title="{{ trad('detail_tournoi.score_mcr_title') if regles == 'mcr' else trad('common.score') }}">#</th>
-        <th class="col-sticky" title="{{ trad('detail_tournoi.ema_pts_title') }}">EMA</th>
+        <th class="col-contrib col-opt center" title="{{ trad('tournament.contribution_title') }}">⏱️</th>
+        <th class="col-pos-lg" title="{{ trad('tournament.position_title') }}">🏅</th>
+        {% if regles == 'mcr' %}<th class="col-pts col-opt right" title="{{ trad('tournament.points_title') }}">{{ trad('tournament.points') }}</th>{% endif %}
+        <th class="col-mahj col-opt right" title="{{ trad('tournament.mahjong_score_title') if regles == 'mcr' else trad('common.score') }}">#</th>
+        <th class="col-sticky" title="{{ trad('tournament.ema_pts_title') }}">EMA</th>
       </tr>
     </thead>
     <tbody>
@@ -124,11 +124,11 @@
   {% if inactifs %}
   <div class="expand-row" id="expand-{{ regles }}" onclick="toggleInactifs('{{ regles }}')">
     <span id="expand-{{ regles }}-icon">▼</span>
-    <span id="expand-{{ regles }}-label">{{ trad('joueur_detail.inactifs_afficher', n=inactifs | length) }}</span>
+    <span id="expand-{{ regles }}-label">{{ trad('player.inactive_show', n=inactifs | length) }}</span>
   </div>
   {% endif %}
   {% else %}
-  <p class="empty">{{ trad('common.aucun_joueur') }} {{ regles | upper }}</p>
+  <p class="empty">{{ trad('common.no_players') }} {{ regles | upper }}</p>
   {% endif %}
 
 </div>
@@ -136,10 +136,10 @@
 
 <script>
 var _I18N_DETAIL = {
-  inactifs_afficher: "{{ trad('joueur_detail.inactifs_afficher', n='COUNT') }}",
-  inactifs_masquer:  "{{ trad('joueur_detail.inactifs_masquer') }}",
-  covid:             "{{ trad('joueur_detail.covid') }}",
-  axe_classement:    "{{ trad('common.classement') }}",
+  inactifs_afficher: "{{ trad('player.inactive_show', n='COUNT') }}",
+  inactifs_masquer:  "{{ trad('player.inactive_hide') }}",
+  covid:             "{{ trad('player.covid') }}",
+  axe_classement:    "{{ trad('common.ranking') }}",
   axe_score:         "{{ trad('common.score') }}"
 };
 function highlightDate(regles, axis, isoDate) {

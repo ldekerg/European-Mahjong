@@ -9,11 +9,11 @@
 #}
 <div class="chart-section">
   <div class="chart-controls">
-    <span class="chart-title">{{ trad('joueurs_actifs_chart.titre') }}</span>
+    <span class="chart-title">{{ trad('home.active_players_chart') }}</span>
     <div class="chart-range-btns">
-      <button onclick="setChartRange('{{ chart_id }}', 52)"  class="range-btn">{{ trad('common.range_1an') }}</button>
-      <button onclick="setChartRange('{{ chart_id }}', 156)" class="range-btn">{{ trad('common.range_3ans') }}</button>
-      <button onclick="setChartRange('{{ chart_id }}', 0)"   class="range-btn active">{{ trad('common.range_tout') }}</button>
+      <button onclick="setChartRange('{{ chart_id }}', 52)"  class="range-btn">{{ trad('common.range_1y') }}</button>
+      <button onclick="setChartRange('{{ chart_id }}', 156)" class="range-btn">{{ trad('common.range_3y') }}</button>
+      <button onclick="setChartRange('{{ chart_id }}', 0)"   class="range-btn active">{{ trad('common.range_all') }}</button>
     </div>
   </div>
   <canvas id="{{ chart_id }}" height="90"></canvas>
@@ -98,7 +98,7 @@
             min: 0,
             grid: { color: gridColor },
             ticks: { color: textColor },
-            title: { display: true, text: '{{ trad("joueurs_actifs_chart.axe") }}', color: textColor, font: { size: 11 } },
+            title: { display: true, text: '{{ trad("home.active_players_chart") }}', color: textColor, font: { size: 11 } },
           },
         },
       },

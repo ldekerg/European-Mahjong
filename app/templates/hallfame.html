@@ -5,7 +5,7 @@
   <h1>{{ trad('nav.hallfame') }}</h1>
   <div class="t-filters">
     <div class="t-filter-group">
-      {% for v, label in [('medailles', trad('hallfame.medailles')), ('semaines', trad('hallfame.semaines')), ('championnats', trad('hallfame.championnats')), ('records', trad('hallfame.records'))] %}
+      {% for v, label in [('medailles', trad('hof.medals')), ('semaines', trad('hof.weeks')), ('championnats', trad('hof.championships')), ('records', trad('hof.records'))] %}
       <a href="?vue={{ v }}&periode={{ periode }}" class="filter-btn {% if vue == v %}active{% endif %}">{{ label }}</a>
       {% endfor %}
     </div>
@@ -26,7 +26,7 @@
 
   <!-- Champions en titre -->
   <div class="stats-grid" style="margin-bottom:1.5rem">
-    {% for type_key, label, is_world in ([('oemc', trad('hallfame.champ_europe'), false), ('wmc', trad('hallfame.champ_monde'), true)] if is_mcr else [('oerc', trad('hallfame.champ_europe'), false), ('wrc', trad('hallfame.champ_monde'), true)]) %}
+    {% for type_key, label, is_world in ([('oemc', trad('hof.european_champ'), false), ('wmc', trad('hof.world_champ'), true)] if is_mcr else [('oerc', trad('hof.european_champ'), false), ('wrc', trad('hof.world_champ'), true)]) %}
     {% set c = champions[type_key] %}
     <div class="stat-card" style="text-align:center">
       <div class="stat-label" style="font-size:0.8rem;margin-bottom:0.5rem">{{ label }}</div>
@@ -37,27 +37,27 @@
       </a>
       <div class="dim" style="font-size:0.78rem">{{ c.tournoi.nom[:35] }}</div>
       <div style="margin-top:0.4rem">
-        {% if c.est_champion %}<span style="color:var(--or-fg);font-weight:700">{{ trad('hallfame.champion') }}</span>
-        {% elif c.est_vice %}<span style="color:var(--argent-fg);font-weight:700">{{ trad('hallfame.vice') }}</span>
-        {% elif c.est_bronze %}<span style="color:var(--bronze-fg);font-weight:700">{{ trad('hallfame.bronze') }}</span>
+        {% if c.est_champion %}<span style="color:var(--or-fg);font-weight:700">{{ trad('hof.winner') }}</span>
+        {% elif c.est_vice %}<span style="color:var(--argent-fg);font-weight:700">{{ trad('hof.runner_up') }}</span>
+        {% elif c.est_bronze %}<span style="color:var(--bronze-fg);font-weight:700">{{ trad('hof.third') }}</span>
         {% else %}<span class="dim">{{ c.position }}e / {{ c.tournoi.nb_joueurs }}</span>
         {% endif %}
         {% if is_world and not c.est_champion %}
-        <span class="dim" style="font-size:0.75rem;display:block">{{ trad('hallfame.meilleur_europeen') }}</span>
+        <span class="dim" style="font-size:0.75rem;display:block">{{ trad('hof.best_european') }}</span>
         {% endif %}
       </div>
       <div class="dim" style="font-size:0.75rem;margin-top:0.25rem">
         {{ c.tournoi.date_debut.strftime('%Y') if c.tournoi.date_debut.year != 1900 else '' }}
       </div>
       {% else %}
-      <div class="dim" style="font-size:0.82rem;margin-top:0.5rem">{{ trad('hallfame.pas_donnees') }}</div>
+      <div class="dim" style="font-size:0.82rem;margin-top:0.5rem">{{ trad('hof.no_data') }}</div>
       {% endif %}
     </div>
     {% endfor %}
   </div>
 
   <!-- Palmarès par tournoi -->
-  <h2 style="margin-bottom:0.75rem">{{ trad('hallfame.palmares') }}</h2>
+  <h2 style="margin-bottom:0.75rem">{{ trad('hof.palmares') }}</h2>
   {% set palmares = palmares_mcr if is_mcr else palmares_rcr %}
   <div style="display:flex;flex-direction:column;gap:1rem">
   {% for item in palmares %}
@@ -68,9 +68,9 @@
         <a href="/tournois/{{ trn.regles }}_{{ trn.ema_id }}" style="font-weight:700;font-size:0.95rem">{{ trn.nom }}</a>
         {% if trn.type_tournoi in ['wmc','wrc'] %}<span class="badge badge-wmc" style="margin-left:0.4rem">{{ 'WMC' if trn.type_tournoi == 'wmc' else 'WRC' }}</span>
         {% else %}<span class="badge" style="margin-left:0.4rem">{{ 'OEMC' if trn.type_tournoi == 'oemc' else 'OERC' }}</span>{% endif %}
-        {% if trn.id in incomplets %}<span class="badge badge-warning" style="margin-left:0.4rem">{{ trad('common.resultats_partiels') }}</span>{% endif %}
+        {% if trn.id in incomplets %}<span class="badge badge-warning" style="margin-left:0.4rem">{{ trad('common.partial_results') }}</span>{% endif %}
       </div>
-      <span class="dim" style="font-size:0.82rem">{{ trn.date_debut.strftime('%d/%m/%Y') if trn.date_debut.year != 1900 else '—' }} · {{ trn.nb_joueurs }} {{ trad('common.joueurs') | lower }}</span>
+      <span class="dim" style="font-size:0.82rem">{{ trn.date_debut.strftime('%d/%m/%Y') if trn.date_debut.year != 1900 else '—' }} · {{ trn.nb_joueurs }} {{ trad('common.players') | lower }}</span>
     </div>
     <div style="display:flex;gap:1rem;flex-wrap:wrap">
       {% for p in item.top3 %}
@@ -108,7 +108,7 @@
   {% else %}
   <div class="t-filters" style="margin-bottom:0.75rem;justify-content:flex-end">
     <div class="t-filter-group">
-      {% for p, label in [('alltime', trad('common.alltime')), ('encours', trad('common.encours'))] %}
+      {% for p, label in [('alltime', trad('common.alltime')), ('encours', trad('common.ongoing'))] %}
       <a href="?vue={{ vue }}&periode={{ p }}" class="filter-btn {% if periode == p %}active{% endif %}">{{ label }}</a>
       {% endfor %}
     </div>

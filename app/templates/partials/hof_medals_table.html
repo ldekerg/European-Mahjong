@@ -14,13 +14,13 @@
     <tr>
       <th class="col-hof-pos center">#</th>
       <th class="col-flag col-opt center">🌍</th>
-      <th class="col-joueur-nom">{{ trad('common.joueurs') }}</th>
+      <th class="col-joueur-nom">{{ trad('common.players') }}</th>
       {% set _tid = table_id if table_id is defined else 'hof-table' %}
-      <th class="col-hof-stat center sortable" onclick="sortTable(3,'{{ _tid }}')" title="{{ trad('hallfame.victoires_title') }}">🥇 <span class="sort-icon">⇅</span></th>
-      <th class="col-hof-stat center sortable" onclick="sortTable(4,'{{ _tid }}')" title="{{ trad('hallfame.deuxiemes_title') }}">🥈 <span class="sort-icon">⇅</span></th>
-      <th class="col-hof-stat center sortable" onclick="sortTable(5,'{{ _tid }}')" title="{{ trad('hallfame.troisiemes_title') }}">🥉 <span class="sort-icon">⇅</span></th>
-      <th class="col-hof-podium center sortable" onclick="sortTable(6,'{{ _tid }}')" title="{{ trad('hallfame.total_medailles_title') }}">🏅 <span class="sort-icon">⇅</span></th>
-      <th class="col-hof-total col-opt center sortable" onclick="sortTable(7,'{{ _tid }}')" title="{{ trad('hallfame.tournois_joues_title') }}">{{ trad('common.tournois') }} <span class="sort-icon">⇅</span></th>
+      <th class="col-hof-stat center sortable" onclick="sortTable(3,'{{ _tid }}')" title="{{ trad('hof.wins_title') }}">🥇 <span class="sort-icon">⇅</span></th>
+      <th class="col-hof-stat center sortable" onclick="sortTable(4,'{{ _tid }}')" title="{{ trad('hof.seconds_title') }}">🥈 <span class="sort-icon">⇅</span></th>
+      <th class="col-hof-stat center sortable" onclick="sortTable(5,'{{ _tid }}')" title="{{ trad('hof.thirds_title') }}">🥉 <span class="sort-icon">⇅</span></th>
+      <th class="col-hof-podium center sortable" onclick="sortTable(6,'{{ _tid }}')" title="{{ trad('hof.total_medals_title') }}">🏅 <span class="sort-icon">⇅</span></th>
+      <th class="col-hof-total col-opt center sortable" onclick="sortTable(7,'{{ _tid }}')" title="{{ trad('common.tournaments_played') }}">{{ trad('common.tournaments') }} <span class="sort-icon">⇅</span></th>
     </tr>
   </thead>
   <tbody>

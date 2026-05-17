@@ -2,10 +2,10 @@
 {% block content %}
 
 <div class="ranking-header">
-  <h1>👥 {{ trad('common.joueurs') }} <span class="t-count-header">({{ total }})</span></h1>
+  <h1>👥 {{ trad('common.players') }} <span class="t-count-header">({{ total }})</span></h1>
   <div class="t-filters">
     <form method="get" action="/joueurs/" style="display:flex;gap:0.5rem;align-items:center">
-      <input type="search" name="q" value="{{ q }}" placeholder="{{ trad('joueurs.recherche_placeholder') }}"
+      <input type="search" name="q" value="{{ q }}" placeholder="{{ trad('players.search_placeholder') }}"
              style="padding:0.3rem 0.6rem;border:1px solid var(--border);border-radius:4px;font-size:0.85rem;width:14rem;background:var(--bg2);color:var(--text)">
       <input type="hidden" name="tri" value="{{ tri }}">
       <input type="hidden" name="asc" value="{{ asc }}">
@@ -13,7 +13,7 @@
       <button type="submit" class="btn-sm">🔍</button>
     </form>
     <div class="t-filter-group">
-      {% for r, label in [('tous', trad('common.tous')), ('MCR','MCR'), ('RCR','RCR')] %}
+      {% for r, label in [('tous', trad('common.all')), ('MCR','MCR'), ('RCR','RCR')] %}
       <a href="?tri={{ tri }}&asc={{ asc }}&regles={{ r }}&q={{ q }}"
          class="filter-btn {% if regles == r %}active{% endif %}">{{ label }}</a>
       {% endfor %}
@@ -28,15 +28,15 @@
     {% endwith %}
   </div>
   <div class="ranking-right" id="apercu-panel">
-    <p class="empty">{{ trad('common.clique_joueur') }}</p>
+    <p class="empty">{{ trad('common.click_player') }}</p>
   </div>
 </div>
 
 <script>
 var _I18N = {
-  clique_joueur: "{{ trad('common.clique_joueur') }}",
-  chargement:    "{{ trad('common.chargement') }}",
-  erreur_chargement: "{{ trad('common.erreur_chargement') }}"
+  clique_joueur: "{{ trad('common.click_player') }}",
+  chargement:    "{{ trad('common.loading') }}",
+  erreur_chargement: "{{ trad('common.load_error') }}"
 };
 var _activeRow = null;
 var _semaine = '{{ semaine_actuelle.isoformat() if semaine_actuelle else "" }}';

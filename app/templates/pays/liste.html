@@ -2,28 +2,28 @@
 {% block content %}
 
 <div class="ranking-header">
-  <h1>🌍 {{ trad('common.pays') }}</h1>
+  <h1>🌍 {{ trad('common.country') }}</h1>
 </div>
 
 <!-- Stats globales -->
 <div class="stats-grid" style="margin-bottom:1.25rem">
   <div class="stat-card">
-    <div class="stat-label">{{ trad('pays.joueurs_enregistres') }}</div>
+    <div class="stat-label">{{ trad('country.registered_players') }}</div>
     <div class="stat-value">{{ stats.nb_joueurs }}</div>
   </div>
   <div class="stat-card">
-    <div class="stat-label">{{ trad('pays.pays_representes') }}</div>
+    <div class="stat-label">{{ trad('country.represented_countries') }}</div>
     <div class="stat-value">{{ stats.nb_pays }}</div>
   </div>
   <div class="stat-card">
-    <div class="stat-label">{{ trad('pays.classes_actuellement') }}</div>
+    <div class="stat-label">{{ trad('country.currently_ranked') }}</div>
     <div class="stat-value">
       <span class="badge badge-mcr">MCR</span> {{ stats.classes_mcr }}
       <span style="margin-left:0.4rem"><span class="badge badge-rcr">RCR</span> {{ stats.classes_rcr }}</span>
     </div>
   </div>
   <div class="stat-card">
-    <div class="stat-label">{{ trad('pays.tournois_joues') }}</div>
+    <div class="stat-label">{{ trad('common.tournaments_played') }}</div>
     <div class="stat-value">
       <span class="badge badge-mcr">MCR</span> {{ stats.nb_tournois_mcr }}
       <span style="margin-left:0.4rem"><span class="badge badge-rcr">RCR</span> {{ stats.nb_tournois_rcr }}</span>
@@ -38,8 +38,8 @@
 
 <!-- Onglets principaux -->
 <div class="tabs" id="main-tabs">
-  <button class="tab-btn {% if onglet != 'classement' %}active{% endif %}" onclick="showMainTab('liste', this)">{{ trad('pays.tab_tous') }}</button>
-  <button class="tab-btn {% if onglet == 'classement' %}active{% endif %}" onclick="showMainTab('classement', this)">{{ trad('pays.tab_equipes') }}</button>
+  <button class="tab-btn {% if onglet != 'classement' %}active{% endif %}" onclick="showMainTab('liste', this)">{{ trad('country.tab_all') }}</button>
+  <button class="tab-btn {% if onglet == 'classement' %}active{% endif %}" onclick="showMainTab('classement', this)">{{ trad('country.tab_teams') }}</button>
 </div>
 
 <!-- ══════════════════════════════════════════════════════════════════════
@@ -52,7 +52,7 @@
     {% endwith %}
   </div>
   <p class="dim" style="margin:0.25rem 0 0.75rem;font-size:0.85rem">
-    {{ trad('pays.equipes_help') }}
+    {{ trad('country.teams_help') }}
   </p>
 
   <!-- Sous-onglets MCR / RCR -->
@@ -76,11 +76,11 @@
         <tr>
           <th class="col-pos">#</th>
           <th class="col-flag col-opt center">🌍</th>
-          <th class="col-pays-nom">{{ trad('common.pays') }}</th>
-          <th class="col-score col-opt right" title="{{ trad('pays.score_title') }}">{{ trad('common.score') }}</th>
-          <th class="col-pays-medailles col-opt center">🥇 {{ trad('common.joueurs') }}</th>
-          <th class="col-pays-medailles col-opt center">🥈 {{ trad('common.joueurs') }}</th>
-          <th class="col-pays-medailles col-opt center">🥉 {{ trad('common.joueurs') }}</th>
+          <th class="col-pays-nom">{{ trad('common.country') }}</th>
+          <th class="col-score col-opt right" title="{{ trad('country.score_title') }}">{{ trad('common.score') }}</th>
+          <th class="col-pays-medailles col-opt center">🥇 {{ trad('common.players') }}</th>
+          <th class="col-pays-medailles col-opt center">🥈 {{ trad('common.players') }}</th>
+          <th class="col-pays-medailles col-opt center">🥉 {{ trad('common.players') }}</th>
         </tr>
       </thead>
       <tbody>
@@ -129,9 +129,9 @@
     <thead>
       <tr>
         <th class="col-flag col-opt center">🌍</th>
-        <th class="col-pays-nom">{{ trad('common.pays') }}</th>
-        <th class="col-pays-joueurs center" title="{{ trad('pays.joueurs_actifs_title') }}">{{ trad('common.joueurs') }}</th>
-        <th class="col-pays-tournois col-opt center">{{ trad('pays.tournois_org_abbr') }}</th>
+        <th class="col-pays-nom">{{ trad('common.country') }}</th>
+        <th class="col-pays-joueurs center" title="{{ trad('country.active_players_title') }}">{{ trad('common.players') }}</th>
+        <th class="col-pays-tournois col-opt center">{{ trad('country.tournaments_org_abbr') }}</th>
       </tr>
     </thead>
     <tbody>
