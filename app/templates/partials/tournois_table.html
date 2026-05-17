@@ -30,7 +30,7 @@ window['{{ _fv }}'] = window['{{ _fv }}'] || function() {};
     <col class="col-ville col-opt">
     <col class="col-duree col-opt">
     <col class="col-coeff col-opt">
-    <col class="col-joueurs col-opt">
+    {% if actifs_ids %}<col class="col-joueurs col-opt">{% endif %}
     {% if not actifs_ids %}<col class="col-joueurs col-sticky">{% endif %}
     {% if actifs_ids %}<col class="col-contrib col-opt col-sticky">{% endif %}
   </colgroup>
@@ -55,7 +55,7 @@ window['{{ _fv }}'] = window['{{ _fv }}'] || function() {};
       {{ th_s('lieu',    trad('common.ville'),          'col-ville col-opt') }}
       <th class="col-duree col-opt center" title="{{ trad('common.duree') }}">🗓️</th>
       {{ th_s('coeff',   '⚖️', 'col-coeff col-opt center',   trad('common.coeff_title')) }}
-      {{ th_s('joueurs', '👥', 'col-joueurs col-opt center', trad('common.nb_joueurs')) }}
+      {% if actifs_ids %}{{ th_s('joueurs', '👥', 'col-joueurs center', trad('common.nb_joueurs')) }} {% endif %}
       {% if not actifs_ids %}{{ th_s('joueurs', '👥', 'col-joueurs col-sticky center', trad('common.nb_joueurs')) }}
       {% endif %}
       {% if actifs_ids %}<th class="col-contrib col-opt col-sticky center" title="{{ trad('tournois.contribution_title') }}">⏱️</th>{% endif %}
@@ -80,7 +80,7 @@ window['{{ _fv }}'] = window['{{ _fv }}'] || function() {};
     {% set duree = ((trn.date_fin - trn.date_debut).days + 1) if trn.date_fin and trn.date_debut.year != 1900 else 1 %}
     <td class="col-duree col-opt center dim">{{ [duree, 1] | max }}j</td>
     <td class="col-coeff col-opt">{{ trn.coefficient }}</td>
-    <td class="col-joueurs col-opt ">{{ trn.nb_joueurs }}</td>
+    {% if actifs_ids %}<td class="col-joueurs col-opt">{{ trn.nb_joueurs }}</td>{% endif %}
     {% if not actifs_ids %}<td class="col-joueurs col-sticky">{{ trn.nb_joueurs }}</td>{% endif %}
     {% if actifs_ids %}
     <td class="col-contrib col-opt col-sticky">
