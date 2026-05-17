@@ -341,6 +341,16 @@ def import_tournament(db: Session, data: dict, reset: bool = False):
         )
         db.add(tournoi)
         db.flush()  # pour obtenir tournoi.id
+        # Supprimer le doublon calendrier s'il existe (même nom+regles+date)
+        doublon_cal = db.query(Tournoi).filter(
+            Tournoi.statut == "calendrier",
+            Tournoi.regles == data["regles"],
+            Tournoi.nom == data["nom"],
+            Tournoi.date_debut == data["date_debut"],
+            Tournoi.id != tournoi.id,
+        ).first()
+        if doublon_cal:
+            db.delete(doublon_cal)
     else:
         tournoi.nom = data["nom"]
         tournoi.lieu = data["lieu"]

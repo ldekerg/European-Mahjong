@@ -37,7 +37,9 @@
       <td class="col-date-lg">{{ trn.date_debut.strftime('%d/%m/%y') }}</td>
       <td class="col-tournoi col-tournoi-nom">
         {{ trn.pays | pays_flag_link('tournois') }} <span class="badge badge-sm {% if trn.regles == 'MCR' %}badge-mcr{% else %}badge-rcr{% endif %}">{{ trn.regles }}</span>
-        {% if trn.ema_id %}<a href="{{ _href }}">{{ trn.nom }}</a>{% else %}{{ trn.nom }}{% endif %}
+        {% if trn.ema_id %}<a href="{{ _href }}">{{ trn.nom }}</a>
+        {% elif trn.url_site %}<a href="{{ trn.url_site }}" target="_blank" rel="noopener">{{ trn.nom }}</a>
+        {% else %}{{ trn.nom }}{% endif %}
         {% if trn.type_tournoi == 'wmc' %}<span class="badge badge-wmc">WMC</span>
         {% elif trn.type_tournoi == 'wrc' %}<span class="badge badge-wmc">WRC</span>
         {% elif trn.type_tournoi == 'oemc' %}<span class="badge badge-oemc">OEMC</span>
