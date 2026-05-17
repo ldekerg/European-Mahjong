@@ -43,3 +43,6 @@ $PYTHON run_ranking_history.py --update
 
 echo ""
 echo "=== Import terminé ==="
+
+# Record last update date
+date +%Y-%m-%dT%H:%M:%S > "$(dirname "$0")/../data/last_update.txt"
