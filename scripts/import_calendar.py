@@ -139,6 +139,9 @@ def parse_calendar(html: str) -> list[dict]:
         nom = nom.strip()
         if not nom:
             continue
+        url_site = lien.get("href", "").strip() if lien else None
+        if url_site and not url_site.startswith("http"):
+            url_site = None
 
         regles_txt = cellules[1].get_text(strip=True)
         regles = "RCR" if "Riichi" in regles_txt or "RCR" in regles_txt else "MCR"
@@ -181,6 +184,7 @@ def parse_calendar(html: str) -> list[dict]:
             "ema_id":       ema_id,
             "type_tournoi": type_from_nom(nom),
             "approbation":  approbation,
+            "url_site":     url_site or None,
         })
 
     return entries
@@ -224,6 +228,9 @@ def run():
             if tournoi.approbation != e["approbation"]:
                 tournoi.approbation = e["approbation"]
                 changed = True
+            if e["url_site"] and tournoi.url_site != e["url_site"]:
+                tournoi.url_site = e["url_site"]
+                changed = True
             if changed:
                 updated += 1
                 print(f"  ~ {e['regles']} {e['date_debut']} {e['nom']}")
@@ -245,6 +252,7 @@ def run():
             type_tournoi = e["type_tournoi"],
             statut       = "calendrier",
             approbation  = e["approbation"],
+            url_site     = e["url_site"],
         ))
         print(f"  + {e['regles']} {e['date_debut']} {e['nom']}")
         inseres += 1

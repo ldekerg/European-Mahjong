@@ -11,6 +11,7 @@ con = sqlite3.connect(DB_PATH)
 for sql in [
     "ALTER TABLE tournois ADD COLUMN type_tournoi TEXT NOT NULL DEFAULT 'normal'",
     "ALTER TABLE joueurs ADD COLUMN statut TEXT NOT NULL DEFAULT 'europeen'",
+    "ALTER TABLE tournois ADD COLUMN url_site TEXT",
 ]:
     try:
         con.execute(sql)

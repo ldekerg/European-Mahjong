@@ -40,6 +40,7 @@ class Tournoi(Base):
     statut = Column(String, nullable=False, default="actif")
     # ok | pending | no_mers | NULL (pour les tournois importés via EMA)
     approbation = Column(String, nullable=True)
+    url_site = Column(String, nullable=True)    # lien vers le site du tournoi (calendrier EMA)
 
     __table_args__ = (
         # Unicité (ema_id, regles) seulement quand ema_id n'est pas NULL (index partiel SQLite)
