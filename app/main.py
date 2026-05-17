@@ -8,24 +8,24 @@ from datetime import date
 from typing import Optional
 from sqlalchemy.orm import Session
 
-from database import engine, SessionLocal
-import models
-from app.routes import joueurs, tournois, hallfame, championnats
-from app.routes import pays
-from app.templates_config import templates
-from models import ClassementHistorique, Joueur
-from ranking import lundi_semaine, classement
+from app.database import engine, SessionLocal
+import app.models as models
+from app.routes import players, tournaments, hof, championships
+from app.routes import countries
+from app.i18n import templates
+from app.models import ClassementHistorique, Joueur
+from app.ranking import lundi_semaine, classement
 
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="EMA Ranking")
 app.mount("/static", StaticFiles(directory=os.path.join(os.path.dirname(__file__), "static")), name="static")
 
-app.include_router(joueurs.router)
-app.include_router(tournois.router)
-app.include_router(hallfame.router)
-app.include_router(pays.router)
-app.include_router(championnats.router)
+app.include_router(players.router)
+app.include_router(tournaments.router)
+app.include_router(hof.router)
+app.include_router(countries.router)
+app.include_router(championships.router)
 
 
 def get_delta_rang(db: Session, semaine: date, regles: str) -> dict:
@@ -91,8 +91,8 @@ def get_classement_semaine(db: Session, semaine: date, regles: str) -> list:
 
 @app.get("/accueil")
 def home(request: Request):
-    from models import Tournoi, Resultat, ResultatAnonyme
-    from app.routes.hallfame import _meilleur_europeen
+    from app.models import Tournoi, Resultat, ResultatAnonyme
+    from app.routes.hof import _meilleur_europeen
     from sqlalchemy import func, exists
     db = SessionLocal()
     try:

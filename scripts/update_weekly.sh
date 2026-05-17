@@ -21,14 +21,14 @@ echo "=== Mise à jour hebdomadaire EMA — $(date) ==="
 # Calcule dynamiquement les IDs à partir du dernier en base + 10 de marge
 MCR_MAX=$($PYTHON -c "
 import sys, os; sys.path.insert(0, '..')
-from database import SessionLocal; from models import Tournoi
+from app.database import SessionLocal; from app.models import Tournoi
 db = SessionLocal()
 t = db.query(Tournoi).filter(Tournoi.regles=='MCR', Tournoi.ema_id < 1000000).order_by(Tournoi.ema_id.desc()).first()
 print(t.ema_id if t else 0)
 ")
 RCR_MAX=$($PYTHON -c "
 import sys, os; sys.path.insert(0, '..')
-from database import SessionLocal; from models import Tournoi
+from app.database import SessionLocal; from app.models import Tournoi
 db = SessionLocal()
 t = db.query(Tournoi).filter(Tournoi.regles=='RCR', Tournoi.ema_id < 1000000).order_by(Tournoi.ema_id.desc()).first()
 print(t.ema_id if t else 0)
@@ -39,25 +39,25 @@ RCR_START=$((RCR_MAX + 1))
 RCR_END=$((RCR_MAX + 10))
 
 echo "--- MCR : IDs $MCR_START à $MCR_END ---"
-$PYTHON import_ema.py --start $MCR_START --end $MCR_END
+$PYTHON importers/ema.py --start $MCR_START --end $MCR_END
 echo "--- RCR : IDs $RCR_START à $RCR_END ---"
-$PYTHON import_ema.py --prefix TR_RCR --start $RCR_START --end $RCR_END
+$PYTHON importers/ema.py --prefix TR_RCR --start $RCR_START --end $RCR_END
 echo "--- Calendrier ---"
-$PYTHON import_calendar.py
+$PYTHON importers/calendar.py
 
 echo "--- Import tournois passés (calendrier → résultats) ---"
-$PYTHON import_nouveaux.py
+$PYTHON importers/new_results.py
 
 echo "--- Migrations ---"
-$PYTHON migrate.py
-$PYTHON migrate_villes.py
-$PYTHON migrate_championnats.py
+$PYTHON migrate/main.py
+$PYTHON migrate/cities.py
+$PYTHON migrate/championships.py
 
 echo "--- Géolocalisation des nouvelles villes ---"
 $PYTHON geocode.py
 
 echo "--- Recalcul classement (semaines manquantes) ---"
-$PYTHON calcul_historique.py --update
+$PYTHON run_ranking_history.py --update
 
 echo "=== Terminé — $(date) ==="
 
