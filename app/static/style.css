@@ -450,7 +450,7 @@ nav a:hover {
 .theme-toggle, .rules-toggle, .lang-toggle {
     background: transparent;
     border: 1px solid rgba(255,255,255,0.3);
-    color: #fff;
+    color: var(--text3);
     padding: 0;
     width: 3rem;
     height: 2rem;
