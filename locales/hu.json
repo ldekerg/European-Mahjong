@@ -182,7 +182,7 @@
     "records_2j": "2 napos versenyek"
   },
   "home": {
-    "intro": "Üdvözlünk az európai Mahjong-rangsorban, amely a <strong>MCR</strong> és <strong>RCR</strong> ágakat foglalja magában. A pontokat az <a href=\"http://mahjong-europe.org\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--accent)\">European Mahjong Association (EMA)</a> által elismert versenyeredmények alapján számítják.",
+    "intro": "Üdvözlünk az európai Mahjong-rangsorban, amely a <strong>MCR</strong> és <strong>RCR</strong> ágakat foglalja magában. A pontokat az <a href=\"http://mahjong-europe.org\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--accent)\">European Mahjong Association (EMA)</a> által elismert versenyeredmények alapján számítják. Az oldal heti rangsorokat, versenytörténetet, játékos- és országrekordokat, valamint Hírességek Csarnokát mutatja.",
     "top5": "Top 5",
     "derniers_tournois": "Legutóbbi versenyek",
     "prochains_tournois": "Közelgő versenyek",
@@ -195,5 +195,12 @@
   "404": {
     "titre": "Az oldal nem található",
     "retour": "Vissza a főoldalra"
+  },
+  "footer": {
+    "donnees": "Adatok",
+    "maj": "Utolsó frissítés",
+    "projet": "Projekt",
+    "code_source": "Forráskód (GitHub)",
+    "signaler_bug": "Hiba jelentése"
   }
 }

@@ -182,7 +182,7 @@
     "records_2j": "Turnee 2 zile"
   },
   "home": {
-    "intro": "Bun venit la clasamentul european de Mahjong, care acoperă disciplinele <strong>MCR</strong> și <strong>RCR</strong>. Punctele sunt calculate din rezultatele turneelor recunoscute de <a href=\"http://mahjong-europe.org\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--accent)\">European Mahjong Association (EMA)</a>.",
+    "intro": "Bun venit la clasamentul european de Mahjong, care acoperă disciplinele <strong>MCR</strong> și <strong>RCR</strong>. Punctele sunt calculate din rezultatele turneelor recunoscute de <a href=\"http://mahjong-europe.org\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--accent)\">European Mahjong Association (EMA)</a>. Acest site prezintă clasamentele săptămânale, istoricul turneelor, recordurile pe jucători și pe țări, precum și Hall of Fame.",
     "top5": "Top 5",
     "derniers_tournois": "Ultimele turnee",
     "prochains_tournois": "Turnee viitoare",
@@ -195,5 +195,12 @@
   "404": {
     "titre": "Pagina nu a fost găsită",
     "retour": "Înapoi la pagina principală"
+  },
+  "footer": {
+    "donnees": "Date",
+    "maj": "Ultima actualizare",
+    "projet": "Proiect",
+    "code_source": "Cod sursă (GitHub)",
+    "signaler_bug": "Raportați o eroare"
   }
 }

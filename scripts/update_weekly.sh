@@ -60,3 +60,6 @@ echo "--- Recalcul classement (semaines manquantes) ---"
 $PYTHON calcul_historique.py --update
 
 echo "=== Terminé — $(date) ==="
+
+# Enregistrer la date de dernière mise à jour
+date +%Y-%m-%dT%H:%M:%S > "$APP_DIR/data/last_update.txt"

@@ -54,6 +54,14 @@ def trad(key: str, lang: str, **kwargs) -> str:
     return val
 
 
+def _read_last_update() -> str:
+    path = os.path.join(os.path.dirname(__file__), "..", "data", "last_update.txt")
+    try:
+        with open(path) as f:
+            return f.read().strip()[:10]  # YYYY-MM-DD
+    except FileNotFoundError:
+        return ""
+
 templates = Jinja2Templates(directory=_TEMPLATES_DIR)
 
 # Injecter la fonction t() et la langue dans tous les contextes Jinja2
@@ -73,6 +81,10 @@ def _patched_response(request_or_name, *args, **kwargs):
     lang = _detect_lang(request) if request else DEFAULT_LANG
     context["lang"] = lang
     context["trad"] = lambda key, **kw: trad(key, lang, **kw)
+    context["derniere_maj"] = _read_last_update()
+    if "current_year" not in context:
+        from datetime import date as _date
+        context["current_year"] = _date.today().year
 
     if isinstance(request_or_name, Request):
         return _orig_response(request, name, context, **{k: v for k, v in kwargs.items() if k not in ("context",)})

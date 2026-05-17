@@ -182,7 +182,7 @@
     "records_2j": "2-денні турніри"
   },
   "home": {
-    "intro": "Ласкаво просимо до європейського рейтингу Маджонгу, що включає дисципліни <strong>MCR</strong> та <strong>RCR</strong>. Очки розраховуються за результатами турнірів, визнаних <a href=\"http://mahjong-europe.org\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--accent)\">European Mahjong Association (EMA)</a>.",
+    "intro": "Ласкаво просимо до європейського рейтингу Маджонгу, що включає дисципліни <strong>MCR</strong> та <strong>RCR</strong>. Очки розраховуються за результатами турнірів, визнаних <a href=\"http://mahjong-europe.org\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--accent)\">European Mahjong Association (EMA)</a>. Цей сайт представляє тижневі рейтинги, історію турнірів, рекорди гравців і країн та Зал Слави.",
     "top5": "Top 5",
     "derniers_tournois": "Останні турніри",
     "prochains_tournois": "Майбутні турніри",
@@ -195,5 +195,12 @@
   "404": {
     "titre": "Сторінку не знайдено",
     "retour": "Повернутися на головну"
+  },
+  "footer": {
+    "donnees": "Дані",
+    "maj": "Останнє оновлення",
+    "projet": "Проєкт",
+    "code_source": "Вихідний код (GitHub)",
+    "signaler_bug": "Повідомити про помилку"
   }
 }

@@ -182,7 +182,7 @@
     "records_2j": "2 päivän turnaukset"
   },
   "home": {
-    "intro": "Tervetuloa eurooppalaiseen Mahjong-rankauslistaan, joka kattaa <strong>MCR</strong>- ja <strong>RCR</strong>-lajit. Pisteet lasketaan <a href=\"http://mahjong-europe.org\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--accent)\">European Mahjong Association (EMA)</a>:n hyväksymistä turnaustuloksista.",
+    "intro": "Tervetuloa eurooppalaiseen Mahjong-rankauslistaan, joka kattaa <strong>MCR</strong>- ja <strong>RCR</strong>-lajit. Pisteet lasketaan <a href=\"http://mahjong-europe.org\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--accent)\">European Mahjong Association (EMA)</a>:n hyväksymistä turnaustuloksista. Sivusto esittelee viikoittaiset sijoitukset, turnaushistorian, pelaaja- ja maakohtaiset ennätykset sekä Hall of Famen.",
     "top5": "Top 5",
     "derniers_tournois": "Viimeisimmät turnaukset",
     "prochains_tournois": "Tulevat turnaukset",
@@ -195,5 +195,12 @@
   "404": {
     "titre": "Sivua ei löydy",
     "retour": "Takaisin etusivulle"
+  },
+  "footer": {
+    "donnees": "Tiedot",
+    "maj": "Viimeisin päivitys",
+    "projet": "Projekti",
+    "code_source": "Lähdekoodi (GitHub)",
+    "signaler_bug": "Ilmoita virheestä"
   }
 }

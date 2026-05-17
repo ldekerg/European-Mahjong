@@ -195,5 +195,12 @@
   "404": {
     "titre": "Page introuvable",
     "retour": "Retour à l'accueil"
+  },
+  "footer": {
+    "donnees": "Données",
+    "maj": "Mise à jour",
+    "projet": "Projet",
+    "code_source": "Code source (GitHub)",
+    "signaler_bug": "Signaler un bug"
   }
 }

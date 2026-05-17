@@ -182,7 +182,7 @@
     "records_2j": "2-day tournaments"
   },
   "home": {
-    "intro": "Welcome to the European Mahjong rankings, covering both <strong>MCR</strong> (Mahjong Competition Rules) and <strong>RCR</strong> (Riichi Competition Rules). Points are calculated from tournament results certified by the <a href=\"http://mahjong-europe.org\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--accent)\">European Mahjong Association (EMA)</a>. This site provides weekly rankings, tournament history, player and country records, and the Hall of Fame.",
+    "intro": "Welcome to the European Mahjong rankings, covering both <strong>MCR</strong> (Mahjong Competition Rules) and <strong>RCR</strong> (Riichi Competition Rules). Points are calculated from tournament results certified by the <a href=\"http://mahjong-europe.org\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--accent)\">European Mahjong Association (EMA)</a>. This site presents weekly rankings, tournament history, player and country records, and the Hall of Fame.",
     "top5": "Top 5",
     "derniers_tournois": "Recent tournaments",
     "prochains_tournois": "Upcoming tournaments",
@@ -195,5 +195,12 @@
   "404": {
     "titre": "Page not found",
     "retour": "Back to home"
+  },
+  "footer": {
+    "donnees": "Data",
+    "maj": "Last update",
+    "projet": "Project",
+    "code_source": "Source code (GitHub)",
+    "signaler_bug": "Report a bug"
   }
 }

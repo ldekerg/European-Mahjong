@@ -182,7 +182,7 @@
     "records_2j": "2-dňové turnaje"
   },
   "home": {
-    "intro": "Vitajte v európskom rebríčku Mahjong, ktorý zahŕňa disciplíny <strong>MCR</strong> a <strong>RCR</strong>. Body sa počítajú z výsledkov turnajov uznaných <a href=\"http://mahjong-europe.org\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--accent)\">European Mahjong Association (EMA)</a>.",
+    "intro": "Vitajte v európskom rebríčku Mahjong, ktorý zahŕňa disciplíny <strong>MCR</strong> a <strong>RCR</strong>. Body sa počítajú z výsledkov turnajov uznaných <a href=\"http://mahjong-europe.org\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--accent)\">European Mahjong Association (EMA)</a>. Táto stránka predstavuje týždenné rebríčky, históriu turnajov, rekordy hráčov a krajín a Sieň slávy.",
     "top5": "Top 5",
     "derniers_tournois": "Posledné turnaje",
     "prochains_tournois": "Nadchádzajúce turnaje",
@@ -195,5 +195,12 @@
   "404": {
     "titre": "Stránka nenájdená",
     "retour": "Späť na hlavnú stránku"
+  },
+  "footer": {
+    "donnees": "Dáta",
+    "maj": "Posledná aktualizácia",
+    "projet": "Projekt",
+    "code_source": "Zdrojový kód (GitHub)",
+    "signaler_bug": "Nahlásiť chybu"
   }
 }

@@ -500,6 +500,41 @@ nav a:hover {
 
 
 /* ═══════════════════════════════════════════════════════════════════
+    Footer
+   ═══════════════════════════════════════════════════════════════════ */
+.site-footer {
+    background: var(--bg3);
+    border-top: 1px solid var(--border);
+    margin-top: 2rem;
+    padding: 0.75rem 1rem;
+    font-size: 0.82rem;
+    color: var(--text3);
+}
+.footer-inner {
+    max-width: 1300px;
+    margin: 0 auto;
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    align-items: center;
+}
+.footer-col {
+    display: flex;
+    flex-direction: row;
+    gap: 0.8rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.footer-col + .footer-col::before {
+    content: '·';
+    color: var(--border);
+}
+.footer-title { font-weight: 700; color: var(--text2); }
+.site-footer a { color: var(--text3); text-decoration: none; }
+.site-footer a:hover { color: var(--accent); }
+
+
+/* ═══════════════════════════════════════════════════════════════════
     Ranking Pages
    ═══════════════════════════════════════════════════════════════════ */
 .ranking-header {

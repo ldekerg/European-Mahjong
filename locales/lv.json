@@ -182,7 +182,7 @@
     "records_2j": "2 dienu turnīri"
   },
   "home": {
-    "intro": "Laipni lūdzam Eiropas Madžonga rangā, kas aptver <strong>MCR</strong> un <strong>RCR</strong> disciplīnas. Punkti tiek aprēķināti no turnīru rezultātiem, ko atzinusi <a href=\"http://mahjong-europe.org\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--accent)\">European Mahjong Association (EMA)</a>.",
+    "intro": "Laipni lūdzam Eiropas Madžonga rangā, kas aptver <strong>MCR</strong> un <strong>RCR</strong> disciplīnas. Punkti tiek aprēķināti no turnīru rezultātiem, ko atzinusi <a href=\"http://mahjong-europe.org\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--accent)\">European Mahjong Association (EMA)</a>. Šī vietne rāda nedēļas ranžējumus, turnīru vēsturi, spēlētāju un valstu rekordus un Slavas zāli.",
     "top5": "Top 5",
     "derniers_tournois": "Pēdējie turnīri",
     "prochains_tournois": "Gaidāmie turnīri",
@@ -195,5 +195,12 @@
   "404": {
     "titre": "Lapa nav atrasta",
     "retour": "Atpakaļ uz sākumlapu"
+  },
+  "footer": {
+    "donnees": "Dati",
+    "maj": "Pēdējais atjauninājums",
+    "projet": "Projekts",
+    "code_source": "Pirmkods (GitHub)",
+    "signaler_bug": "Ziņot par kļūdu"
   }
 }

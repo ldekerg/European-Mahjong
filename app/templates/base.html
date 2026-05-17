@@ -88,6 +88,24 @@
     <main>
         {% block content %}{% endblock %}
     </main>
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <div class="footer-col">
+          <span class="footer-title">EMA Ranking</span>
+          <span class="dim">© {{ current_year }} Loïc de Kergommeaux</span>
+        </div>
+        <div class="footer-col">
+          <span class="footer-title">{{ trad('footer.donnees') }}</span>
+          <a href="http://mahjong-europe.org" target="_blank" rel="noopener">mahjong-europe.org</a>
+          {% if derniere_maj %}<span class="dim">{{ trad('footer.maj') }} : {{ derniere_maj }}</span>{% endif %}
+        </div>
+        <div class="footer-col">
+          <span class="footer-title">{{ trad('footer.projet') }}</span>
+          <a href="https://github.com/ldekerg/European-Mahjong" target="_blank" rel="noopener">{{ trad('footer.code_source') }}</a>
+          <a href="https://docs.google.com/spreadsheets/d/1171_RCkJqYgwkzBxbM2llVEizs_2mRyk5W1DwrAtT0M/edit?gid=0#gid=0" target="_blank" rel="noopener">{{ trad('footer.signaler_bug') }}</a>
+        </div>
+      </div>
+    </footer>
     <script>
     // ── Langue ───────────────────────────────────────────────────────────────
     function toggleLangDropdown() {

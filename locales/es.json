@@ -56,7 +56,6 @@
     "delta": "Δ",
     "delta_title": "Cambio respecto a la semana anterior",
     "nouveau": "nuevo",
-    "torneis_actifs_title": "Torneos activos",
     "tournois_actifs_title": "Torneos activos",
     "podiums_title": "Podios en torneos activos",
     "aucun": "Sin clasificación para esta semana."
@@ -183,7 +182,7 @@
     "records_2j": "Torneos 2 días"
   },
   "home": {
-    "intro": "Bienvenido al ranking europeo de Mahjong, que incluye las disciplinas <strong>MCR</strong> y <strong>RCR</strong>. Los puntos se calculan a partir de los resultados de torneos reconocidos por la <a href=\"http://mahjong-europe.org\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--accent)\">European Mahjong Association (EMA)</a>.",
+    "intro": "Bienvenido al ranking europeo de Mahjong, que incluye las disciplinas <strong>MCR</strong> y <strong>RCR</strong>. Los puntos se calculan a partir de los resultados de torneos reconocidos por la <a href=\"http://mahjong-europe.org\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--accent)\">European Mahjong Association (EMA)</a>. Este sitio presenta los rankings semanales, el historial de torneos, los palmarés por jugador y por país, así como el Hall of Fame.",
     "top5": "Top 5",
     "derniers_tournois": "Últimos torneos",
     "prochains_tournois": "Próximos torneos",
@@ -196,5 +195,12 @@
   "404": {
     "titre": "Página no encontrada",
     "retour": "Volver al inicio"
+  },
+  "footer": {
+    "donnees": "Datos",
+    "maj": "Última actualización",
+    "projet": "Proyecto",
+    "code_source": "Código fuente (GitHub)",
+    "signaler_bug": "Reportar un error"
   }
 }

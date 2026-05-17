@@ -182,7 +182,7 @@
     "records_2j": "2-dagarsturneringar"
   },
   "home": {
-    "intro": "Välkommen till den europeiska Mahjong-rankningen för <strong>MCR</strong> och <strong>RCR</strong>. Poäng beräknas utifrån turneringsresultat godkända av <a href=\"http://mahjong-europe.org\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--accent)\">European Mahjong Association (EMA)</a>.",
+    "intro": "Välkommen till den europeiska Mahjong-rankningen för <strong>MCR</strong> och <strong>RCR</strong>. Poäng beräknas utifrån turneringsresultat godkända av <a href=\"http://mahjong-europe.org\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--accent)\">European Mahjong Association (EMA)</a>. Webbplatsen visar veckoranking, turneringshistorik, spelare- och landsrekord samt Hall of Fame.",
     "top5": "Top 5",
     "derniers_tournois": "Senaste turneringar",
     "prochains_tournois": "Kommande turneringar",
@@ -195,5 +195,12 @@
   "404": {
     "titre": "Sidan hittades inte",
     "retour": "Tillbaka till startsidan"
+  },
+  "footer": {
+    "donnees": "Data",
+    "maj": "Senaste uppdatering",
+    "projet": "Projekt",
+    "code_source": "Källkod (GitHub)",
+    "signaler_bug": "Rapportera ett fel"
   }
 }
