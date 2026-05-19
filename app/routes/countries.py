@@ -336,6 +336,9 @@ def pays_detail(
     code: str,
     week: Optional[str] = Query(None),
     rules: Optional[str] = Query(None),
+    sort: str = Query("nom"),
+    asc: int = Query(1),
+    tab: str = Query("ranking"),
     db: Session = Depends(get_db),
 ):
     code = code.upper()
@@ -470,6 +473,16 @@ def pays_detail(
         for j in joueurs_q
     ]
 
+    _sort_key = {
+        "nom":       lambda x: x["player"].last_name or "",
+        "prenom":    lambda x: x["player"].first_name or "",
+        "premier":   lambda x: x["premier"] or dt.max.date(),
+        "nb_mcr":    lambda x: x["nb_mcr"],
+        "nb_rcr":    lambda x: x["nb_rcr"],
+        "nb_total":  lambda x: x["nb_total"],
+    }.get(sort, lambda x: x["player"].last_name or "")
+    joueurs_data.sort(key=_sort_key, reverse=(asc == 0))
+
     nb_classes_mcr = len(mcr)
     nb_classes_rcr = len(rcr)
     meilleur_actuel_mcr = mcr[0]["position"] if mcr else None
@@ -514,6 +527,9 @@ def pays_detail(
         "ville_filtre":     None,
         # Players
         "players":          joueurs_data,
+        "sort":             sort,
+        "asc":              asc,
+        "tab":              tab,
         # Chart
         "chart_json":       json.dumps(chart_detail),
         # National circuits

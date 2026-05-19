@@ -122,7 +122,7 @@
 <div id="tab-players" class="tab-content hidden">
   <div class="ranking-layout">
     <div class="ranking-left">
-      {% with show_apercu=true %}
+      {% with show_apercu=true, sort_url_base='?tab=players&rules=' + active_tab, asc=asc %}
       {% include 'partials/players_table.html' %}
       {% endwith %}
     </div>
