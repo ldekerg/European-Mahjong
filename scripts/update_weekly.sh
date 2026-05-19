@@ -56,7 +56,9 @@ $PYTHON migrate/championships.py
 echo "--- Géolocalisation des nouvelles villes ---"
 $PYTHON geocode.py
 
-echo "--- Recalcul classement (semaines manquantes) ---"
+echo "--- Recalcul classement (semaine courante forcée + semaines manquantes) ---"
+CURRENT_WEEK=$(python3 -c "from datetime import date, timedelta; d=date.today(); print((d - timedelta(days=d.weekday())).isoformat())")
+$PYTHON run_ranking_history.py --week $CURRENT_WEEK
 $PYTHON run_ranking_history.py --update
 
 echo "=== Terminé — $(date) ==="
