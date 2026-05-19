@@ -27,7 +27,7 @@
 <div id="tab-{{ regles }}" class="tab-content {% if regles != 'mcr' %}hidden{% endif %}">
 
   <!-- Statistiques -->
-  {% include 'partials/stat_cards.html' %}
+  {% with rules=regles %}{% include 'partials/stat_cards.html' %}{% endwith %}
 
   <!-- Graphique évolution -->
   {% if data.historique_chart %}
