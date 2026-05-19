@@ -175,12 +175,16 @@ templates.env.filters["pays_flag_link"] = flag_link
 
 
 def ema_color(value: int, max_val: int = 1000) -> str:
-    """Return a CSS background+color style for a red→green gradient."""
-    ratio = max(0.0, min(1.0, value / max_val))
-    hue = ratio * 120           # 0 = rouge, 120 = vert
-    bg  = f"hsl({hue:.0f}, 75%, 88%)"
-    fg  = f"hsl({hue:.0f}, 60%, 30%)"
-    return f"background:{bg}; color:{fg}; font-weight:600"
+    """Return a CSS background+color style with a red→score_color bar filling left to right."""
+    ratio   = max(0.0, min(1.0, value / max_val))
+    pct     = round(ratio * 100, 1)
+    hue_end = round(ratio * 120)   # 0=red, 120=green — matches the score
+    fg      = f"hsl({hue_end}, 80%, 30%)"
+    return (f"background-image:linear-gradient(to right, hsl(0,100%,65%), hsl({hue_end},100%,70%));"
+            f"background-size:{pct}% 100%;"
+            f"background-repeat:no-repeat;"
+            f"background-position:left center;"
+            f"color:{fg};font-weight:600")
 
 templates.env.filters["ema_color"] = ema_color
 
