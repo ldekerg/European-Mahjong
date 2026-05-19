@@ -28,15 +28,15 @@ def liste_joueurs(
     # Subqueries to count tournaments per player/rules + date of first tournament
     mcr_count = (
         db.query(Result.player_id, func.count(Result.id).label("nb"))
-        .join(T).filter(T.rules == "MCR").group_by(Result.player_id).subquery()
+        .join(T).filter(T.rules == "MCR", T.ema_id.isnot(None)).group_by(Result.player_id).subquery()
     )
     rcr_count = (
         db.query(Result.player_id, func.count(Result.id).label("nb"))
-        .join(T).filter(T.rules == "RCR").group_by(Result.player_id).subquery()
+        .join(T).filter(T.rules == "RCR", T.ema_id.isnot(None)).group_by(Result.player_id).subquery()
     )
     premier_tournoi = (
         db.query(Result.player_id, func.min(T.start_date).label("premier"))
-        .join(T).filter(T.start_date != date(1900, 1, 1))
+        .join(T).filter(T.start_date != date(1900, 1, 1), T.ema_id.isnot(None))
         .group_by(Result.player_id).subquery()
     )
 

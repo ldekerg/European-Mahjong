@@ -457,7 +457,8 @@ def pays_detail(
         )
         .join(Tournament, Result.tournament_id == Tournament.id)
         .filter(Result.player_id.in_(player_ids),
-                Tournament.start_date != _date(1900, 1, 1))
+                Tournament.start_date != _date(1900, 1, 1),
+                Tournament.ema_id.isnot(None))
         .group_by(Result.player_id)
         .all()
     }
