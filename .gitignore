@@ -34,3 +34,6 @@ Thumbs.db
 
 # Todo
 Todo.md 
+
+# Testing
+app/static/test_flags.html
