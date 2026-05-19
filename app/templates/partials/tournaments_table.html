@@ -73,7 +73,7 @@ window['{{ _fv }}'] = window['{{ _fv }}'] || function() {};
       {% if trn.tournament_type == 'wmc' %}<span class="badge badge-wmc">WMC</span>
       {% elif trn.tournament_type == 'wrc' %}<span class="badge badge-wmc">WRC</span>
       {% elif trn.tournament_type == 'oemc' %}<span class="badge badge-oemc">OEMC</span>
-      {% elif trn.tournament_type == 'oerc' %}<span class="badge badge-oerc">OERC</span>{% endif %}
+      {% elif trn.tournament_type == 'oerc' %}<span class="badge badge-oerc">ERMC</span>{% endif %}
       {% if incomplets is defined and trn.id in incomplets %}<span class="badge badge-warning">{{ trad('common.partial_results') }}</span>{% endif %}
     </td>
     <td class="col-ville col-opt t-ville" onclick="{{ _fv }}('{{ trn.city }}')">{{ trn.city }}</td>

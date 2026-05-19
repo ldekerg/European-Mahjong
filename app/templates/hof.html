@@ -67,7 +67,7 @@
       <div>
         <a href="/tournaments/{{ trn.rules }}_{{ trn.ema_id }}" style="font-weight:700;font-size:0.95rem">{{ trn.name }}</a>
         {% if trn.tournament_type in ['wmc','wrc'] %}<span class="badge badge-wmc" style="margin-left:0.4rem">{{ 'WMC' if trn.tournament_type == 'wmc' else 'WRC' }}</span>
-        {% else %}<span class="badge" style="margin-left:0.4rem">{{ 'OEMC' if trn.tournament_type == 'oemc' else 'OERC' }}</span>{% endif %}
+        {% else %}<span class="badge" style="margin-left:0.4rem">{{ 'OEMC' if trn.tournament_type == 'oemc' else 'ERMC' }}</span>{% endif %}
         {% if trn.id in incomplets %}<span class="badge badge-warning" style="margin-left:0.4rem">{{ trad('common.partial_results') }}</span>{% endif %}
       </div>
       <span class="dim" style="font-size:0.82rem">{{ trn.start_date.strftime('%d/%m/%Y') if trn.start_date.year != 1900 else '—' }} · {{ trn.nb_players }} {{ trad('common.players') | lower }}</span>
