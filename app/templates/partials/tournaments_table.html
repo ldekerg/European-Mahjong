@@ -66,7 +66,7 @@ window['{{ _fv }}'] = window['{{ _fv }}'] || function() {};
   {% set actif = trn.id in actifs_ids %}
   {% set contrib = actifs_ids[trn.id] if actif else 0 %}
   <tr class="t-row t-row-{{ _tk if _tk else 'all' }} {% if actif %}row-actif{% endif %} {% if trn.tournament_type in ['wmc','wrc'] %}row-wmc{% elif trn.tournament_type in ['oemc','oerc'] %}row-oemc{% endif %}"
-      data-lieu="{{ trn.city }}">
+      data-city="{{ trn.city }}">
     <td class="col-date-lg">{{ trn.start_date.strftime('%d/%m/%y') }}</td>
     <td class="col-tournoi">
       {{ trn.country | pays_flag_link('tournaments') }} <span class="badge badge-sm {% if trn.rules == 'MCR' %}badge-mcr{% else %}badge-rcr{% endif %}">{{ trn.rules }}</span> <a href="/tournaments/{{ trn.rules }}_{{ trn.ema_id }}">{{ trn.name }}</a>
