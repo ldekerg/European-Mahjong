@@ -5,7 +5,7 @@
   <h1>{{ trad('nav.hallfame') }}</h1>
   <div class="t-filters">
     <div class="t-filter-group">
-      {% for v, label in [('medailles', trad('hof.medals')), ('semaines', trad('hof.weeks')), ('championnats', trad('hof.championships')), ('records', trad('hof.records'))] %}
+      {% for v, label in [('medals', trad('hof.medals')), ('weeks', trad('hof.weeks')), ('championships', trad('hof.championships')), ('records', trad('hof.records'))] %}
       <a href="?view={{ v }}&periode={{ periode }}" class="filter-btn {% if view == v %}active{% endif %}">{{ label }}</a>
       {% endfor %}
     </div>
@@ -21,7 +21,7 @@
 {% for regles_key, tab in [('mcr', mcr), ('rcr', rcr)] %}
 <div id="tab-{{ regles_key }}" class="tab-content {% if regles_key != 'mcr' %}hidden{% endif %}">
 
-  {% if view == 'championnats' %}
+  {% if view == 'championships' %}
   {% set is_mcr = regles_key == 'mcr' %}
 
   <!-- Champions en titre -->
@@ -100,7 +100,7 @@
   {% include 'partials/hof_records_table.html' %}
   {% endwith %}
 
-  {% elif view == 'medailles' %}
+  {% elif view == 'medals' %}
   {% with medals_data=tab.medals_data, table_id='hof-medals-' + regles_key %}
   {% include 'partials/hof_medals_table.html' %}
   {% endwith %}
@@ -113,7 +113,7 @@
       {% endfor %}
     </div>
   </div>
-  {% with data=tab.data, periode=periode, table_id='hof-semaines-' + regles_key %}
+  {% with data=tab.data, periode=periode, table_id='hof-weeks-' + regles_key %}
   {% include 'partials/hof_weeks_table.html' %}
   {% endwith %}
   {% endif %}
@@ -130,7 +130,7 @@ function showTab(name, btn) {
   document.getElementById('tab-' + name).classList.remove('hidden');
   btn.classList.add('active');
   // Trier la table active
-  var tid = '{{ "hof-medals" if view == "medailles" else "hof-semaines" }}-' + name;
+  var tid = '{{ "hof-medals" if view == "medals" else "hof-weeks" }}-' + name;
   sortDefault(tid);
 }
 
@@ -183,7 +183,7 @@ function sortTable(col, tableId) {
 
 window.addEventListener('DOMContentLoaded', function() {
   ['mcr','rcr'].forEach(function(r) {
-    var tid = '{{ "hof-medals" if view == "medailles" else "hof-semaines" }}-' + r;
+    var tid = '{{ "hof-medals" if view == "medals" else "hof-weeks" }}-' + r;
     sortDefault(tid);
   });
 });

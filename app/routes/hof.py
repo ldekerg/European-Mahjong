@@ -207,7 +207,9 @@ def _compute_hof(db: Session, regles: str, periode: str) -> dict:
         func.sum(case((Result.position == 3, 1), else_=0)).label("bronze_t"),
         func.count(Result.id).label("total_t"),
     ).join(Tournament, Result.tournament_id == Tournament.id
-    ).filter(Tournament.rules == regles
+    ).filter(
+        Tournament.rules == regles,
+        Tournament.ema_id.isnot(None),
     ).group_by(Result.player_id).subquery()
 
     medals_rows = db.query(medals_q, Player).join(Player, medals_q.c.player_id == Player.id).all()
