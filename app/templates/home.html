@@ -37,7 +37,7 @@
   <a href="/hof/?view=championnats" class="dim" style="font-size:0.78rem;font-weight:400;margin-left:0.5rem">{{ trad('hof.link') }}</a>
 </h2>
 <div class="stats-grid" style="margin-bottom:1.5rem">
-  {% for type_key, label in [('oemc','🇪🇺 OEMC'), ('wmc','🌍 WMC'), ('oerc','🇪🇺 OERC'), ('wrc','🌍 WRC')] %}
+  {% for type_key, label in [('oemc','🇪🇺 OEMC'), ('wmc','🌍 WMC'), ('oerc','🇪🇺 ERMC'), ('wrc','🌍 WRC')] %}
   {% set c = champions[type_key] %}
   <div class="stat-card" style="text-align:center">
     <div class="stat-label" style="font-size:0.8rem;margin-bottom:0.4rem">{{ label }}</div>
