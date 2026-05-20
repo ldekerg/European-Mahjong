@@ -313,20 +313,33 @@ PUBLIC_PREFIXES = ("/home", "/ranking", "/players", "/tournaments", "/countries"
                    "/hof", "/championships", "/formulas", "/classement", "/accueil",
                    "/joueurs", "/tournois", "/pays", "/palmares")
 
+EXEMPT_PREFIXES = ("/static", "/manage", "/admin", "/verify")
+
+_TURNSTILE_SECRET = os.getenv("TURNSTILE_SECRET", "")
+_TURNSTILE_VERIFY_URL = "https://challenges.cloudflare.com/turnstile/v0/siteverify"
+
 # Simple in-memory rate limiter: 30 req/min per IP on public routes
-import time, collections
+import time, collections, urllib.request, urllib.parse
 _rl_store: dict = collections.defaultdict(list)
 _rl_limit = 30
 _rl_window = 60  # seconds
 
+
 @app.middleware("http")
-async def rate_limit_public(request: Request, call_next):
+async def captcha_and_rate_limit(request: Request, call_next):
     path = request.url.path
-    if any(path.startswith(p) for p in PUBLIC_PREFIXES):
+
+    # Skip exempt routes
+    if any(path.startswith(p) for p in EXEMPT_PREFIXES):
+        return await call_next(request)
+
+    is_public = any(path.startswith(p) for p in PUBLIC_PREFIXES) or path == "/"
+
+    if is_public:
+        # 1. Rate limiting
         ip = get_remote_address(request)
         now = time.time()
-        window_start = now - _rl_window
-        _rl_store[ip] = [t for t in _rl_store[ip] if t > window_start]
+        _rl_store[ip] = [t for t in _rl_store[ip] if t > now - _rl_window]
         if len(_rl_store[ip]) >= _rl_limit:
             return JSONResponse(
                 {"detail": "Too many requests. Please slow down."},
@@ -334,7 +347,52 @@ async def rate_limit_public(request: Request, call_next):
                 headers={"Retry-After": "60"},
             )
         _rl_store[ip].append(now)
+
+        # 2. Turnstile captcha — only if secret is configured
+        if _TURNSTILE_SECRET and request.session.get("human") != "true":
+            next_url = str(request.url)
+            return RedirectResponse(f"/verify?next={urllib.parse.quote(next_url)}", status_code=302)
+
     return await call_next(request)
+
+
+@app.get("/verify")
+async def verify_get(request: Request, next: str = "/home"):
+    from fastapi.templating import Jinja2Templates as _J
+    from app.i18n import templates as _tpl
+    return _tpl.TemplateResponse(request, "verify.html", {"next": next})
+
+
+@app.post("/verify")
+async def verify_post(request: Request):
+    form = await request.form()
+    token = form.get("cf-turnstile-response", "")
+    next_url = form.get("next", "/home")
+
+    verified = False
+    if _TURNSTILE_SECRET and token:
+        try:
+            data = urllib.parse.urlencode({
+                "secret": _TURNSTILE_SECRET,
+                "response": token,
+                "remoteip": get_remote_address(request),
+            }).encode()
+            req = urllib.request.Request(_TURNSTILE_VERIFY_URL, data=data)
+            with urllib.request.urlopen(req, timeout=5) as resp:
+                import json as _json
+                result = _json.loads(resp.read())
+                verified = result.get("success", False)
+        except Exception:
+            verified = False
+    elif not _TURNSTILE_SECRET:
+        # No secret configured (dev mode) — always pass
+        verified = True
+
+    if verified:
+        request.session["human"] = "true"
+        return RedirectResponse(next_url, status_code=302)
+
+    return RedirectResponse(f"/verify?next={urllib.parse.quote(next_url)}", status_code=302)
 
 
 @app.get("/home")
