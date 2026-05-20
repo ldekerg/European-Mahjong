@@ -97,7 +97,7 @@
           {% if i < e.top3 | length %}{% set j = e.top3[i] %}
           <td class="col-pays-medailles col-opt center" style="font-size:0.82rem">
             <a href="/players/{{ j.player_id }}" title="#{{ j.position }} · {{ j.score }} pts">
-              {{ j.first_name | first_name }} {{ j.last_name | title }}
+              {{ j.first_name | first_name }} {{ j.name | title }}
             </a>
             <span class="dim" style="display:block;font-size:0.75rem">#{{ j.position }} · {{ j.score }}</span>
           </td>
