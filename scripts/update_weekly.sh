@@ -53,7 +53,10 @@ $PYTHON migrate/main.py
 $PYTHON migrate/cities.py
 $PYTHON migrate/championships.py
 
-echo "--- Géolocalisation des nouvelles villes ---"
+echo "--- Reporting tournaments without city ---"
+$PYTHON create_missing_cities.py
+
+echo "--- Geocoding new cities ---"
 $PYTHON geocode.py
 
 echo "--- Recalcul classement (4 dernières semaines + semaines manquantes) ---"

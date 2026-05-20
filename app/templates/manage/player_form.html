@@ -1,0 +1,79 @@
+{% extends "manage/base.html" %}
+{% block title %} — {{ 'Edit' if player else 'New' }} player{% endblock %}
+{% block content %}
+
+<div class="manage-header">
+  <h1>{{ 'Edit player' if player else 'New player' }}</h1>
+  <a href="/manage/players/" class="btn btn-secondary">← Back</a>
+</div>
+
+<form method="post" class="manage-form">
+  <div class="form-grid">
+
+    <div class="form-group">
+      <label>EMA ID *</label>
+      <input type="text" name="id" value="{{ player.id if player else '' }}"
+             {% if player %}readonly{% else %}required{% endif %}
+             class="manage-input" placeholder="e.g. 04290031"
+             pattern="[0-9]{8}" title="8 digits">
+      {% if player %}<p class="form-hint">The EMA ID cannot be changed.</p>{% endif %}
+    </div>
+
+    <div class="form-group">
+      <label>Last name *</label>
+      <input type="text" name="last_name" value="{{ player.last_name if player else '' }}" required class="manage-input">
+    </div>
+
+    <div class="form-group">
+      <label>First name *</label>
+      <input type="text" name="first_name" value="{{ player.first_name if player else '' }}" required class="manage-input">
+    </div>
+
+    <div class="form-group">
+      <label>Nationality *</label>
+      <select name="nationality" required class="manage-select">
+        {% for code in allowed_countries %}
+        <option value="{{ code }}" {% if player and player.nationality == code %}selected{% endif %}>{{ code | flag }} {{ code }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Status</label>
+      <select name="status" class="manage-select">
+        {% for val, label in [('europeen','European'),('guest','Guest'),('etranger','Foreign')] %}
+        <option value="{{ val }}" {% if player and player.status == val %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+  </div>
+
+  {% if player and changements %}
+  <div class="manage-section">
+    <h2>Nationality history</h2>
+    <table style="max-width:500px">
+      <thead><tr><th>Date</th><th>Before</th><th>After</th></tr></thead>
+      <tbody>
+      {% for c in changements %}
+      <tr>
+        <td>{{ c.change_date.strftime('%Y-%m-%d') }}</td>
+        <td>{{ c.nationality_before | flag }} {{ c.nationality_before }}</td>
+        <td>{{ c.nationality_after | flag }} {{ c.nationality_after }}</td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  <div class="form-actions">
+    <button type="submit" class="btn btn-primary">💾 Save</button>
+    <a href="/manage/players/" class="btn btn-secondary">Cancel</a>
+    {% if player %}
+    <a href="/players/{{ player.id }}" target="_blank" class="btn btn-secondary" style="margin-left:auto">👁 View on site</a>
+    {% endif %}
+  </div>
+</form>
+
+{% endblock %}

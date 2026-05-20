@@ -1,0 +1,52 @@
+{% extends "manage/base.html" %}
+{% block title %} — Dashboard{% endblock %}
+{% block content %}
+
+<div class="manage-header">
+  <h1>Dashboard</h1>
+  {% if manage_user.role != 'superadmin' and manage_user.country_list %}
+  <span class="dim">Managed countries:
+    {% for c in manage_user.country_list %}{{ c | flag }} {{ c }}{% if not loop.last %}, {% endif %}{% endfor %}
+  </span>
+  {% endif %}
+</div>
+
+<div class="stats-grid" style="margin-bottom:1.5rem">
+  <div class="stat-card">
+    <div class="stat-label">Tournaments</div>
+    <div class="stat-value">{{ nb_tournaments }}</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Players</div>
+    <div class="stat-value">{{ nb_players }}</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Cities</div>
+    <div class="stat-value">{{ nb_cities }}</div>
+  </div>
+</div>
+
+<div class="manage-actions">
+  <a href="/manage/tournaments/" class="manage-card">
+    <div class="manage-card-icon">🏆</div>
+    <div class="manage-card-title">Tournaments</div>
+    <div class="manage-card-desc">View, add and edit tournaments. Import results from CSV.</div>
+  </a>
+  <a href="/manage/players/" class="manage-card">
+    <div class="manage-card-icon">👤</div>
+    <div class="manage-card-title">Players</div>
+    <div class="manage-card-desc">View, add and edit players for your countries.</div>
+  </a>
+  <a href="/manage/cities/" class="manage-card">
+    <div class="manage-card-icon">📍</div>
+    <div class="manage-card-title">Cities</div>
+    <div class="manage-card-desc">Manage cities and their GPS coordinates.</div>
+  </a>
+  <a href="/manage/championships/" class="manage-card">
+    <div class="manage-card-icon">🏅</div>
+    <div class="manage-card-title">Championships</div>
+    <div class="manage-card-desc">Manage national circuits, editions and linked tournaments.</div>
+  </a>
+</div>
+
+{% endblock %}

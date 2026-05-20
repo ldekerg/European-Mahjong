@@ -1,0 +1,56 @@
+{% extends "manage/base.html" %}
+{% block title %} — {{ series.name }}{% endblock %}
+{% block content %}
+
+<div class="manage-header">
+  <h1>{{ series.country | flag }} {{ series.name }}</h1>
+  <div style="display:flex;gap:0.5rem">
+    <a href="/manage/championships/{{ series.slug }}/new" class="btn btn-primary">+ Nouvelle édition</a>
+    <a href="/manage/championships/" class="btn btn-secondary">← Retour</a>
+  </div>
+</div>
+
+<p class="dim" style="margin-bottom:1rem;font-size:0.85rem">
+  <span class="badge {% if series.rules == 'MCR' %}badge-mcr{% else %}badge-rcr{% endif %}">{{ series.rules }}</span>
+  {% if series.description %} — {{ series.description }}{% endif %}
+</p>
+
+{% if editions %}
+<div class="scroll-table">
+<table>
+  <thead>
+    <tr>
+      <th class="col-nowrap">Année</th>
+      <th>Nom</th>
+      <th class="col-nowrap col-opt">Formule</th>
+      <th>Champion</th>
+      <th class="col-nowrap col-opt center">Tournois</th>
+      <th class="col-nowrap">Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for e in editions %}
+  <tr>
+    <td class="col-nowrap"><strong>{{ e.year }}</strong></td>
+    <td>{{ e.name or (series.name ~ ' ' ~ e.year) }}</td>
+    <td class="col-nowrap col-opt dim" style="font-size:0.8rem">{{ e.formula }}</td>
+    <td>
+      {% if e.champion %}{{ e.champion.first_name | first_name }} {{ e.champion.last_name | title }}
+      {% elif e.champion_name %}{{ e.champion_name }}
+      {% else %}<span class="dim">—</span>{% endif %}
+    </td>
+    <td class="col-nowrap col-opt center">{{ e.tournament_links | length }}</td>
+    <td class="col-nowrap manage-actions-cell">
+      <a href="/manage/championships/{{ series.slug }}/{{ e.year }}/edit" class="btn btn-sm">✏️ Gérer</a>
+      <a href="/championships/{{ series.slug }}/{{ e.year }}" target="_blank" class="btn btn-sm btn-secondary">👁</a>
+    </td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% else %}
+<p class="empty">Aucune édition. <a href="/manage/championships/{{ series.slug }}/new">Créer la première →</a></p>
+{% endif %}
+
+{% endblock %}

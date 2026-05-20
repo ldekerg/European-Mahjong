@@ -37,22 +37,25 @@ def _tournois_tab(db, rules: str, view: str, sort: str, asc: int, city) -> dict:
     elif view == "speciaux":
         q = q.filter(Tournament.tournament_type.in_(["wmc", "wrc", "oemc", "oerc"]))
 
+    from app.models import City
+    from sqlalchemy.orm import outerjoin
+    q = q.outerjoin(City, Tournament.city_id == City.id)
+
     col_map = {"date": Tournament.start_date, "coeff": Tournament.coefficient,
                "players": Tournament.nb_players, "name": Tournament.name,
-               "city": Tournament.city, "country": Tournament.country}
+               "city": City.name, "country": Tournament.country}
     col = col_map.get(sort, Tournament.start_date)
     q = q.order_by(col if asc else col.desc())
     if city:
-        q = q.filter(Tournament.city == city)
+        q = q.filter(City.name == city)
     tournois_list = q.filter(Tournament.start_date != date(1900, 1, 1)).all()
 
-    from app.models import City
     vq = db.query(
-        Tournament.city, Tournament.country, City.latitude, City.longitude,
+        City.name.label("city"), Tournament.country, City.latitude, City.longitude,
         func.count(Tournament.id).label("nb"),
     ).join(City, Tournament.city_id == City.id
     ).filter(
-        Tournament.city != "", Tournament.rules == rules,
+        Tournament.city_id.isnot(None), Tournament.rules == rules,
         Tournament.ema_id.isnot(None),
     )
     if view == "actifs":
@@ -61,7 +64,7 @@ def _tournois_tab(db, rules: str, view: str, sort: str, asc: int, city) -> dict:
         vq = vq.filter(Tournament.tournament_type.in_(["wmc", "wrc", "oemc", "oerc"]))
     cities = [{"city": v.city, "country": v.country, "lat": v.latitude,
                "lon": v.longitude, "nb": v.nb}
-              for v in vq.group_by(Tournament.city, Tournament.country,
+              for v in vq.group_by(City.name, Tournament.country,
                                     City.latitude, City.longitude).all()]
 
     # Map bounds: fitBounds on all if view=speciaux, otherwise Europe by default

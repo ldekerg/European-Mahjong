@@ -197,6 +197,9 @@ def fmt_date(iso: str) -> str:
 
 templates.env.filters["fmt_date"] = fmt_date
 
+import json as _json
+templates.env.filters["fromjson"] = lambda s: _json.loads(s) if s else {}
+
 # Accent corrections for common French first names
 _ACCENTS = {
     "loic": "Loïc", "loïc": "Loïc",

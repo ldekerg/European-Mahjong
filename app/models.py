@@ -1,6 +1,25 @@
-from sqlalchemy import Column, String, Integer, Float, Date, ForeignKey, UniqueConstraint, Boolean, Index, text
+from sqlalchemy import Column, String, Integer, Float, Date, ForeignKey, UniqueConstraint, Boolean, Index, text, DateTime
 from sqlalchemy.orm import relationship
 from app.database import Base
+from datetime import datetime
+
+
+class AdminUser(Base):
+    __tablename__ = "admin_users"
+
+    id            = Column(Integer, primary_key=True, autoincrement=True)
+    username      = Column(String, unique=True, nullable=False)
+    password_hash = Column(String, nullable=False)             # bcrypt hash
+    role          = Column(String, nullable=False, default="admin")  # superadmin | admin
+    countries     = Column(String, nullable=True)              # comma-separated ISO codes e.g. "FR,BE,LU"
+    created_at    = Column(DateTime, nullable=False, default=datetime.utcnow)
+    last_login    = Column(DateTime, nullable=True)
+
+    @property
+    def country_list(self) -> list[str]:
+        if not self.countries:
+            return []
+        return [c.strip().upper() for c in self.countries.split(",") if c.strip()]
 
 
 class Player(Base):
@@ -23,17 +42,19 @@ class Tournament(Base):
     ema_id          = Column(Integer, nullable=True)        # original EMA number, NULL if not yet assigned
     rules           = Column(String, nullable=False)         # MCR or RCR
     name            = Column(String, nullable=False)
-    city            = Column(String, nullable=False)
+    city_id         = Column(Integer, ForeignKey("cities.id"), nullable=True)  # NULL = unknown city
     country         = Column(String, nullable=False)
     start_date      = Column(Date, nullable=False)
     end_date        = Column(Date, nullable=False)
     nb_players      = Column(Integer, nullable=False)
     coefficient     = Column(Float, nullable=False)          # MERS coefficient
-    latitude        = Column(Float, nullable=True)           # deprecated — use city_obj
-    longitude       = Column(Float, nullable=True)           # deprecated — use city_obj
-    city_id         = Column(Integer, ForeignKey("cities.id"), nullable=True)
 
     city_obj        = relationship("City")
+
+    @property
+    def city(self) -> str:
+        """City name for display — empty string if no city linked."""
+        return self.city_obj.name if self.city_obj else ""
     # normal | wmc | oemc | wrc | oerc  (wmc/wrc excluded from ranking)
     tournament_type = Column(String, nullable=False, default="normal")
     # actif | calendrier | archive
@@ -76,6 +97,9 @@ class AnonymousResult(Base):
     nationality   = Column(String, nullable=True)            # uppercase ISO code e.g. "FR"
     last_name     = Column(String, nullable=True)
     first_name    = Column(String, nullable=True)
+    points        = Column(Integer, nullable=True)           # cumulative wins (MCR) or None
+    mahjong       = Column(Integer, nullable=True)           # cumulative raw score
+    ranking       = Column(Integer, nullable=True)           # EMA points awarded
 
     tournament = relationship("Tournament")
 

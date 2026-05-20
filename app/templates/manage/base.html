@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EMA Manage{% block title %}{% endblock %}</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="stylesheet" href="/static/manage.css">
+  <script>
+  (function () {
+    const t = localStorage.getItem('theme');
+    if (t) document.documentElement.setAttribute('data-theme', t);
+    else if (window.matchMedia('(prefers-color-scheme: dark)').matches)
+      document.documentElement.setAttribute('data-theme', 'dark');
+  })();
+  </script>
+</head>
+<body>
+  <nav>
+    <a href="/home">EMA Ranking</a>
+    <div id="nav-links">
+      <a href="/manage/" {% if manage_section == 'dashboard' %}class="active"{% endif %}>Dashboard</a>
+      <a href="/manage/tournaments/" {% if manage_section == 'tournaments' %}class="active"{% endif %}>Tournaments</a>
+      <a href="/manage/players/" {% if manage_section == 'players' %}class="active"{% endif %}>Players</a>
+      <a href="/manage/cities/" {% if manage_section == 'cities' %}class="active"{% endif %}>Cities</a>
+      <a href="/manage/championships/" {% if manage_section == 'championships' %}class="active"{% endif %}>Championships</a>
+      <a href="/admin/" target="_blank" class="dim" style="font-size:0.85rem">DB Admin ↗</a>
+    </div>
+    <div class="nav-controls">
+      <!-- User dropdown -->
+      {% if manage_user %}
+      <div class="user-picker" id="user-picker">
+        <button class="user-toggle" onclick="toggleUserDropdown()" title="Account">
+          {{ manage_user.username }}
+          {% if manage_user.role == 'superadmin' %}<span class="badge badge-mcr" style="font-size:0.65rem;margin-left:0.3rem">superadmin</span>
+          {% else %}<span class="badge" style="font-size:0.65rem;margin-left:0.3rem;background:var(--bg3)">admin</span>{% endif %}
+          ▾
+        </button>
+        <div class="user-dropdown" id="user-dropdown" style="display:none">
+          <div class="user-dropdown-info">
+            {% if manage_user.country_list %}
+            <span class="dim" style="font-size:0.8rem">
+              Countries: {% for c in manage_user.country_list %}{{ c | flag }} {{ c }}{% if not loop.last %}, {% endif %}{% endfor %}
+            </span>
+            {% else %}
+            <span class="dim" style="font-size:0.8rem">All countries</span>
+            {% endif %}
+            {% if manage_user.last_login %}
+            <span class="dim" style="font-size:0.75rem">Last login: {{ manage_user.last_login.strftime('%Y-%m-%d %H:%M') }}</span>
+            {% endif %}
+          </div>
+          <hr style="margin:0.4rem 0;border:none;border-top:1px solid var(--border)">
+          <!-- Change password form -->
+          <form method="post" action="/manage/account/password" id="pwd-form" style="display:block;padding:0.5rem 0.75rem">
+            <div style="font-size:0.8rem;font-weight:600;margin-bottom:0.4rem">Change password</div>
+            <input type="password" name="current_password" placeholder="Current password" required
+                   class="manage-input" style="width:100%;margin-bottom:0.35rem;font-size:0.8rem">
+            <input type="password" name="new_password" placeholder="New password (min. 8)" required minlength="8"
+                   class="manage-input" style="width:100%;margin-bottom:0.35rem;font-size:0.8rem">
+            <input type="password" name="confirm_password" placeholder="Confirm new password" required
+                   class="manage-input" style="width:100%;margin-bottom:0.5rem;font-size:0.8rem">
+            <button type="submit" class="btn btn-sm btn-primary" style="width:100%">Update password</button>
+          </form>
+          <hr style="margin:0.4rem 0;border:none;border-top:1px solid var(--border)">
+          <a href="/manage/logout" style="display:block;padding:0.4rem 0.75rem;font-size:0.85rem;color:var(--text2);text-decoration:none">Logout</a>
+        </div>
+      </div>
+      {% endif %}
+      <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">🌙</button>
+    </div>
+  </nav>
+
+  <main>
+    {% if flash %}
+    <div class="flash flash-{{ flash.type }}">{{ flash.message }}</div>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </main>
+
+  <style>
+  .user-picker { position: relative; }
+  .user-toggle {
+    background: none; border: 1px solid var(--border); border-radius: 6px;
+    padding: 0.3rem 0.6rem; cursor: pointer; font-size: 0.85rem;
+    color: var(--text); display: flex; align-items: center; gap: 0.25rem;
+  }
+  .user-toggle:hover { background: var(--bg2); }
+  .user-dropdown {
+    position: absolute; right: 0; top: calc(100% + 0.4rem);
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 8px; box-shadow: 0 4px 16px var(--shadow);
+    min-width: 220px; z-index: 200;
+  }
+  .user-dropdown-info {
+    display: flex; flex-direction: column; gap: 0.2rem;
+    padding: 0.5rem 0.75rem;
+  }
+  </style>
+
+  <script>
+  function toggleUserDropdown() {
+    var d = document.getElementById('user-dropdown');
+    d.style.display = d.style.display === 'none' ? 'block' : 'none';
+  }
+  document.addEventListener('click', function(e) {
+    var picker = document.getElementById('user-picker');
+    if (picker && !picker.contains(e.target))
+      document.getElementById('user-dropdown').style.display = 'none';
+  });
+
+  function toggleTheme() {
+    var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    document.documentElement.setAttribute('data-theme', dark ? '' : 'dark');
+    localStorage.setItem('theme', dark ? 'light' : 'dark');
+    document.querySelector('.theme-toggle').textContent = dark ? '🌙' : '☀️';
+  }
+  if (localStorage.getItem('theme') === 'dark')
+    document.querySelector('.theme-toggle').textContent = '☀️';
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/twemoji@14/dist/twemoji.min.js" crossorigin="anonymous"></script>
+  <script>document.addEventListener('DOMContentLoaded', function() { twemoji.parse(document.body, { folder: 'svg', ext: '.svg' }); });</script>
+</body>
+</html>

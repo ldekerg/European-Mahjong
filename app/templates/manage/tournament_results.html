@@ -1,0 +1,351 @@
+{% extends "manage/base.html" %}
+{% block title %} — Results {{ tournament.name }}{% endblock %}
+{% block content %}
+
+<div class="manage-header">
+  <h1>Results — {{ tournament.name }}</h1>
+  <a href="/manage/tournaments/" class="btn btn-secondary">← Back</a>
+</div>
+
+<div class="stats-grid" style="margin-bottom:1rem">
+  <div class="stat-card">
+    <div class="stat-label">Date</div>
+    <div class="stat-value" style="font-size:1rem">{{ tournament.start_date.strftime('%Y-%m-%d') }}</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Rules</div>
+    <div class="stat-value"><span class="badge {% if tournament.rules == 'MCR' %}badge-mcr{% else %}badge-rcr{% endif %}">{{ tournament.rules }}</span></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Players</div>
+    <div class="stat-value">{{ tournament.nb_players }}</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Recorded results</div>
+    <div class="stat-value" id="result-count">{{ results | length }}</div>
+  </div>
+</div>
+
+<!-- Editable results table -->
+<div class="manage-section" id="results-section" data-rules="{{ tournament.rules }}" data-nb="{{ tournament.nb_players }}">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem">
+    <h2 style="margin:0">Results <span class="dim" style="font-size:0.85rem;font-weight:400">— edit inline</span></h2>
+    <div style="display:flex;gap:0.5rem">
+      <button type="button" class="btn btn-sm" onclick="sortByScore()">↕ Re-sort &amp; renumber</button>
+      <button type="button" class="btn btn-sm btn-primary" onclick="addRow()">+ Add row</button>
+    </div>
+  </div>
+
+  <form method="post" action="/manage/tournaments/{{ tournament.id }}/results/save" id="results-form" style="display:block">
+    <input type="hidden" name="deleted_ids" id="deleted-ids" value="">
+    <div class="scroll-table">
+    <table id="results-table">
+      <thead>
+        <tr>
+          <th class="col-nowrap">#</th>
+          {% if tournament.rules == 'MCR' %}
+          <th class="col-nowrap" title="MCR: cumulative table points (wins × value: 0/1/2/4)">Points</th>
+          {% endif %}
+          <th class="col-nowrap" title="Cumulative raw score">Mahjong</th>
+          <th class="col-nowrap" title="Computed from position">EMA pts</th>
+          <th>Player <span class="dim" style="font-weight:400;font-size:0.8rem">(EMA ID — fill to link to existing player)</span></th>
+          <th class="col-nowrap col-opt">Last name</th>
+          <th class="col-nowrap col-opt">First name</th>
+          <th class="col-nowrap col-opt">Nat.</th>
+          <th class="col-nowrap"></th>
+        </tr>
+      </thead>
+      <tbody id="results-tbody">
+      {# Merge EMA results and anonymous results sorted by position #}
+      {% set all_rows = [] %}
+      {% for r in results %}{% set _ = all_rows.append(('ema', r)) %}{% endfor %}
+      {% for r in anon_results %}{% set _ = all_rows.append(('anon', r)) %}{% endfor %}
+      {% for kind, r in all_rows | sort(attribute='1.position') %}
+
+      {% if kind == 'ema' %}
+      <tr data-id="{{ r.id }}">
+        <td class="col-nowrap">
+          <input type="number" name="position_{{ r.id }}" value="{{ r.position }}"
+                 min="1" class="manage-input inp-pos" style="width:3.5rem"
+                 oninput="onPosChange(this)" onblur="sortByScore()">
+        </td>
+        {% if tournament.rules == 'MCR' %}
+        <td class="col-nowrap">
+          <input type="number" name="points_{{ r.id }}" value="{{ r.points }}"
+                 class="manage-input inp-pts" style="width:4.5rem"
+                 onblur="sortByScore()">
+        </td>
+        {% endif %}
+        <td class="col-nowrap">
+          <input type="number" name="mahjong_{{ r.id }}" value="{{ r.mahjong }}"
+                 class="manage-input inp-mah" style="width:5.5rem"
+                 onblur="sortByScore()">
+        </td>
+        <td class="col-nowrap dim ema-pts-cell">{{ r.ranking }}</td>
+        <td>
+          <input type="hidden" name="result_id_{{ r.id }}" value="{{ r.id }}">
+          <input type="text" name="ema_id_{{ r.id }}" value="{{ r.player_id or '' }}"
+                 class="manage-input inp-ema" style="width:7rem" placeholder="EMA ID"
+                 oninput="onEmaChange(this)">
+          {% if r.player %}
+          <span class="player-name dim" style="font-size:0.8rem">
+            {{ r.player.first_name | first_name }} {{ r.player.last_name | title }}
+          </span>
+          {% endif %}
+        </td>
+        <td class="col-nowrap col-opt">
+          <input type="text" name="last_name_{{ r.id }}" value="{{ r.player.last_name if r.player else '' }}"
+                 class="manage-input inp-ln{% if r.player %} inp-locked{% endif %}" style="width:7rem" placeholder="Last name"
+                 {% if r.player %}readonly{% endif %}>
+        </td>
+        <td class="col-nowrap col-opt">
+          <input type="text" name="first_name_{{ r.id }}" value="{{ r.player.first_name if r.player else '' }}"
+                 class="manage-input inp-fn{% if r.player %} inp-locked{% endif %}" style="width:6rem" placeholder="First name"
+                 {% if r.player %}readonly{% endif %}>
+        </td>
+        <td class="col-nowrap col-opt">
+          <input type="text" name="nationality_{{ r.id }}" value="{{ r.nationality or (r.player.nationality if r.player else '') }}"
+                 class="manage-input inp-nat{% if r.player %} inp-locked{% endif %}" style="width:3.5rem" placeholder="FR" maxlength="2"
+                 {% if r.player %}readonly{% endif %}>
+        </td>
+        <td class="col-nowrap">
+          <button type="button" class="btn btn-sm btn-secondary" data-rid="{{ r.id }}" onclick="deleteRow(this)" title="Delete">🗑</button>
+        </td>
+      </tr>
+
+      {% else %}{# anonymous result #}
+      <tr data-id="anon_{{ r.id }}" style="background:color-mix(in srgb, var(--bg2) 60%, var(--bg))">
+        <td class="col-nowrap">
+          <input type="number" name="position_anon_{{ r.id }}" value="{{ r.position }}"
+                 min="1" class="manage-input inp-pos" style="width:3.5rem"
+                 oninput="onPosChange(this)" onblur="sortByScore()">
+        </td>
+        {% if tournament.rules == 'MCR' %}
+        <td class="col-nowrap">
+          <input type="number" name="points_anon_{{ r.id }}" value="{{ r.points or 0 }}"
+                 class="manage-input inp-pts" style="width:4.5rem" onblur="sortByScore()">
+        </td>
+        {% endif %}
+        <td class="col-nowrap">
+          <input type="number" name="mahjong_anon_{{ r.id }}" value="{{ r.mahjong or 0 }}"
+                 class="manage-input inp-mah" style="width:5.5rem" onblur="sortByScore()">
+        </td>
+        <td class="col-nowrap dim ema-pts-cell">{{ r.ranking or '—' }}</td>
+        <td>
+          <input type="hidden" name="result_id_anon_{{ r.id }}" value="anon_{{ r.id }}">
+          <input type="text" name="ema_id_anon_{{ r.id }}" value=""
+                 class="manage-input inp-ema" style="width:7rem" placeholder="EMA ID (optional)"
+                 oninput="onEmaChange(this)">
+          <span class="dim" style="font-size:0.8rem">anon</span>
+        </td>
+        <td class="col-nowrap col-opt">
+          <input type="text" name="last_name_anon_{{ r.id }}" value="{{ r.last_name or '' }}"
+                 class="manage-input inp-ln" style="width:7rem" placeholder="Last name">
+        </td>
+        <td class="col-nowrap col-opt">
+          <input type="text" name="first_name_anon_{{ r.id }}" value="{{ r.first_name or '' }}"
+                 class="manage-input inp-fn" style="width:6rem" placeholder="First name">
+        </td>
+        <td class="col-nowrap col-opt">
+          <input type="text" name="nationality_anon_{{ r.id }}" value="{{ r.nationality or '' }}"
+                 class="manage-input inp-nat" style="width:3.5rem" placeholder="FR" maxlength="2">
+        </td>
+        <td class="col-nowrap">
+          <button type="button" class="btn btn-sm btn-secondary" data-rid="anon_{{ r.id }}" onclick="deleteRow(this)" title="Delete">🗑</button>
+        </td>
+      </tr>
+      {% endif %}
+
+      {% endfor %}
+      </tbody>
+    </table>
+    </div>
+    <div class="form-actions" style="margin-top:0.75rem">
+      <button type="submit" class="btn btn-primary">💾 Save changes</button>
+      <a href="/manage/tournaments/{{ tournament.id }}/results" class="btn btn-secondary">Reset</a>
+    </div>
+  </form>
+</div>
+
+<!-- CSV import -->
+<div class="manage-section">
+  <h2>Import from CSV <span class="dim" style="font-size:0.85rem;font-weight:400">— replaces all existing results</span></h2>
+  <p class="dim" style="margin-bottom:0.5rem;font-size:0.85rem">
+    Format: <code>position,ema_id,last_name,first_name,nationality,points,mahjong</code> — header row ignored.
+  </p>
+  <details style="margin-bottom:0.75rem">
+    <summary class="dim" style="cursor:pointer;font-size:0.85rem">Field reference</summary>
+    <table style="margin-top:0.5rem;font-size:0.82rem;border-collapse:collapse">
+      <tr><td style="padding:0.1rem 0.75rem 0.1rem 0;font-weight:600;white-space:nowrap">position</td><td class="dim">Finish position (1 = winner)</td></tr>
+      <tr><td style="padding:0.1rem 0.75rem 0.1rem 0;font-weight:600;white-space:nowrap">ema_id</td><td class="dim">Empty → anonymous. Known ID → name/nat from DB. Unknown ID → player created.</td></tr>
+      <tr><td style="padding:0.1rem 0.75rem 0.1rem 0;font-weight:600;white-space:nowrap">last_name / first_name / nationality</td><td class="dim">Required if no ema_id or ema_id is new</td></tr>
+      <tr><td style="padding:0.1rem 0.75rem 0.1rem 0;font-weight:600;white-space:nowrap">points</td><td class="dim">MCR: cumulative table points — RCR: not used (set 1)</td></tr>
+      <tr><td style="padding:0.1rem 0.75rem 0.1rem 0;font-weight:600;white-space:nowrap">mahjong</td><td class="dim">Cumulative raw score</td></tr>
+      <tr><td style="padding:0.1rem 0.75rem 0.1rem 0;font-weight:600;white-space:nowrap">ranking</td><td class="dim">Ignored — computed automatically</td></tr>
+    </table>
+  </details>
+  <form method="post" enctype="multipart/form-data" action="/manage/tournaments/{{ tournament.id }}/results/import" style="display:block">
+    <div class="form-group" style="max-width:400px">
+      <label>CSV file</label>
+      <input type="file" name="csv_file" accept=".csv,.txt" required class="manage-input">
+    </div>
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">📥 Import</button>
+      <a href="/manage/tournaments/{{ tournament.id }}/results/template" class="btn btn-secondary">⬇ Download template</a>
+    </div>
+  </form>
+</div>
+
+<style>
+.inp-locked { opacity: 0.45; background: var(--bg2); }
+</style>
+
+<script>
+var _section    = document.getElementById('results-section');
+var _rules      = _section.dataset.rules;
+var _nbPlayers  = parseInt(_section.dataset.nb);
+var _deleted    = [];
+var _newRowIdx  = 0;
+
+// -- EMA pts calculation --------------------------------------------------
+function emaPts(pos) {
+  if (_nbPlayers <= 1 || pos < 1) return 0;
+  return Math.round((_nbPlayers - pos) / (_nbPlayers - 1) * 1000);
+}
+
+function updateEmaPts(row) {
+  var pos = parseInt(row.querySelector('.inp-pos').value) || 0;
+  row.querySelector('.ema-pts-cell').textContent = emaPts(pos);
+}
+
+// -- Position changed manually → update EMA pts only (sort on blur) ------
+function onPosChange(input) {
+  updateEmaPts(input.closest('tr'));
+}
+
+function sortByScore() {
+  var tbody = document.getElementById('results-tbody');
+  var rows  = Array.from(tbody.querySelectorAll('tr'));
+
+  rows.sort(function(a, b) {
+    if (_rules === 'MCR') {
+      var pa = parseInt(a.querySelector('.inp-pts')?.value) || 0;
+      var pb = parseInt(b.querySelector('.inp-pts')?.value) || 0;
+      if (pb !== pa) return pb - pa;
+    }
+    var ma = parseInt(a.querySelector('.inp-mah').value) || 0;
+    var mb = parseInt(b.querySelector('.inp-mah').value) || 0;
+    return mb - ma;
+  });
+
+  // Renumber positions and update EMA pts
+  rows.forEach(function(row, idx) {
+    var posInput = row.querySelector('.inp-pos');
+    posInput.value = idx + 1;
+    updateEmaPts(row);
+    tbody.appendChild(row);
+  });
+  updateCount();
+}
+
+// -- EMA ID lookup --------------------------------------------------------
+var _emaCache = {};
+
+function lockFields(row, lock) {
+  ['.inp-ln', '.inp-fn', '.inp-nat'].forEach(function(sel) {
+    var el = row.querySelector(sel);
+    if (!el) return;
+    el.readOnly = lock;
+    el.classList.toggle('inp-locked', lock);
+  });
+}
+
+function onEmaChange(input) {
+  var row  = input.closest('tr');
+  var eid  = input.value.trim();
+  var span = row.querySelector('.player-name');
+
+  if (!eid) {
+    lockFields(row, false);
+    if (span) span.textContent = '';
+    return;
+  }
+
+  if (_emaCache[eid]) {
+    applyPlayer(row, _emaCache[eid]);
+    return;
+  }
+
+  fetch('/manage/players/' + encodeURIComponent(eid) + '/lookup')
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data.found) {
+        _emaCache[eid] = data;
+        applyPlayer(row, data);
+      } else {
+        lockFields(row, false);
+        if (span) span.textContent = '(new player)';
+      }
+    })
+    .catch(function() {});
+}
+
+function applyPlayer(row, data) {
+  row.querySelector('.inp-ln').value  = data.last_name;
+  row.querySelector('.inp-fn').value  = data.first_name;
+  row.querySelector('.inp-nat').value = data.nationality;
+  lockFields(row, true);
+  var span = row.querySelector('.player-name');
+  if (span) span.textContent = data.first_name + ' ' + data.last_name;
+}
+
+// -- Add row --------------------------------------------------------------
+function addRow() {
+  var idx   = 'new_' + (++_newRowIdx);
+  var tbody = document.getElementById('results-tbody');
+  var count = tbody.querySelectorAll('tr').length;
+  var pos   = count + 1;
+
+  var mcrCol = _rules === 'MCR'
+    ? '<td class="col-nowrap"><input type="number" name="points_' + idx + '" value="0" class="manage-input inp-pts" style="width:4.5rem" onblur="sortByScore()"></td>'
+    : '';
+
+  var tr = document.createElement('tr');
+  tr.dataset.id = idx;
+  tr.innerHTML =
+    '<td class="col-nowrap"><input type="number" name="position_' + idx + '" value="' + pos + '" min="1" class="manage-input inp-pos" style="width:3.5rem" oninput="onPosChange(this)"></td>' +
+    mcrCol +
+    '<td class="col-nowrap"><input type="number" name="mahjong_' + idx + '" value="0" class="manage-input inp-mah" style="width:5.5rem" onblur="sortByScore()"></td>' +
+    '<td class="col-nowrap dim ema-pts-cell">' + emaPts(pos) + '</td>' +
+    '<td><input type="hidden" name="result_id_' + idx + '" value="' + idx + '">' +
+    '    <input type="text" name="ema_id_' + idx + '" value="" class="manage-input inp-ema" style="width:7rem" placeholder="EMA ID" oninput="onEmaChange(this)">' +
+    '    <span class="player-name dim" style="font-size:0.8rem"></span></td>' +
+    '<td class="col-nowrap col-opt"><input type="text" name="last_name_' + idx + '" value="" class="manage-input inp-ln" style="width:7rem" placeholder="Last name"></td>' +
+    '<td class="col-nowrap col-opt"><input type="text" name="first_name_' + idx + '" value="" class="manage-input inp-fn" style="width:6rem" placeholder="First name"></td>' +
+    '<td class="col-nowrap col-opt"><input type="text" name="nationality_' + idx + '" value="" class="manage-input inp-nat" style="width:3.5rem" placeholder="FR" maxlength="2"></td>' +
+    '<td class="col-nowrap"><button type="button" class="btn btn-sm btn-secondary" data-rid="' + idx + '" onclick="deleteRow(this)" title="Delete">🗑</button></td>';
+  tbody.appendChild(tr);
+  updateCount();
+}
+
+// -- Delete row -----------------------------------------------------------
+function deleteRow(btn) {
+  if (!confirm('Delete this result?')) return;
+  var rid = btn.dataset.rid;
+  if (!String(rid).startsWith('new_')) {
+    _deleted.push(rid);
+    document.getElementById('deleted-ids').value = _deleted.join(',');
+  }
+  btn.closest('tr').remove();
+  updateCount();
+}
+
+// -- Update result count display ------------------------------------------
+function updateCount() {
+  var n = document.getElementById('results-tbody').querySelectorAll('tr').length;
+  var el = document.getElementById('result-count');
+  if (el) el.textContent = n;
+}
+</script>
+
+{% endblock %}

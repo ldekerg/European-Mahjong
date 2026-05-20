@@ -1,0 +1,112 @@
+{% extends "manage/base.html" %}
+{% block title %} — Cities{% endblock %}
+{% block content %}
+
+{% set base_url = '/manage/cities/' %}
+
+<div class="manage-header">
+  <h1>Cities</h1>
+  <a href="/manage/cities/new" class="btn btn-primary">+ New city</a>
+</div>
+
+<form method="get" class="manage-filters">
+  <input type="text" name="q" value="{{ q }}" placeholder="Search name, country..." class="manage-input">
+  <input type="hidden" name="sort" value="{{ sort }}">
+  <input type="hidden" name="asc" value="{{ asc }}">
+  <button type="submit" class="btn">Filter</button>
+  <a href="/manage/cities/" class="btn btn-secondary">Reset</a>
+</form>
+
+<!-- Merge action bar — shown when at least 2 cities are selected -->
+<div id="merge-bar" class="merge-bar" style="display:none">
+  <span id="merge-count" class="dim"></span>
+  <button type="submit" form="merge-form" class="btn btn-primary">🔀 Merge selection</button>
+  <button type="button" class="btn btn-secondary" onclick="clearSelection()">✕ Cancel</button>
+</div>
+
+<form method="post" action="/manage/cities/merge-preview" id="merge-form" style="display:block">
+<div class="scroll-table">
+<table>
+  <thead>
+    <tr>
+      <th style="width:2rem">
+        <input type="checkbox" id="select-all" onchange="toggleAll(this)" title="Select all">
+      </th>
+      {% set _col='name' %}{% set _label='Name' %}{% set _cls='' %}{% include 'manage/partials/sortable_th.html' %}
+      {% set _col='country' %}{% set _label='Country' %}{% set _cls='col-nowrap center' %}{% include 'manage/partials/sortable_th.html' %}
+      {% set _col='lat' %}{% set _label='Lat.' %}{% set _cls='col-nowrap col-opt right' %}{% include 'manage/partials/sortable_th.html' %}
+      {% set _col='lon' %}{% set _label='Lon.' %}{% set _cls='col-nowrap col-opt right' %}{% include 'manage/partials/sortable_th.html' %}
+      {% set _col='nb' %}{% set _label='Tournaments' %}{% set _cls='col-nowrap center' %}{% include 'manage/partials/sortable_th.html' %}
+      <th class="col-nowrap">Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for c in cities %}
+  <tr>
+    <td><input type="checkbox" name="city_ids" value="{{ c.city.id }}" class="city-cb" onchange="updateMergeBar()"></td>
+    <td>{{ c.city.name }}</td>
+    <td class="col-nowrap center">{{ c.city.country | flag }} {{ c.city.country }}</td>
+    <td class="col-nowrap col-opt right dim">{{ '%.4f' % c.city.latitude }}</td>
+    <td class="col-nowrap col-opt right dim">{{ '%.4f' % c.city.longitude }}</td>
+    <td class="col-nowrap center">{{ c.nb_tournaments }}</td>
+    <td class="col-nowrap manage-actions-cell">
+      <a href="/manage/cities/{{ c.city.id }}/edit" class="btn btn-sm">✏️</a>
+    </td>
+  </tr>
+  {% else %}
+  <tr><td colspan="7" class="empty">No cities found.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+</form>
+
+{% if total_pages > 1 %}
+<div class="manage-pagination">
+  {% if page > 1 %}<a href="?{{ qs }}&sort={{ sort }}&asc={{ asc }}&page={{ page - 1 }}" class="btn btn-sm">‹ Previous</a>{% endif %}
+  <span class="dim">Page {{ page }} / {{ total_pages }}</span>
+  {% if page < total_pages %}<a href="?{{ qs }}&sort={{ sort }}&asc={{ asc }}&page={{ page + 1 }}" class="btn btn-sm">Next ›</a>{% endif %}
+</div>
+{% endif %}
+
+<style>
+.merge-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: color-mix(in srgb, var(--accent) 10%, var(--bg));
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  border-radius: 8px;
+  padding: 0.6rem 1rem;
+  margin-bottom: 0.75rem;
+}
+</style>
+
+<script>
+function updateMergeBar() {
+  var checked = document.querySelectorAll('.city-cb:checked');
+  var bar = document.getElementById('merge-bar');
+  var count = document.getElementById('merge-count');
+  if (checked.length >= 2) {
+    bar.style.display = 'flex';
+    count.textContent = checked.length + ' cities selected';
+  } else {
+    bar.style.display = 'none';
+  }
+  document.getElementById('select-all').indeterminate =
+    checked.length > 0 && checked.length < document.querySelectorAll('.city-cb').length;
+}
+
+function toggleAll(cb) {
+  document.querySelectorAll('.city-cb').forEach(function(el) { el.checked = cb.checked; });
+  updateMergeBar();
+}
+
+function clearSelection() {
+  document.querySelectorAll('.city-cb').forEach(function(el) { el.checked = false; });
+  document.getElementById('select-all').checked = false;
+  document.getElementById('merge-bar').style.display = 'none';
+}
+</script>
+
+{% endblock %}

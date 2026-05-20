@@ -201,6 +201,34 @@ def ranking(db: Session, target_week: date, rules: str) -> list[dict]:
     return scores
 
 
+def mers_coefficient(nb_days: int, nb_players: int, nationalities: list[str],
+                     tournament_type: str = "normal") -> float:
+    """MERS coefficient counting all countries (including non-EMA like JP, SG).
+    Matches EMA official values in ~98% of cases."""
+    EXCLUDED = {"GUEST", "OTHER", "XX", ""}
+    active = {n.upper() for n in nationalities if n and n.upper() not in EXCLUDED}
+    return _coeff_from_counts(nb_days, nb_players, len(active), tournament_type)
+
+
+def mers_coefficient_ema_only(nb_days: int, nb_players: int, nationalities: list[str],
+                               tournament_type: str = "normal") -> float:
+    """MERS coefficient counting only EMA member countries."""
+    from app.i18n import PAYS_EMA
+    EXCLUDED = {"GUEST", "OTHER", "XX", ""}
+    active = {n.upper() for n in nationalities
+              if n and n.upper() not in EXCLUDED and n.upper() in PAYS_EMA}
+    return _coeff_from_counts(nb_days, nb_players, len(active), tournament_type)
+
+
+def _coeff_from_counts(nb_days: int, nb_players: int, nb_countries: int,
+                       tournament_type: str) -> float:
+    duration  = min(max(nb_days, 1), 3)
+    players   = 0.0 if nb_players <= 40 else (0.5 if nb_players <= 80 else 1.0)
+    countries = 0.0 if nb_countries <= 5 else (0.5 if nb_countries <= 9 else 1.0)
+    qual      = 1.0 if tournament_type in ("oemc", "oerc", "wmc", "wrc") else 0.0
+    return duration + players + countries + qual
+
+
 def ema_points(position: int, nb_players: int) -> int:
     """
     EMA points for a player given their position in a tournament.

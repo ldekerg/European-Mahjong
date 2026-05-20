@@ -1,0 +1,70 @@
+{% extends "manage/base.html" %}
+{% block title %} — {{ 'Edit' if series else 'New' }} series{% endblock %}
+{% block content %}
+
+<div class="manage-header">
+  <h1>{{ 'Edit series' if series else 'New championship series' }}</h1>
+  <a href="/manage/championships/" class="btn btn-secondary">← Back</a>
+</div>
+
+<form method="post" class="manage-form">
+  <div class="form-grid">
+
+    <div class="form-group">
+      <label>Name *</label>
+      <input type="text" name="name" value="{{ series.name if series else '' }}" required class="manage-input"
+             placeholder="e.g. French MCR Championship">
+    </div>
+
+    <div class="form-group">
+      <label>Slug *</label>
+      <input type="text" name="slug" value="{{ series.slug if series else '' }}"
+             {% if series %}readonly{% else %}required{% endif %}
+             class="manage-input" placeholder="e.g. france-mcr"
+             pattern="[a-z0-9\-]+" title="Lowercase letters, digits and hyphens only">
+      {% if not series %}<p class="form-hint">Unique identifier in the URL. Lowercase letters, digits and hyphens.</p>{% endif %}
+    </div>
+
+    <div class="form-group">
+      <label>Rules *</label>
+      <select name="rules" required class="manage-select">
+        <option value="MCR" {% if not series or series.rules == 'MCR' %}selected{% endif %}>MCR</option>
+        <option value="RCR" {% if series and series.rules == 'RCR' %}selected{% endif %}>RCR</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Country *</label>
+      <select name="country" required class="manage-select">
+        {% for code in allowed_countries %}
+        <option value="{{ code }}" {% if series and series.country == code %}selected{% endif %}>{{ code | flag }} {{ code }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="form-group" style="grid-column: 1 / -1">
+      <label>Description</label>
+      <textarea name="description" class="manage-input" rows="3"
+                placeholder="Optional description...">{{ series.description if series and series.description else '' }}</textarea>
+    </div>
+
+  </div>
+
+  <div class="form-actions">
+    <button type="submit" class="btn btn-primary">💾 Save</button>
+    <a href="/manage/championships/" class="btn btn-secondary">Cancel</a>
+  </div>
+</form>
+
+<script>
+/* Auto-generate slug from name if slug is empty */
+document.querySelector('[name=name]').addEventListener('input', function() {
+  var slugField = document.querySelector('[name=slug]');
+  if (slugField.readOnly) return;
+  slugField.value = this.value.toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+});
+</script>
+
+{% endblock %}

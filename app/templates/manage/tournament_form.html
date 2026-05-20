@@ -1,0 +1,297 @@
+{% extends "manage/base.html" %}
+{% block title %} — {{ 'Edit' if tournament else 'New' }} tournament{% endblock %}
+{% block content %}
+
+<div class="manage-header">
+  <h1>{{ 'Edit tournament' if tournament else 'New tournament' }}</h1>
+  <a href="/manage/tournaments/" class="btn btn-secondary">← Back</a>
+</div>
+
+{% if tournament and tournament.ema_id %}
+<p class="dim" style="margin-bottom:1rem;font-size:0.85rem">ID EMA : <strong>{{ tournament.ema_id }}</strong></p>
+{% endif %}
+
+<form method="post" class="manage-form" id="tournament-form">
+  <div class="form-grid">
+
+    <div class="form-group">
+      <label>Name *</label>
+      <input type="text" name="name" value="{{ tournament.name if tournament else '' }}" required class="manage-input">
+    </div>
+
+    <div class="form-group">
+      <label>Rules *</label>
+      <select name="rules" required class="manage-select">
+        <option value="MCR" {% if not tournament or tournament.rules == 'MCR' %}selected{% endif %}>MCR</option>
+        <option value="RCR" {% if tournament and tournament.rules == 'RCR' %}selected{% endif %}>RCR</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Type</label>
+      <select name="tournament_type" id="tournament-type" class="manage-select" onchange="updateTypeHelp()">
+        {% for val, label, hint in [
+          ('normal',   'Normal (EMA)',          'Official EMA tournament included in MERS ranking.'),
+          ('non_mers', 'Non-MERS',              'EMA tournament not included in MERS ranking.'),
+          ('oemc',     'OEMC',                  'Open European MCR Championship.'),
+          ('oerc',     'ERMC',                  'Open European Riichi Mahjong Championship.'),
+          ('wmc',      'WMC',                   'World Mahjong Championship. Not included in MERS.'),
+          ('wrc',      'WRC',                   'World Riichi Championship. Not included in MERS.'),
+        ] %}
+        <option value="{{ val }}"
+                data-hint="{{ hint }}"
+                data-ema="{{ 'true' if val in ['normal','oemc','oerc','non_mers'] else 'false' }}"
+                {% if tournament and tournament.tournament_type == val %}selected{% endif %}>
+          {{ label }}
+        </option>
+        {% endfor %}
+      </select>
+      <p class="form-hint" id="type-hint"></p>
+    </div>
+
+    <div class="form-group">
+      <label>Start date *</label>
+      <input type="date" name="start_date" value="{{ tournament.start_date.isoformat() if tournament else '' }}" required class="manage-input">
+    </div>
+
+    <div class="form-group">
+      <label>End date *</label>
+      <input type="date" name="end_date" value="{{ tournament.end_date.isoformat() if tournament else '' }}" required class="manage-input">
+    </div>
+
+    <div class="form-group">
+      <label>Country *</label>
+      <select name="country" id="country-select" required class="manage-select" onchange="filterCities()">
+        {% for code in allowed_countries %}
+        <option value="{{ code }}" {% if tournament and tournament.country == code %}selected{% elif not tournament and loop.first %}selected{% endif %}>{{ code | flag }} {{ code }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>City</label>
+      <div style="display:flex;gap:0.5rem;align-items:center">
+        <select name="city_id" id="city-select" class="manage-select" style="flex:1">
+          <option value="">— Unknown —</option>
+          {% for city in cities %}
+          <option value="{{ city.id }}"
+                  data-country="{{ city.country }}"
+                  {% if tournament and tournament.city_id == city.id %}selected{% endif %}>
+            {{ city.name }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+      <p class="form-hint">City not listed? <a href="#" onclick="openCityModal();return false;">Create a city</a></p>
+    </div>
+
+    <div class="form-group">
+      <label>Number of players *</label>
+      <input type="number" name="nb_players" value="{{ tournament.nb_players if tournament else '' }}" required min="1" class="manage-input">
+    </div>
+
+    <div class="form-group">
+      <label>Status</label>
+      <select name="status" class="manage-select">
+        {% for val, label in [('actif','Active'),('calendrier','Calendar'),('archive','Archive')] %}
+        <option value="{{ val }}" {% if tournament and tournament.status == val %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Website</label>
+      <input type="url" name="website" value="{{ tournament.website if tournament and tournament.website else '' }}" class="manage-input" placeholder="https://...">
+    </div>
+
+  </div>
+
+  <!-- Championship link -->
+  {% if championships %}
+  <div class="manage-section">
+    <h2>Link to championship</h2>
+    <div class="form-group" style="max-width:400px">
+      <label>Championship edition</label>
+      <select name="championship_id" class="manage-select">
+        <option value="">— None —</option>
+        {% for champ in championships %}
+        <option value="{{ champ.id }}" {% if current_championship_id == champ.id %}selected{% endif %}>
+          {{ champ.series.name }} {{ champ.year }}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="form-actions">
+    <button type="submit" class="btn btn-primary">💾 Save</button>
+    <a href="/manage/tournaments/" class="btn btn-secondary">Cancel</a>
+    {% if tournament and tournament.ema_id %}
+    <a href="/tournaments/{{ tournament.rules }}_{{ tournament.ema_id }}" target="_blank" class="btn btn-secondary" style="margin-left:auto">👁 View on site</a>
+    {% endif %}
+  </div>
+</form>
+
+<!-- Modal nouvelle ville -->
+<div id="city-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center">
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1.5rem;width:100%;max-width:440px;box-shadow:0 8px 32px rgba(0,0,0,0.2)">
+    <h2 style="margin:0 0 1rem">New city</h2>
+    <div class="form-group" style="margin-bottom:0.75rem">
+      <label>Name *</label>
+      <input type="text" id="modal-city-name" class="manage-input" style="width:100%">
+    </div>
+    <div class="form-group" style="margin-bottom:0.75rem">
+      <label>Country *</label>
+      <select id="modal-city-country" class="manage-select" style="width:100%">
+        {% for code in allowed_countries %}
+        <option value="{{ code }}">{{ code | flag }} {{ code }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-bottom:0.75rem">
+      <div class="form-group">
+        <label>Latitude *</label>
+        <input type="number" id="modal-lat" class="manage-input" step="0.000001" placeholder="48.8566">
+      </div>
+      <div class="form-group">
+        <label>Longitude *</label>
+        <input type="number" id="modal-lon" class="manage-input" step="0.000001" placeholder="2.3522">
+      </div>
+    </div>
+    <div id="modal-map" style="height:200px;border-radius:8px;margin-bottom:0.75rem;border:1px solid var(--border)"></div>
+    <p class="form-hint" style="margin-bottom:0.75rem">Cliquer sur la carte pour positionner le marqueur.</p>
+    <div id="modal-error" class="flash flash-error" style="display:none;margin-bottom:0.75rem"></div>
+    <div style="display:flex;gap:0.5rem">
+      <button type="button" class="btn btn-primary" onclick="submitCityModal()">💾 Create</button>
+      <button type="button" class="btn btn-secondary" onclick="closeCityModal()">Annuler</button>
+    </div>
+  </div>
+</div>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9/dist/leaflet.js"></script>
+<script>
+// -- City dropdown filtering by country ------------------------------------
+function filterCities() {
+  var country = document.getElementById('country-select').value;
+  var sel = document.getElementById('city-select');
+  var current = sel.value;
+  Array.from(sel.options).forEach(function(opt) {
+    if (!opt.value) return; // keep "— Inconnue —"
+    opt.hidden = opt.dataset.country !== country;
+  });
+  // Reset selection if current city is not in the new country
+  var currentOpt = sel.querySelector('option[value="' + current + '"]');
+  if (current && currentOpt && currentOpt.dataset.country !== country) {
+    sel.value = '';
+  }
+}
+
+// Run on load to filter to initial country
+document.addEventListener('DOMContentLoaded', filterCities);
+
+// -- Type hint ---------------------------------------------------------------
+function updateTypeHelp() {
+  var sel = document.getElementById('tournament-type');
+  var opt = sel.options[sel.selectedIndex];
+  document.getElementById('type-hint').textContent = opt.dataset.hint || '';
+}
+document.addEventListener('DOMContentLoaded', updateTypeHelp);
+
+// -- City modal ------------------------------------------------------------
+var _modalMap = null, _modalMarker = null;
+
+function openCityModal() {
+  var modal = document.getElementById('city-modal');
+  modal.style.display = 'flex';
+  // Sync country with form
+  var country = document.getElementById('country-select').value;
+  document.getElementById('modal-city-country').value = country;
+  document.getElementById('modal-error').style.display = 'none';
+
+  // Init map once
+  if (!_modalMap) {
+    _modalMap = L.map('modal-map').setView([48, 10], 4);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap'
+    }).addTo(_modalMap);
+    _modalMarker = L.marker([48, 10], { draggable: true }).addTo(_modalMap);
+    _modalMarker.on('dragend', function(e) { setModalCoords(e.target.getLatLng()); });
+    _modalMap.on('click', function(e) { _modalMarker.setLatLng(e.latlng); setModalCoords(e.latlng); });
+    document.getElementById('modal-lat').addEventListener('input', syncMarkerFromInputs);
+    document.getElementById('modal-lon').addEventListener('input', syncMarkerFromInputs);
+  }
+  setTimeout(function() { _modalMap.invalidateSize(); }, 100);
+}
+
+function setModalCoords(latlng) {
+  document.getElementById('modal-lat').value = latlng.lat.toFixed(6);
+  document.getElementById('modal-lon').value = latlng.lng.toFixed(6);
+}
+
+function syncMarkerFromInputs() {
+  var lat = parseFloat(document.getElementById('modal-lat').value);
+  var lon = parseFloat(document.getElementById('modal-lon').value);
+  if (!isNaN(lat) && !isNaN(lon)) {
+    _modalMarker.setLatLng([lat, lon]);
+    _modalMap.setView([lat, lon], _modalMap.getZoom());
+  }
+}
+
+function closeCityModal() {
+  document.getElementById('city-modal').style.display = 'none';
+}
+
+function submitCityModal() {
+  var name    = document.getElementById('modal-city-name').value.trim();
+  var country = document.getElementById('modal-city-country').value;
+  var lat     = document.getElementById('modal-lat').value;
+  var lon     = document.getElementById('modal-lon').value;
+  var errEl   = document.getElementById('modal-error');
+
+  if (!name || !lat || !lon) {
+    errEl.textContent = 'Name, latitude and longitude are required.';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  fetch('/manage/cities/create-ajax', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name: name, country: country, latitude: parseFloat(lat), longitude: parseFloat(lon) })
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    if (data.error) {
+      errEl.textContent = data.error;
+      errEl.style.display = 'block';
+      return;
+    }
+    // Add new option to city select and select it
+    var sel = document.getElementById('city-select');
+    var opt = document.createElement('option');
+    opt.value = data.id;
+    opt.textContent = data.name;
+    opt.dataset.country = data.country;
+    sel.appendChild(opt);
+    sel.value = data.id;
+    closeCityModal();
+    // Reset modal fields
+    document.getElementById('modal-city-name').value = '';
+    document.getElementById('modal-lat').value = '';
+    document.getElementById('modal-lon').value = '';
+  })
+  .catch(function() {
+    errEl.textContent = 'Erreur réseau.';
+    errEl.style.display = 'block';
+  });
+}
+
+// Close modal on backdrop click
+document.getElementById('city-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeCityModal();
+});
+</script>
+
+{% endblock %}

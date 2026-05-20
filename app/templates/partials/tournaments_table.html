@@ -17,7 +17,7 @@
 window['{{ _fv }}'] = window['{{ _fv }}'] || function() {};
 </script>
 
-<div id="{{ _badge_id }}" style="{% if not city_filter %}display:none{% endif %}" class="ville-badge">
+<div id="{{ _badge_id }}" {% if not city_filter %}style="display:none"{% endif %} class="ville-badge">
   📍 <span id="{{ _badge_nom_id }}">{{ city_filter or '' }}</span>
   <button onclick="{{ _fv }}(null)" class="ville-badge-close" title="{{ trad('tournament.clear_filter') }}">✕</button>
 </div>

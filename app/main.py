@@ -13,15 +13,220 @@ import app.models as models
 from app.routes import players, tournaments, hof, championships
 from app.routes import countries
 from app.routes import formulas
+from app.routes import manage
+from app.routes import manage_championships
 from app.i18n import templates
 from app.models import RankingHistory, Player
 from app.ranking import week_monday, ranking
 
+from sqladmin import Admin, ModelView
+from sqladmin.authentication import AuthenticationBackend
+from starlette.requests import Request as StarletteRequest
+import bcrypt
+from datetime import datetime as _dt
+
+
+class AdminAuth(AuthenticationBackend):
+    async def login(self, request: StarletteRequest) -> bool:
+        form = await request.form()
+        username = form.get("username", "")
+        password = form.get("password", "")
+
+        db = SessionLocal()
+        try:
+            from app.models import AdminUser
+            user = db.query(AdminUser).filter_by(username=username).first()
+            if not user:
+                return False
+            if not bcrypt.checkpw(password.encode(), user.password_hash.encode()):
+                return False
+            user.last_login = _dt.utcnow()
+            db.commit()
+            request.session["admin_username"] = user.username
+            request.session["admin_role"] = user.role
+            return True
+        finally:
+            db.close()
+
+    async def logout(self, request: StarletteRequest) -> bool:
+        request.session.clear()
+        return True
+
+    async def authenticate(self, request: StarletteRequest) -> bool:
+        return "admin_username" in request.session
+
+
+def _is_superadmin(request: StarletteRequest) -> bool:
+    return request.session.get("admin_role") == "superadmin"
+
+
+from app.models import (
+    Player as PlayerModel, Tournament as TournamentModel, Result as ResultModel,
+    AnonymousResult, NationalityChange, City,
+    ChampionshipSeries, Championship, ChampionshipTournament, RankingHistory as RankingHistoryModel,
+)
+
+
+class _AdminBase(ModelView):
+    """Base view: read-only for admin, full access for superadmin."""
+    def can_create(self, request: StarletteRequest) -> bool:
+        return _is_superadmin(request)
+    def can_edit(self, request: StarletteRequest) -> bool:
+        return _is_superadmin(request)
+    def can_delete(self, request: StarletteRequest) -> bool:
+        return _is_superadmin(request)
+
+
+class PlayerAdmin(_AdminBase, model=PlayerModel):
+    name = "Player"
+    name_plural = "Players"
+    icon = "fa-solid fa-user"
+    column_list = [PlayerModel.id, PlayerModel.last_name, PlayerModel.first_name,
+                   PlayerModel.nationality, PlayerModel.status]
+    column_searchable_list = [PlayerModel.id, PlayerModel.last_name, PlayerModel.first_name,
+                               PlayerModel.nationality]
+    column_sortable_list = [PlayerModel.id, PlayerModel.last_name, PlayerModel.first_name,
+                             PlayerModel.nationality, PlayerModel.status]
+    column_default_sort = [(PlayerModel.last_name, False)]
+
+
+class TournamentAdmin(_AdminBase, model=TournamentModel):
+    name = "Tournament"
+    name_plural = "Tournaments"
+    icon = "fa-solid fa-trophy"
+    column_list = [TournamentModel.id, TournamentModel.ema_id, TournamentModel.rules,
+                   TournamentModel.name, TournamentModel.city_id, TournamentModel.country,
+                   TournamentModel.start_date, TournamentModel.nb_players,
+                   TournamentModel.coefficient, TournamentModel.tournament_type,
+                   TournamentModel.status]
+    column_searchable_list = [TournamentModel.name, TournamentModel.country, TournamentModel.ema_id]
+    column_sortable_list = [TournamentModel.id, TournamentModel.ema_id, TournamentModel.rules,
+                             TournamentModel.start_date, TournamentModel.nb_players,
+                             TournamentModel.coefficient, TournamentModel.country]
+    column_default_sort = [(TournamentModel.start_date, True)]
+
+
+class ResultAdmin(_AdminBase, model=ResultModel):
+    name = "Result"
+    name_plural = "Results"
+    icon = "fa-solid fa-list-ol"
+    column_list = [ResultModel.id, ResultModel.tournament_id, ResultModel.player_id,
+                   ResultModel.position, ResultModel.points, ResultModel.ranking,
+                   ResultModel.nationality]
+    column_searchable_list = [ResultModel.player_id, ResultModel.tournament_id]
+    column_sortable_list = [ResultModel.id, ResultModel.tournament_id, ResultModel.player_id,
+                             ResultModel.position, ResultModel.ranking]
+
+
+class AnonymousResultAdmin(_AdminBase, model=AnonymousResult):
+    name = "Anonymous Result"
+    name_plural = "Anonymous Results"
+    icon = "fa-solid fa-user-secret"
+    column_list = [AnonymousResult.id, AnonymousResult.tournament_id, AnonymousResult.position,
+                   AnonymousResult.nationality, AnonymousResult.last_name, AnonymousResult.first_name]
+    column_searchable_list = [AnonymousResult.tournament_id, AnonymousResult.last_name]
+
+
+class NationalityChangeAdmin(_AdminBase, model=NationalityChange):
+    name = "Nationality Change"
+    name_plural = "Nationality Changes"
+    icon = "fa-solid fa-flag"
+    column_list = [NationalityChange.id, NationalityChange.player_id,
+                   NationalityChange.nationality_before, NationalityChange.nationality_after,
+                   NationalityChange.change_date]
+    column_searchable_list = [NationalityChange.player_id]
+    column_sortable_list = [NationalityChange.change_date, NationalityChange.player_id]
+
+
+class CityAdmin(_AdminBase, model=City):
+    name = "City"
+    name_plural = "Cities"
+    icon = "fa-solid fa-map-marker-alt"
+    column_list = [City.id, City.name, City.country, City.latitude, City.longitude]
+    column_searchable_list = [City.name, City.country]
+    column_sortable_list = [City.name, City.country]
+
+
+class ChampionshipSeriesAdmin(_AdminBase, model=ChampionshipSeries):
+    name = "Championship Series"
+    name_plural = "Championship Series"
+    icon = "fa-solid fa-medal"
+    column_list = [ChampionshipSeries.id, ChampionshipSeries.slug, ChampionshipSeries.name,
+                   ChampionshipSeries.rules, ChampionshipSeries.country]
+    column_searchable_list = [ChampionshipSeries.slug, ChampionshipSeries.name,
+                               ChampionshipSeries.country]
+
+
+class ChampionshipAdmin(_AdminBase, model=Championship):
+    name = "Championship"
+    name_plural = "Championships"
+    icon = "fa-solid fa-crown"
+    column_list = [Championship.id, Championship.series_id, Championship.year,
+                   Championship.name, Championship.formula, Championship.champion_id]
+    column_sortable_list = [Championship.year, Championship.series_id]
+
+
+class ChampionshipTournamentAdmin(_AdminBase, model=ChampionshipTournament):
+    name = "Championship Tournament"
+    name_plural = "Championship Tournaments"
+    icon = "fa-solid fa-link"
+    column_list = [ChampionshipTournament.id, ChampionshipTournament.championship_id,
+                   ChampionshipTournament.tournament_id]
+    column_searchable_list = [ChampionshipTournament.championship_id,
+                               ChampionshipTournament.tournament_id]
+
+
+class RankingHistoryAdmin(_AdminBase, model=RankingHistoryModel):
+    name = "Ranking History"
+    name_plural = "Ranking History"
+    icon = "fa-solid fa-chart-line"
+    column_list = [RankingHistoryModel.id, RankingHistoryModel.week, RankingHistoryModel.rules,
+                   RankingHistoryModel.player_id, RankingHistoryModel.position,
+                   RankingHistoryModel.score, RankingHistoryModel.nb_tournaments]
+    column_searchable_list = [RankingHistoryModel.player_id]
+    column_sortable_list = [RankingHistoryModel.week, RankingHistoryModel.rules,
+                             RankingHistoryModel.position, RankingHistoryModel.score]
+    column_default_sort = [(RankingHistoryModel.week, True), (RankingHistoryModel.position, False)]
+
+
+class AdminUserAdmin(_AdminBase, model=models.AdminUser):
+    name = "Admin User"
+    name_plural = "Admin Users"
+    icon = "fa-solid fa-shield-halved"
+    column_list = [models.AdminUser.id, models.AdminUser.username, models.AdminUser.role,
+                   models.AdminUser.countries, models.AdminUser.created_at, models.AdminUser.last_login]
+    column_sortable_list = [models.AdminUser.username, models.AdminUser.role,
+                             models.AdminUser.created_at]
+    form_excluded_columns = ["password_hash", "last_login", "created_at"]
+    def can_create(self, request: StarletteRequest) -> bool:
+        return False  # use CLI only
+    def can_edit(self, request: StarletteRequest) -> bool:
+        return False  # use CLI only
+    def can_delete(self, request: StarletteRequest) -> bool:
+        return _is_superadmin(request)
+
 if os.getenv("DATABASE_URL"):
     models.Base.metadata.create_all(bind=engine)
 
+from starlette.middleware.sessions import SessionMiddleware
+
 app = FastAPI(title="EMA Ranking")
+app.add_middleware(SessionMiddleware, secret_key=os.getenv("SECRET_KEY", "ema-admin-secret"))
 app.mount("/static", StaticFiles(directory=os.path.join(os.path.dirname(__file__), "static")), name="static")
+
+admin = Admin(app, engine, title="EMA Admin", base_url="/admin",
+              authentication_backend=AdminAuth(secret_key=os.getenv("SECRET_KEY", "ema-admin-secret")))
+admin.add_view(PlayerAdmin)
+admin.add_view(TournamentAdmin)
+admin.add_view(ResultAdmin)
+admin.add_view(AnonymousResultAdmin)
+admin.add_view(NationalityChangeAdmin)
+admin.add_view(CityAdmin)
+admin.add_view(ChampionshipSeriesAdmin)
+admin.add_view(ChampionshipAdmin)
+admin.add_view(ChampionshipTournamentAdmin)
+admin.add_view(RankingHistoryAdmin)
+admin.add_view(AdminUserAdmin)
 
 app.include_router(players.router)
 app.include_router(tournaments.router)
@@ -29,6 +234,8 @@ app.include_router(hof.router)
 app.include_router(countries.router)
 app.include_router(championships.router)
 app.include_router(formulas.router)
+app.include_router(manage.router)
+app.include_router(manage_championships.router)
 
 
 def get_rank_delta(db: Session, week: date, regles: str) -> dict:

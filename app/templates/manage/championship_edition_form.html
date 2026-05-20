@@ -1,0 +1,131 @@
+{% extends "manage/base.html" %}
+{% block title %} — {{ 'Edit' if edition else 'New' }} edition{% endblock %}
+{% block content %}
+
+<div class="manage-header">
+  <h1>{{ series.country | flag }} {{ series.name }} — {{ 'Edit edition' if edition else 'New edition' }}</h1>
+  <a href="/manage/championships/{{ series.slug }}/" class="btn btn-secondary">← Back</a>
+</div>
+
+<form method="post" class="manage-form">
+  <div class="form-grid">
+
+    <div class="form-group">
+      <label>Year *</label>
+      <input type="number" name="year" value="{{ edition.year if edition else '' }}"
+             {% if edition %}readonly{% else %}required{% endif %}
+             min="2000" max="2099" class="manage-input">
+    </div>
+
+    <div class="form-group">
+      <label>Name (optional)</label>
+      <input type="text" name="name" value="{{ edition.name if edition and edition.name else '' }}"
+             class="manage-input" placeholder="{{ series.name }} {{ edition.year if edition else '…' }}">
+      <p class="form-hint">Leave empty to use series name + year.</p>
+    </div>
+
+    <div class="form-group">
+      <label>Formula</label>
+      <select name="formula" class="manage-select" id="formula-select" onchange="updateParams()">
+        <option value="moyenne_n_meilleurs" {% if not edition or edition.formula == 'moyenne_n_meilleurs' %}selected{% endif %}>
+          Average of N best rankings
+        </option>
+      </select>
+    </div>
+
+    <div class="form-group" id="param-n-group">
+      <label>N (number of tournaments counted)</label>
+      <input type="number" name="param_n" id="param-n"
+             value="{{ (edition.params | fromjson).get('n', 3) if edition else 3 }}"
+             min="1" max="20" class="manage-input">
+      <p class="form-hint">The player's N best EMA rankings in the circuit tournaments are averaged.</p>
+    </div>
+
+    <div class="form-group">
+      <label>Champion (EMA player ID)</label>
+      <input type="text" name="champion_id" value="{{ edition.champion_id if edition and edition.champion_id else '' }}"
+             class="manage-input" placeholder="e.g. 04290031" list="players-list">
+      <datalist id="players-list">
+        {% for p in players %}
+        <option value="{{ p.id }}">{{ p.first_name | first_name }} {{ p.last_name | title }} ({{ p.nationality }})</option>
+        {% endfor %}
+      </datalist>
+    </div>
+
+    <div class="form-group">
+      <label>Champion (free text if no EMA number)</label>
+      <input type="text" name="champion_name" value="{{ edition.champion_name if edition and edition.champion_name else '' }}"
+             class="manage-input" placeholder="Last name First name">
+    </div>
+
+  </div>
+
+  <!-- Tournament links -->
+  <div class="manage-section">
+    <h2>Circuit tournaments</h2>
+    <p class="dim" style="font-size:0.85rem;margin-bottom:0.75rem">
+      Select the tournaments that are part of this edition.
+      You can also link a tournament from its edit form.
+    </p>
+
+    <div class="manage-filters" style="margin-bottom:0.75rem">
+      <input type="text" id="t-search" placeholder="Filter tournaments..." class="manage-input" oninput="filterTournaments()">
+    </div>
+
+    <div class="scroll-table" style="max-height:400px;overflow-y:auto">
+    <table id="t-table">
+      <thead>
+        <tr>
+          <th style="width:2rem"></th>
+          <th class="col-nowrap">Date</th>
+          <th>Name</th>
+          <th class="col-nowrap col-opt">City</th>
+          <th class="col-nowrap">Rules</th>
+          <th class="col-nowrap center">👥</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for t in available_tournaments %}
+      <tr data-name="{{ t.name | lower }} {{ t.city | lower }}">
+        <td>
+          <input type="checkbox" name="tournament_ids" value="{{ t.id }}"
+                 {% if t.id in linked_ids %}checked{% endif %}>
+        </td>
+        <td class="col-nowrap">{{ t.start_date.strftime('%Y-%m-%d') }}</td>
+        <td>{{ t.name }}</td>
+        <td class="col-nowrap col-opt">{{ t.city }}</td>
+        <td class="col-nowrap"><span class="badge {% if t.rules == 'MCR' %}badge-mcr{% else %}badge-rcr{% endif %}">{{ t.rules }}</span></td>
+        <td class="col-nowrap center">{{ t.nb_players }}</td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <button type="submit" class="btn btn-primary">💾 Save</button>
+    <a href="/manage/championships/{{ series.slug }}/" class="btn btn-secondary">Cancel</a>
+    {% if edition %}
+    <a href="/championships/{{ series.slug }}/{{ edition.year }}" target="_blank" class="btn btn-secondary" style="margin-left:auto">👁 View on site</a>
+    {% endif %}
+  </div>
+</form>
+
+<script>
+function filterTournaments() {
+  var q = document.getElementById('t-search').value.toLowerCase();
+  document.querySelectorAll('#t-table tbody tr').forEach(function(row) {
+    row.style.display = row.dataset.name.includes(q) ? '' : 'none';
+  });
+}
+
+function updateParams() {
+  var formula = document.getElementById('formula-select').value;
+  document.getElementById('param-n-group').style.display =
+    formula === 'moyenne_n_meilleurs' ? '' : 'none';
+}
+document.addEventListener('DOMContentLoaded', updateParams);
+</script>
+
+{% endblock %}

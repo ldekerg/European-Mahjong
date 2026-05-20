@@ -1,0 +1,61 @@
+{% extends "manage/base.html" %}
+{% block title %} — Merge cities{% endblock %}
+{% block content %}
+
+<div class="manage-header">
+  <h1>Merge cities</h1>
+  <a href="/manage/cities/" class="btn btn-secondary">← Cancel</a>
+</div>
+
+<p class="dim" style="margin-bottom:1.25rem">
+  Choose the city to <strong>keep</strong>. The others will be deleted and their tournaments reassigned to the kept city.
+</p>
+
+<form method="post" action="/manage/cities/merge">
+  {% for c in cities %}
+  <input type="hidden" name="city_ids" value="{{ c.city.id }}">
+  {% endfor %}
+
+  <div class="scroll-table" style="margin-bottom:1.5rem">
+  <table>
+    <thead>
+      <tr>
+        <th style="width:2.5rem">Keep</th>
+        <th>Name</th>
+        <th class="col-nowrap center">Country</th>
+        <th class="col-nowrap col-opt right">Lat.</th>
+        <th class="col-nowrap col-opt right">Lon.</th>
+        <th class="col-nowrap center">Tournaments</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for c in cities %}
+    <tr>
+      <td style="text-align:center">
+        <input type="radio" name="keep_id" value="{{ c.city.id }}"
+               {% if loop.first %}checked{% endif %} required>
+      </td>
+      <td><strong>{{ c.city.name }}</strong></td>
+      <td class="col-nowrap center">{{ c.city.country | flag }} {{ c.city.country }}</td>
+      <td class="col-nowrap col-opt right dim">{{ '%.4f' % c.city.latitude }}</td>
+      <td class="col-nowrap col-opt right dim">{{ '%.4f' % c.city.longitude }}</td>
+      <td class="col-nowrap center">{{ c.nb_tournaments }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+
+  <div class="flash flash-warning" style="margin-bottom:1rem">
+    ⚠️ This operation is <strong>irreversible</strong>:
+    {{ cities | length - 1 }} cit{{ 'ies' if cities | length > 2 else 'y' }} will be deleted
+    and {{ total_tournaments }} tournament{{ 's' if total_tournaments > 1 }} reassigned to the kept city.
+  </div>
+
+  <div class="form-actions">
+    <button type="submit" class="btn btn-primary">🔀 Confirm merge</button>
+    <a href="/manage/cities/" class="btn btn-secondary">Cancel</a>
+  </div>
+</form>
+
+{% endblock %}

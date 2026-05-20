@@ -431,11 +431,11 @@ def pays_detail(
     # Cities for the map
     from app.models import City
     villes_q = (
-        db.query(Tournament.city, Tournament.country, City.latitude, City.longitude,
+        db.query(City.name.label("city"), Tournament.country, City.latitude, City.longitude,
                  func.count(Tournament.id).label("nb"))
         .join(City, Tournament.city_id == City.id)
         .filter(Tournament.country == pays_nom)
-        .group_by(Tournament.city, Tournament.country, City.latitude, City.longitude)
+        .group_by(City.name, Tournament.country, City.latitude, City.longitude)
         .all()
     )
     cities = [{"city": v.city, "country": v.country, "lat": v.latitude, "lon": v.longitude, "nb": v.nb}

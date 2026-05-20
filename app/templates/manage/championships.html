@@ -1,0 +1,42 @@
+{% extends "manage/base.html" %}
+{% block title %} — Championnats{% endblock %}
+{% block content %}
+
+<div class="manage-header">
+  <h1>Championnats nationaux</h1>
+  <a href="/manage/championships/new" class="btn btn-primary">+ Nouvelle série</a>
+</div>
+
+{% if series_list %}
+<div class="scroll-table">
+<table>
+  <thead>
+    <tr>
+      <th>Nom</th>
+      <th class="col-nowrap center">Pays</th>
+      <th class="col-nowrap">Règles</th>
+      <th class="col-nowrap col-opt center">Éditions</th>
+      <th class="col-nowrap">Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for s in series_list %}
+  <tr>
+    <td><strong>{{ s.name }}</strong><br><span class="dim" style="font-size:0.8rem">{{ s.slug }}</span></td>
+    <td class="col-nowrap center">{{ s.country | flag }} {{ s.country }}</td>
+    <td class="col-nowrap"><span class="badge {% if s.rules == 'MCR' %}badge-mcr{% else %}badge-rcr{% endif %}">{{ s.rules }}</span></td>
+    <td class="col-nowrap col-opt center">{{ s.editions | length }}</td>
+    <td class="col-nowrap manage-actions-cell">
+      <a href="/manage/championships/{{ s.slug }}/" class="btn btn-sm">📋 Éditions</a>
+      <a href="/manage/championships/{{ s.slug }}/edit" class="btn btn-sm btn-secondary">✏️</a>
+    </td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% else %}
+<p class="empty">Aucune série de championnat. <a href="/manage/championships/new">Créer la première →</a></p>
+{% endif %}
+
+{% endblock %}

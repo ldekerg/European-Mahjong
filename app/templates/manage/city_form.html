@@ -1,0 +1,86 @@
+{% extends "manage/base.html" %}
+{% block title %} — {{ 'Edit' if city else 'New' }} city{% endblock %}
+{% block content %}
+
+<div class="manage-header">
+  <h1>{{ 'Edit city' if city else 'New city' }}</h1>
+  <a href="/manage/cities/" class="btn btn-secondary">← Back</a>
+</div>
+
+<form method="post" class="manage-form">
+  <div class="form-grid">
+
+    <div class="form-group">
+      <label>Name *</label>
+      <input type="text" name="name" value="{{ city.name if city else '' }}" required class="manage-input">
+    </div>
+
+    <div class="form-group">
+      <label>Country *</label>
+      <select name="country" required class="manage-select">
+        {% for code in allowed_countries %}
+        <option value="{{ code }}" {% if city and city.country == code %}selected{% endif %}>{{ code | flag }} {{ code }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Latitude *</label>
+      <input type="number" name="latitude" value="{{ city.latitude if city else '' }}"
+             required step="0.0000001" min="-90" max="90" class="manage-input" placeholder="ex: 48.8566">
+    </div>
+
+    <div class="form-group">
+      <label>Longitude *</label>
+      <input type="number" name="longitude" value="{{ city.longitude if city else '' }}"
+             required step="0.0000001" min="-180" max="180" class="manage-input" placeholder="ex: 2.3522">
+    </div>
+
+  </div>
+
+  <p class="form-hint">
+    💡 You can find coordinates on <a href="https://www.openstreetmap.org" target="_blank">OpenStreetMap</a> — right click → "Show address".
+  </p>
+
+  <!-- Live map preview -->
+  <div id="map-preview" style="height:300px;border-radius:8px;margin:1rem 0;border:1px solid var(--border)"></div>
+
+  <div class="form-actions">
+    <button type="submit" class="btn btn-primary">💾 Save</button>
+    <a href="/manage/cities/" class="btn btn-secondary">Cancel</a>
+  </div>
+</form>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9/dist/leaflet.js"></script>
+<script>
+var lat = parseFloat(document.querySelector('[name=latitude]').value) || 48.8566;
+var lng = parseFloat(document.querySelector('[name=longitude]').value) || 2.3522;
+var map = L.map('map-preview').setView([lat, lng], 6);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '© OpenStreetMap contributors'
+}).addTo(map);
+var marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+
+function updateInputs(latlng) {
+  document.querySelector('[name=latitude]').value  = latlng.lat.toFixed(4);
+  document.querySelector('[name=longitude]').value = latlng.lng.toFixed(4);
+}
+
+marker.on('dragend', function(e) { updateInputs(e.target.getLatLng()); });
+map.on('click', function(e) {
+  marker.setLatLng(e.latlng);
+  updateInputs(e.latlng);
+});
+
+document.querySelector('[name=latitude]').addEventListener('change', function() {
+  var lt = parseFloat(this.value), ln = parseFloat(document.querySelector('[name=longitude]').value);
+  if (!isNaN(lt) && !isNaN(ln)) { marker.setLatLng([lt,ln]); map.setView([lt,ln], map.getZoom()); }
+});
+document.querySelector('[name=longitude]').addEventListener('change', function() {
+  var lt = parseFloat(document.querySelector('[name=latitude]').value), ln = parseFloat(this.value);
+  if (!isNaN(lt) && !isNaN(ln)) { marker.setLatLng([lt,ln]); map.setView([lt,ln], map.getZoom()); }
+});
+</script>
+
+{% endblock %}

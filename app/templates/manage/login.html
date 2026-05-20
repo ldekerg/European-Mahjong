@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EMA Manage — Login</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="stylesheet" href="/static/manage.css">
+  <script>
+  (function () {
+    const t = localStorage.getItem('theme');
+    if (t) document.documentElement.setAttribute('data-theme', t);
+    else if (window.matchMedia('(prefers-color-scheme: dark)').matches)
+      document.documentElement.setAttribute('data-theme', 'dark');
+  })();
+  </script>
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-card">
+      <div class="login-logo">🀄</div>
+      <h1 class="login-title">EMA Manage</h1>
+      <p class="dim" style="text-align:center;margin-bottom:1.5rem">Administration interface</p>
+
+      {% if error %}
+      <div class="flash flash-error">{{ error }}</div>
+      {% endif %}
+
+      <form method="post" action="/manage/login">
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" name="username" autofocus required class="manage-input" autocomplete="username">
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" name="password" required class="manage-input" autocomplete="current-password">
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%;margin-top:0.5rem">Login</button>
+      </form>
+
+      <p style="text-align:center;margin-top:1.5rem">
+        <a href="/home" class="dim" style="font-size:0.85rem">← Back to site</a>
+      </p>
+    </div>
+  </div>
+</body>
+</html>

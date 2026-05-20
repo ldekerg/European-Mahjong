@@ -1,0 +1,77 @@
+{% extends "manage/base.html" %}
+{% block title %} — Tournaments{% endblock %}
+{% block content %}
+
+{% set base_url = '/manage/tournaments/' %}
+
+<div class="manage-header">
+  <h1>Tournaments</h1>
+  <a href="/manage/tournaments/new" class="btn btn-primary">+ New tournament</a>
+</div>
+
+<form method="get" class="manage-filters">
+  <input type="text" name="q" value="{{ q }}" placeholder="Search name, city..." class="manage-input">
+  <select name="rules" class="manage-select">
+    <option value="">All rules</option>
+    <option value="MCR" {% if rules == 'MCR' %}selected{% endif %}>MCR</option>
+    <option value="RCR" {% if rules == 'RCR' %}selected{% endif %}>RCR</option>
+  </select>
+  <select name="country" class="manage-select">
+    <option value="">All countries</option>
+    {% for c in filter_countries %}
+    <option value="{{ c }}" {% if country == c %}selected{% endif %}>{{ c | flag }} {{ c }}</option>
+    {% endfor %}
+  </select>
+  <input type="hidden" name="sort" value="{{ sort }}">
+  <input type="hidden" name="asc" value="{{ asc }}">
+  <button type="submit" class="btn">Filter</button>
+  <a href="/manage/tournaments/" class="btn btn-secondary">Reset</a>
+</form>
+
+<div class="scroll-table">
+<table>
+  <thead>
+    <tr>
+      {% set _col='ema_id' %}{% set _label='EMA ID' %}{% set _cls='col-nowrap col-opt' %}{% include 'manage/partials/sortable_th.html' %}
+      <th class="col-nowrap"></th>
+      {% set _col='name' %}{% set _label='Name' %}{% set _cls='' %}{% include 'manage/partials/sortable_th.html' %}
+      {% set _col='city' %}{% set _label='City' %}{% set _cls='col-nowrap col-opt' %}{% include 'manage/partials/sortable_th.html' %}
+      {% set _col='country' %}{% set _label='Country' %}{% set _cls='col-nowrap col-opt center' %}{% include 'manage/partials/sortable_th.html' %}
+      {% set _col='date' %}{% set _label='Date' %}{% set _cls='col-nowrap' %}{% include 'manage/partials/sortable_th.html' %}
+      {% set _col='players' %}{% set _label='👥' %}{% set _cls='col-nowrap col-opt center' %}{% include 'manage/partials/sortable_th.html' %}
+      {% set _col='coeff' %}{% set _label='⚖️' %}{% set _cls='col-nowrap col-opt center' %}{% include 'manage/partials/sortable_th.html' %}
+      <th class="col-nowrap">Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for t in tournaments %}
+  <tr>
+    <td class="col-nowrap col-opt dim">{{ t.ema_id or '—' }}</td>
+    <td class="col-nowrap"><span class="badge {% if t.rules == 'MCR' %}badge-mcr{% else %}badge-rcr{% endif %}">{{ t.rules }}</span></td>
+    <td><a href="/tournaments/{{ t.rules }}_{{ t.ema_id }}" target="_blank">{{ t.name }}</a></td>
+    <td class="col-nowrap col-opt">{{ t.city }}</td>
+    <td class="col-nowrap col-opt center">{{ t.country | flag }} {{ t.country }}</td>
+    <td class="col-nowrap">{{ t.start_date.strftime('%d/%m/%y') }}</td>
+    <td class="col-nowrap col-opt center dim">{{ t.nb_players }}</td>
+    <td class="col-nowrap col-opt center dim">{{ t.coefficient }}</td>
+    <td class="col-nowrap manage-actions-cell">
+      <a href="/manage/tournaments/{{ t.id }}/edit" class="btn btn-sm" title="Edit">✏️</a>
+      <a href="/manage/tournaments/{{ t.id }}/results" class="btn btn-sm btn-secondary" title="Results">📥</a>
+    </td>
+  </tr>
+  {% else %}
+  <tr><td colspan="9" class="empty">No tournaments found.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+
+{% if total_pages > 1 %}
+<div class="manage-pagination">
+  {% if page > 1 %}<a href="?{{ qs }}&sort={{ sort }}&asc={{ asc }}&page={{ page - 1 }}" class="btn btn-sm">‹ Previous</a>{% endif %}
+  <span class="dim">Page {{ page }} / {{ total_pages }}</span>
+  {% if page < total_pages %}<a href="?{{ qs }}&sort={{ sort }}&asc={{ asc }}&page={{ page + 1 }}" class="btn btn-sm">Next ›</a>{% endif %}
+</div>
+{% endif %}
+
+{% endblock %}

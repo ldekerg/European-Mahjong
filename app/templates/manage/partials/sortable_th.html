@@ -1,0 +1,23 @@
+{#
+  Sortable column header for manage tables.
+  Variables required in calling context:
+    sort      — current sort column key
+    asc       — current sort direction (1=asc, 0=desc)
+    qs        — base query string (without sort/asc/page)
+    base_url  — base URL path (e.g. '/manage/tournaments/')
+  Usage:
+    {% set _col='name' %}{% set _label='Nom' %}{% set _cls='' %}
+    {% include 'manage/partials/sortable_th.html' %}
+#}
+{% set _active = (sort == _col) %}
+{% set _next_asc = 0 if (_active and asc) else 1 %}
+{% set _href = base_url ~ '?' ~ (qs ~ '&' if qs else '') ~ 'sort=' ~ _col ~ '&asc=' ~ _next_asc %}
+<th class="sortable-th {{ _cls | default('') }}">
+  <a href="{{ _href }}" class="th-sort-link">{{ _label }}
+    {% if _active %}
+      <span class="sort-arrow">{{ '▲' if asc else '▼' }}</span>
+    {% else %}
+      <span class="sort-arrow dim">⇅</span>
+    {% endif %}
+  </a>
+</th>

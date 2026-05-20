@@ -23,7 +23,25 @@ from bs4 import BeautifulSoup
 from sqlalchemy.orm import Session
 
 from app.database import engine, SessionLocal
-from app.models import Base, Player, Tournament, Result, AnonymousResult
+from app.models import Base, Player, Tournament, Result, AnonymousResult, City
+from app.i18n import _PAYS_ISO
+
+
+def _resolve_city_id(db, city_name: str, country_raw: str) -> int | None:
+    """Find city_id by name + ISO country code, or return None."""
+    if not city_name:
+        return None
+    # Normalize country to ISO 2-letter code
+    iso = country_raw.strip().upper()
+    if len(iso) != 2:
+        iso = _PAYS_ISO.get(country_raw.strip().lower(), "")
+    if not iso:
+        return None
+    city = db.query(City).filter(
+        City.name == city_name.strip(),
+        City.country == iso,
+    ).first()
+    return city.id if city else None
 
 Base.metadata.create_all(bind=engine)
 
@@ -196,7 +214,9 @@ def parse_tournament(html: str, tournament_id: int) -> dict | None:
                 if "," in parts:
                     lieu, pays_full = parts.split(",", 1)
                     lieu = lieu.strip()
-                    pays = pays_full.strip()
+                    pays_full = pays_full.strip()
+                    # Normalize to ISO 2-letter code
+                    pays = _PAYS_ISO.get(pays_full.lower(), pays_full.upper()[:2])
                 else:
                     lieu = parts
             break
@@ -334,7 +354,9 @@ def import_tournament(db: Session, data: dict, reset: bool = False):
         reset_tournament(db, tournoi.id)
     if not tournoi:
         tournoi = Tournament(
-            ema_id=data["ema_id"], name=data["name"], city=data["city"], country=data["country"],
+            ema_id=data["ema_id"], name=data["name"],
+            city_id=_resolve_city_id(db, data["city"], data["country"]),
+            country=data["country"],
             start_date=data["start_date"], end_date=data["end_date"],
             nb_players=data["nb_players"], coefficient=data["coefficient"],
             rules=data["rules"],
@@ -352,8 +374,8 @@ def import_tournament(db: Session, data: dict, reset: bool = False):
         if doublon_cal:
             db.delete(doublon_cal)
     else:
-        tournoi.name = data["name"]
-        tournoi.city = data["city"]
+        tournoi.name    = data["name"]
+        tournoi.city_id = _resolve_city_id(db, data["city"], data["country"])
         tournoi.country = data["country"]
         tournoi.start_date = data["start_date"]
         tournoi.end_date = data["end_date"]
@@ -370,11 +392,14 @@ def import_tournament(db: Session, data: dict, reset: bool = False):
             ).first()
             if not existing_anon:
                 db.add(AnonymousResult(
-                    tournament_id  = tournoi.id,
-                    position    = r["position"],
-                    nationality = r["nationality"] or None,
-                    last_name   = r["name"] or None,
-                    first_name  = r["first_name"] or None,
+                    tournament_id = tournoi.id,
+                    position      = r["position"],
+                    nationality   = r["nationality"] or None,
+                    last_name     = r["name"] or None,
+                    first_name    = r["first_name"] or None,
+                    points        = r.get("points"),
+                    mahjong       = r.get("mahjong"),
+                    ranking       = r.get("ranking"),
                 ))
             else:
                 if not existing_anon.nationality and r["nationality"]:
@@ -383,6 +408,12 @@ def import_tournament(db: Session, data: dict, reset: bool = False):
                     existing_anon.last_name = r["name"]
                 if not existing_anon.first_name and r["first_name"]:
                     existing_anon.first_name = r["first_name"]
+                if r.get("points") is not None:
+                    existing_anon.points  = r["points"]
+                if r.get("mahjong") is not None:
+                    existing_anon.mahjong = r["mahjong"]
+                if r.get("ranking") is not None:
+                    existing_anon.ranking = r["ranking"]
             continue
 
         joueur = db.query(Player).filter(Player.id == r["player_id"]).first()

@@ -11,7 +11,7 @@ import urllib.request, ssl
 from datetime import date, timedelta
 from bs4 import BeautifulSoup
 from app.database import SessionLocal
-from app.models import Tournament
+from app.models import Tournament, City
 
 URL = "http://mahjong-europe.org/ranking/Calendar.html"
 
@@ -157,7 +157,7 @@ def parse_calendar(html: str) -> list[dict]:
         else:
             approbation = "ok"
 
-        pays = ISO_PAYS.get(nat_iso, lieu)
+        pays = nat_iso.upper()  # store as ISO 2-letter code
 
         # ema_id from results link
         ema_id = None
@@ -239,20 +239,21 @@ def run():
             continue
 
         # New calendar tournament
+        city_obj = db.query(City).filter_by(name=e["city"], country=e["country"]).first()
         db.add(Tournament(
-            ema_id       = e["ema_id"],
-            rules         = e["rules"],
-            name          = e["name"],
-            city          = e["city"],
-            country       = e["country"],
-            start_date    = e["start_date"],
-            end_date      = e["end_date"],
-            nb_players   = 0,
-            coefficient  = 0.0,
+            ema_id          = e["ema_id"],
+            rules           = e["rules"],
+            name            = e["name"],
+            city_id         = city_obj.id if city_obj else None,
+            country         = e["country"],
+            start_date      = e["start_date"],
+            end_date        = e["end_date"],
+            nb_players      = 0,
+            coefficient     = 0.0,
             tournament_type = e["tournament_type"],
-            status        = "calendrier",
-            approval      = e["approval"],
-            website       = e["website"],
+            status          = "calendrier",
+            approval        = e["approval"],
+            website         = e["website"],
         ))
         print(f"  + {e['rules']} {e['start_date']} {e['name']}")
         inseres += 1

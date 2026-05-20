@@ -1,0 +1,66 @@
+{% extends "manage/base.html" %}
+{% block title %} — Players{% endblock %}
+{% block content %}
+
+{% set base_url = '/manage/players/' %}
+
+<div class="manage-header">
+  <h1>Players</h1>
+  <a href="/manage/players/new" class="btn btn-primary">+ New player</a>
+</div>
+
+<form method="get" class="manage-filters">
+  <input type="text" name="q" value="{{ q }}" placeholder="Search name, first name, ID..." class="manage-input">
+  <select name="country" class="manage-select">
+    <option value="">All countries</option>
+    {% for c in filter_countries %}
+    <option value="{{ c }}" {% if country == c %}selected{% endif %}>{{ c | flag }} {{ c }}</option>
+    {% endfor %}
+  </select>
+  <input type="hidden" name="sort" value="{{ sort }}">
+  <input type="hidden" name="asc" value="{{ asc }}">
+  <button type="submit" class="btn">Filter</button>
+  <a href="/manage/players/" class="btn btn-secondary">Reset</a>
+</form>
+
+<div class="scroll-table">
+<table>
+  <thead>
+    <tr>
+      {% set _col='id' %}{% set _label='EMA ID' %}{% set _cls='col-nowrap' %}{% include 'manage/partials/sortable_th.html' %}
+      {% set _col='name' %}{% set _label='Last name' %}{% set _cls='' %}{% include 'manage/partials/sortable_th.html' %}
+      {% set _col='first_name' %}{% set _label='First name' %}{% set _cls='col-opt' %}{% include 'manage/partials/sortable_th.html' %}
+      {% set _col='nationality' %}{% set _label='Nat.' %}{% set _cls='col-nowrap center' %}{% include 'manage/partials/sortable_th.html' %}
+      {% set _col='status' %}{% set _label='Status' %}{% set _cls='col-nowrap col-opt' %}{% include 'manage/partials/sortable_th.html' %}
+      <th class="col-nowrap">Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for p in players %}
+  <tr>
+    <td class="col-nowrap dim">{{ p.id }}</td>
+    <td>{{ p.last_name | title }}</td>
+    <td class="col-opt">{{ p.first_name | first_name }}</td>
+    <td class="col-nowrap center">{{ p.nationality | flag }} {{ p.nationality }}</td>
+    <td class="col-nowrap col-opt"><span class="badge" style="background:var(--bg3);font-size:0.75rem">{{ p.status }}</span></td>
+    <td class="col-nowrap manage-actions-cell">
+      <a href="/manage/players/{{ p.id }}/edit" class="btn btn-sm" title="Edit">✏️</a>
+      <a href="/players/{{ p.id }}" target="_blank" class="btn btn-sm btn-secondary" title="View">👁</a>
+    </td>
+  </tr>
+  {% else %}
+  <tr><td colspan="6" class="empty">No players found.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+
+{% if total_pages > 1 %}
+<div class="manage-pagination">
+  {% if page > 1 %}<a href="?{{ qs }}&sort={{ sort }}&asc={{ asc }}&page={{ page - 1 }}" class="btn btn-sm">‹ Previous</a>{% endif %}
+  <span class="dim">Page {{ page }} / {{ total_pages }}</span>
+  {% if page < total_pages %}<a href="?{{ qs }}&sort={{ sort }}&asc={{ asc }}&page={{ page + 1 }}" class="btn btn-sm">Next ›</a>{% endif %}
+</div>
+{% endif %}
+
+{% endblock %}
