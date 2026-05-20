@@ -1,6 +1,10 @@
 from fastapi import FastAPI, Request, Query, Depends
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
 import sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
@@ -210,7 +214,13 @@ if os.getenv("DATABASE_URL"):
 
 from starlette.middleware.sessions import SessionMiddleware
 
+# Rate limiter — 30 req/min per IP, applied only to public routes
+limiter = Limiter(key_func=get_remote_address, default_limits=[])
+
 app = FastAPI(title="EMA Ranking")
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+app.add_middleware(SlowAPIMiddleware)
 app.add_middleware(SessionMiddleware, secret_key=os.getenv("SECRET_KEY", "ema-admin-secret"))
 app.mount("/static", StaticFiles(directory=os.path.join(os.path.dirname(__file__), "static")), name="static")
 
@@ -297,6 +307,34 @@ def get_week_ranking(db: Session, week: date, regles: str) -> list:
         for r in raw
         if r["player_id"] in players_map
     ]
+
+
+PUBLIC_PREFIXES = ("/home", "/ranking", "/players", "/tournaments", "/countries",
+                   "/hof", "/championships", "/formulas", "/classement", "/accueil",
+                   "/joueurs", "/tournois", "/pays", "/palmares")
+
+# Simple in-memory rate limiter: 30 req/min per IP on public routes
+import time, collections
+_rl_store: dict = collections.defaultdict(list)
+_rl_limit = 30
+_rl_window = 60  # seconds
+
+@app.middleware("http")
+async def rate_limit_public(request: Request, call_next):
+    path = request.url.path
+    if any(path.startswith(p) for p in PUBLIC_PREFIXES):
+        ip = get_remote_address(request)
+        now = time.time()
+        window_start = now - _rl_window
+        _rl_store[ip] = [t for t in _rl_store[ip] if t > window_start]
+        if len(_rl_store[ip]) >= _rl_limit:
+            return JSONResponse(
+                {"detail": "Too many requests. Please slow down."},
+                status_code=429,
+                headers={"Retry-After": "60"},
+            )
+        _rl_store[ip].append(now)
+    return await call_next(request)
 
 
 @app.get("/home")
