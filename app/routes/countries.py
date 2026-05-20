@@ -114,8 +114,8 @@ def _pays_name(code: str) -> str:
 
 
 def _pays_tournois_name(code: str) -> str:
-    """Returns the country name as it appears in the tournaments table."""
-    return ISO_NOM_PAYS.get(code.upper(), code)
+    """Returns the ISO code as stored in the tournaments table."""
+    return code.upper()
 
 
 def _ranking_pays(db, week, regles, code):
