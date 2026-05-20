@@ -481,3 +481,55 @@ def accueil(
 @app.get("/")
 def root():
     return RedirectResponse(url="/home")
+
+
+# ---------------------------------------------------------------------------
+# Legacy URL redirections (old French route names)
+# ---------------------------------------------------------------------------
+
+@app.get("/classement")
+def legacy_classement(request: Request):
+    # Preserve query params: ?joueur=X&regles=Y&semaine=Z → /ranking?player_filter=X&rules=Y&week=Z
+    p = request.query_params
+    params = {}
+    if p.get("joueur"):       params["player_filter"] = p["joueur"]
+    if p.get("regles"):       params["rules"]         = p["regles"]
+    if p.get("semaine"):      params["week"]           = p["semaine"]
+    qs = "&".join(f"{k}={v}" for k, v in params.items())
+    return RedirectResponse(f"/ranking{'?' + qs if qs else ''}", status_code=301)
+
+@app.get("/accueil")
+def legacy_accueil():
+    return RedirectResponse("/home", status_code=301)
+
+@app.get("/joueurs")
+@app.get("/joueurs/")
+def legacy_joueurs():
+    return RedirectResponse("/players/", status_code=301)
+
+@app.get("/joueurs/{player_id}")
+def legacy_joueur(player_id: str):
+    return RedirectResponse(f"/players/{player_id}", status_code=301)
+
+@app.get("/tournois")
+@app.get("/tournois/")
+def legacy_tournois():
+    return RedirectResponse("/tournaments/", status_code=301)
+
+@app.get("/tournois/{path:path}")
+def legacy_tournoi(path: str):
+    return RedirectResponse(f"/tournaments/{path}", status_code=301)
+
+@app.get("/pays")
+@app.get("/pays/")
+def legacy_pays():
+    return RedirectResponse("/countries/", status_code=301)
+
+@app.get("/pays/{code}")
+def legacy_pays_detail(code: str):
+    return RedirectResponse(f"/countries/{code}", status_code=301)
+
+@app.get("/palmares")
+@app.get("/palmares/")
+def legacy_palmares():
+    return RedirectResponse("/hof/", status_code=301)
