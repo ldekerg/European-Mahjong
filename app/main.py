@@ -220,8 +220,8 @@ limiter = Limiter(key_func=get_remote_address, default_limits=[])
 app = FastAPI(title="EMA Ranking")
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
-app.add_middleware(SlowAPIMiddleware)
 app.add_middleware(SessionMiddleware, secret_key=os.getenv("SECRET_KEY", "ema-admin-secret"))
+app.add_middleware(SlowAPIMiddleware)
 app.mount("/static", StaticFiles(directory=os.path.join(os.path.dirname(__file__), "static")), name="static")
 
 admin = Admin(app, engine, title="EMA Admin", base_url="/admin",
@@ -348,8 +348,8 @@ async def captcha_and_rate_limit(request: Request, call_next):
             )
         _rl_store[ip].append(now)
 
-        # 2. Turnstile captcha — only if secret is configured
-        if _TURNSTILE_SECRET and request.session.get("human") != "true":
+        # 2. Turnstile captcha — check via cookie directly (session not yet available in middleware)
+        if _TURNSTILE_SECRET and request.cookies.get("human_verified") != "true":
             next_url = str(request.url)
             return RedirectResponse(f"/verify?next={urllib.parse.quote(next_url)}", status_code=302)
 
@@ -389,8 +389,10 @@ async def verify_post(request: Request):
         verified = True
 
     if verified:
-        request.session["human"] = "true"
-        return RedirectResponse(next_url, status_code=302)
+        response = RedirectResponse(next_url, status_code=302)
+        # Cookie de session navigateur (expire à la fermeture du navigateur)
+        response.set_cookie("human_verified", "true", httponly=True, samesite="lax")
+        return response
 
     return RedirectResponse(f"/verify?next={urllib.parse.quote(next_url)}", status_code=302)
 
