@@ -26,11 +26,23 @@ def _chart_joueurs_liste(db):
         ORDER BY ch.week
     ''')).fetchall()
 
+    # Unique players (MCR or RCR) per week
+    rows_all = db.execute(text('''
+        SELECT ch.week, COUNT(DISTINCT ch.player_id) AS nb
+        FROM ranking_history ch
+        JOIN players j ON j.id = ch.player_id
+        WHERE j.nationality NOT IN ('', 'GUEST')
+        GROUP BY ch.week
+        ORDER BY ch.week
+    ''')).fetchall()
+
     by_rules: dict = defaultdict(dict)
     weeks_set: set = set()
     for sem, r, nb in rows:
         by_rules[r][sem] = nb
         weeks_set.add(sem)
+
+    all_weeks: dict = {sem: nb for sem, nb in rows_all}
 
     labels = sorted(weeks_set)
     mcr = by_rules['MCR']
@@ -40,7 +52,7 @@ def _chart_joueurs_liste(db):
         'labels': [s.isoformat() if hasattr(s, 'isoformat') else str(s) for s in labels],
         'datasets': [
             {'label': 'Tout', 'cssColor': '--chart-tout', 'width': 2.5,
-             'data': [mcr.get(s, 0) + rcr.get(s, 0) for s in labels]},
+             'data': [all_weeks.get(s, 0) for s in labels]},
             {'label': 'MCR',  'cssColor': '--chart-mcr',  'width': 2,
              'data': [mcr.get(s, 0) for s in labels]},
             {'label': 'RCR',  'cssColor': '--chart-rcr',  'width': 2,
@@ -63,11 +75,22 @@ def _chart_joueurs_detail(db, code):
         ORDER BY ch.week
     '''), {'c': code}).fetchall()
 
+    rows_all = db.execute(text('''
+        SELECT ch.week, COUNT(DISTINCT ch.player_id) AS nb
+        FROM ranking_history ch
+        JOIN players j ON j.id = ch.player_id
+        WHERE j.nationality = :c
+        GROUP BY ch.week
+        ORDER BY ch.week
+    '''), {'c': code}).fetchall()
+
     by_rules: dict = defaultdict(dict)
     weeks_set: set = set()
     for sem, r, nb in rows:
         by_rules[r][sem] = nb
         weeks_set.add(sem)
+
+    all_weeks: dict = {sem: nb for sem, nb in rows_all}
 
     labels = sorted(weeks_set)
     mcr = by_rules['MCR']
@@ -77,7 +100,7 @@ def _chart_joueurs_detail(db, code):
         'labels': [s.isoformat() if hasattr(s, 'isoformat') else str(s) for s in labels],
         'datasets': [
             {'label': 'Tout', 'cssColor': '--chart-tout', 'width': 2,
-             'data': [mcr.get(s, 0) + rcr.get(s, 0) for s in labels]},
+             'data': [all_weeks.get(s, 0) for s in labels]},
             {'label': 'MCR',  'cssColor': '--chart-mcr',  'width': 2,
              'data': [mcr.get(s, 0) for s in labels]},
             {'label': 'RCR',  'cssColor': '--chart-rcr',  'width': 2,
