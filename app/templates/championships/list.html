@@ -15,10 +15,10 @@
   {% set _ = par_pays[s.country].append(s) %}
 {% endfor %}
 
-{% for pays_code, liste in par_pays.items() %}
+{% for country_code, liste in par_pays.items() %}
 <div style="margin-bottom:2rem">
   <h2 style="display:flex;align-items:center;gap:0.5rem">
-    {{ pays_code | flag }} {{ pays_code }}
+    {{ country_code | flag }} {{ country_code }}
   </h2>
   <div class="stats-grid">
     {% for s in liste %}

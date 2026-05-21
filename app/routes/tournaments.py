@@ -13,12 +13,12 @@ router = APIRouter(prefix="/tournaments")
 from app.i18n import templates, PAYS_EMA
 
 
-def _incomplets_ids(db, tournoi_ids: list) -> set:
+def _incomplete_ids(db, tournament_ids: list) -> set:
     """IDs of tournaments with at least one anonymous European player without a name (unidentified EMA player)."""
-    if not tournoi_ids:
+    if not tournament_ids:
         return set()
     rows = db.query(AnonymousResult.tournament_id).filter(
-        AnonymousResult.tournament_id.in_(tournoi_ids),
+        AnonymousResult.tournament_id.in_(tournament_ids),
         AnonymousResult.nationality.in_(PAYS_EMA),
         AnonymousResult.first_name.is_(None),
         AnonymousResult.last_name.is_(None),
@@ -26,7 +26,7 @@ def _incomplets_ids(db, tournoi_ids: list) -> set:
     return {row.tournament_id for row in rows}
 
 
-def _tournois_tab(db, rules: str, view: str, sort: str, asc: int, city) -> dict:
+def _tournaments_tab(db, rules: str, view: str, sort: str, asc: int, city) -> dict:
     from sqlalchemy import func
     week = week_monday(date.today())
     active_ids = {t.id: c for t, c in active_tournaments(db, week, rules)}
@@ -48,7 +48,7 @@ def _tournois_tab(db, rules: str, view: str, sort: str, asc: int, city) -> dict:
     q = q.order_by(col if asc else col.desc())
     if city:
         q = q.filter(City.name == city)
-    tournois_list = q.filter(Tournament.start_date != date(1900, 1, 1)).all()
+    tournaments_list = q.filter(Tournament.start_date != date(1900, 1, 1)).all()
 
     vq = db.query(
         City.name.label("city"), Tournament.country, City.latitude, City.longitude,
@@ -67,26 +67,25 @@ def _tournois_tab(db, rules: str, view: str, sort: str, asc: int, city) -> dict:
               for v in vq.group_by(City.name, Tournament.country,
                                     City.latitude, City.longitude).all()]
 
-    # Map bounds: fitBounds on all if view=speciaux, otherwise Europe by default
-    carte_bounds = None
+    map_bounds = None
     if view == "speciaux" and cities:
         lats = [v["lat"] for v in cities]
         lons = [v["lon"] for v in cities]
-        carte_bounds = [[min(lats), min(lons)], [max(lats), max(lons)]]
+        map_bounds = [[min(lats), min(lons)], [max(lats), max(lons)]]
 
-    incomplete = _incomplets_ids(db, [t.id for t in tournois_list])
+    incomplete = _incomplete_ids(db, [t.id for t in tournaments_list])
 
     return {
-        "tournaments":     tournois_list,
+        "tournaments":  tournaments_list,
         "active_ids":   active_ids,
         "cities":       cities,
-        "carte_bounds": carte_bounds,
+        "carte_bounds": map_bounds,
         "incomplete":   incomplete,
     }
 
 
 @router.get("/")
-def liste_tournois(
+def list_tournaments(
     request: Request,
     view: str = Query("all"),
     sort: str = Query("date"),
@@ -94,8 +93,8 @@ def liste_tournois(
     city: Optional[str] = Query(None),
     db: Session = Depends(get_db),
 ):
-    mcr = _tournois_tab(db, "MCR", view, sort, asc, city)
-    rcr = _tournois_tab(db, "RCR", view, sort, asc, city)
+    mcr = _tournaments_tab(db, "MCR", view, sort, asc, city)
+    rcr = _tournaments_tab(db, "RCR", view, sort, asc, city)
 
     return templates.TemplateResponse(request, "tournaments/list.html", {
         "mcr": mcr,
@@ -110,11 +109,10 @@ def liste_tournois(
 
 
 @router.get("/calendar")
-def calendrier(request: Request, db: Session = Depends(get_db)):
+def calendar(request: Request, db: Session = Depends(get_db)):
     from collections import defaultdict
-    from datetime import date as _date
 
-    tournois = (
+    tournaments = (
         db.query(Tournament)
         .filter(Tournament.status == "calendrier")
         .order_by(Tournament.start_date)
@@ -122,14 +120,14 @@ def calendrier(request: Request, db: Session = Depends(get_db)):
     )
 
     by_month = defaultdict(list)
-    for t in tournois:
+    for t in tournaments:
         by_month[(t.start_date.year, t.start_date.month)].append(t)
 
     from app.i18n import _LOCALES, _detect_lang
     lang = _detect_lang(request)
     months = _LOCALES.get(lang, _LOCALES.get("fr", {})).get("common", {}).get("months", [])
 
-    tournois_par_mois = [
+    tournaments_by_month = [
         {"label": f"{months[m-1]} {y}" if months else f"{m}/{y}", "tournaments": ts}
         for (y, m), ts in sorted(by_month.items())
     ]
@@ -144,112 +142,106 @@ def calendrier(request: Request, db: Session = Depends(get_db)):
     recent_ids = [t.id for t in recent]
 
     return templates.TemplateResponse(request, "tournaments/calendar.html", {
-        "tournois_par_mois": tournois_par_mois,
-        "nb_total": len(tournois),
+        "tournois_par_mois": tournaments_by_month,
+        "nb_total": len(tournaments),
         "recent": recent,
         "recent_ids": recent_ids,
     })
 
 
-
 @router.get("/{rules}_{ema_id}")
-def detail_tournoi_ema(rules: str, ema_id: int, request: Request, db: Session = Depends(get_db)):
-    tournoi = db.query(Tournament).filter(Tournament.ema_id == ema_id, Tournament.rules == rules.upper()).first()
-    if not tournoi:
+def tournament_detail_ema(rules: str, ema_id: int, request: Request, db: Session = Depends(get_db)):
+    tournament = db.query(Tournament).filter(Tournament.ema_id == ema_id, Tournament.rules == rules.upper()).first()
+    if not tournament:
         return templates.TemplateResponse(request, "404.html", status_code=404)
-    return detail_tournoi(tournoi.id, request, db)
+    return tournament_detail(tournament.id, request, db)
 
 
 @router.get("/{tournament_id}")
-def detail_tournoi(tournament_id: int, request: Request, db: Session = Depends(get_db)):
+def tournament_detail(tournament_id: int, request: Request, db: Session = Depends(get_db)):
     from collections import Counter
-    tournoi = db.query(Tournament).filter(Tournament.id == tournament_id).first()
-    if not tournoi:
+    tournament = db.query(Tournament).filter(Tournament.id == tournament_id).first()
+    if not tournament:
         return templates.TemplateResponse(request, "404.html", status_code=404)
-    resultats_identifies = (
+
+    identified_results = (
         db.query(Result)
         .filter(Result.tournament_id == tournament_id)
         .order_by(Result.position)
         .all()
     )
-    resultats_anonymes = (
+    anonymous_results = (
         db.query(AnonymousResult)
         .filter(AnonymousResult.tournament_id == tournament_id)
         .order_by(AnonymousResult.position)
         .all()
     )
-    joueurs = db.query(Player).order_by(Player.last_name).all()
-    players_map = {j.id: j for j in joueurs}
+    players = db.query(Player).order_by(Player.last_name).all()
+    players_map = {p.id: p for p in players}
 
-    # Unified list sorted by position: each entry has the fields needed by the template
-    def _as_row(r, joueur=None):
+    def _as_row(r, player=None):
         return {
             "position":    r.position,
             "nationality": r.nationality or "",
-            "player":      joueur,
+            "player":      player,
             "ranking":     getattr(r, "ranking", None),
             "points":      getattr(r, "points", None),
             "mahjong":     getattr(r, "mahjong", None),
-            "anonyme":     joueur is None,
-            "first_name":      getattr(r, "first_name", None) or (joueur.first_name if joueur else ""),
-            "name":         getattr(r, "last_name", None)    or (joueur.last_name    if joueur else ""),
+            "anonyme":     player is None,
+            "first_name":  getattr(r, "first_name", None) or (player.first_name if player else ""),
+            "name":        getattr(r, "last_name", None)   or (player.last_name  if player else ""),
         }
 
-    resultats_unifies = sorted(
-        [_as_row(r, players_map.get(r.player_id)) for r in resultats_identifies]
-        + [_as_row(r) for r in resultats_anonymes],
+    unified_results = sorted(
+        [_as_row(r, players_map.get(r.player_id)) for r in identified_results]
+        + [_as_row(r) for r in anonymous_results],
         key=lambda x: x["position"],
     )
 
-    # For backward compatibility with the rest of the template (podium, pays_stats, etc.)
-    results = resultats_identifies
-
-    # Stats by country (identified + anonymous with flag)
     nat_list = [
         players_map[r.player_id].nationality
-        for r in resultats_identifies
+        for r in identified_results
         if r.player_id in players_map
     ] + [
-        r.nationality for r in resultats_anonymes if r.nationality
+        r.nationality for r in anonymous_results if r.nationality
     ]
-    pays_count = Counter(nat_list)
-    pays_stats = sorted(
-        [{"code": k, "nb": v} for k, v in pays_count.items() if k and k != "GUEST"],
+    country_count = Counter(nat_list)
+    country_stats = sorted(
+        [{"code": k, "nb": v} for k, v in country_count.items() if k and k != "GUEST"],
         key=lambda x: -x["nb"]
     )
 
-    # Podium: top 3 with medal rank (how many times this player finished at this position before)
     from sqlalchemy import text as _text
     podium = []
-    positions_podium = set()
+    podium_positions = set()
 
-    for r in resultats_identifies:
+    for r in identified_results:
         if r.position > 3:
             break
-        j = players_map.get(r.player_id)
-        if not j:
+        p = players_map.get(r.player_id)
+        if not p:
             continue
-        rang_med = db.execute(_text('''
+        medal_rank = db.execute(_text('''
             SELECT COUNT(*) FROM results r2
             JOIN tournaments t2 ON t2.id = r2.tournament_id
-            WHERE r2.player_id = :jid
+            WHERE r2.player_id = :pid
               AND r2.position = :pos
-              AND t2.rules   = :reg
+              AND t2.rules   = :rules
               AND t2.start_date < :ddate
-        '''), {"jid": r.player_id, "pos": r.position,
-               "reg": tournoi.rules, "ddate": tournoi.start_date}).scalar() or 0
+        '''), {"pid": r.player_id, "pos": r.position,
+               "rules": tournament.rules, "ddate": tournament.start_date}).scalar() or 0
         podium.append({
             "position":      r.position,
-            "player":        j,
-            "rang_medaille": rang_med + 1,
+            "player":        p,
+            "rang_medaille": medal_rank + 1,
             "anonyme":       False,
         })
-        positions_podium.add(r.position)
+        podium_positions.add(r.position)
 
-    for r in resultats_anonymes:
+    for r in anonymous_results:
         if r.position > 3:
             continue
-        if r.position in positions_podium:
+        if r.position in podium_positions:
             continue
         podium.append({
             "position":      r.position,
@@ -257,48 +249,46 @@ def detail_tournoi(tournament_id: int, request: Request, db: Session = Depends(g
             "rang_medaille": None,
             "anonyme":       True,
             "nationality":   r.nationality or "",
-            "first_name":        r.first_name or "",
-            "name":           r.last_name or "",
+            "first_name":    r.first_name or "",
+            "name":          r.last_name or "",
         })
-        positions_podium.add(r.position)
+        podium_positions.add(r.position)
 
     podium.sort(key=lambda x: x["position"])
 
-    nb_resultats = len(resultats_identifies) + len(resultats_anonymes)
-    nb_anon_europeens = sum(
-        1 for r in resultats_anonymes
+    num_results = len(identified_results) + len(anonymous_results)
+    num_anonymous_europeans = sum(
+        1 for r in anonymous_results
         if r.nationality and r.nationality.upper() in PAYS_EMA
         and not (r.first_name or r.last_name)
-    )  # PAYS_EMA defined at module level
-    resultats_incomplets = nb_anon_europeens > 0
+    )
+    incomplete_results = num_anonymous_europeans > 0
 
-    # Championship this tournament belongs to (if any)
     from app.models import ChampionshipTournament, Championship, ChampionshipSeries
-    lien_champ = db.query(ChampionshipTournament).filter_by(tournament_id=tournament_id).first()
-    circuit_tournois = []
-    circuit_serie = None
+    circuit_link = db.query(ChampionshipTournament).filter_by(tournament_id=tournament_id).first()
+    circuit_tournaments = []
+    circuit_series = None
     circuit_edition = None
-    if lien_champ:
-        circuit_edition = db.query(Championship).filter_by(id=lien_champ.championship_id).first()
-        circuit_serie = db.query(ChampionshipSeries).filter_by(id=circuit_edition.series_id).first()
-        circuit_tournois = [
+    if circuit_link:
+        circuit_edition = db.query(Championship).filter_by(id=circuit_link.championship_id).first()
+        circuit_series = db.query(ChampionshipSeries).filter_by(id=circuit_edition.series_id).first()
+        circuit_tournaments = [
             l.tournament for l in circuit_edition.tournament_links
             if l.tournament.city_id
         ]
 
     return templates.TemplateResponse(request, "tournaments/detail.html", {
-        "tournoi":              tournoi,
-        "results":            resultats_unifies,
-        "players":              joueurs,
-        "pays_stats":           pays_stats,
-        "nb_pays":              len(pays_stats),
-        "podium":               podium,
-        "resultats_incomplets":  resultats_incomplets,
-        "nb_resultats":          nb_resultats,
-        "nb_anon_europeens":     nb_anon_europeens,
-        "is_mondial":            tournoi.tournament_type in ('wmc', 'wrc'),
-        "circuit_tournois":      circuit_tournois,
-        "circuit_serie":         circuit_serie,
+        "tournoi":               tournament,
+        "results":               unified_results,
+        "players":               players,
+        "pays_stats":            country_stats,
+        "nb_pays":               len(country_stats),
+        "podium":                podium,
+        "resultats_incomplets":  incomplete_results,
+        "nb_resultats":          num_results,
+        "nb_anon_europeens":     num_anonymous_europeans,
+        "is_mondial":            tournament.tournament_type in ('wmc', 'wrc'),
+        "circuit_tournois":      circuit_tournaments,
+        "circuit_serie":         circuit_series,
         "circuit_edition":       circuit_edition,
     })
-

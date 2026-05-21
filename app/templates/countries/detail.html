@@ -229,7 +229,7 @@ function fetchApercu(joueurId, rules) {
   panel.innerHTML = '<p class="empty">' + _I18N.chargement + '</p>';
   var week = '{{ week.isoformat() }}';
   var r = rules || document.querySelector('#tab-ranking .tab-btn.active').textContent.trim().split(' ')[0];
-  fetch('/players/' + joueurId + '/apercu?week=' + week + '&rules=' + r + '&pays_code={{ code }}')
+  fetch('/players/' + joueurId + '/apercu?week=' + week + '&rules=' + r + '&country_code={{ code }}')
     .then(function(res){ return res.text(); })
     .then(function(html){ panel.innerHTML = html; })
     .catch(function(){ panel.innerHTML = '<p class="empty">' + _I18N.erreur_chargement + '</p>'; });

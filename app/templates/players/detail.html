@@ -6,10 +6,10 @@
 {% include 'partials/player_header.html' %}
 {% endwith %}
 
-{% if changements_nat %}
+{% if nationality_changes %}
 <div class="nat-warning">
   {{ trad('player.nat_warning') }}
-  {% for c in changements_nat %}
+  {% for c in nationality_changes %}
     {{ c.nationality_before | flag }} {{ c.nationality_before }}
     → {{ c.nationality_after | flag }} {{ c.nationality_after }}
     {{ trad('player.nat_from') }} {{ c.change_date.strftime('%d/%m/%Y') }}{% if not loop.last %}, {% endif %}
@@ -30,7 +30,7 @@
   {% with rules=regles %}{% include 'partials/stat_cards.html' %}{% endwith %}
 
   <!-- Graphique évolution -->
-  {% if data.historique_chart %}
+  {% if data.history_chart %}
   <div class="chart-section">
     <div class="chart-controls">
       <span class="chart-title">{{ trad('player.ranking_evolution') }}</span>
@@ -46,7 +46,7 @@
 
   <!-- Liste des tournois -->
   {% if data.tournaments %}
-  {% set inactifs = data.tournaments | selectattr('actif', 'equalto', false) | list %}
+  {% set inactifs = data.tournaments | selectattr('active', 'equalto', false) | list %}
   <div id="ville-badge-{{ regles }}" style="display:none" class="ville-badge">
     📍 <span id="ville-badge-nom-{{ regles }}"></span>
     <button onclick="filtreJoueurVille(null,'{{ regles | upper }}',null)" class="ville-badge-close" title="Effacer">✕</button>
@@ -58,7 +58,7 @@
       <col class="col-date-lg">
       <col class="col-duree col-opt">
       <col class="col-ville col-opt">
-      {% if changements_nat %}<col class="col-duree col-opt">{% endif %}
+      {% if nationality_changes %}<col class="col-duree col-opt">{% endif %}
       <col class="col-tournoi">
       <col class="col-coeff col-opt">
       <col class="col-contrib col-opt">
@@ -72,7 +72,7 @@
         <th class="col-date-lg">{{ trad('common.date') }}</th>
         <th class="col-duree col-opt" title="{{ trad('common.duration') }}">🗓️</th>
         <th class="col-ville col-opt">{{ trad('common.city') }}</th>
-        {% if changements_nat %}<th class="col-opt center" title="Nationality at time of tournament">🏳️</th>{% endif %}
+        {% if nationality_changes %}<th class="col-opt center" title="Nationality at time of tournament">🏳️</th>{% endif %}
         <th class="col-tournoi">{{ trad('common.tournament') }}</th>
         <th class="col-coeff col-opt center" title="{{ trad('common.coeff_title') }}">⚖️</th>
         <th class="col-contrib col-opt center" title="{{ trad('tournament.contribution_title') }}">⏱️</th>
@@ -84,18 +84,18 @@
     </thead>
     <tbody>
       {% for trn in data.tournaments %}
-      <tr class="t-player-row {% if trn.actif %}row-actif{% endif %} {% if trn.type in ['wmc','wrc'] %}row-wmc{% elif trn.type in ['oemc','oerc'] %}row-oemc{% endif %}{% if not trn.actif %} row-inactif row-inactif-{{ regles }} hidden{% endif %}"
+      <tr class="t-player-row {% if trn.active %}row-actif{% endif %} {% if trn.type in ['wmc','wrc'] %}row-wmc{% elif trn.type in ['oemc','oerc'] %}row-oemc{% endif %}{% if not trn.active %} row-inactif row-inactif-{{ regles }} hidden{% endif %}"
           data-ville="{{ trn.city }}" data-regles="{{ regles | upper }}">
         <td class="col-date-lg">{{ trn.date.strftime('%d/%m/%Y') if trn.date.year != 1900 else '—' }}</td>
-        <td class="col-duree col-opt center">{{ trn.duree }}j</td>
+        <td class="col-duree col-opt center">{{ trn.duration }}j</td>
         <td class="col-ville col-opt nowrap">
           {{ trn.country | pays_flag_link('tournaments') }}
           <span class="t-ville" onclick="filtreJoueurVille('{{ trn.city }}', '{{ regles | upper }}', this)">{{ trn.city }}</span>
         </td>
-        {% if changements_nat %}
+        {% if nationality_changes %}
         <td class="col-opt center">
-          {% if trn.nat_tournoi != player.nationality %}
-            {{ trn.nat_tournoi | flag_link('players') }}
+          {% if trn.nat_at_tournament != player.nationality %}
+            {{ trn.nat_at_tournament | flag_link('players') }}
           {% endif %}
         </td>
         {% endif %}
@@ -173,8 +173,8 @@ function clearHighlight(regles) {
   chart.update('none');
 }
 
-const FREEZE_START = '{{ freeze_debut }}';
-const FREEZE_END   = '{{ freeze_fin }}';
+const FREEZE_START = '{{ freeze_start }}';
+const FREEZE_END   = '{{ freeze_end }}';
 const CHARTS = {};
 
 function buildChart(regles, data) {
@@ -297,8 +297,8 @@ function setRange(regles, weeks) {
 }
 
 {% for regles, data in [('mcr', mcr), ('rcr', rcr)] %}
-{% if data.historique_chart %}
-buildChart('{{ regles }}', {{ data.historique_chart | tojson }});
+{% if data.history_chart %}
+buildChart('{{ regles }}', {{ data.history_chart | tojson }});
 {% endif %}
 {% endfor %}
 

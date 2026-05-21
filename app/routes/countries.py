@@ -281,8 +281,9 @@ def pays_liste(
         .all()
     )
     tournois_par_code: dict = defaultdict(int)
-    for nom, nb in tournois_par_pays_nom.items():
-        iso = _PAYS_ISO.get(nom.lower().strip())
+    for country_val, nb in tournois_par_pays_nom.items():
+        # country column stores ISO codes directly (e.g. "FR")
+        iso = country_val.upper().strip()
         if iso:
             tournois_par_code[iso] += nb
 
@@ -309,7 +310,7 @@ def pays_liste(
             "nb_tournaments":   tournois_par_code.get(code, 0),
         }
         for code in all_codes
-    ], key=lambda x: (-x["nb_players"], x["name"]))
+    ], key=lambda x: (-x["nb_actifs"], x["name"]))
 
     import json
     chart_liste = _chart_joueurs_liste(db)
@@ -425,8 +426,8 @@ def pays_detail(
     actifs_dict = {t.id: c for t, c in active_tournaments(db, week_date, "MCR")}
     actifs_dict.update({t.id: c for t, c in active_tournaments(db, week_date, "RCR")})
 
-    from app.routes.tournaments import _incomplets_ids
-    incomplete = _incomplets_ids(db, [t.id for t in tous_tournois])
+    from app.routes.tournaments import _incomplete_ids
+    incomplete = _incomplete_ids(db, [t.id for t in tous_tournois])
 
     # Cities for the map
     from app.models import City
