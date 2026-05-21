@@ -1224,7 +1224,7 @@ caption.t-count {
 
 .site-warning {
     position: sticky;
-    top: 58px; /* hauteur approximative de la navbar */
+    top: var(--sticky-nav-height, 58px);
 
     z-index: 40;
 

@@ -223,6 +223,9 @@
 
         var nav = document.querySelector('nav');
         if (nav) off += nav.offsetHeight;
+        root.style.setProperty('--sticky-nav-height', off + 'px');
+        var warning = document.querySelector('.site-warning');
+        if (warning) off += warning.offsetHeight;
         root.style.setProperty('--sticky-header-top', off + 'px');
 
         document.querySelectorAll('.ranking-header, .player-header').forEach(function(el) {
