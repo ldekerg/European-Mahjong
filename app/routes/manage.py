@@ -526,6 +526,8 @@ async def tournament_results_save(tournament_id: int, request: Request, db: Sess
     if not t:
         return RedirectResponse("/manage/tournaments/", status_code=302)
 
+    _take_snapshot(f"before_save_t{tournament_id}")
+
     from app.ranking import ema_points
     form = await request.form()
 
@@ -1252,9 +1254,36 @@ def audit_list(
     actions = [r[0] for r in db.query(AuditLog.action).distinct().order_by(AuditLog.action).all()]
     admins  = [r[0] for r in db.query(AuditLog.admin_user).distinct().order_by(AuditLog.admin_user).all()]
 
+    # Build sorted list of (datetime, filename) from snapshot filenames
+    _BACKUPS_DIR.mkdir(parents=True, exist_ok=True)
+    _snapshots = []
+    for f in sorted(_BACKUPS_DIR.glob("ranking_*.db")):
+        try:
+            parts = f.stem.split("_")
+            ts = _dt.strptime(parts[1] + parts[2], "%Y%m%d%H%M%S")
+            _snapshots.append((ts, f.name))
+        except Exception:
+            pass
+
+    def _nearest_snapshot(entry_ts: _dt) -> str | None:
+        """Return the most recent snapshot filename taken before entry_ts."""
+        result = None
+        for ts, name in _snapshots:
+            if ts <= entry_ts:
+                result = name
+            else:
+                break
+        return result
+
+    # Attach nearest snapshot to each entry
+    entries_with_snap = [
+        (e, _nearest_snapshot(e.timestamp))
+        for e in entries
+    ]
+
     ctx = _base_ctx(request, user, "audit")
     ctx.update({
-        "entries": entries,
+        "entries_with_snap": entries_with_snap,
         "page": page, "total_pages": max(1, (total + PAGE_SIZE - 1) // PAGE_SIZE),
         "table": table, "action": action, "admin": admin,
         "tables": tables, "actions": actions, "admins": admins,
@@ -1297,12 +1326,16 @@ async def audit_undo(entry_id: int, request: Request, db: Session = Depends(get_
 
     try:
         old_data = json.loads(entry.old_values) if entry.old_values else None
+        new_data = json.loads(entry.new_values) if entry.new_values else {}
         pk = entry.row_id if entry.table_name == "players" else int(entry.row_id)
+
         if entry.action == "UPDATE" and old_data:
             obj = db.get(model, pk)
             if not obj:
                 _set_flash(request, "Row no longer exists.", "error")
                 return RedirectResponse("/manage/audit/", status_code=302)
+
+            # Restore all non-PK columns
             for col in obj.__table__.columns:
                 if col.name in old_data and not col.primary_key:
                     val = old_data[col.name]
@@ -1310,20 +1343,53 @@ async def audit_undo(entry_id: int, request: Request, db: Session = Depends(get_
                         setattr(obj, col.name, None if val == "None" else val)
                     except Exception:
                         pass
+
+            # Player-specific: remove NationalityChange created by this edit
+            if entry.table_name == "players":
+                old_nat = old_data.get("nationality")
+                new_nat = new_data.get("nationality")
+                if old_nat and new_nat and old_nat != new_nat and old_nat != "None":
+                    db.query(NationalityChange).filter_by(
+                        player_id=entry.row_id,
+                        nationality_before=old_nat,
+                        nationality_after=new_nat,
+                    ).delete()
+
+            # Tournament-specific: recompute ranking_history after restoring dates/players/type
+            if entry.table_name == "tournaments":
+                db.flush()
+                _recompute_tournament_weeks(obj)
+
             _audit(db, request, "UNDO", entry.table_name, entry.row_id,
                    description=f"Undid #{entry_id}: {entry.description}")
             db.commit()
             _set_flash(request, f"Undone: {entry.description}")
+
         elif entry.action == "CREATE":
             obj = db.get(model, pk)
-            if obj:
-                _audit(db, request, "UNDO", entry.table_name, entry.row_id,
-                       description=f"Undid CREATE #{entry_id} — deleted row", old=obj)
-                db.delete(obj)
-                db.commit()
-                _set_flash(request, f"Row deleted (undo of CREATE #{entry_id}).")
-            else:
+            if not obj:
                 _set_flash(request, "Row already gone.", "error")
+                return RedirectResponse("/manage/audit/", status_code=302)
+
+            # Remove dependents before deleting
+            if entry.table_name == "tournaments":
+                db.query(Result).filter_by(tournament_id=pk).delete()
+                db.query(AnonymousResult).filter_by(tournament_id=pk).delete()
+                db.query(ChampionshipTournament).filter_by(tournament_id=pk).delete()
+            elif entry.table_name == "players":
+                if db.query(Result).filter_by(player_id=entry.row_id).count():
+                    _set_flash(request, "Cannot undo: player already has results.", "error")
+                    return RedirectResponse("/manage/audit/", status_code=302)
+            elif entry.table_name == "cities":
+                # Unlink tournaments pointing to this city
+                db.query(Tournament).filter_by(city_id=pk).update({"city_id": None})
+
+            _audit(db, request, "UNDO", entry.table_name, entry.row_id,
+                   description=f"Undid CREATE #{entry_id} — deleted row", old=obj)
+            db.delete(obj)
+            db.commit()
+            _set_flash(request, f"Row deleted (undo of CREATE #{entry_id}).")
+
         else:
             _set_flash(request, "Nothing to undo.", "error")
     except Exception as e:
@@ -1350,10 +1416,16 @@ def backups_list(request: Request):
     backups = []
     for f in files:
         stat = f.stat()
+        # Parse timestamp from filename (ranking_YYYYMMDD_HHMMSS_*.db) — more reliable than st_mtime
+        try:
+            parts = f.stem.split("_")  # ['ranking', 'YYYYMMDD', 'HHMMSS', ...]
+            mtime = _dt.strptime(parts[1] + parts[2], "%Y%m%d%H%M%S").strftime("%Y-%m-%d %H:%M UTC")
+        except Exception:
+            mtime = _dt.fromtimestamp(stat.st_mtime).strftime("%Y-%m-%d %H:%M")
         backups.append({
             "name": f.name,
             "size_kb": round(stat.st_size / 1024),
-            "mtime": _dt.utcfromtimestamp(stat.st_mtime).strftime("%Y-%m-%d %H:%M UTC"),
+            "mtime": mtime,
         })
 
     ctx = _base_ctx(request, user, "backups")

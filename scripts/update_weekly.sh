@@ -18,6 +18,9 @@ exec >> "$LOG" 2>&1
 
 echo "=== Mise à jour hebdomadaire EMA — $(date) ==="
 
+echo "--- Snapshot avant import ---"
+$PYTHON take_snapshot.py update_weekly
+
 # Calcule dynamiquement les IDs à partir du dernier en base + 10 de marge
 MCR_MAX=$($PYTHON -c "
 import sys, os; sys.path.insert(0, '..')
