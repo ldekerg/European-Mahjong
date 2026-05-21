@@ -1,0 +1,115 @@
+{% extends "manage/base.html" %}
+{% block title %} — Audit Log{% endblock %}
+{% block content %}
+
+<div class="manage-header">
+  <h1>Audit Log</h1>
+  <span class="dim" style="font-size:0.875rem">{{ total }} entr{{ 'ies' if total != 1 else 'y' }}</span>
+</div>
+
+<form method="get" class="manage-filters">
+  <select name="table" class="manage-select">
+    <option value="">All tables</option>
+    {% for t in tables %}
+    <option value="{{ t }}" {% if table == t %}selected{% endif %}>{{ t }}</option>
+    {% endfor %}
+  </select>
+  <select name="action" class="manage-select">
+    <option value="">All actions</option>
+    {% for a in actions %}
+    <option value="{{ a }}" {% if action == a %}selected{% endif %}>{{ a }}</option>
+    {% endfor %}
+  </select>
+  <select name="admin" class="manage-select">
+    <option value="">All admins</option>
+    {% for u in admins %}
+    <option value="{{ u }}" {% if admin == u %}selected{% endif %}>{{ u }}</option>
+    {% endfor %}
+  </select>
+  <button type="submit" class="btn">Filter</button>
+  <a href="/manage/audit/" class="btn btn-secondary">Reset</a>
+</form>
+
+<div class="scroll-table">
+<table>
+  <thead>
+    <tr>
+      <th class="col-nowrap">#</th>
+      <th class="col-nowrap">Time</th>
+      <th class="col-nowrap">Admin</th>
+      <th class="col-nowrap">Action</th>
+      <th class="col-nowrap">Table</th>
+      <th class="col-nowrap">Row</th>
+      <th>Description</th>
+      <th class="col-nowrap">Details</th>
+      <th class="col-nowrap">Undo</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for e in entries %}
+  <tr>
+    <td class="dim col-nowrap" style="font-size:0.8rem">{{ e.id }}</td>
+    <td class="col-nowrap dim" style="font-size:0.8rem">{{ e.timestamp.strftime('%d/%m/%y %H:%M') }}</td>
+    <td class="col-nowrap">{{ e.admin_user }}</td>
+    <td class="col-nowrap">
+      {% if e.action == 'CREATE' %}<span class="badge" style="background:#d1fae5;color:#065f46">CREATE</span>
+      {% elif e.action == 'UPDATE' %}<span class="badge" style="background:#dbeafe;color:#1e40af">UPDATE</span>
+      {% elif e.action == 'DELETE' %}<span class="badge" style="background:#fee2e2;color:#7f1d1d">DELETE</span>
+      {% elif e.action == 'IMPORT' %}<span class="badge" style="background:#fef3c7;color:#78350f">IMPORT</span>
+      {% elif e.action == 'UNDO' %}<span class="badge" style="background:#f3e8ff;color:#6b21a8">UNDO</span>
+      {% else %}<span class="badge">{{ e.action }}</span>{% endif %}
+    </td>
+    <td class="col-nowrap dim">{{ e.table_name }}</td>
+    <td class="col-nowrap dim">{{ e.row_id or '—' }}</td>
+    <td style="font-size:0.85rem">{{ e.description or '—' }}</td>
+    <td class="col-nowrap">
+      {% if e.old_values or e.new_values %}
+      <button type="button" class="btn btn-sm btn-secondary" onclick="toggleDiff({{ e.id }})">diff</button>
+      {% else %}—{% endif %}
+    </td>
+    <td class="col-nowrap">
+      {% if e.action in ('UPDATE', 'CREATE') and e.table_name in ('tournaments', 'players', 'cities') %}
+      <form method="post" action="/manage/audit/{{ e.id }}/undo" style="display:inline"
+            onsubmit="return confirm('Undo this action?')">
+        <button type="submit" class="btn btn-sm" title="Undo">↩ Undo</button>
+      </form>
+      {% else %}—{% endif %}
+    </td>
+  </tr>
+  <tr id="diff-{{ e.id }}" style="display:none">
+    <td colspan="9" style="padding:0">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;font-size:0.78rem;font-family:monospace;background:var(--bg2)">
+        <div style="padding:0.75rem;border-right:1px solid var(--border);overflow:auto;max-height:300px">
+          <div style="font-weight:700;color:var(--text2);margin-bottom:0.4rem">Before</div>
+          <pre style="margin:0;white-space:pre-wrap;color:var(--text)">{{ e.old_values | pretty_json if e.old_values else '—' }}</pre>
+        </div>
+        <div style="padding:0.75rem;overflow:auto;max-height:300px">
+          <div style="font-weight:700;color:var(--text2);margin-bottom:0.4rem">After</div>
+          <pre style="margin:0;white-space:pre-wrap;color:var(--text)">{{ e.new_values | pretty_json if e.new_values else '—' }}</pre>
+        </div>
+      </div>
+    </td>
+  </tr>
+  {% else %}
+  <tr><td colspan="9" class="empty">No audit entries found.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+
+{% if total_pages > 1 %}
+<div class="manage-pagination">
+  {% if page > 1 %}<a href="?table={{ table }}&action={{ action }}&admin={{ admin }}&page={{ page - 1 }}" class="btn btn-sm">‹ Previous</a>{% endif %}
+  <span class="dim">Page {{ page }} / {{ total_pages }}</span>
+  {% if page < total_pages %}<a href="?table={{ table }}&action={{ action }}&admin={{ admin }}&page={{ page + 1 }}" class="btn btn-sm">Next ›</a>{% endif %}
+</div>
+{% endif %}
+
+<script>
+function toggleDiff(id) {
+  var row = document.getElementById('diff-' + id);
+  row.style.display = row.style.display === 'none' ? 'table-row' : 'none';
+}
+</script>
+
+{% endblock %}

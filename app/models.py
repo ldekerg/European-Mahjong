@@ -182,6 +182,28 @@ class ChampionshipTournament(Base):
     )
 
 
+class AuditLog(Base):
+    """Admin action audit log — each row is one CREATE/UPDATE/DELETE by an admin user."""
+    __tablename__ = "audit_log"
+
+    id          = Column(Integer, primary_key=True, autoincrement=True)
+    timestamp   = Column(DateTime, nullable=False, default=datetime.utcnow)
+    admin_user  = Column(String, nullable=False)           # username
+    action      = Column(String, nullable=False)           # CREATE | UPDATE | DELETE
+    table_name  = Column(String, nullable=False)           # e.g. "tournaments"
+    row_id      = Column(String, nullable=True)            # primary key of affected row
+    description = Column(String, nullable=True)            # human-readable summary
+    old_values  = Column(String, nullable=True)            # JSON snapshot before change
+    new_values  = Column(String, nullable=True)            # JSON snapshot after change
+    session_id  = Column(String, nullable=True)            # groups related rows (e.g. bulk import)
+
+    __table_args__ = (
+        Index("ix_audit_log_timestamp", "timestamp"),
+        Index("ix_audit_log_table_row", "table_name", "row_id"),
+        Index("ix_audit_log_session", "session_id"),
+    )
+
+
 class RankingHistory(Base):
     __tablename__ = "ranking_history"
 

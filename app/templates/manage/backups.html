@@ -1,0 +1,47 @@
+{% extends "manage/base.html" %}
+{% block title %} — Backups{% endblock %}
+{% block content %}
+
+<div class="manage-header">
+  <h1>DB Snapshots</h1>
+  <form method="post" action="/manage/backups/create"
+        onsubmit="return confirm('Create a snapshot now?')">
+    <button type="submit" class="btn btn-primary">📸 Take snapshot now</button>
+  </form>
+</div>
+
+<p class="dim" style="font-size:0.85rem;margin-bottom:1rem">
+  Snapshots are taken automatically before CSV imports. Up to 30 snapshots are kept.
+  To restore: download the file and copy it to the server via SSH (stop the app first).
+</p>
+
+{% if backups %}
+<div class="scroll-table">
+<table>
+  <thead>
+    <tr>
+      <th>Filename</th>
+      <th class="col-nowrap center">Size</th>
+      <th class="col-nowrap">Created (UTC)</th>
+      <th class="col-nowrap">Download</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for b in backups %}
+  <tr>
+    <td style="font-family:monospace;font-size:0.85rem">{{ b.name }}</td>
+    <td class="col-nowrap center dim">{{ b.size_kb }} KB</td>
+    <td class="col-nowrap dim">{{ b.mtime }}</td>
+    <td class="col-nowrap">
+      <a href="/manage/backups/download/{{ b.name }}" class="btn btn-sm btn-secondary">⬇ Download</a>
+    </td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% else %}
+<p class="empty">No snapshots yet. Take one manually or import results to trigger one automatically.</p>
+{% endif %}
+
+{% endblock %}

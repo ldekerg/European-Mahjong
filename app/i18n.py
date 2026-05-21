@@ -250,3 +250,12 @@ def prenom_propre(s: str) -> str:
     return " ".join(result)
 
 templates.env.filters["first_name"] = prenom_propre
+
+
+def _pretty_json(s: str) -> str:
+    try:
+        return _json.dumps(_json.loads(s), indent=2, ensure_ascii=False)
+    except Exception:
+        return s or ""
+
+templates.env.filters["pretty_json"] = _pretty_json

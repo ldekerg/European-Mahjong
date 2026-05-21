@@ -1,7 +1,7 @@
-import csv, io, bcrypt
+import csv, io, os, bcrypt
 from datetime import date
 from fastapi import APIRouter, Depends, Request, Form, UploadFile, File, Query
-from fastapi.responses import RedirectResponse, JSONResponse, Response
+from fastapi.responses import RedirectResponse, JSONResponse, Response, FileResponse
 from sqlalchemy.orm import Session
 
 
@@ -36,9 +36,60 @@ def _recompute_tournament_weeks(tournament: "Tournament"):
     return len(weeks)
 from sqlalchemy import func
 
+import json, shutil, uuid
+from pathlib import Path
+from datetime import datetime as _dt
+
 from app.database import get_db, SessionLocal
-from app.models import AdminUser, Tournament, Player, Result, AnonymousResult, City, NationalityChange, Championship, ChampionshipSeries, ChampionshipTournament
+from app.models import AdminUser, Tournament, Player, Result, AnonymousResult, City, NationalityChange, Championship, ChampionshipSeries, ChampionshipTournament, AuditLog
 from app.i18n import templates, ISO_NOM_PAYS
+
+# ---------------------------------------------------------------------------
+# Snapshot helpers
+# ---------------------------------------------------------------------------
+_DB_PATH = Path(os.environ.get("DATABASE_URL", "sqlite:///./data/ema_ranking.db").replace("sqlite:///", ""))
+_BACKUPS_DIR = Path(os.environ.get("BACKUPS_DIR", "./backups"))
+
+
+def _take_snapshot(label: str = "") -> Path:
+    """Copy the SQLite DB file to backups/. Returns the backup path."""
+    _BACKUPS_DIR.mkdir(parents=True, exist_ok=True)
+    ts = _dt.utcnow().strftime("%Y%m%d_%H%M%S")
+    slug = label.replace(" ", "_")[:40] if label else "manual"
+    dest = _BACKUPS_DIR / f"ranking_{ts}_{slug}.db"
+    shutil.copy2(_DB_PATH, dest)
+    # Keep only the 30 most recent backups
+    backups = sorted(_BACKUPS_DIR.glob("ranking_*.db"))
+    for old in backups[:-30]:
+        old.unlink(missing_ok=True)
+    return dest
+
+
+# ---------------------------------------------------------------------------
+# Audit log helpers
+# ---------------------------------------------------------------------------
+
+def _obj_to_dict(obj) -> dict:
+    """Serialize a SQLAlchemy model instance to a plain dict (column values only)."""
+    return {c.name: str(getattr(obj, c.name)) for c in obj.__table__.columns}
+
+
+def _audit(db: Session, request: Request, action: str, table: str, row_id,
+           description: str = "", old=None, new=None, session_id: str | None = None):
+    """Write one audit log entry."""
+    username = request.session.get("admin_username", "?")
+    entry = AuditLog(
+        admin_user=username,
+        action=action,
+        table_name=table,
+        row_id=str(row_id) if row_id is not None else None,
+        description=description,
+        old_values=json.dumps(_obj_to_dict(old), default=str) if old is not None else None,
+        new_values=json.dumps(_obj_to_dict(new), default=str) if new is not None else None,
+        session_id=session_id,
+    )
+    db.add(entry)
+    # (caller must db.commit())
 
 # Tournament types that get an ema_id assigned automatically
 EMA_TYPES = {'normal', 'oemc', 'oerc', 'non_mers'}
@@ -346,6 +397,8 @@ async def tournament_new_post(request: Request, db: Session = Depends(get_db)):
 
     champ_id = int(form["championship_id"]) if form.get("championship_id") else None
     _save_championship_link(db, t.id, champ_id)
+    _audit(db, request, "CREATE", "tournaments", t.id,
+           description=f"Created tournament «{t.name}»", new=t)
     db.commit()
 
     suffix = f" (ID EMA : {ema_id})" if ema_id else ""
@@ -397,6 +450,8 @@ async def tournament_edit_post(tournament_id: int, request: Request, db: Session
     if t_type in EMA_TYPES and not t.ema_id:
         t.ema_id = _next_ema_id(db, form.get("rules", t.rules))
 
+    old_snapshot = _obj_to_dict(t)
+
     from app.ranking import mers_coefficient as _mcoeff
     t.rules      = form["rules"]
     t.name       = form["name"]
@@ -417,6 +472,15 @@ async def tournament_edit_post(tournament_id: int, request: Request, db: Session
 
     champ_id = int(form["championship_id"]) if form.get("championship_id") else None
     _save_championship_link(db, t.id, champ_id)
+
+    entry = AuditLog(
+        admin_user=request.session.get("admin_username", "?"),
+        action="UPDATE", table_name="tournaments", row_id=str(t.id),
+        description=f"Updated tournament «{t.name}»",
+        old_values=json.dumps(old_snapshot, default=str),
+        new_values=json.dumps(_obj_to_dict(t), default=str),
+    )
+    db.add(entry)
     db.commit()
     _set_flash(request, f"Tournoi « {t.name} » mis à jour.")
     return RedirectResponse("/manage/tournaments/", status_code=302)
@@ -594,6 +658,10 @@ async def tournament_results_save(tournament_id: int, request: Request, db: Sess
     if nb_weeks:
         msg += f" — Ranking recomputed for {nb_weeks} week{'s' if nb_weeks > 1 else ''}."
 
+    _audit(db, request, "UPDATE", "results", tournament_id,
+           description=f"Saved results for «{t.name}»: {msg}")
+    db.commit()
+
     _set_flash(request, msg, "success" if not errors else "warning")
     return RedirectResponse(f"/manage/tournaments/{tournament_id}/results", status_code=302)
 
@@ -610,6 +678,9 @@ async def tournament_results_import(
     t = db.query(Tournament).filter_by(id=tournament_id).first()
     if not t:
         return RedirectResponse("/manage/tournaments/", status_code=302)
+
+    # Snapshot before overwriting results
+    _take_snapshot(f"before_import_t{tournament_id}")
 
     replace = True
 
@@ -702,6 +773,10 @@ async def tournament_results_import(
     nb_weeks = _recompute_tournament_weeks(t)
     if nb_weeks:
         msg += f" — Ranking recomputed for {nb_weeks} week{'s' if nb_weeks > 1 else ''}."
+
+    _audit(db, request, "IMPORT", "results", tournament_id,
+           description=f"CSV import for «{t.name}»: {msg}")
+    db.commit()
 
     _set_flash(request, msg, "success" if not errors else "warning")
     return RedirectResponse(f"/manage/tournaments/{tournament_id}/results", status_code=302)
@@ -814,6 +889,9 @@ async def player_new_post(request: Request, db: Session = Depends(get_db)):
         status=form.get("status", "europeen"),
     )
     db.add(p)
+    db.flush()
+    _audit(db, request, "CREATE", "players", p.id,
+           description=f"Created player {p.first_name} {p.last_name}", new=p)
     db.commit()
     _set_flash(request, f"Joueur {p.first_name} {p.last_name} créé.")
     return RedirectResponse("/manage/players/", status_code=302)
@@ -864,10 +942,19 @@ async def player_edit_post(player_id: str, request: Request, db: Session = Depen
         )
         db.add(chg)
 
+    old_snapshot = _obj_to_dict(p)
     p.last_name = form["last_name"].strip().upper()
     p.first_name = form["first_name"].strip()
     p.nationality = new_nationality
     p.status = form.get("status", p.status)
+    entry = AuditLog(
+        admin_user=request.session.get("admin_username", "?"),
+        action="UPDATE", table_name="players", row_id=str(p.id),
+        description=f"Updated player {p.first_name} {p.last_name}",
+        old_values=json.dumps(old_snapshot, default=str),
+        new_values=json.dumps(_obj_to_dict(p), default=str),
+    )
+    db.add(entry)
     db.commit()
     _set_flash(request, f"Joueur {p.first_name} {p.last_name} mis à jour.")
     return RedirectResponse("/manage/players/", status_code=302)
@@ -940,7 +1027,10 @@ async def cities_delete(request: Request, db: Session = Depends(get_db)):
 
     deleted = 0
     for city_id in ids:
-        # Unlink tournaments first
+        c = db.query(City).filter_by(id=city_id).first()
+        if c:
+            _audit(db, request, "DELETE", "cities", city_id,
+                   description=f"Deleted city «{c.name}» ({c.country})", old=c)
         db.query(Tournament).filter(Tournament.city_id == city_id).update({"city_id": None})
         db.query(City).filter_by(id=city_id).delete()
         deleted += 1
@@ -977,6 +1067,9 @@ async def city_create_ajax(request: Request, db: Session = Depends(get_db)):
 
     c = City(name=name, country=country, latitude=lat, longitude=lon)
     db.add(c)
+    db.flush()
+    _audit(db, request, "CREATE", "cities", c.id,
+           description=f"Created city «{c.name}» ({c.country})", new=c)
     db.commit()
     return JSONResponse({"id": c.id, "name": c.name, "country": c.country})
 
@@ -1031,10 +1124,16 @@ async def cities_merge(request: Request, db: Session = Depends(get_db)):
         return RedirectResponse("/manage/cities/", status_code=302)
 
     total_moved = 0
+    sid = str(uuid.uuid4())[:8]
     for drop_id in drop_ids:
+        drop_city = db.query(City).filter_by(id=drop_id).first()
         moved = db.query(Tournament).filter(Tournament.city_id == drop_id)\
                   .update({"city_id": keep_id})
         total_moved += moved
+        if drop_city:
+            _audit(db, request, "DELETE", "cities", drop_id,
+                   description=f"Merged city «{drop_city.name}» into «{keep_city.name}»",
+                   old=drop_city, session_id=sid)
         db.query(City).filter_by(id=drop_id).delete()
 
     db.commit()
@@ -1065,6 +1164,9 @@ async def city_new_post(request: Request, db: Session = Depends(get_db)):
         longitude=float(form["longitude"]),
     )
     db.add(c)
+    db.flush()
+    _audit(db, request, "CREATE", "cities", c.id,
+           description=f"Created city «{c.name}» ({c.country})", new=c)
     db.commit()
     _set_flash(request, f"Ville « {c.name} » créée.")
     return RedirectResponse("/manage/cities/", status_code=302)
@@ -1099,10 +1201,190 @@ async def city_edit_post(city_id: int, request: Request, db: Session = Depends(g
     if not c:
         return RedirectResponse("/manage/cities/", status_code=302)
     form = await request.form()
+    old_snapshot = _obj_to_dict(c)
     c.name = form["name"].strip()
     c.country = form["country"].strip().upper()
     c.latitude = float(form["latitude"])
     c.longitude = float(form["longitude"])
+    entry = AuditLog(
+        admin_user=request.session.get("admin_username", "?"),
+        action="UPDATE", table_name="cities", row_id=str(c.id),
+        description=f"Updated city «{c.name}»",
+        old_values=json.dumps(old_snapshot, default=str),
+        new_values=json.dumps(_obj_to_dict(c), default=str),
+    )
+    db.add(entry)
     db.commit()
     _set_flash(request, f"Ville « {c.name} » mise à jour.")
     return RedirectResponse("/manage/cities/", status_code=302)
+
+
+# ---------------------------------------------------------------------------
+# Audit log
+# ---------------------------------------------------------------------------
+
+@router.get("/audit/")
+def audit_list(
+    request: Request,
+    page: int = Query(1, ge=1),
+    table: str = "", action: str = "", admin: str = "",
+    db: Session = Depends(get_db),
+):
+    user = _require_auth(request)
+    if isinstance(user, RedirectResponse):
+        return user
+    if user.role != "superadmin":
+        _set_flash(request, "Access denied.", "error")
+        return RedirectResponse("/manage/", status_code=302)
+
+    qr = db.query(AuditLog).order_by(AuditLog.timestamp.desc())
+    if table:
+        qr = qr.filter(AuditLog.table_name == table)
+    if action:
+        qr = qr.filter(AuditLog.action == action)
+    if admin:
+        qr = qr.filter(AuditLog.admin_user == admin)
+
+    total = qr.count()
+    entries = qr.offset((page - 1) * PAGE_SIZE).limit(PAGE_SIZE).all()
+
+    tables  = [r[0] for r in db.query(AuditLog.table_name).distinct().order_by(AuditLog.table_name).all()]
+    actions = [r[0] for r in db.query(AuditLog.action).distinct().order_by(AuditLog.action).all()]
+    admins  = [r[0] for r in db.query(AuditLog.admin_user).distinct().order_by(AuditLog.admin_user).all()]
+
+    ctx = _base_ctx(request, user, "audit")
+    ctx.update({
+        "entries": entries,
+        "page": page, "total_pages": max(1, (total + PAGE_SIZE - 1) // PAGE_SIZE),
+        "table": table, "action": action, "admin": admin,
+        "tables": tables, "actions": actions, "admins": admins,
+        "total": total,
+    })
+    return templates.TemplateResponse(request, "manage/audit.html", ctx)
+
+
+@router.post("/audit/{entry_id}/undo")
+async def audit_undo(entry_id: int, request: Request, db: Session = Depends(get_db)):
+    user = _require_auth(request)
+    if isinstance(user, RedirectResponse):
+        return user
+    if user.role != "superadmin":
+        _set_flash(request, "Access denied.", "error")
+        return RedirectResponse("/manage/", status_code=302)
+
+    entry = db.query(AuditLog).filter_by(id=entry_id).first()
+    if not entry:
+        _set_flash(request, "Audit entry not found.", "error")
+        return RedirectResponse("/manage/audit/", status_code=302)
+
+    if entry.action == "DELETE":
+        _set_flash(request, "DELETE cannot be undone automatically — restore a snapshot instead.", "error")
+        return RedirectResponse("/manage/audit/", status_code=302)
+
+    if entry.action not in ("UPDATE", "CREATE"):
+        _set_flash(request, f"Action «{entry.action}» cannot be undone automatically.", "error")
+        return RedirectResponse("/manage/audit/", status_code=302)
+
+    _TABLE_MODEL = {
+        "tournaments": Tournament,
+        "players":     Player,
+        "cities":      City,
+    }
+    model = _TABLE_MODEL.get(entry.table_name)
+    if not model:
+        _set_flash(request, f"Table «{entry.table_name}» undo not supported.", "error")
+        return RedirectResponse("/manage/audit/", status_code=302)
+
+    try:
+        old_data = json.loads(entry.old_values) if entry.old_values else None
+        pk = entry.row_id if entry.table_name == "players" else int(entry.row_id)
+        if entry.action == "UPDATE" and old_data:
+            obj = db.get(model, pk)
+            if not obj:
+                _set_flash(request, "Row no longer exists.", "error")
+                return RedirectResponse("/manage/audit/", status_code=302)
+            for col in obj.__table__.columns:
+                if col.name in old_data and not col.primary_key:
+                    val = old_data[col.name]
+                    try:
+                        setattr(obj, col.name, None if val == "None" else val)
+                    except Exception:
+                        pass
+            _audit(db, request, "UNDO", entry.table_name, entry.row_id,
+                   description=f"Undid #{entry_id}: {entry.description}")
+            db.commit()
+            _set_flash(request, f"Undone: {entry.description}")
+        elif entry.action == "CREATE":
+            obj = db.get(model, pk)
+            if obj:
+                _audit(db, request, "UNDO", entry.table_name, entry.row_id,
+                       description=f"Undid CREATE #{entry_id} — deleted row", old=obj)
+                db.delete(obj)
+                db.commit()
+                _set_flash(request, f"Row deleted (undo of CREATE #{entry_id}).")
+            else:
+                _set_flash(request, "Row already gone.", "error")
+        else:
+            _set_flash(request, "Nothing to undo.", "error")
+    except Exception as e:
+        _set_flash(request, f"Undo failed: {e}", "error")
+
+    return RedirectResponse("/manage/audit/", status_code=302)
+
+
+# ---------------------------------------------------------------------------
+# Backups
+# ---------------------------------------------------------------------------
+
+@router.get("/backups/")
+def backups_list(request: Request):
+    user = _require_auth(request)
+    if isinstance(user, RedirectResponse):
+        return user
+    if user.role != "superadmin":
+        _set_flash(request, "Access denied.", "error")
+        return RedirectResponse("/manage/", status_code=302)
+
+    _BACKUPS_DIR.mkdir(parents=True, exist_ok=True)
+    files = sorted(_BACKUPS_DIR.glob("ranking_*.db"), reverse=True)
+    backups = []
+    for f in files:
+        stat = f.stat()
+        backups.append({
+            "name": f.name,
+            "size_kb": round(stat.st_size / 1024),
+            "mtime": _dt.utcfromtimestamp(stat.st_mtime).strftime("%Y-%m-%d %H:%M UTC"),
+        })
+
+    ctx = _base_ctx(request, user, "backups")
+    ctx["backups"] = backups
+    return templates.TemplateResponse(request, "manage/backups.html", ctx)
+
+
+@router.post("/backups/create")
+async def backups_create(request: Request):
+    user = _require_auth(request)
+    if isinstance(user, RedirectResponse):
+        return user
+    if user.role != "superadmin":
+        _set_flash(request, "Access denied.", "error")
+        return RedirectResponse("/manage/", status_code=302)
+    dest = _take_snapshot("manual")
+    _set_flash(request, f"Snapshot created: {dest.name}")
+    return RedirectResponse("/manage/backups/", status_code=302)
+
+
+@router.get("/backups/download/{filename}")
+def backups_download(filename: str, request: Request):
+    user = _require_auth(request)
+    if isinstance(user, RedirectResponse):
+        return user
+    if user.role != "superadmin":
+        _set_flash(request, "Access denied.", "error")
+        return RedirectResponse("/manage/", status_code=302)
+    if not filename.startswith("ranking_") or not filename.endswith(".db") or "/" in filename:
+        return JSONResponse({"error": "Invalid filename."}, status_code=400)
+    path = _BACKUPS_DIR / filename
+    if not path.exists():
+        return JSONResponse({"error": "File not found."}, status_code=404)
+    return FileResponse(path, media_type="application/octet-stream", filename=filename)

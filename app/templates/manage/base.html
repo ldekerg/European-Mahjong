@@ -24,6 +24,10 @@
       <a href="/manage/players/" {% if manage_section == 'players' %}class="active"{% endif %}>Players</a>
       <a href="/manage/cities/" {% if manage_section == 'cities' %}class="active"{% endif %}>Cities</a>
       <a href="/manage/championships/" {% if manage_section == 'championships' %}class="active"{% endif %}>Championships</a>
+      {% if manage_user and manage_user.role == 'superadmin' %}
+      <a href="/manage/audit/" {% if manage_section == 'audit' %}class="active"{% endif %}>Audit</a>
+      <a href="/manage/backups/" {% if manage_section == 'backups' %}class="active"{% endif %}>Backups</a>
+      {% endif %}
       <a href="/admin/" target="_blank" class="dim" style="font-size:0.85rem">DB Admin ↗</a>
     </div>
     <div class="nav-controls">
