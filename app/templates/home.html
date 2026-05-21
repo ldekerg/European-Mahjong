@@ -31,6 +31,20 @@
   </a>
 </div>
 
+<!-- ── Recently added to calendar ───────────────────────────────────────── -->
+{% if recent_calendar %}
+{% set recent_ids = recent_calendar | map(attribute='id') | list %}
+<section style="margin-bottom:1.5rem">
+  <h2 style="margin-bottom:0.5rem">
+    {{ trad('calendar.recently_added') }}
+    <a href="/tournaments/calendar" class="dim" style="font-size:0.78rem;font-weight:400;margin-left:0.5rem">{{ trad('common.see_all') }}</a>
+  </h2>
+  {% with tournois_par_mois=[{'label':'','tournaments':recent_calendar}], compact=true, compact_max=5, new_ids=recent_ids %}
+  {% include 'partials/calendar_list.html' %}
+  {% endwith %}
+</section>
+{% endif %}
+
 <!-- ── Champions en titre ────────────────────────────────────────────────── -->
 <h2 style="margin-bottom:0.75rem">
   {{ trad('hof.champions') }}

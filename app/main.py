@@ -478,6 +478,14 @@ def home(request: Request, db: Session = Depends(get_db)):
             for (y, m), ts in sorted(cal_by_month.items())
         ]
 
+        recent_calendar = (
+            db.query(Tournament)
+            .filter(Tournament.status == "calendrier", Tournament.created_at.isnot(None))
+            .order_by(Tournament.created_at.desc())
+            .limit(5)
+            .all()
+        )
+
         # Reigning champions
         champions = {
             "oemc": _meilleur_europeen(db, "oemc"),
@@ -500,6 +508,7 @@ def home(request: Request, db: Session = Depends(get_db)):
         "upcoming":          upcoming,
         "champions":          champions,
         "calendar_by_month": calendar_by_month,
+        "recent_calendar":   recent_calendar,
     })
 
 

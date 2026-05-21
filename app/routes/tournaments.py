@@ -141,11 +141,13 @@ def calendrier(request: Request, db: Session = Depends(get_db)):
         .limit(5)
         .all()
     )
+    recent_ids = [t.id for t in recent]
 
     return templates.TemplateResponse(request, "tournaments/calendar.html", {
         "tournois_par_mois": tournois_par_mois,
         "nb_total": len(tournois),
         "recent": recent,
+        "recent_ids": recent_ids,
     })
 
 
