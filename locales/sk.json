@@ -44,7 +44,21 @@
     "city": "Mesto",
     "see_all": "zobraziť všetko →",
     "tournaments_played": "Odohraté turnaje",
-    "active_tournaments": "Aktívne turnaje"
+    "active_tournaments": "Aktívne turnaje",
+    "months": [
+      "Január",
+      "Február",
+      "Marec",
+      "Apríl",
+      "Máj",
+      "Jún",
+      "Júl",
+      "August",
+      "September",
+      "Október",
+      "November",
+      "December"
+    ]
   },
   "home": {
     "intro": "Vitajte v európskom rebríčku Mahjong, ktorý zahŕňa disciplíny <strong>MCR</strong> a <strong>RCR</strong>. Body sa počítajú z výsledkov turnajov uznaných <a href=\"http://mahjong-europe.org\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--accent)\">European Mahjong Association (EMA)</a>. Táto stránka predstavuje týždenné rebríčky, históriu turnajov, rekordy hráčov a krajín a Sieň slávy.",
@@ -114,7 +128,9 @@
     "ok": "✓ OK",
     "pending": "⏳ Čakajúci",
     "no_mers": "Bez MERS",
-    "more": "+ {n} ďalších →"
+    "more": "+ {n} ďalších →",
+    "recently_added": "Nedávno pridané",
+    "new_badge": "nový"
   },
   "country": {
     "registered_players": "Registrovaní hráči",

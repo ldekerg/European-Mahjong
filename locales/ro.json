@@ -44,7 +44,21 @@
     "city": "Oraș",
     "see_all": "vezi tot →",
     "tournaments_played": "Turnee jucate",
-    "active_tournaments": "Turnee active"
+    "active_tournaments": "Turnee active",
+    "months": [
+      "Ianuarie",
+      "Februarie",
+      "Martie",
+      "Aprilie",
+      "Mai",
+      "Iunie",
+      "Iulie",
+      "August",
+      "Septembrie",
+      "Octombrie",
+      "Noiembrie",
+      "Decembrie"
+    ]
   },
   "home": {
     "intro": "Bun venit la clasamentul european de Mahjong, care acoperă disciplinele <strong>MCR</strong> și <strong>RCR</strong>. Punctele sunt calculate din rezultatele turneelor recunoscute de <a href=\"http://mahjong-europe.org\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--accent)\">European Mahjong Association (EMA)</a>. Acest site prezintă clasamentele săptămânale, istoricul turneelor, recordurile pe jucători și pe țări, precum și Hall of Fame.",
@@ -114,7 +128,9 @@
     "ok": "✓ OK",
     "pending": "⏳ În așteptare",
     "no_mers": "Fără MERS",
-    "more": "+ {n} mai mult →"
+    "more": "+ {n} mai mult →",
+    "recently_added": "Adăugate recent",
+    "new_badge": "nou"
   },
   "country": {
     "registered_players": "Jucători înregistrați",

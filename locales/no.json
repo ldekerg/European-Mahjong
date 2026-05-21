@@ -44,7 +44,21 @@
     "city": "By",
     "see_all": "vis alle →",
     "tournaments_played": "Spilte turneringer",
-    "active_tournaments": "Aktive turneringer"
+    "active_tournaments": "Aktive turneringer",
+    "months": [
+      "Januar",
+      "Februar",
+      "Mars",
+      "April",
+      "Mai",
+      "Juni",
+      "Juli",
+      "August",
+      "September",
+      "Oktober",
+      "November",
+      "Desember"
+    ]
   },
   "home": {
     "intro": "Velkommen til den europeiske Mahjong-rangeringen, som dekker disiplinene <strong>MCR</strong> og <strong>RCR</strong>. Poeng beregnes fra turneringsresultater godkjent av <a href=\"http://mahjong-europe.org\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--accent)\">European Mahjong Association (EMA)</a>. Nettstedet viser ukentlige rangeringer, turneringshistorikk, rekorder for spillere og land, samt Hall of Fame.",
@@ -114,7 +128,9 @@
     "ok": "✓ OK",
     "pending": "⏳ Venter",
     "no_mers": "Ingen MERS",
-    "more": "+ {n} flere →"
+    "more": "+ {n} flere →",
+    "recently_added": "Nylig lagt til",
+    "new_badge": "ny"
   },
   "country": {
     "registered_players": "Registrerte spillere",

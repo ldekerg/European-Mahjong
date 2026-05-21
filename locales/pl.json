@@ -44,7 +44,21 @@
     "city": "Miasto",
     "see_all": "pokaż wszystko →",
     "tournaments_played": "Rozegrane turnieje",
-    "active_tournaments": "Aktywne turnieje"
+    "active_tournaments": "Aktywne turnieje",
+    "months": [
+      "Styczeń",
+      "Luty",
+      "Marzec",
+      "Kwiecień",
+      "Maj",
+      "Czerwiec",
+      "Lipiec",
+      "Sierpień",
+      "Wrzesień",
+      "Październik",
+      "Listopad",
+      "Grudzień"
+    ]
   },
   "home": {
     "intro": "Witamy w europejskim rankingu Mahjong, obejmującym dyscypliny <strong>MCR</strong> i <strong>RCR</strong>. Punkty są obliczane na podstawie wyników turniejów uznanych przez <a href=\"http://mahjong-europe.org\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--accent)\">European Mahjong Association (EMA)</a>. Strona prezentuje tygodniowe rankingi, historię turniejów, rekordy graczy i krajów oraz Hall of Fame.",
@@ -114,7 +128,9 @@
     "ok": "✓ OK",
     "pending": "⏳ Oczekujący",
     "no_mers": "Bez MERS",
-    "more": "+ {n} więcej →"
+    "more": "+ {n} więcej →",
+    "recently_added": "Ostatnio dodane",
+    "new_badge": "nowy"
   },
   "country": {
     "registered_players": "Zarejestrowani gracze",

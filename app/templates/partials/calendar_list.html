@@ -44,6 +44,7 @@
         {% elif trn.tournament_type == 'wrc' %}<span class="badge badge-wmc">WRC</span>
         {% elif trn.tournament_type == 'oemc' %}<span class="badge badge-oemc">OEMC</span>
         {% elif trn.tournament_type == 'oerc' %}<span class="badge badge-oerc">ERMC</span>{% endif %}
+        {% if new_ids is defined and trn.id in new_ids %}<span class="badge" style="background:#dc2626;color:#fff;font-size:0.68rem">{{ trad('calendar.new_badge') }}</span>{% endif %}
       </td>
       <td class="col-ville col-opt">{{ trn.city }}</td>
       {% set duree = ((trn.end_date - trn.start_date).days + 1) if trn.end_date and trn.end_date != trn.start_date else 1 %}

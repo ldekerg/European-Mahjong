@@ -11,7 +11,18 @@
   </div>
 </div>
 
-{% with tournois_par_mois=tournois_par_mois %}
+{% set recent_ids = recent | map(attribute='id') | list %}
+
+{% if recent %}
+<section style="margin-bottom:2rem">
+  <h2 style="font-size:1rem;color:var(--text2);margin-bottom:0.75rem">{{ trad('calendar.recently_added') }}</h2>
+  {% with tournois_par_mois=[{'label':'','tournaments':recent}], compact=true, compact_max=5, new_ids=recent_ids %}
+  {% include 'partials/calendar_list.html' %}
+  {% endwith %}
+</section>
+{% endif %}
+
+{% with tournois_par_mois=tournois_par_mois, new_ids=recent_ids %}
 {% include 'partials/calendar_list.html' %}
 {% endwith %}
 

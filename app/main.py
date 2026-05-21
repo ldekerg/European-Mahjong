@@ -461,8 +461,6 @@ def home(request: Request, db: Session = Depends(get_db)):
 
         # Calendar (for the compact home partial)
         from collections import defaultdict
-        MONTHS_FR = ["", "Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
-                   "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"]
         cal_tournaments = (
             db.query(Tournament)
             .filter(Tournament.status == "calendrier")
@@ -472,8 +470,11 @@ def home(request: Request, db: Session = Depends(get_db)):
         cal_by_month = defaultdict(list)
         for t in cal_tournaments:
             cal_by_month[(t.start_date.year, t.start_date.month)].append(t)
+        from app.i18n import _LOCALES, _detect_lang
+        _lang = _detect_lang(request)
+        _months = _LOCALES.get(_lang, _LOCALES.get("fr", {})).get("common", {}).get("months", [])
         calendar_by_month = [
-            {"label": f"{MONTHS_FR[m]} {y}", "tournaments": ts}
+            {"label": f"{_months[m-1]} {y}" if _months else f"{m}/{y}", "tournaments": ts}
             for (y, m), ts in sorted(cal_by_month.items())
         ]
 

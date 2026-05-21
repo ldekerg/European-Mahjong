@@ -98,6 +98,29 @@ def fetch_html() -> str:
     return raw.decode("utf-8", errors="replace")
 
 
+def parse_whats_new(html: str) -> dict[str, date]:
+    """Parse the 'What's new' section. Returns {tournament_name: date_added}."""
+    soup = BeautifulSoup(html, "html.parser")
+    result = {}
+    h4 = soup.find("h4", string=lambda t: t and "what" in t.lower())
+    if not h4:
+        return result
+    ul = h4.find_next("ul")
+    if not ul:
+        return result
+    for li in ul.find_all("li"):
+        txt = li.get_text(" ", strip=True)
+        # Format: "18/05/2026 : -- Vienna Riichi Open 2026 -- : ..."
+        m = re.match(r'(\d{2}/\d{2}/\d{4})\s*:\s*--\s*(.+?)\s*--', txt)
+        if m:
+            try:
+                d = date(int(m.group(1)[6:]), int(m.group(1)[3:5]), int(m.group(1)[:2]))
+                result[m.group(2).strip()] = d
+            except ValueError:
+                pass
+    return result
+
+
 def parse_calendar(html: str) -> list[dict]:
     soup = BeautifulSoup(html, "html.parser")
     lignes = soup.find_all("div", class_=["TCTT_ligne", "TCTT_ligneG"])
@@ -192,6 +215,8 @@ def parse_calendar(html: str) -> list[dict]:
 
 def run():
     html = fetch_html()
+    whats_new = parse_whats_new(html)
+    print(f"What's new: {len(whats_new)} entries")
     entries = parse_calendar(html)
     print(f"Parsed: {len(entries)} tournaments")
 
@@ -231,6 +256,13 @@ def run():
             if e["website"] and tournoi.website != e["website"]:
                 tournoi.website = e["website"]
                 changed = True
+            # Backfill created_at from what's new if not yet set
+            if tournoi.created_at is None:
+                from datetime import datetime as _dt
+                added_date = whats_new.get(e["name"])
+                if added_date:
+                    tournoi.created_at = _dt.combine(added_date, _dt.min.time())
+                    changed = True
             if changed:
                 updated += 1
                 print(f"  ~ {e['rules']} {e['start_date']} {e['name']}")
@@ -239,6 +271,9 @@ def run():
             continue
 
         # New calendar tournament
+        from datetime import datetime as _dt
+        added_date = whats_new.get(e["name"])
+        created_at = _dt.combine(added_date, _dt.min.time()) if added_date else None
         city_obj = db.query(City).filter_by(name=e["city"], country=e["country"]).first()
         db.add(Tournament(
             ema_id          = e["ema_id"],
@@ -254,8 +289,9 @@ def run():
             status          = "calendrier",
             approval        = e["approval"],
             website         = e["website"],
+            created_at      = created_at,
         ))
-        print(f"  + {e['rules']} {e['start_date']} {e['name']}")
+        print(f"  + {e['rules']} {e['start_date']} {e['name']} (added {added_date or 'now'})")
         inseres += 1
 
     db.commit()

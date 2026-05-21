@@ -62,6 +62,7 @@ class Tournament(Base):
     # ok | pending | no_mers | NULL (for tournaments imported via EMA)
     approval        = Column(String, nullable=True)
     website         = Column(String, nullable=True)          # link to tournament website
+    created_at      = Column(DateTime, nullable=True, default=datetime.utcnow)
 
     __table_args__ = (
         Index("uq_tournoi_ema_regles", "ema_id", "rules", unique=True,

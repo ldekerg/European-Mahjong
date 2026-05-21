@@ -113,8 +113,6 @@ def liste_tournois(
 def calendrier(request: Request, db: Session = Depends(get_db)):
     from collections import defaultdict
     from datetime import date as _date
-    MOIS_FR = ["", "Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
-               "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"]
 
     tournois = (
         db.query(Tournament)
@@ -127,14 +125,27 @@ def calendrier(request: Request, db: Session = Depends(get_db)):
     for t in tournois:
         by_month[(t.start_date.year, t.start_date.month)].append(t)
 
+    from app.i18n import _LOCALES, _detect_lang
+    lang = _detect_lang(request)
+    months = _LOCALES.get(lang, _LOCALES.get("fr", {})).get("common", {}).get("months", [])
+
     tournois_par_mois = [
-        {"label": f"{MOIS_FR[m]} {y}", "tournaments": ts}
+        {"label": f"{months[m-1]} {y}" if months else f"{m}/{y}", "tournaments": ts}
         for (y, m), ts in sorted(by_month.items())
     ]
+
+    recent = (
+        db.query(Tournament)
+        .filter(Tournament.status == "calendrier", Tournament.created_at.isnot(None))
+        .order_by(Tournament.created_at.desc())
+        .limit(5)
+        .all()
+    )
 
     return templates.TemplateResponse(request, "tournaments/calendar.html", {
         "tournois_par_mois": tournois_par_mois,
         "nb_total": len(tournois),
+        "recent": recent,
     })
 
 
