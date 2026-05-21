@@ -40,6 +40,7 @@
       {% set _col='date' %}{% set _label='Date' %}{% set _cls='col-nowrap' %}{% include 'manage/partials/sortable_th.html' %}
       {% set _col='players' %}{% set _label='👥' %}{% set _cls='col-nowrap col-opt center' %}{% include 'manage/partials/sortable_th.html' %}
       {% set _col='coeff' %}{% set _label='⚖️' %}{% set _cls='col-nowrap col-opt center' %}{% include 'manage/partials/sortable_th.html' %}
+      <th class="col-nowrap col-opt">Status</th>
       <th class="col-nowrap">Actions</th>
     </tr>
   </thead>
@@ -54,13 +55,26 @@
     <td class="col-nowrap">{{ t.start_date.strftime('%d/%m/%y') }}</td>
     <td class="col-nowrap col-opt center dim">{{ t.nb_players }}</td>
     <td class="col-nowrap col-opt center dim">{{ t.coefficient }}</td>
+    <td class="col-nowrap col-opt">
+      {% if t.status == 'actif' %}
+        <span class="dim" style="font-size:0.82rem">Active</span>
+      {% elif t.status == 'archive' %}
+        <span class="dim" style="font-size:0.82rem">Archive</span>
+      {% elif t.status == 'calendrier' %}
+        <span class="dim" style="font-size:0.82rem">Calendar</span>
+        {% if t.approval == 'ok' %} <span class="badge" style="font-size:0.7rem;background:#d1fae5;color:#065f46">EMA</span>
+        {% elif t.approval == 'pending' %} <span class="badge" style="font-size:0.7rem;background:#fef3c7;color:#78350f">pending</span>
+        {% elif t.approval == 'no_mers' %} <span class="badge" style="font-size:0.7rem;background:#fee2e2;color:#7f1d1d">no MERS</span>
+        {% endif %}
+      {% endif %}
+    </td>
     <td class="col-nowrap manage-actions-cell">
       <a href="/manage/tournaments/{{ t.id }}/edit" class="btn btn-sm" title="Edit">✏️</a>
       <a href="/manage/tournaments/{{ t.id }}/results" class="btn btn-sm btn-secondary" title="Results">📥</a>
     </td>
   </tr>
   {% else %}
-  <tr><td colspan="9" class="empty">No tournaments found.</td></tr>
+  <tr><td colspan="10" class="empty">No tournaments found.</td></tr>
   {% endfor %}
   </tbody>
 </table>

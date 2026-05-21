@@ -51,6 +51,41 @@
   </div>
 </form>
 
+{% if city_tournaments %}
+<div class="manage-section">
+  <h2>Linked tournaments <span class="dim" style="font-weight:400;font-size:0.85rem">({{ city_tournaments | length }})</span></h2>
+  <div class="scroll-table">
+  <table>
+    <thead>
+      <tr>
+        <th class="col-nowrap">Date</th>
+        <th class="col-nowrap"></th>
+        <th>Name</th>
+        <th class="col-nowrap col-opt center" title="Players">👥</th>
+        <th class="col-nowrap">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for t in city_tournaments %}
+    <tr>
+      <td class="col-nowrap">{{ t.start_date.strftime('%Y-%m-%d') }}</td>
+      <td class="col-nowrap"><span class="badge {% if t.rules == 'MCR' %}badge-mcr{% else %}badge-rcr{% endif %}">{{ t.rules }}</span></td>
+      <td>{{ t.name }}</td>
+      <td class="col-nowrap col-opt center dim">{{ t.nb_players }}</td>
+      <td class="col-nowrap manage-actions-cell">
+        <a href="/manage/tournaments/{{ t.id }}/edit" class="btn btn-sm">✏️</a>
+        {% if t.ema_id %}<a href="/tournaments/{{ t.rules }}_{{ t.ema_id }}" target="_blank" class="btn btn-sm btn-secondary">👁</a>{% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</div>
+{% elif city %}
+<p class="dim" style="margin-top:1.5rem;font-size:0.85rem">No tournaments linked to this city.</p>
+{% endif %}
+
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9/dist/leaflet.js"></script>
 <script>

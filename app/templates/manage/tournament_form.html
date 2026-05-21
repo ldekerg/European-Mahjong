@@ -31,17 +31,14 @@
       <label>Type</label>
       <select name="tournament_type" id="tournament-type" class="manage-select" onchange="updateTypeHelp()">
         {% for val, label, hint in [
-          ('normal',   'Normal (EMA)',          'Official EMA tournament included in MERS ranking.'),
-          ('non_mers', 'Non-MERS',              'EMA tournament not included in MERS ranking.'),
-          ('oemc',     'OEMC',                  'Open European MCR Championship.'),
-          ('oerc',     'ERMC',                  'Open European Riichi Mahjong Championship.'),
-          ('wmc',      'WMC',                   'World Mahjong Championship. Not included in MERS.'),
-          ('wrc',      'WRC',                   'World Riichi Championship. Not included in MERS.'),
+          ('normal',      'Normal (EMA)',           'Official EMA tournament included in MERS ranking.'),
+          ('non_mers',    'Non-MERS',               'EMA tournament not included in MERS ranking.'),
+          ('championship','European Championship',  'OEMC (MCR) or ERMC (RCR) depending on rules. Included in MERS with qualification bonus (+1).'),
+          ('world',       'World Championship',     'WMC (MCR) or WRC (RCR) depending on rules. Not included in MERS.'),
         ] %}
         <option value="{{ val }}"
                 data-hint="{{ hint }}"
-                data-ema="{{ 'true' if val in ['normal','oemc','oerc','non_mers'] else 'false' }}"
-                {% if tournament and tournament.tournament_type == val %}selected{% endif %}>
+                {% if tournament and tournament.tournament_type in ([val] + ({'championship':['oemc','oerc'],'world':['wmc','wrc']}.get(val,[]))) %}selected{% endif %}>
           {{ label }}
         </option>
         {% endfor %}
@@ -92,11 +89,23 @@
 
     <div class="form-group">
       <label>Status</label>
-      <select name="status" class="manage-select">
-        {% for val, label in [('actif','Active'),('calendrier','Calendar'),('archive','Archive')] %}
-        <option value="{{ val }}" {% if tournament and tournament.status == val %}selected{% endif %}>{{ label }}</option>
-        {% endfor %}
-      </select>
+      <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap">
+        <select name="status" id="status-select" class="manage-select" onchange="updateApprovalVisibility()">
+          {% for val, label in [('actif','Active'),('calendrier','Calendar'),('archive','Archive')] %}
+          <option value="{{ val }}" {% if tournament and tournament.status == val %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+        <span id="approval-group" style="display:none;align-items:center;gap:0.6rem;font-size:0.875rem">
+          <label style="display:flex;align-items:center;gap:0.25rem;font-weight:400;cursor:pointer">
+            <input type="radio" name="approval" value="ok"
+                   {% if tournament and tournament.approval == 'ok' %}checked{% endif %}> Approved
+          </label>
+          <label style="display:flex;align-items:center;gap:0.25rem;font-weight:400;cursor:pointer">
+            <input type="radio" name="approval" value="pending"
+                   {% if not tournament or tournament.approval == 'pending' %}checked{% endif %}> Pending
+          </label>
+        </span>
+      </div>
     </div>
 
     <div class="form-group">
@@ -196,8 +205,22 @@ function updateTypeHelp() {
   var sel = document.getElementById('tournament-type');
   var opt = sel.options[sel.selectedIndex];
   document.getElementById('type-hint').textContent = opt.dataset.hint || '';
+  updateApprovalVisibility();
 }
-document.addEventListener('DOMContentLoaded', updateTypeHelp);
+
+// -- Approval radios: visible only for Calendar status + normal(EMA) type ---
+function updateApprovalVisibility() {
+  var status = document.getElementById('status-select').value;
+  var type   = document.getElementById('tournament-type').value;
+  var group  = document.getElementById('approval-group');
+  var show   = status === 'calendrier' && type === 'normal';
+  group.style.display = show ? 'flex' : 'none';
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  updateTypeHelp();
+  updateApprovalVisibility();
+});
 
 // -- City modal ------------------------------------------------------------
 var _modalMap = null, _modalMarker = null;

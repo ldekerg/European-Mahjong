@@ -57,6 +57,15 @@ router = APIRouter(prefix="/manage")
 PAGE_SIZE = 50
 
 
+def _resolve_tournament_type(form_type: str, rules: str) -> str:
+    """Resolve 'championship'/'world' to the actual type based on rules."""
+    if form_type == "championship":
+        return "oemc" if rules == "MCR" else "oerc"
+    if form_type == "world":
+        return "wmc" if rules == "MCR" else "wrc"
+    return form_type
+
+
 def _parse_city_id(form_value: str) -> int | None:
     """Return city_id int from form value, or None if empty/invalid."""
     try:
@@ -309,7 +318,7 @@ async def tournament_new_post(request: Request, db: Session = Depends(get_db)):
         return RedirectResponse("/manage/tournaments/new", status_code=302)
 
     from app.ranking import mers_coefficient as _mcoeff
-    t_type  = form.get("tournament_type", "normal")
+    t_type  = _resolve_tournament_type(form.get("tournament_type", "normal"), form.get("rules", "MCR"))
     ema_id  = _next_ema_id(db, form["rules"]) if t_type in EMA_TYPES else None
     start   = date.fromisoformat(form["start_date"])
     end     = date.fromisoformat(form["end_date"])
@@ -329,6 +338,7 @@ async def tournament_new_post(request: Request, db: Session = Depends(get_db)):
         coefficient=coeff,
         tournament_type=t_type,
         status=form.get("status", "actif"),
+        approval=form.get("approval") or None,
         website=form.get("website") or None,
     )
     db.add(t)
@@ -381,7 +391,7 @@ async def tournament_edit_post(tournament_id: int, request: Request, db: Session
         return RedirectResponse("/manage/tournaments/", status_code=302)
 
     form = await request.form()
-    t_type = form.get("tournament_type", t.tournament_type)
+    t_type = _resolve_tournament_type(form.get("tournament_type", t.tournament_type), form.get("rules", t.rules))
 
     # Assign ema_id if type changed to an EMA type and it had none
     if t_type in EMA_TYPES and not t.ema_id:
@@ -401,8 +411,9 @@ async def tournament_edit_post(tournament_id: int, request: Request, db: Session
     nats    = [r.nationality or "" for r in t.results]
     nats   += [a.nationality or "" for a in db.query(AnonymousResult).filter_by(tournament_id=t.id).all()]
     t.coefficient = _mcoeff(nb_days, t.nb_players, nats, t_type)
-    t.status = form.get("status", t.status)
-    t.website = form.get("website") or None
+    t.status   = form.get("status", t.status)
+    t.approval = form.get("approval") or None
+    t.website  = form.get("website") or None
 
     champ_id = int(form["championship_id"]) if form.get("championship_id") else None
     _save_championship_link(db, t.id, champ_id)
@@ -916,6 +927,29 @@ def cities_list(
     return templates.TemplateResponse(request, "manage/cities.html", ctx)
 
 
+@router.post("/cities/delete")
+async def cities_delete(request: Request, db: Session = Depends(get_db)):
+    user = _require_auth(request)
+    if isinstance(user, RedirectResponse):
+        return user
+    form = await request.form()
+    ids = [int(i) for i in form.getlist("city_ids") if i.isdigit()]
+    if not ids:
+        _set_flash(request, "No cities selected.", "error")
+        return RedirectResponse("/manage/cities/", status_code=302)
+
+    deleted = 0
+    for city_id in ids:
+        # Unlink tournaments first
+        db.query(Tournament).filter(Tournament.city_id == city_id).update({"city_id": None})
+        db.query(City).filter_by(id=city_id).delete()
+        deleted += 1
+
+    db.commit()
+    _set_flash(request, f"{deleted} cit{'ies' if deleted > 1 else 'y'} deleted.")
+    return RedirectResponse("/manage/cities/", status_code=302)
+
+
 @router.post("/cities/create-ajax")
 async def city_create_ajax(request: Request, db: Session = Depends(get_db)):
     user = _require_auth(request)
@@ -1044,8 +1078,15 @@ def city_edit(city_id: int, request: Request, db: Session = Depends(get_db)):
     c = db.query(City).filter_by(id=city_id).first()
     if not c:
         return RedirectResponse("/manage/cities/", status_code=302)
+    city_tournaments = (
+        db.query(Tournament)
+        .filter(Tournament.city_id == city_id)
+        .order_by(Tournament.start_date.desc())
+        .all()
+    )
     ctx = _base_ctx(request, user, "cities")
-    ctx.update({"city": c, "allowed_countries": _allowed_countries(user)})
+    ctx.update({"city": c, "allowed_countries": _allowed_countries(user),
+                "city_tournaments": city_tournaments})
     return templates.TemplateResponse(request, "manage/city_form.html", ctx)
 
 

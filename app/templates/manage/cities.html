@@ -17,14 +17,17 @@
   <a href="/manage/cities/" class="btn btn-secondary">Reset</a>
 </form>
 
-<!-- Merge action bar — shown when at least 2 cities are selected -->
-<div id="merge-bar" class="merge-bar" style="display:none">
-  <span id="merge-count" class="dim"></span>
-  <button type="submit" form="merge-form" class="btn btn-primary">🔀 Merge selection</button>
-  <button type="button" class="btn btn-secondary" onclick="clearSelection()">✕ Cancel</button>
+<!-- Selection action bar — aligned with checkbox column -->
+<div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.4rem;padding-left:0.75rem">
+  <button type="button" class="btn btn-sm btn-secondary" id="btn-merge" onclick="submitMerge()" disabled>🔀 Merge</button>
+  <button type="button" class="btn btn-sm btn-secondary" id="btn-delete" onclick="submitDelete()" disabled>🗑 Delete</button>
+  <span id="selection-count" class="dim" style="font-size:0.82rem"></span>
 </div>
 
 <form method="post" action="/manage/cities/merge-preview" id="merge-form" style="display:block">
+<form method="post" action="/manage/cities/delete" id="delete-form" style="display:block">
+
+<!-- Hidden inputs duplicated into both forms by JS -->
 <div class="scroll-table">
 <table>
   <thead>
@@ -43,14 +46,17 @@
   <tbody>
   {% for c in cities %}
   <tr>
-    <td><input type="checkbox" name="city_ids" value="{{ c.city.id }}" class="city-cb" onchange="updateMergeBar()"></td>
-    <td>{{ c.city.name }}</td>
+    <td>
+      <input type="checkbox" name="city_ids" value="{{ c.city.id }}"
+             class="city-cb" data-nb="{{ c.nb_tournaments }}" onchange="updateButtons()">
+    </td>
+    <td><a href="/manage/cities/{{ c.city.id }}/edit">{{ c.city.name }}</a></td>
     <td class="col-nowrap center">{{ c.city.country | flag }} {{ c.city.country }}</td>
     <td class="col-nowrap col-opt right dim">{{ '%.4f' % c.city.latitude }}</td>
     <td class="col-nowrap col-opt right dim">{{ '%.4f' % c.city.longitude }}</td>
-    <td class="col-nowrap center">{{ c.nb_tournaments }}</td>
+    <td class="col-nowrap center {% if c.nb_tournaments == 0 %}dim{% endif %}">{{ c.nb_tournaments }}</td>
     <td class="col-nowrap manage-actions-cell">
-      <a href="/manage/cities/{{ c.city.id }}/edit" class="btn btn-sm">✏️</a>
+      <a href="/manage/cities/{{ c.city.id }}/edit" class="btn btn-sm" title="Edit">✏️</a>
     </td>
   </tr>
   {% else %}
@@ -59,6 +65,8 @@
   </tbody>
 </table>
 </div>
+
+</form>
 </form>
 
 {% if total_pages > 1 %}
@@ -69,43 +77,55 @@
 </div>
 {% endif %}
 
-<style>
-.merge-bar {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  background: color-mix(in srgb, var(--accent) 10%, var(--bg));
-  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
-  border-radius: 8px;
-  padding: 0.6rem 1rem;
-  margin-bottom: 0.75rem;
-}
-</style>
-
 <script>
-function updateMergeBar() {
-  var checked = document.querySelectorAll('.city-cb:checked');
-  var bar = document.getElementById('merge-bar');
-  var count = document.getElementById('merge-count');
-  if (checked.length >= 2) {
-    bar.style.display = 'flex';
-    count.textContent = checked.length + ' cities selected';
-  } else {
-    bar.style.display = 'none';
-  }
+function getChecked() {
+  return Array.from(document.querySelectorAll('.city-cb:checked'));
+}
+
+function updateButtons() {
+  var checked = getChecked();
+  var n = checked.length;
+
+  document.getElementById('btn-merge').disabled  = n < 2;
+  document.getElementById('btn-delete').disabled = n < 1;
   document.getElementById('select-all').indeterminate =
-    checked.length > 0 && checked.length < document.querySelectorAll('.city-cb').length;
+    n > 0 && n < document.querySelectorAll('.city-cb').length;
+
+  var count = document.getElementById('selection-count');
+  count.textContent = n > 0 ? n + ' selected' : '';
 }
 
 function toggleAll(cb) {
   document.querySelectorAll('.city-cb').forEach(function(el) { el.checked = cb.checked; });
-  updateMergeBar();
+  updateButtons();
 }
 
-function clearSelection() {
-  document.querySelectorAll('.city-cb').forEach(function(el) { el.checked = false; });
-  document.getElementById('select-all').checked = false;
-  document.getElementById('merge-bar').style.display = 'none';
+function _syncIds(formId) {
+  var form = document.getElementById(formId);
+  // Remove previous hidden inputs
+  form.querySelectorAll('input[name=city_ids]').forEach(function(el) { el.remove(); });
+  getChecked().forEach(function(cb) {
+    var inp = document.createElement('input');
+    inp.type = 'hidden'; inp.name = 'city_ids'; inp.value = cb.value;
+    form.appendChild(inp);
+  });
+}
+
+function submitMerge() {
+  _syncIds('merge-form');
+  document.getElementById('merge-form').submit();
+}
+
+function submitDelete() {
+  var checked = getChecked();
+  var withTournaments = checked.filter(function(cb) { return parseInt(cb.dataset.nb) > 0; });
+  var msg = 'Delete ' + checked.length + ' cit' + (checked.length > 1 ? 'ies' : 'y') + '?';
+  if (withTournaments.length > 0) {
+    msg += '\n\n⚠️ Warning: ' + withTournaments.length + ' of them are linked to tournaments. Those links will be removed.';
+  }
+  if (!confirm(msg)) return;
+  _syncIds('delete-form');
+  document.getElementById('delete-form').submit();
 }
 </script>
 
