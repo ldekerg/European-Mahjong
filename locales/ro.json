@@ -130,7 +130,11 @@
     "no_mers": "Fără MERS",
     "more": "+ {n} mai mult →",
     "recently_added": "Adăugate recent",
-    "new_badge": "nou"
+    "new_badge": "nou",
+    "registration_open": "Registration open",
+    "registration_open_abbr": "Reg. open",
+    "soon": "curând",
+    "opened": "deschis"
   },
   "country": {
     "registered_players": "Jucători înregistrați",

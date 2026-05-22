@@ -130,7 +130,11 @@
     "no_mers": "Nincs MERS",
     "more": "+ {n} további →",
     "recently_added": "Újonnan hozzáadott",
-    "new_badge": "új"
+    "new_badge": "új",
+    "registration_open": "Registration open",
+    "registration_open_abbr": "Reg. open",
+    "soon": "hamarosan",
+    "opened": "nyitott"
   },
   "country": {
     "registered_players": "Regisztrált játékosok",

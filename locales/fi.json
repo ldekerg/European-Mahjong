@@ -130,7 +130,11 @@
     "no_mers": "Ei MERS",
     "more": "+ {n} lisää →",
     "recently_added": "Äskettäin lisätty",
-    "new_badge": "uusi"
+    "new_badge": "uusi",
+    "registration_open": "Registration open",
+    "registration_open_abbr": "Reg. open",
+    "soon": "pian",
+    "opened": "auki"
   },
   "country": {
     "registered_players": "Rekisteröidyt pelaajat",

@@ -185,6 +185,7 @@
 .col-coeff        { width: 2.8rem; }
 .col-contrib      { width: 4.4rem; }
 .col-statut-cal   { width: 2.5rem; }
+.col-reg-open     { width: 3.5rem; }
 .col-joueurs      { width: 2rem; }
 .col-joueurs-sort { width: 4rem; }
 .col-score        { width: 3.5rem; }
@@ -1121,6 +1122,9 @@ caption.t-count {
 .badge-pending { background:var(--pending-bg);
                 color:var(--pending-fg);
                 border:1px solid var(--pending-fg)}
+
+.badge-soon   { background:#f97316; color:#fff; border:1px solid #ea6c0a; font-size:0.68rem; }
+.badge-opened { background:var(--ok-bg); color:var(--ok-fg); border:1px solid var(--ok-fg); font-size:0.68rem; }
 
 /* ═══════════════════════════════════════════════════════════════════
    RESPONSIVE MOBILE  (≤ 768px)

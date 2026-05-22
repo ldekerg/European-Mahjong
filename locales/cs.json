@@ -130,7 +130,11 @@
     "no_mers": "Bez MERS",
     "more": "+ {n} dalších →",
     "recently_added": "Nedávno přidáno",
-    "new_badge": "nový"
+    "new_badge": "nový",
+    "registration_open": "Registration open",
+    "registration_open_abbr": "Reg. open",
+    "soon": "brzy",
+    "opened": "otevřeno"
   },
   "country": {
     "registered_players": "Registrovaní hráči",

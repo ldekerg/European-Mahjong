@@ -130,7 +130,11 @@
     "no_mers": "Nav MERS",
     "more": "+ {n} vēl →",
     "recently_added": "Nesen pievienoti",
-    "new_badge": "jauns"
+    "new_badge": "jauns",
+    "registration_open": "Registration open",
+    "registration_open_abbr": "Reg. open",
+    "soon": "drīz",
+    "opened": "atvērts"
   },
   "country": {
     "registered_players": "Reģistrētie spēlētāji",

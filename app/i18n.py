@@ -1,4 +1,5 @@
 import os, json
+from datetime import date as _date
 from markupsafe import Markup
 from fastapi.templating import Jinja2Templates
 from fastapi import Request
@@ -259,3 +260,5 @@ def _pretty_json(s: str) -> str:
         return s or ""
 
 templates.env.filters["pretty_json"] = _pretty_json
+
+templates.env.globals["today"] = lambda: _date.today()

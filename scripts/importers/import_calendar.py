@@ -172,6 +172,15 @@ def parse_calendar(html: str) -> list[dict]:
         dates_txt = cellules[2].get_text(strip=True)
         lieu = cellules[3].get_text(strip=True)
 
+        reg_txt = cellules[5].get_text(strip=True) if len(cellules) > 5 else ""
+        registration_open = None
+        m_reg = re.match(r'(\w+)\s+(\d+),?\s+(\d{4})', reg_txt)
+        if m_reg and m_reg.group(1) in MOIS:
+            try:
+                registration_open = date(int(m_reg.group(3)), MOIS[m_reg.group(1)], int(m_reg.group(2)))
+            except ValueError:
+                pass
+
         approbation_txt = cellules[4].get_text(strip=True) if len(cellules) > 4 else ""
         if "No MERS" in approbation_txt or "No Mers" in approbation_txt or "No Europe" in approbation_txt:
             approbation = "no_mers"
@@ -206,8 +215,9 @@ def parse_calendar(html: str) -> list[dict]:
             "end_date":     date_fin,
             "ema_id":       ema_id,
             "tournament_type": type_from_nom(nom),
-            "approval":  approbation,
-            "website":     url_site or None,
+            "approval":          approbation,
+            "website":           url_site or None,
+            "registration_open": registration_open,
         })
 
     return entries
@@ -256,6 +266,9 @@ def run():
             if e["website"] and tournoi.website != e["website"]:
                 tournoi.website = e["website"]
                 changed = True
+            if e["registration_open"] and tournoi.registration_open != e["registration_open"]:
+                tournoi.registration_open = e["registration_open"]
+                changed = True
             # Backfill created_at from what's new if not yet set
             if tournoi.created_at is None:
                 from datetime import datetime as _dt
@@ -287,9 +300,10 @@ def run():
             coefficient     = 0.0,
             tournament_type = e["tournament_type"],
             status          = "calendrier",
-            approval        = e["approval"],
-            website         = e["website"],
-            created_at      = created_at,
+            approval          = e["approval"],
+            website           = e["website"],
+            registration_open = e["registration_open"],
+            created_at        = created_at,
         ))
         print(f"  + {e['rules']} {e['start_date']} {e['name']} (added {added_date or 'now'})")
         inseres += 1

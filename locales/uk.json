@@ -130,7 +130,11 @@
     "no_mers": "Без MERS",
     "more": "+ {n} ще →",
     "recently_added": "Нещодавно додані",
-    "new_badge": "нове"
+    "new_badge": "нове",
+    "registration_open": "Registration open",
+    "registration_open_abbr": "Reg. open",
+    "soon": "незабаром",
+    "opened": "відкрито"
   },
   "country": {
     "registered_players": "Зареєстровані гравці",

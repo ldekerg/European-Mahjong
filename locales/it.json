@@ -130,7 +130,11 @@
     "no_mers": "Senza MERS",
     "more": "+ {n} altri →",
     "recently_added": "Aggiunti di recente",
-    "new_badge": "nuovo"
+    "new_badge": "nuovo",
+    "registration_open": "Registration open",
+    "registration_open_abbr": "Reg. open",
+    "soon": "presto",
+    "opened": "aperto"
   },
   "country": {
     "registered_players": "Giocatori registrati",

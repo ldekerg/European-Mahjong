@@ -130,7 +130,11 @@
     "no_mers": "Ingen MERS",
     "more": "+ {n} fler →",
     "recently_added": "Nyligen tillagda",
-    "new_badge": "ny"
+    "new_badge": "ny",
+    "registration_open": "Registration open",
+    "registration_open_abbr": "Reg. open",
+    "soon": "snart",
+    "opened": "öppen"
   },
   "country": {
     "registered_players": "Registrerade spelare",

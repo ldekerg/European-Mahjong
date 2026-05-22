@@ -130,7 +130,11 @@
     "no_mers": "Geen MERS",
     "more": "+ {n} meer →",
     "recently_added": "Recent toegevoegd",
-    "new_badge": "nieuw"
+    "new_badge": "nieuw",
+    "registration_open": "Registration open",
+    "registration_open_abbr": "Reg. open",
+    "soon": "binnenkort",
+    "opened": "open"
   },
   "country": {
     "registered_players": "Geregistreerde spelers",
