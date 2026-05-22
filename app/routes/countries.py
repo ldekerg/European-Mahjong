@@ -1,4 +1,4 @@
-import sys, os
+import sys, os, json
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from fastapi import APIRouter, Depends, Request, Query
@@ -12,6 +12,13 @@ from app.database import get_db
 from app.models import Player, Tournament, Result, RankingHistory
 from app.ranking import week_monday, active_tournaments, FREEZE_START, FREEZE_END
 from app.i18n import templates, ISO_NOM_PAYS, _PAYS_ISO
+
+_FEDERATIONS_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "data", "federations.json")
+try:
+    with open(_FEDERATIONS_PATH, encoding="utf-8") as _f:
+        FEDERATIONS: dict = json.load(_f)
+except Exception:
+    FEDERATIONS = {}
 
 router = APIRouter(prefix="/countries")
 
@@ -303,11 +310,12 @@ def pays_liste(
     all_codes = set(players_by_country.keys()) - {"", "GUEST"}
     pays_list = sorted([
         {
-            "code":          code,
+            "code":           code,
             "name":           _pays_name(code),
-            "nb_players":    players_by_country.get(code, 0),
-            "nb_actifs":     actifs_par_pays.get(code, 0),
-            "nb_tournaments":   tournois_par_code.get(code, 0),
+            "nb_players":     players_by_country.get(code, 0),
+            "nb_actifs":      actifs_par_pays.get(code, 0),
+            "nb_tournaments": tournois_par_code.get(code, 0),
+            "federation":     FEDERATIONS.get(code.upper()),
         }
         for code in all_codes
     ], key=lambda x: (-x["nb_actifs"], x["name"]))
@@ -559,4 +567,6 @@ def pays_detail(
         "chart_json":       json.dumps(chart_detail),
         # National circuits
         "series_pays":      series_pays,
+        # Federation
+        "federation":       FEDERATIONS.get(code.upper()),
     })

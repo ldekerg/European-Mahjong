@@ -197,8 +197,9 @@
 .col-hof-stat     { width: 3rem; }     /* stat HOF (médailles, semaines) */
 .col-hof-podium   { width: 3.5rem; }  /* podium HOF */
 .col-hof-total    { width: 5rem; }     /* total HOF */
-.col-pays-joueurs { width: 7rem; }     /* joueurs actifs dans liste pays */
-.col-pays-tournois{ width: 6rem; }    /* tournois org dans liste pays */
+.col-pays-joueurs    { width: 7rem; }
+.col-pays-tournois   { width: 6rem; }
+.col-pays-federation { width: 8rem; max-width: 18rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .col-champ-score  { width: 5rem; }    /* score moyen championnat */
 .col-champ-t      { width: 4rem; }    /* nb tournois championnat */
 .col-tournoi      { width: 14rem; }   /* nom tournoi calendrier */

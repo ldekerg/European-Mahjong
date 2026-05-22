@@ -125,6 +125,7 @@
       <col class="col-pays-nom">
       <col class="col-pays-joueurs">
       <col class="col-pays-tournois col-opt">
+      <col class="col-pays-federation col-opt">
     </colgroup>
     <thead>
       <tr>
@@ -132,6 +133,7 @@
         <th class="col-pays-nom">{{ trad('common.country') }}</th>
         <th class="col-pays-joueurs center" title="{{ trad('country.active_players_title') }}">{{ trad('common.players') }}</th>
         <th class="col-pays-tournois col-opt center">{{ trad('country.tournaments_org_abbr') }}</th>
+        <th class="col-pays-federation col-opt">Federation</th>
       </tr>
     </thead>
     <tbody>
@@ -145,6 +147,11 @@
         </td>
         <td class="col-pays-tournois col-opt center {% if p.nb_tournaments %}rank-num{% else %}dim{% endif %}">
           {{ p.nb_tournaments or '—' }}
+        </td>
+        <td class="col-pays-federation col-opt">
+          {% if p.federation %}
+          <a href="{{ p.federation.url }}" target="_blank" rel="noopener" class="dim" style="font-size:0.8rem">{{ p.federation.name }}</a>
+          {% endif %}
         </td>
       </tr>
       {% endfor %}

@@ -2,14 +2,30 @@
 {% block content %}
 
 <!-- ── En-tête pays ─────────────────────────────────────────────────────── -->
-<div class="ranking-header">
-  <h1 style="display:flex;align-items:center;gap:0.5rem">
-    <span style="font-size:2rem">{{ code | flag }}</span>
-    {{ nom_pays }}
-    {% if code in ['RU', 'BY'] %}
-    <span class="badge badge-suspendu" title="{{ trad('country.suspended_title') }}">{{ trad('country.suspended') }}</span>
+<div class="ranking-header" style="align-items:flex-start">
+  <div>
+    <h1 style="display:flex;align-items:center;gap:0.5rem">
+      <span style="font-size:2rem">{{ code | flag }}</span>
+      {{ nom_pays }}
+      {% if code in ['RU', 'BY'] %}
+      <span class="badge badge-suspendu" title="{{ trad('country.suspended_title') }}">{{ trad('country.suspended') }}</span>
+      {% endif %}
+    </h1>
+    {% if federation %}
+    <a href="{{ federation.url }}" target="_blank" rel="noopener"
+       class="dim" style="font-size:0.8rem;margin-top:0.3rem;display:inline-block">
+      {{ federation.name }} ↗
+    </a>
     {% endif %}
-  </h1>
+  </div>
+  {% if federation and federation.logo %}
+  <a href="{{ federation.url }}" target="_blank" rel="noopener" title="{{ federation.name }}">
+    <img src="{{ federation.logo }}" alt="{{ federation.name }}"
+         style="height:5rem;width:auto;max-width:10rem;object-fit:contain;
+                background:#fff;border-radius:6px;padding:0.4rem;
+                box-shadow:0 1px 4px rgba(0,0,0,0.15)">
+  </a>
+  {% endif %}
 </div>
 
 <!-- ── Stats fixes ──────────────────────────────────────────────────────── -->
