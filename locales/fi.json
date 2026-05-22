@@ -103,7 +103,9 @@
     "best_ranking": "Paras rankaus",
     "best_score": "Korkein pistemäärä",
     "best_points": "Maks. turnauspisteet",
-    "best_mahjong": "Maks. Mahjong-pisteet"
+    "best_mahjong": "Maks. Mahjong-pisteet",
+    "national_ranking": "Kansallinen sijoitus",
+    "best_national_ranking": "Paras kansallinen sijoitus"
   },
   "tournament": {
     "map_hint": "Napsauta merkkiä suodattaaksesi kaupungin mukaan",

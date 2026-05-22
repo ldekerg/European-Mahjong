@@ -103,7 +103,9 @@
     "best_ranking": "Labākais rangs",
     "best_score": "Maksimālie punkti",
     "best_points": "Maks. turnīra punkti",
-    "best_mahjong": "Maks. Mahjong rezultāts"
+    "best_mahjong": "Maks. Mahjong rezultāts",
+    "national_ranking": "Nacionālais reitings",
+    "best_national_ranking": "Labākais nacionālais reitings"
   },
   "tournament": {
     "map_hint": "Noklikšķiniet uz atzīmes, lai filtrētu pēc pilsētas",

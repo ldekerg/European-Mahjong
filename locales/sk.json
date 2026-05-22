@@ -103,7 +103,9 @@
     "best_ranking": "Najlepšie umiestnenie",
     "best_score": "Maximálne skóre",
     "best_points": "Max. body turnaja",
-    "best_mahjong": "Max. skóre Mahjong"
+    "best_mahjong": "Max. skóre Mahjong",
+    "national_ranking": "Národný rebríček",
+    "best_national_ranking": "Najlepší národný rebríček"
   },
   "tournament": {
     "map_hint": "Kliknite na značku pre filtrovanie podľa mesta",

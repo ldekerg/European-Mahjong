@@ -103,7 +103,9 @@
     "best_ranking": "Beste ranking",
     "best_score": "Maximale score",
     "best_points": "Max. toernooi­punten",
-    "best_mahjong": "Max. Mahjong-score"
+    "best_mahjong": "Max. Mahjong-score",
+    "national_ranking": "Nationaal klassement",
+    "best_national_ranking": "Beste nationale klassement"
   },
   "tournament": {
     "map_hint": "Klik op een markering om op stad te filteren",

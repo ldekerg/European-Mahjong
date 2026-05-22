@@ -103,7 +103,9 @@
     "best_ranking": "Beste rangering",
     "best_score": "Høyeste poengsum",
     "best_points": "Maks. turneringspoeng",
-    "best_mahjong": "Maks. Mahjong-poeng"
+    "best_mahjong": "Maks. Mahjong-poeng",
+    "national_ranking": "Nasjonal rangering",
+    "best_national_ranking": "Beste nasjonale rangering"
   },
   "tournament": {
     "map_hint": "Klikk på en markør for å filtrere etter by",

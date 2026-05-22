@@ -103,7 +103,9 @@
     "best_ranking": "Cel mai bun clasament",
     "best_score": "Punctaj maxim",
     "best_points": "Max. puncte turneu",
-    "best_mahjong": "Max. scor Mahjong"
+    "best_mahjong": "Max. scor Mahjong",
+    "national_ranking": "Clasament național",
+    "best_national_ranking": "Cel mai bun clasament național"
   },
   "tournament": {
     "map_hint": "Faceți clic pe un marker pentru a filtra după oraș",

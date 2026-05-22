@@ -175,6 +175,43 @@ def player_detail(player_id: str, request: Request, db: Session = Depends(get_db
             key=lambda x: x["mahjong"], default=None,
         )
 
+        # Current + best national rank
+        compatriot_ids = [
+            r[0] for r in db.query(Player.id)
+            .filter(Player.nationality == player.nationality).all()
+        ]
+        national_rank = None
+        if ranking:
+            nb_above = db.query(RankingHistory.player_id).filter(
+                RankingHistory.rules == rules,
+                RankingHistory.week == week,
+                RankingHistory.player_id.in_(compatriot_ids),
+                RankingHistory.position < ranking.position,
+            ).count()
+            national_rank = nb_above + 1
+
+        # Best national rank — single query: for each week the player was ranked,
+        # count compatriots ranked above, then pick the minimum
+        best_national_rank = None
+        date_best_national_rank = None
+        if history and compatriot_ids:
+            from sqlalchemy import text as _text
+            ids_placeholder = ",".join(f"'{i}'" for i in compatriot_ids)
+            rows = db.execute(_text(f"""
+                SELECT ph.week, ph.position,
+                       (SELECT COUNT(*) FROM ranking_history ch
+                        WHERE ch.rules = :rules AND ch.week = ph.week
+                          AND ch.player_id IN ({ids_placeholder})
+                          AND ch.position < ph.position) AS nb_above
+                FROM ranking_history ph
+                WHERE ph.player_id = :pid AND ph.rules = :rules
+                ORDER BY nb_above ASC
+                LIMIT 1
+            """), {"rules": rules, "pid": player_id}).fetchone()
+            if rows:
+                best_national_rank = rows[2] + 1
+                date_best_national_rank = rows[0].isoformat() if hasattr(rows[0], 'isoformat') else str(rows[0])
+
         return {
             "ranking": ranking,
             "best_rank": best_rank,
@@ -187,6 +224,9 @@ def player_detail(player_id: str, request: Request, db: Session = Depends(get_db
             "nb_active": sum(1 for td in tournaments_data if td["active"]),
             "best_points":  best_points,
             "best_mahjong": best_mahjong,
+            "national_rank": national_rank,
+            "best_national_rank": best_national_rank,
+            "date_best_national_rank": date_best_national_rank,
         }
 
     nationality_changes = db.query(NationalityChange).filter(

@@ -103,7 +103,9 @@
     "best_ranking": "Bästa rankning",
     "best_score": "Högsta poäng",
     "best_points": "Max. turneringspoäng",
-    "best_mahjong": "Max. Mahjong-poäng"
+    "best_mahjong": "Max. Mahjong-poäng",
+    "national_ranking": "Nationell ranking",
+    "best_national_ranking": "Bästa nationella ranking"
   },
   "tournament": {
     "map_hint": "Klicka på en markör för att filtrera efter stad",

@@ -103,7 +103,9 @@
     "best_ranking": "Legjobb rangsor",
     "best_score": "Maximális pontszám",
     "best_points": "Max. versenypontok",
-    "best_mahjong": "Max. Mahjong-pontszám"
+    "best_mahjong": "Max. Mahjong-pontszám",
+    "national_ranking": "Nemzeti rangsor",
+    "best_national_ranking": "Legjobb nemzeti rangsor"
   },
   "tournament": {
     "map_hint": "Kattints egy jelölőre a városra való szűréshez",

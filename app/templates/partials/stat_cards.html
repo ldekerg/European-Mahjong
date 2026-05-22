@@ -1,10 +1,12 @@
 {# Grille de stats d'un joueur pour une discipline.
    Variables requises :
-     data   — dict {ranking, best_rank, date_best_rank, max_score, date_max_score, nb_active, tournois}
+     data   — dict {ranking, national_rank, best_rank, date_best_rank, best_national_rank, date_best_national_rank, max_score, date_max_score, nb_active, tournaments}
      regles — 'mcr' ou 'rcr'
    Dépendance JS : highlightDate() et clearHighlight() définis dans players/detail.html
 #}
 <div class="stats-grid">
+
+  <!-- 1. Classement actuel + national -->
   <div class="stat-card">
     <div class="stat-label">{{ trad('player.current_ranking') }}</div>
     <div class="stat-value">
@@ -13,7 +15,14 @@
         <span class="stat-sub">{{ data.ranking.score | round(2) }}</span>
       {% else %}—{% endif %}
     </div>
+    {% if data.national_rank %}
+    <div class="stat-sub" style="margin-top:0.25rem">
+      {{ player.nationality | flag }} #{{ data.national_rank }}
+    </div>
+    {% endif %}
   </div>
+
+  <!-- 2. Meilleur classement mondial -->
   <div class="stat-card stat-card-hl"
        onmouseenter="highlightDate('{{ rules }}','pos','{{ data.date_best_rank }}')"
        onmouseleave="clearHighlight('{{ rules }}')">
@@ -31,6 +40,25 @@
     </div>
   </div>
 
+  <!-- 3. Meilleur classement national -->
+  <div class="stat-card stat-card-hl"
+       onmouseenter="highlightDate('{{ rules }}','pos','{{ data.date_best_national_rank }}')"
+       onmouseleave="clearHighlight('{{ rules }}')">
+    <div class="stat-label">{{ trad('player.best_national_ranking') }} {{ player.nationality | flag }}</div>
+    <div class="stat-value">
+      {% if data.best_national_rank %}
+        {{ data.best_national_rank }}
+        {% if data.date_best_national_rank %}
+        <a class="apercu-best" href="/countries/{{ player.nationality }}?week={{ data.date_best_national_rank }}&rules={{ rules | upper }}"
+           title="{{ trad('player.best_national_ranking') }}">
+          🏆 <span class="apercu-best-date">{{ data.date_best_national_rank | fmt_date }}</span>
+        </a>
+        {% endif %}
+      {% else %}—{% endif %}
+    </div>
+  </div>
+
+  <!-- 4. Meilleur score -->
   <div class="stat-card stat-card-hl"
        onmouseenter="highlightDate('{{ rules }}','score','{{ data.date_max_score }}')"
        onmouseleave="clearHighlight('{{ rules }}')">
@@ -47,14 +75,16 @@
       {% else %}—{% endif %}
     </div>
   </div>
-  <div class="stat-card">
-    <div class="stat-label">{{ trad('common.active_tournaments') }}</div>
-    <div class="stat-value">{{ data.nb_active }}</div>
-  </div>
+
+  <!-- 5. Tournois joués + actifs -->
   <div class="stat-card">
     <div class="stat-label">{{ trad('common.tournaments_played') }}</div>
-    <div class="stat-value">{{ data.tournaments | length }}</div>
+    <div class="stat-value">
+      {{ data.tournaments | length }}
+      <span class="stat-sub">{{ data.nb_active }} {{ trad('common.active_tournaments') }}</span>
+    </div>
   </div>
+
   {% if data.best_points and data.best_points.points > 0 and rules == 'mcr' %}
   <div class="stat-card">
     <div class="stat-label">{{ trad('player.best_points') }}</div>
@@ -66,6 +96,7 @@
     </div>
   </div>
   {% endif %}
+
   {% if data.best_mahjong and data.best_mahjong.mahjong > 0 %}
   <div class="stat-card">
     <div class="stat-label">{{ trad('player.best_mahjong') }}</div>
@@ -77,4 +108,5 @@
     </div>
   </div>
   {% endif %}
+
 </div>
