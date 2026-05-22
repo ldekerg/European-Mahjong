@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>EMA Manage{% block title %}{% endblock %}</title>
+  <title>EMA Ranking - Manager</title>
   <link rel="stylesheet" href="/static/style.css">
   <link rel="stylesheet" href="/static/manage.css">
   <script>
@@ -27,8 +27,9 @@
       {% if manage_user and manage_user.role == 'superadmin' %}
       <a href="/manage/audit/" {% if manage_section == 'audit' %}class="active"{% endif %}>Audit</a>
       <a href="/manage/backups/" {% if manage_section == 'backups' %}class="active"{% endif %}>Backups</a>
-      {% endif %}
       <a href="/admin/" target="_blank" class="dim" style="font-size:0.85rem">DB Admin ↗</a>
+      {% endif %}
+
     </div>
     <div class="nav-controls">
       <!-- User dropdown -->
