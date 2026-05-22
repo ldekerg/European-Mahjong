@@ -6,7 +6,8 @@
     "players": "Játékosok",
     "countries": "Országok",
     "tournaments": "Versenyek",
-    "formulas": "Formulas"
+    "formulas": "Formulas",
+    "ranking_system": "Rangsorolási rendszer"
   },
   "common": {
     "dark_mode": "Sötét mód",
@@ -272,5 +273,41 @@
     "note_divergence_label": "Divergence from official EMA",
     "note_divergence_weekly": "The official EMA ranking does not specify an update frequency. This application recalculates the ranking every Monday.",
     "note_divergence_104": "The tournament contribution duration (104 active weeks) may differ from the official EMA definition, which expresses the period in calendar years rather than active weeks excluding the freeze."
+  },
+  "ranking_system": {
+    "tab_ranking": "Rangsor-képletek",
+    "tab_certification": "Verseny-tanúsítás",
+    "tab_quotas": "Bajnoksági kvóták",
+    "page_title": "A MERS rendszer",
+    "cert_intro": "Az EMA tanúsítja a versenyeket a Mahjong European Ranking System (MERS) keretében.",
+    "cert_apply_title": "Tanúsítás igénylése",
+    "cert_apply_desc": "Egy EMA-tagszervezet kérhet turniertanúsítást. A kérelmet a nemzeti testület tagjának kell elküldenie az EMA testületének a torna előtt legalább 3 hónappal.",
+    "cert_limit_title": "MERS-versenyek száma országonként",
+    "cert_limit_desc": "Minden ország évente legfeljebb 3 MERS-versenyt rendezhet szabálykészletenként, a verseny súlyától függetlenül.",
+    "cert_req_title": "MERS-versenyek követelményei",
+    "cert_req_open": "Nyitottnak kell lennie minden európai országból érkező játékos számára.",
+    "cert_req_players": "Legalább 16 játékosnak kell részt vennie EMA-tagországokból.",
+    "cert_req_ema_num": "A játékosoknak EMA-regisztrációs számra van szükségük a rangsorban való szerepeltetéshez.",
+    "cert_sessions_title": "Minimális körök időtartam szerint",
+    "cert_col_duration": "Időtartam",
+    "cert_col_sessions": "Min. körök",
+    "cert_col_time": "Idő körenként",
+    "cert_observer_title": "EMA-megfigyelő",
+    "cert_observer_desc": "A szervezők felelősek az EMA-megfigyelő kinevezéséért, és nevüket legalább két héttel a rendezvény előtt be kell jelenteniük.",
+    "quotas_intro": "Az EMA-kvóták meghatározzák az egyes országok számára az európai és világbajnokságokon kiosztott helyek számát.",
+    "quotas_part_a_title": "A rész — Alaphelyek",
+    "quotas_a1": "A1 — Egy hely a 3 legjobb EMA-ország számára az országrangsorban.",
+    "quotas_a2": "A2 — Egy hely minden EMA-ország számára.",
+    "quotas_a3": "A3 — Egy hely minden olyan ország számára, amelynek 700 pont feletti játékosai vannak.",
+    "quotas_part_b_title": "B rész — Arányos helyek",
+    "quotas_b1": "B1 — A rangsorban szereplő játékosok százaléka (ország / összes).",
+    "quotas_b2": "B2 — A 700 pont feletti rangsorban lévő játékosok százaléka (ország / összes).",
+    "quotas_b3": "B3 — B1 és B2 átlaga, az A rész utáni fennmaradó helyekre alkalmazva.",
+    "quotas_formula": "Q = [A1+A2+A3] + B3 × [Összesen − Összeg(A rész)]",
+    "quotas_limits_title": "Korlátok és újraelosztás",
+    "quotas_limit_max": "Egy ország nem kaphat több helyet, mint a globális átlag feletti játékosok száma.",
+    "quotas_limit_min": "Minden EMA-ország legalább 1 helyet kap garantáltan.",
+    "quotas_invited_title": "Meghívott & nem EMA játékosok",
+    "quotas_invited_desc": "A nem EMA- és meghívott játékosok helyeit az EMA határozza meg. Ha a játékosok nem érdeklődnek, a helyek az EMA-kvótán belül kerülnek újraelosztásra."
   }
 }

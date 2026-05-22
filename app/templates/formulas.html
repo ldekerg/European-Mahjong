@@ -2,17 +2,25 @@
 {% block content %}
 
 <div class="ranking-header">
-  <h1>{{ trad('nav.formulas') }}</h1>
+  <h1>{{ trad('ranking_system.page_title') }}</h1>
+</div>
+
+<!-- Onglets principaux -->
+<div class="tabs" id="main-tabs">
+  <button class="tab-btn active" onclick="showTab('ranking', this)">{{ trad('ranking_system.tab_ranking') }}</button>
+  <button class="tab-btn"        onclick="showTab('certification', this)">{{ trad('ranking_system.tab_certification') }}</button>
+  <button class="tab-btn"        onclick="showTab('quotas', this)">{{ trad('ranking_system.tab_quotas') }}</button>
 </div>
 
 <div style="max-width:780px;margin:0 auto;padding:0 1rem 3rem">
 
-  <!-- ── Notes & warnings ─────────────────────────────────────── -->
-  <section id="notes" style="margin-bottom:2.5rem">
-    <h2 style="border-bottom:2px solid var(--accent);padding-bottom:0.4rem;margin-bottom:1rem">
-      {{ trad('formulas.notes_title') }}
-    </h2>
+<!-- ══════════════════════════════════════════════════════════════════════
+     ONGLET FORMULES
+     ══════════════════════════════════════════════════════════════════════ -->
+<div id="tab-ranking" class="tab-content">
 
+  <!-- Notes & warnings -->
+  <section id="notes" style="margin-bottom:2.5rem;margin-top:1.5rem">
     <div class="note-block note-inferred">
       <div class="note-label">💡 {{ trad('formulas.note_inferred_label') }}</div>
       <ul>
@@ -20,7 +28,6 @@
         <li id="note-covid-dates">{{ trad('formulas.note_inferred_covid') }}</li>
       </ul>
     </div>
-
     <div class="note-block note-divergence" style="margin-top:1rem">
       <div class="note-label">⚠ {{ trad('formulas.note_divergence_label') }}</div>
       <ul>
@@ -30,17 +37,13 @@
     </div>
   </section>
 
-  <!-- ── 1. Tournament EMA points ─────────────────────────────── -->
+  <!-- 1. Tournament EMA points -->
   <section style="margin-bottom:2.5rem">
-    <h2 style="border-bottom:2px solid var(--accent);padding-bottom:0.4rem;margin-bottom:1rem">
-      {{ trad('formulas.tournament_score_title') }}
-    </h2>
+    <h2 class="section-title">{{ trad('formulas.tournament_score_title') }}</h2>
     <p>{{ trad('formulas.tournament_score_intro') }}</p>
-
     <div class="formula-box">
       <span class="formula-math">EMA = (N &minus; position) / (N &minus; 1) &times; 1000</span>
     </div>
-
     <ul style="margin:0.75rem 0 0.75rem 1.2rem;line-height:1.8">
       <li><strong>N</strong> — {{ trad('formulas.var_n') }}</li>
       <li><strong>position</strong> — {{ trad('formulas.var_pos') }}</li>
@@ -51,32 +54,26 @@
       <thead>
         <tr>
           <th>{{ trad('formulas.col_position') }}</th>
-          <th>N = 40</th>
-          <th>N = 80</th>
-          <th>N = 120</th>
+          <th>N = 40</th><th>N = 80</th><th>N = 120</th>
         </tr>
       </thead>
       <tbody>
-        <tr><td>1 <span class="dim"></span></td><td>1000</td><td>1000</td><td>1000</td></tr>
+        <tr><td>1</td><td>1000</td><td>1000</td><td>1000</td></tr>
         <tr><td>10</td><td>769</td><td>873</td><td>916</td></tr>
-        <tr><td>25 <span class="dim"></span></td><td>359</td><td>696</td><td>798</td></tr>
+        <tr><td>25</td><td>359</td><td>696</td><td>798</td></tr>
         <tr><td>{{ trad('formulas.last') }}</td><td>0</td><td>0</td><td>0</td></tr>
       </tbody>
     </table>
     </div>
   </section>
 
-  <!-- ── 2. Tournament coefficient ────────────────────────────── -->
+  <!-- 2. Tournament coefficient -->
   <section style="margin-bottom:2.5rem">
-    <h2 style="border-bottom:2px solid var(--accent);padding-bottom:0.4rem;margin-bottom:1rem">
-      {{ trad('formulas.coefficient_title') }}
-    </h2>
+    <h2 class="section-title">{{ trad('formulas.coefficient_title') }}</h2>
     <p>{{ trad('formulas.coefficient_intro') }}</p>
-
     <div class="formula-box">
       <span class="formula-math">{{ trad('formulas.formula_coeff') }}</span>
     </div>
-
     <div class="scroll-table" style="margin-top:0.75rem">
     <table>
       <thead>
@@ -100,7 +97,6 @@
       </tbody>
     </table>
     </div>
-
     <p style="margin-top:0.75rem">{{ trad('formulas.coefficient_examples') }}</p>
     <div class="scroll-table">
     <table>
@@ -124,13 +120,10 @@
     </div>
   </section>
 
-  <!-- ── 3. Player ranking score ───────────────────────────────── -->
+  <!-- 3. Player ranking score -->
   <section style="margin-bottom:2.5rem">
-    <h2 style="border-bottom:2px solid var(--accent);padding-bottom:0.4rem;margin-bottom:1rem">
-      {{ trad('formulas.player_score_title') }}
-    </h2>
+    <h2 class="section-title">{{ trad('formulas.player_score_title') }}</h2>
     <p>{{ trad('formulas.player_score_intro') }}</p>
-
     <div class="formula-box">
       <span class="formula-math">{{ trad('formulas.formula_score') }}</span>
     </div>
@@ -140,7 +133,6 @@
     <div class="formula-box">
       <span class="formula-math">{{ trad('formulas.formula_part_a_n') }}</span>
     </div>
-
     <div class="scroll-table" style="margin-top:0.5rem">
     <table>
       <thead><tr><th>{{ trad('formulas.nb_tournaments') }}</th><th>{{ trad('formulas.retained_a') }}</th></tr></thead>
@@ -154,15 +146,13 @@
     </table>
     </div>
     <p style="margin-top:0.5rem;font-size:0.85rem" class="dim">
-      {{ trad('formulas.part_a_tiebreak') }}
-      <a href="#note-tiebreak" class="ref-inferred">💡</a>
+      {{ trad('formulas.part_a_tiebreak') }} <a href="#note-tiebreak" class="ref-inferred">💡</a>
     </p>
 
     <h3 style="margin-top:1.25rem">{{ trad('formulas.part_b_title') }}</h3>
     <p>{{ trad('formulas.part_b_desc') }}</p>
     <p style="font-size:0.85rem" class="dim">
-      {{ trad('formulas.part_b_tiebreak') }}
-      <a href="#note-tiebreak" class="ref-inferred">💡</a>
+      {{ trad('formulas.part_b_tiebreak') }} <a href="#note-tiebreak" class="ref-inferred">💡</a>
     </p>
 
     <h3 style="margin-top:1.25rem">{{ trad('formulas.weighted_avg_title') }}</h3>
@@ -176,21 +166,13 @@
     <p>{{ trad('formulas.min_req_desc') }}</p>
   </section>
 
-  <!-- ── 4. Weekly ranking update ─────────────────────────────── -->
+  <!-- 4. Weekly ranking update -->
   <section style="margin-bottom:2.5rem">
-    <h2 style="border-bottom:2px solid var(--accent);padding-bottom:0.4rem;margin-bottom:1rem">
-      {{ trad('formulas.weekly_title') }}
-    </h2>
-    <p>
-      {{ trad('formulas.weekly_desc') }}
-      <a href="#note-weekly" class="ref-divergence">⚠</a>
-    </p>
+    <h2 class="section-title">{{ trad('formulas.weekly_title') }}</h2>
+    <p>{{ trad('formulas.weekly_desc') }} <a href="#note-weekly" class="ref-divergence">⚠</a></p>
 
     <h3 style="margin-top:1.25rem">{{ trad('formulas.weekly_activation_title') }}</h3>
-    <p>
-      {{ trad('formulas.weekly_activation_desc') }}
-      <a href="#note-104" class="ref-divergence">⚠</a>
-    </p>
+    <p>{{ trad('formulas.weekly_activation_desc') }} <a href="#note-104" class="ref-divergence">⚠</a></p>
     <p style="font-size:0.85rem" class="dim">{{ trad('formulas.weekly_activation_note') }}</p>
 
     <h3 style="margin-top:1.25rem">{{ trad('formulas.weekly_examples_title') }}</h3>
@@ -215,20 +197,14 @@
     </div>
   </section>
 
-  <!-- ── 5. Active period and COVID freeze ─────────────────────── -->
+  <!-- 5. Active period and COVID freeze -->
   <section style="margin-bottom:2.5rem">
-    <h2 style="border-bottom:2px solid var(--accent);padding-bottom:0.4rem;margin-bottom:1rem">
-      {{ trad('formulas.active_period_title') }}
-    </h2>
+    <h2 class="section-title">{{ trad('formulas.active_period_title') }}</h2>
     <p>{{ trad('formulas.active_period_desc') }}</p>
-
     <div class="scroll-table" style="margin-top:0.5rem">
     <table>
       <thead>
-        <tr>
-          <th>{{ trad('formulas.age') }}</th>
-          <th>{{ trad('formulas.time_weight') }}</th>
-        </tr>
+        <tr><th>{{ trad('formulas.age') }}</th><th>{{ trad('formulas.time_weight') }}</th></tr>
       </thead>
       <tbody>
         <tr><td>{{ trad('formulas.year_1') }}</td><td>× 1,0</td></tr>
@@ -237,7 +213,6 @@
       </tbody>
     </table>
     </div>
-
     <div class="formula-callout" style="margin-top:1rem">
       <strong>{{ trad('formulas.covid_title') }}</strong>
       <p style="margin:0.4rem 0 0">{{ trad('formulas.covid_desc') }}</p>
@@ -248,17 +223,138 @@
     </div>
   </section>
 
-  <!-- ── 6. World tournaments ──────────────────────────────────── -->
+  <!-- 6. World tournaments -->
   <section style="margin-bottom:2.5rem">
-    <h2 style="border-bottom:2px solid var(--accent);padding-bottom:0.4rem;margin-bottom:1rem">
-      {{ trad('formulas.world_title') }}
-    </h2>
+    <h2 class="section-title">{{ trad('formulas.world_title') }}</h2>
     <p>{{ trad('formulas.world_desc') }}</p>
   </section>
 
-</div>
+</div><!-- /tab-ranking -->
+
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     ONGLET CERTIFICATION
+     ══════════════════════════════════════════════════════════════════════ -->
+<div id="tab-certification" class="tab-content hidden">
+
+  <section style="margin-bottom:2.5rem;margin-top:1.5rem">
+    <p>{{ trad('ranking_system.cert_intro') }}</p>
+  </section>
+
+  <!-- Applying -->
+  <section style="margin-bottom:2.5rem">
+    <h2 class="section-title">{{ trad('ranking_system.cert_apply_title') }}</h2>
+    <p>{{ trad('ranking_system.cert_apply_desc') }}</p>
+  </section>
+
+  <!-- Limit per country -->
+  <section style="margin-bottom:2.5rem">
+    <h2 class="section-title">{{ trad('ranking_system.cert_limit_title') }}</h2>
+    <p>{{ trad('ranking_system.cert_limit_desc') }}</p>
+  </section>
+
+  <!-- Requirements -->
+  <section style="margin-bottom:2.5rem">
+    <h2 class="section-title">{{ trad('ranking_system.cert_req_title') }}</h2>
+    <ul style="margin:0.75rem 0 0.75rem 1.2rem;line-height:1.8">
+      <li>{{ trad('ranking_system.cert_req_open') }}</li>
+      <li>{{ trad('ranking_system.cert_req_players') }}</li>
+      <li>{{ trad('ranking_system.cert_req_ema_num') }}</li>
+    </ul>
+
+    <!-- Sessions table -->
+    <h3 style="margin-top:1.25rem">{{ trad('ranking_system.cert_sessions_title') }}</h3>
+    <div class="scroll-table" style="margin-top:0.5rem">
+    <table>
+      <thead>
+        <tr>
+          <th></th>
+          <th colspan="3" style="text-align:center"><span class="badge badge-mcr">MCR</span></th>
+          <th colspan="3" style="text-align:center"><span class="badge badge-rcr">RCR</span></th>
+        </tr>
+        <tr>
+          <th>{{ trad('ranking_system.cert_col_duration') }}</th>
+          <th>{{ trad('ranking_system.cert_col_sessions') }}</th>
+          <th colspan="2">{{ trad('ranking_system.cert_col_time') }}</th>
+          <th>{{ trad('ranking_system.cert_col_sessions') }}</th>
+          <th colspan="2">{{ trad('ranking_system.cert_col_time') }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>1 {{ trad('formulas.day') }}</td><td class="center">4</td><td colspan="2">90 min</td><td class="center">4</td><td colspan="2">90 min</td></tr>
+        <tr><td>2 {{ trad('formulas.days') }}</td><td class="center">6</td><td colspan="2">120 min</td><td class="center">7</td><td colspan="2">90 min</td></tr>
+        <tr><td>3 {{ trad('formulas.days') }}</td><td class="center">9</td><td colspan="2">120 min</td><td class="center">11</td><td colspan="2">90 min</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </section>
+
+  <!-- Observer -->
+  <section style="margin-bottom:2.5rem">
+    <h2 class="section-title">{{ trad('ranking_system.cert_observer_title') }}</h2>
+    <p>{{ trad('ranking_system.cert_observer_desc') }}</p>
+  </section>
+
+</div><!-- /tab-certification -->
+
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     ONGLET QUOTAS
+     ══════════════════════════════════════════════════════════════════════ -->
+<div id="tab-quotas" class="tab-content hidden">
+
+  <section style="margin-bottom:2.5rem;margin-top:1.5rem">
+    <p>{{ trad('ranking_system.quotas_intro') }}</p>
+  </section>
+
+  <!-- Part A -->
+  <section style="margin-bottom:2.5rem">
+    <h2 class="section-title">{{ trad('ranking_system.quotas_part_a_title') }}</h2>
+    <ul style="margin:0.75rem 0 0.75rem 1.2rem;line-height:1.9">
+      <li>{{ trad('ranking_system.quotas_a1') }}</li>
+      <li>{{ trad('ranking_system.quotas_a2') }}</li>
+      <li>{{ trad('ranking_system.quotas_a3') }}</li>
+    </ul>
+  </section>
+
+  <!-- Part B -->
+  <section style="margin-bottom:2.5rem">
+    <h2 class="section-title">{{ trad('ranking_system.quotas_part_b_title') }}</h2>
+    <ul style="margin:0.75rem 0 0.75rem 1.2rem;line-height:1.9">
+      <li>{{ trad('ranking_system.quotas_b1') }}</li>
+      <li>{{ trad('ranking_system.quotas_b2') }}</li>
+      <li>{{ trad('ranking_system.quotas_b3') }}</li>
+    </ul>
+    <div class="formula-box" style="margin-top:0.75rem">
+      <span class="formula-math">{{ trad('ranking_system.quotas_formula') }}</span>
+    </div>
+  </section>
+
+  <!-- Limits -->
+  <section style="margin-bottom:2.5rem">
+    <h2 class="section-title">{{ trad('ranking_system.quotas_limits_title') }}</h2>
+    <ul style="margin:0.75rem 0 0.75rem 1.2rem;line-height:1.9">
+      <li>{{ trad('ranking_system.quotas_limit_max') }}</li>
+      <li>{{ trad('ranking_system.quotas_limit_min') }}</li>
+    </ul>
+  </section>
+
+  <!-- Invited players -->
+  <section style="margin-bottom:2.5rem">
+    <h2 class="section-title">{{ trad('ranking_system.quotas_invited_title') }}</h2>
+    <p>{{ trad('ranking_system.quotas_invited_desc') }}</p>
+  </section>
+
+</div><!-- /tab-quotas -->
+
+</div><!-- /max-width wrapper -->
 
 <style>
+.section-title {
+  border-bottom: 2px solid var(--accent);
+  padding-bottom: 0.4rem;
+  margin-bottom: 1rem;
+}
 .formula-box {
   background: var(--bg2);
   border-left: 4px solid var(--accent);
@@ -269,9 +365,7 @@
   font-size: 1rem;
   overflow-x: auto;
 }
-.formula-math {
-  white-space: nowrap;
-}
+.formula-math { white-space: nowrap; }
 .formula-callout {
   background: var(--bg2);
   border: 1px solid var(--border);
@@ -284,17 +378,9 @@
   font-size: 0.88rem;
   line-height: 1.6;
 }
-.note-block ul {
-  margin: 0.4rem 0 0 1.2rem;
-  padding: 0;
-}
-.note-block li {
-  margin-bottom: 0.3rem;
-}
-.note-label {
-  font-weight: 600;
-  margin-bottom: 0.3rem;
-}
+.note-block ul { margin: 0.4rem 0 0 1.2rem; padding: 0; }
+.note-block li { margin-bottom: 0.3rem; }
+.note-label { font-weight: 600; margin-bottom: 0.3rem; }
 .note-inferred {
   background: color-mix(in srgb, #10b981 10%, var(--bg2));
   border: 1px solid color-mix(in srgb, #10b981 45%, transparent);
@@ -303,24 +389,31 @@
   background: color-mix(in srgb, #f59e0b 8%, var(--bg2));
   border: 1px solid color-mix(in srgb, #f59e0b 40%, transparent);
 }
-.ref-inferred {
-  font-size: 0.8rem;
-  text-decoration: none;
-  opacity: 1;
-  margin-left: 0.2rem;
-}
-.ref-divergence {
-  font-size: 0.8rem;
-  text-decoration: none;
-  opacity: 1;
-  margin-left: 0.2rem;
-  color: #f59e0b;
-}
-h3 {
-  font-size: 1rem;
-  color: var(--accent);
-  margin-bottom: 0.3rem;
-}
+.ref-inferred { font-size:0.8rem; text-decoration:none; opacity:1; margin-left:0.2rem; }
+.ref-divergence { font-size:0.8rem; text-decoration:none; opacity:1; margin-left:0.2rem; color:#f59e0b; }
+h3 { font-size:1rem; color:var(--accent); margin-bottom:0.3rem; }
 </style>
+
+<script>
+function showTab(name, btn) {
+  ['ranking','certification','quotas'].forEach(function(t) {
+    document.getElementById('tab-' + t).classList.add('hidden');
+  });
+  document.querySelectorAll('#main-tabs .tab-btn').forEach(function(b) { b.classList.remove('active'); });
+  document.getElementById('tab-' + name).classList.remove('hidden');
+  btn.classList.add('active');
+  var url = new URL(window.location.href);
+  url.searchParams.set('tab', name);
+  history.replaceState(null, '', url.toString());
+}
+
+window.addEventListener('DOMContentLoaded', function() {
+  var tab = new URLSearchParams(window.location.search).get('tab');
+  if (tab && ['certification','quotas'].includes(tab)) {
+    var btn = document.querySelector('#main-tabs .tab-btn[onclick*="' + tab + '"]');
+    if (btn) showTab(tab, btn);
+  }
+});
+</script>
 
 {% endblock %}

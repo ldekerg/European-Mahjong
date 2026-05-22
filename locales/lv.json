@@ -6,7 +6,8 @@
     "players": "Spēlētāji",
     "countries": "Valstis",
     "tournaments": "Turnīri",
-    "formulas": "Formulas"
+    "formulas": "Formulas",
+    "ranking_system": "Rangu sistēma"
   },
   "common": {
     "dark_mode": "Tumšais režīms",
@@ -272,5 +273,41 @@
     "note_divergence_label": "Divergence from official EMA",
     "note_divergence_weekly": "The official EMA ranking does not specify an update frequency. This application recalculates the ranking every Monday.",
     "note_divergence_104": "The tournament contribution duration (104 active weeks) may differ from the official EMA definition, which expresses the period in calendar years rather than active weeks excluding the freeze."
+  },
+  "ranking_system": {
+    "tab_ranking": "Ranga formulas",
+    "tab_certification": "Turnīru sertifikācija",
+    "tab_quotas": "Čempionātu kvotas",
+    "page_title": "MERS sistēma",
+    "cert_intro": "EMA sertificē turnīrus Mahjong European Ranking System (MERS) ietvaros.",
+    "cert_apply_title": "Pieteikums sertifikācijai",
+    "cert_apply_desc": "EMA dalīborganizācija var pieteikties turnīra sertifikācijai. Pieteikums jāiesniedz valsts valdes loceklim EMA valdei vismaz 3 mēnešus pirms turnīra.",
+    "cert_limit_title": "MERS turnīru skaits uz valsti",
+    "cert_limit_desc": "Katra valsts var rīkot līdz 3 MERS turnīriem gadā un noteikumu kopai, neatkarīgi no turnīra svara.",
+    "cert_req_title": "Prasības MERS turnīriem",
+    "cert_req_open": "Jābūt atvērtam visiem spēlētājiem no Eiropas valstīm.",
+    "cert_req_players": "Jāpiedalās vismaz 16 spēlētājiem no EMA dalībvalstīm.",
+    "cert_req_ema_num": "Spēlētājiem nepieciešams EMA reģistrācijas numurs, lai tiktu iekļauti reitingā.",
+    "cert_sessions_title": "Minimālās sesijas pēc ilguma",
+    "cert_col_duration": "Ilgums",
+    "cert_col_sessions": "Min. sesijas",
+    "cert_col_time": "Laiks uz sesiju",
+    "cert_observer_title": "EMA novērotājs",
+    "cert_observer_desc": "Organizatori ir atbildīgi par EMA novērotāja iecelšanu, paziņojot viņu vārdu vismaz divas nedēļas pirms pasākuma.",
+    "quotas_intro": "EMA kvotas nosaka katrai valstij piešķirto vietu skaitu Eiropas un Pasaules čempionātos.",
+    "quotas_part_a_title": "A daļa — Pamata vietas",
+    "quotas_a1": "A1 — Viena vieta 3 labākajām EMA valstīm valstu reitingā.",
+    "quotas_a2": "A2 — Viena vieta katrai EMA valstij.",
+    "quotas_a3": "A3 — Viena vieta katrai valstij ar spēlētājiem virs 700 punktiem.",
+    "quotas_part_b_title": "B daļa — Proporcionālās vietas",
+    "quotas_b1": "B1 — Spēlētāju procentuālā daļa reitingu sarakstā (valsts / kopā).",
+    "quotas_b2": "B2 — Spēlētāju procentuālā daļa ar reitingu virs 700 punktiem (valsts / kopā).",
+    "quotas_b3": "B3 — B1 un B2 vidējā vērtība, piemērota atlikušajām vietām pēc A daļas.",
+    "quotas_formula": "Q = [A1+A2+A3] + B3 × [Kopā − Summa(A daļa)]",
+    "quotas_limits_title": "Ierobežojumi un pārdale",
+    "quotas_limit_max": "Valsts nevar saņemt vairāk vietu, nekā ir spēlētāju, kuri ir vērtēti virs globālā vidējā.",
+    "quotas_limit_min": "Katrai EMA valstij ir garantēta vismaz 1 vieta.",
+    "quotas_invited_title": "Uzaicināti & ne-EMA spēlētāji",
+    "quotas_invited_desc": "Vietas ne-EMA un uzaicinātajiem spēlētājiem nosaka EMA. Ja spēlētāji nav ieinteresēti, vietas tiek pārdales EMA kvotas ietvaros."
   }
 }

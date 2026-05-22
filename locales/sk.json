@@ -6,7 +6,8 @@
     "players": "Hráči",
     "countries": "Krajiny",
     "tournaments": "Turnaje",
-    "formulas": "Formulas"
+    "formulas": "Formulas",
+    "ranking_system": "Systém hodnotenia"
   },
   "common": {
     "dark_mode": "Tmavý režim",
@@ -272,5 +273,41 @@
     "note_divergence_label": "Divergence from official EMA",
     "note_divergence_weekly": "The official EMA ranking does not specify an update frequency. This application recalculates the ranking every Monday.",
     "note_divergence_104": "The tournament contribution duration (104 active weeks) may differ from the official EMA definition, which expresses the period in calendar years rather than active weeks excluding the freeze."
+  },
+  "ranking_system": {
+    "tab_ranking": "Vzorce hodnotenia",
+    "tab_certification": "Certifikácia turnajov",
+    "tab_quotas": "Kvóty majstrovstiev",
+    "page_title": "Systém MERS",
+    "cert_intro": "EMA certifikuje turnaje v rámci hodnotiaceho systému MERS.",
+    "cert_apply_title": "Žiadosť o certifikáciu",
+    "cert_apply_desc": "Členská organizácia EMA môže požiadať o certifikáciu turnaja. Žiadosť musí byť zaslaná národným členom predstavenstva predstavenstvu EMA najmenej 3 mesiace pred turnajom.",
+    "cert_limit_title": "Počet MERS turnajov na krajinu",
+    "cert_limit_desc": "Každá krajina môže organizovať až 3 MERS turnaje ročne a na pravidlá, bez ohľadu na váhu turnaja.",
+    "cert_req_title": "Požiadavky pre MERS turnaje",
+    "cert_req_open": "Musí byť otvorený pre všetkých hráčov z európskych krajín.",
+    "cert_req_players": "Musí sa zúčastniť aspoň 16 hráčov z členských krajín EMA.",
+    "cert_req_ema_num": "Hráči potrebujú registračné číslo EMA, aby boli zaradení do rebríčka.",
+    "cert_sessions_title": "Minimálne kolá podľa trvania",
+    "cert_col_duration": "Trvanie",
+    "cert_col_sessions": "Min. kolá",
+    "cert_col_time": "Čas na kolo",
+    "cert_observer_title": "EMA pozorovateľ",
+    "cert_observer_desc": "Organizátori sú zodpovední za vymenovanie pozorovateľa EMA a oznámenie jeho mena najmenej dva týždne pred podujatím.",
+    "quotas_intro": "Kvóty EMA určujú počet miest pridelených každej krajine pre európske a svetové majstrovstvá.",
+    "quotas_part_a_title": "Časť A — Základné miesta",
+    "quotas_a1": "A1 — Jedno miesto pre 3 najlepšie krajiny EMA v krajinskom rebríčku.",
+    "quotas_a2": "A2 — Jedno miesto pre každú krajinu EMA.",
+    "quotas_a3": "A3 — Jedno miesto pre každú krajinu s hráčmi nad 700 bodov.",
+    "quotas_part_b_title": "Časť B — Proporcionálne miesta",
+    "quotas_b1": "B1 — Percento hráčov v rebríčku (krajina / celkovo).",
+    "quotas_b2": "B2 — Percento hráčov s hodnotením nad 700 bodov (krajina / celkovo).",
+    "quotas_b3": "B3 — Priemer B1 a B2, aplikovaný na zostávajúce miesta po časti A.",
+    "quotas_formula": "Q = [A1+A2+A3] + B3 × [Celkovo − Súčet(Časť A)]",
+    "quotas_limits_title": "Limity a prerozdelenie",
+    "quotas_limit_max": "Krajina nemôže získať viac miest, ako je počet hráčov zaradených nad globálny priemer.",
+    "quotas_limit_min": "Každá krajina EMA má garantované aspoň 1 miesto.",
+    "quotas_invited_title": "Pozvaní & hráči mimo EMA",
+    "quotas_invited_desc": "Miesta pre hráčov mimo EMA a pozvaných určuje EMA. Ak hráči nemajú záujem, miesta sa prerozdeľujú v rámci kvóty EMA."
   }
 }

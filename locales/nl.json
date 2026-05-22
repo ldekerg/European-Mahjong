@@ -6,7 +6,8 @@
     "players": "Spelers",
     "countries": "Landen",
     "tournaments": "Toernooien",
-    "formulas": "Formulas"
+    "formulas": "Formulas",
+    "ranking_system": "Ranglijstsysteem"
   },
   "common": {
     "dark_mode": "Donkere modus",
@@ -272,5 +273,41 @@
     "note_divergence_label": "Divergence from official EMA",
     "note_divergence_weekly": "The official EMA ranking does not specify an update frequency. This application recalculates the ranking every Monday.",
     "note_divergence_104": "The tournament contribution duration (104 active weeks) may differ from the official EMA definition, which expresses the period in calendar years rather than active weeks excluding the freeze."
+  },
+  "ranking_system": {
+    "tab_ranking": "Ranglijstformules",
+    "tab_certification": "Toernooicertificering",
+    "tab_quotas": "Kampioenschapsquota's",
+    "page_title": "Het MERS-systeem",
+    "cert_intro": "De EMA certificeert toernooien onder het Mahjong European Ranking System (MERS).",
+    "cert_apply_title": "Aanvragen van certificering",
+    "cert_apply_desc": "Een EMA-lidorganisatie kan certificering van een toernooi aanvragen. Het verzoek moet minstens 3 maanden voor het toernooi door het nationaal bestuurslid naar het EMA-bestuur worden gestuurd.",
+    "cert_limit_title": "Aantal MERS-toernooien per land",
+    "cert_limit_desc": "Elk land kan tot 3 MERS-toernooien per jaar en regelset houden, ongeacht het gewicht van het toernooi.",
+    "cert_req_title": "Vereisten voor MERS-toernooien",
+    "cert_req_open": "Moet open staan voor alle spelers uit Europese landen.",
+    "cert_req_players": "Er moeten minimaal 16 spelers uit EMA-lidlanden deelnemen.",
+    "cert_req_ema_num": "Spelers hebben een EMA-registratienummer nodig om in de ranglijst te staan.",
+    "cert_sessions_title": "Minimumsessies per duur",
+    "cert_col_duration": "Duur",
+    "cert_col_sessions": "Min. sessies",
+    "cert_col_time": "Tijd per sessie",
+    "cert_observer_title": "EMA-waarnemer",
+    "cert_observer_desc": "Organisatoren zijn verantwoordelijk voor het aanwijzen van een EMA-waarnemer en moeten hun naam minimaal twee weken voor het evenement bekendmaken.",
+    "quotas_intro": "EMA-quota's bepalen het aantal plaatsen dat aan elk land wordt toegewezen voor Europese en Wereldkampioenschappen.",
+    "quotas_part_a_title": "Deel A — Basisplaatsen",
+    "quotas_a1": "A1 — Eén plaats voor de 3 beste EMA-landen in het landenklassement.",
+    "quotas_a2": "A2 — Één plaats voor elk EMA-land.",
+    "quotas_a3": "A3 — Één plaats voor elk land met spelers boven 700 punten.",
+    "quotas_part_b_title": "Deel B — Proportionele plaatsen",
+    "quotas_b1": "B1 — Percentage spelers in de ranglijst (land / totaal).",
+    "quotas_b2": "B2 — Percentage spelers met een ranking boven 700 punten (land / totaal).",
+    "quotas_b3": "B3 — Gemiddelde van B1 en B2, toegepast op de resterende plaatsen na deel A.",
+    "quotas_formula": "Q = [A1+A2+A3] + B3 × [Totaal − Som(Deel A)]",
+    "quotas_limits_title": "Limieten en herverdeling",
+    "quotas_limit_max": "Een land kan niet meer plaatsen krijgen dan het aantal spelers dat boven het wereldgemiddelde staat.",
+    "quotas_limit_min": "Elk EMA-land heeft minimaal 1 gegarandeerde plaats.",
+    "quotas_invited_title": "Genodigde & niet-EMA-spelers",
+    "quotas_invited_desc": "Plaatsen voor niet-EMA- en uitgenodigde spelers worden door de EMA bepaald. Als spelers niet geïnteresseerd zijn, worden de plaatsen herverdeeld binnen het EMA-quota."
   }
 }

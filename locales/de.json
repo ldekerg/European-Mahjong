@@ -6,7 +6,8 @@
     "players": "Spieler",
     "countries": "Länder",
     "tournaments": "Turniere",
-    "formulas": "Formulas"
+    "formulas": "Formulas",
+    "ranking_system": "Rangliste-System"
   },
   "common": {
     "dark_mode": "Dunkelmodus",
@@ -272,5 +273,41 @@
     "note_divergence_label": "Divergence from official EMA",
     "note_divergence_weekly": "The official EMA ranking does not specify an update frequency. This application recalculates the ranking every Monday.",
     "note_divergence_104": "The tournament contribution duration (104 active weeks) may differ from the official EMA definition, which expresses the period in calendar years rather than active weeks excluding the freeze."
+  },
+  "ranking_system": {
+    "tab_ranking": "Ranglistenformeln",
+    "tab_certification": "Turnierzertifizierung",
+    "tab_quotas": "Meisterschaftsquoten",
+    "page_title": "Das MERS-System",
+    "cert_intro": "Die EMA zertifiziert Turniere im Rahmen des Mahjong European Ranking System (MERS).",
+    "cert_apply_title": "Antrag auf Zertifizierung",
+    "cert_apply_desc": "Eine EMA-Mitgliedsorganisation kann die Zertifizierung eines Turniers beantragen. Der Antrag muss mindestens 3 Monate vor dem Turnier vom nationalen Vorstandsmitglied an den EMA-Vorstand gesendet werden.",
+    "cert_limit_title": "Anzahl der MERS-Turniere pro Land",
+    "cert_limit_desc": "Jedes Land kann bis zu 3 MERS-Turniere pro Jahr und Regelwerk veranstalten, unabhängig vom Gewicht des Turniers.",
+    "cert_req_title": "Anforderungen für MERS-Turniere",
+    "cert_req_open": "Muss für alle Spieler aus europäischen Ländern offen sein.",
+    "cert_req_players": "Mindestens 16 Spieler aus EMA-Mitgliedsländern müssen teilnehmen.",
+    "cert_req_ema_num": "Spieler benötigen eine EMA-Registrierungsnummer, um in der Rangliste aufgeführt zu werden.",
+    "cert_sessions_title": "Mindestsitzungen nach Dauer",
+    "cert_col_duration": "Dauer",
+    "cert_col_sessions": "Min. Sitzungen",
+    "cert_col_time": "Zeit pro Sitzung",
+    "cert_observer_title": "EMA-Beobachter",
+    "cert_observer_desc": "Die Veranstalter sind für die Ernennung eines EMA-Beobachters verantwortlich und müssen dessen Namen mindestens zwei Wochen vor der Veranstaltung bekannt geben.",
+    "quotas_intro": "EMA-Quoten bestimmen die Anzahl der Plätze, die jedem Land für Europameisterschaften und Weltmeisterschaften zugeteilt werden.",
+    "quotas_part_a_title": "Teil A — Grundplätze",
+    "quotas_a1": "A1 — Ein Platz für die 3 besten EMA-Länder im Länderranking.",
+    "quotas_a2": "A2 — Ein Platz für jedes EMA-Land.",
+    "quotas_a3": "A3 — Ein Platz für jedes Land mit Spielern über 700 Punkten.",
+    "quotas_part_b_title": "Teil B — Proportionale Plätze",
+    "quotas_b1": "B1 — Prozentsatz der Spieler in der Rangliste (Land / Gesamt).",
+    "quotas_b2": "B2 — Prozentsatz der Spieler mit einem Ranking über 700 Punkten (Land / Gesamt).",
+    "quotas_b3": "B3 — Durchschnitt von B1 und B2, angewandt auf die verbleibenden Plätze nach Teil A.",
+    "quotas_formula": "Q = [A1+A2+A3] + B3 × [Gesamt − Summe(Teil A)]",
+    "quotas_limits_title": "Grenzen und Umverteilung",
+    "quotas_limit_max": "Ein Land kann nicht mehr Plätze bekommen als die Anzahl der Spieler, die über dem globalen Durchschnitt ranken.",
+    "quotas_limit_min": "Jedes EMA-Land hat mindestens 1 garantierten Platz.",
+    "quotas_invited_title": "Eingeladene & Nicht-EMA-Spieler",
+    "quotas_invited_desc": "Plätze für Nicht-EMA- und eingeladene Spieler werden von der EMA festgelegt. Wenn Spieler nicht interessiert sind, werden die Plätze innerhalb der EMA-Quote umverteilt."
   }
 }

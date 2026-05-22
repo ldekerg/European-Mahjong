@@ -6,7 +6,8 @@
     "players": "Joueurs",
     "countries": "Pays",
     "tournaments": "Tournois",
-    "formulas": "Formules"
+    "formulas": "Formules",
+    "ranking_system": "Système de classement"
   },
   "common": {
     "dark_mode": "Mode sombre",
@@ -272,5 +273,41 @@
     "note_divergence_label": "Divergence avec l'EMA officiel",
     "note_divergence_weekly": "Le classement EMA officiel ne précise pas de fréquence de mise à jour. Notre application recalcule le classement chaque lundi.",
     "note_divergence_104": "La durée de contribution d'un tournoi (104 semaines actives) diffère potentiellement de la définition EMA officielle, qui exprime la période en années calendaires et non en semaines actives hors gel."
+  },
+  "ranking_system": {
+    "tab_ranking": "Formules de classement",
+    "tab_certification": "Certification des tournois",
+    "tab_quotas": "Quotas championnats",
+    "page_title": "Le système MERS",
+    "cert_intro": "L'EMA certifie les tournois dans le cadre du système de classement européen de Mahjong (MERS). Les tournois certifiés contribuent au classement des joueurs.",
+    "cert_apply_title": "Demande de certification",
+    "cert_apply_desc": "Une organisation membre de l'EMA peut demander la certification d'un tournoi. La demande doit être envoyée par le membre du conseil national au conseil de l'EMA au moins 3 mois avant le tournoi.",
+    "cert_limit_title": "Nombre de tournois MERS par pays",
+    "cert_limit_desc": "Chaque pays peut organiser jusqu'à 3 tournois MERS par an et par règlement, quelle que soit le poids du tournoi.",
+    "cert_req_title": "Conditions pour les tournois MERS",
+    "cert_req_open": "Doit être ouvert à tous les joueurs des pays européens.",
+    "cert_req_players": "Au moins 16 joueurs de pays membres de l'EMA doivent participer.",
+    "cert_req_ema_num": "Les joueurs ont besoin d'un numéro d'enregistrement EMA pour figurer dans le classement.",
+    "cert_sessions_title": "Sessions minimales par durée",
+    "cert_col_duration": "Durée",
+    "cert_col_sessions": "Sessions min.",
+    "cert_col_time": "Temps par session",
+    "cert_observer_title": "Observateur EMA",
+    "cert_observer_desc": "Les organisateurs sont responsables de la désignation d'un observateur EMA et doivent annoncer son nom au moins deux semaines avant l'événement. L'observateur devrait de préférence être un membre du conseil EMA d'un autre pays, ou un joueur de tournoi expérimenté d'un autre pays.",
+    "quotas_intro": "Les quotas EMA déterminent le nombre de places allouées à chaque pays pour les Championnats d'Europe et du Monde (OEMC, WMC, ERMC, WRC).",
+    "quotas_part_a_title": "Partie A — Places de base",
+    "quotas_a1": "A1 — Une place pour les 3 meilleurs pays EMA au classement par équipes.",
+    "quotas_a2": "A2 — Une place pour chaque pays EMA.",
+    "quotas_a3": "A3 — Une place pour chaque pays ayant des joueurs classés au-dessus de 700 points.",
+    "quotas_part_b_title": "Partie B — Places proportionnelles",
+    "quotas_b1": "B1 — Pourcentage de joueurs dans la liste de classement (pays / total).",
+    "quotas_b2": "B2 — Pourcentage de joueurs avec un classement supérieur à 700 points (pays / total).",
+    "quotas_b3": "B3 — Moyenne de B1 et B2, appliquée aux places restantes après la partie A.",
+    "quotas_formula": "Q = [A1+A2+A3] + B3 × [Total − Somme(Partie A)]",
+    "quotas_limits_title": "Limites et redistribution",
+    "quotas_limit_max": "Un pays ne peut pas obtenir plus de places que le nombre de joueurs classés au-dessus de la moyenne mondiale.",
+    "quotas_limit_min": "Chaque pays EMA a au moins 1 place garantie.",
+    "quotas_invited_title": "Joueurs invités et hors EMA",
+    "quotas_invited_desc": "Les places pour les joueurs non-EMA et invités sont fixées par l'EMA. Si les joueurs ne sont pas intéressés, les places sont redistribuées dans le quota EMA. Les joueurs de pays sans organisation peuvent postuler dans le quota pour le Reste du Monde."
   }
 }

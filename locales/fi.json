@@ -6,7 +6,8 @@
     "players": "Pelaajat",
     "countries": "Maat",
     "tournaments": "Turnaukset",
-    "formulas": "Formulas"
+    "formulas": "Formulas",
+    "ranking_system": "Rankausjärjestelmä"
   },
   "common": {
     "dark_mode": "Tumma tila",
@@ -272,5 +273,41 @@
     "note_divergence_label": "Divergence from official EMA",
     "note_divergence_weekly": "The official EMA ranking does not specify an update frequency. This application recalculates the ranking every Monday.",
     "note_divergence_104": "The tournament contribution duration (104 active weeks) may differ from the official EMA definition, which expresses the period in calendar years rather than active weeks excluding the freeze."
+  },
+  "ranking_system": {
+    "tab_ranking": "Rankauskaavat",
+    "tab_certification": "Turnaustensertifiointi",
+    "tab_quotas": "Mestaruuskiintiöt",
+    "page_title": "MERS-järjestelmä",
+    "cert_intro": "EMA sertifioi turnauksia Mahjong European Ranking System (MERS) -järjestelmän puitteissa.",
+    "cert_apply_title": "Sertifiointihakemus",
+    "cert_apply_desc": "EMA-jäsenjärjestö voi hakea turnauksen sertifiointia. Hakemus on lähetettävä kansallisen hallituksen jäsenen toimesta EMA-hallitukselle vähintään 3 kuukautta ennen turnausta.",
+    "cert_limit_title": "MERS-turnausten lukumäärä maata kohti",
+    "cert_limit_desc": "Jokainen maa voi järjestää enintään 3 MERS-turnausta vuodessa ja sääntöjoukkoa kohti, riippumatta turnauksen painosta.",
+    "cert_req_title": "Vaatimukset MERS-turnauksille",
+    "cert_req_open": "Täytyy olla avoin kaikille eurooppalaisista maista tuleville pelaajille.",
+    "cert_req_players": "Vähintään 16 pelaajaa EMA:n jäsenmaista on osallistuttava.",
+    "cert_req_ema_num": "Pelaajilla on oltava EMA-rekisteröintinumero, jotta he voivat olla rankingissa.",
+    "cert_sessions_title": "Vähimmäissessiot keston mukaan",
+    "cert_col_duration": "Kesto",
+    "cert_col_sessions": "Min. sessiot",
+    "cert_col_time": "Aika per sessio",
+    "cert_observer_title": "EMA-tarkkailija",
+    "cert_observer_desc": "Järjestäjät ovat vastuussa EMA-tarkkailijan nimeämisestä ja heidän nimensä ilmoittamisesta vähintään kaksi viikkoa ennen tapahtumaa.",
+    "quotas_intro": "EMA-kiintiöt määrittävät kullekin maalle jaettujen paikkojen määrän Euroopan ja maailman mestaruuskilpailuissa.",
+    "quotas_part_a_title": "Osa A — Perussijoitukset",
+    "quotas_a1": "A1 — Yksi paikka 3 parhaalle EMA-maalle maarankinissa.",
+    "quotas_a2": "A2 — Yksi paikka jokaiselle EMA-maalle.",
+    "quotas_a3": "A3 — Yksi paikka jokaiselle maalle, jolla on yli 700 pisteen pelaajia.",
+    "quotas_part_b_title": "Osa B — Suhteelliset sijoitukset",
+    "quotas_b1": "B1 — Prosenttiosuus pelaajista rankinglistalla (maa / yhteensä).",
+    "quotas_b2": "B2 — Prosenttiosuus pelaajista, joiden ranking on yli 700 pistettä (maa / yhteensä).",
+    "quotas_b3": "B3 — B1:n ja B2:n keskiarvo, sovelletaan jäljellä oleviin sijoituksiin osan A jälkeen.",
+    "quotas_formula": "Q = [A1+A2+A3] + B3 × [Yhteensä − Summa(Osa A)]",
+    "quotas_limits_title": "Rajat ja uudelleenjako",
+    "quotas_limit_max": "Maa ei voi saada enemmän paikkoja kuin globaalin keskiarvon ylittävien pelaajien määrä.",
+    "quotas_limit_min": "Jokaisella EMA-maalla on vähintään 1 taattu paikka.",
+    "quotas_invited_title": "Kutsutut & ei-EMA-pelaajat",
+    "quotas_invited_desc": "EMA asettaa ei-EMA- ja kutsuttujen pelaajien paikat. Jos pelaajat eivät ole kiinnostuneita, paikat jaetaan uudelleen EMA-kiintiön sisällä."
   }
 }

@@ -6,7 +6,8 @@
     "players": "Jucători",
     "countries": "Țări",
     "tournaments": "Turnee",
-    "formulas": "Formulas"
+    "formulas": "Formulas",
+    "ranking_system": "Sistem de clasament"
   },
   "common": {
     "dark_mode": "Mod întunecat",
@@ -272,5 +273,41 @@
     "note_divergence_label": "Divergence from official EMA",
     "note_divergence_weekly": "The official EMA ranking does not specify an update frequency. This application recalculates the ranking every Monday.",
     "note_divergence_104": "The tournament contribution duration (104 active weeks) may differ from the official EMA definition, which expresses the period in calendar years rather than active weeks excluding the freeze."
+  },
+  "ranking_system": {
+    "tab_ranking": "Formule de clasament",
+    "tab_certification": "Certificarea turneelor",
+    "tab_quotas": "Cote de campionat",
+    "page_title": "Sistemul MERS",
+    "cert_intro": "EMA certifică turneele în cadrul sistemului european de clasament Mahjong (MERS).",
+    "cert_apply_title": "Solicitare de certificare",
+    "cert_apply_desc": "O organizație membră EMA poate solicita certificarea unui turneu. Cererea trebuie trimisă de membrul consiliului național la consiliul EMA cu cel puțin 3 luni înainte de turneu.",
+    "cert_limit_title": "Numărul de turnee MERS per țară",
+    "cert_limit_desc": "Fiecare țară poate organiza până la 3 turnee MERS pe an și set de reguli, indiferent de greutatea turneului.",
+    "cert_req_title": "Cerințe pentru turneele MERS",
+    "cert_req_open": "Trebuie să fie deschis tuturor jucătorilor din țările europene.",
+    "cert_req_players": "Trebuie să participe cel puțin 16 jucători din țările membre EMA.",
+    "cert_req_ema_num": "Jucătorii au nevoie de un număr de înregistrare EMA pentru a fi listați în clasament.",
+    "cert_sessions_title": "Sesiuni minime pe durată",
+    "cert_col_duration": "Durată",
+    "cert_col_sessions": "Sesiuni min.",
+    "cert_col_time": "Timp per sesiune",
+    "cert_observer_title": "Observator EMA",
+    "cert_observer_desc": "Organizatorii sunt responsabili pentru numirea unui observator EMA, anunțând numele acestuia cu cel puțin două săptămâni înainte de eveniment.",
+    "quotas_intro": "Cotele EMA determină numărul de locuri alocate fiecărei țări pentru campionatele europene și mondiale.",
+    "quotas_part_a_title": "Partea A — Locuri de bază",
+    "quotas_a1": "A1 — Un loc pentru cele 3 țări EMA de top în clasamentul pe țări.",
+    "quotas_a2": "A2 — Un loc pentru fiecare țară EMA.",
+    "quotas_a3": "A3 — Un loc pentru fiecare țară cu jucători clasați peste 700 de puncte.",
+    "quotas_part_b_title": "Partea B — Locuri proporționale",
+    "quotas_b1": "B1 — Procentul jucătorilor din lista de clasament (țară / total).",
+    "quotas_b2": "B2 — Procentul jucătorilor cu clasament peste 700 de puncte (țară / total).",
+    "quotas_b3": "B3 — Media B1 și B2, aplicată locurilor rămase după Partea A.",
+    "quotas_formula": "Q = [A1+A2+A3] + B3 × [Total − Sumă(Partea A)]",
+    "quotas_limits_title": "Limite și redistribuire",
+    "quotas_limit_max": "O țară nu poate obține mai multe locuri decât numărul de jucători clasați peste media globală.",
+    "quotas_limit_min": "Fiecare țară EMA are garantat cel puțin 1 loc.",
+    "quotas_invited_title": "Jucători invitați & non-EMA",
+    "quotas_invited_desc": "Locurile pentru jucătorii non-EMA și invitați sunt stabilite de EMA. Dacă jucătorii nu sunt interesați, locurile sunt redistribuite în cadrul cotei EMA."
   }
 }

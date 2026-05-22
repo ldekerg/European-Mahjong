@@ -310,7 +310,7 @@ def get_week_ranking(db: Session, week: date, regles: str) -> list:
 
 
 PUBLIC_PREFIXES = ("/home", "/ranking", "/players", "/tournaments", "/countries",
-                   "/hof", "/championships", "/formulas", "/classement", "/accueil",
+                   "/hof", "/championships", "/ranking-system", "/classement", "/accueil",
                    "/joueurs", "/tournois", "/pays", "/palmares")
 
 EXEMPT_PREFIXES = ("/static", "/manage", "/admin", "/verify")

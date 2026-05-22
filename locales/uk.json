@@ -6,7 +6,8 @@
     "players": "Гравці",
     "countries": "Країни",
     "tournaments": "Турніри",
-    "formulas": "Formulas"
+    "formulas": "Formulas",
+    "ranking_system": "Система рейтингу"
   },
   "common": {
     "dark_mode": "Темна тема",
@@ -272,5 +273,41 @@
     "note_divergence_label": "Divergence from official EMA",
     "note_divergence_weekly": "The official EMA ranking does not specify an update frequency. This application recalculates the ranking every Monday.",
     "note_divergence_104": "The tournament contribution duration (104 active weeks) may differ from the official EMA definition, which expresses the period in calendar years rather than active weeks excluding the freeze."
+  },
+  "ranking_system": {
+    "tab_ranking": "Формули рейтингу",
+    "tab_certification": "Сертифікація турнірів",
+    "tab_quotas": "Квоти чемпіонату",
+    "page_title": "Система MERS",
+    "cert_intro": "EMA сертифікує турніри в рамках системи рейтингу MERS.",
+    "cert_apply_title": "Заявка на сертифікацію",
+    "cert_apply_desc": "Організація-член EMA може подати заявку на сертифікацію турніру. Заявка повинна бути надіслана національним членом ради до ради EMA не менш ніж за 3 місяці до турніру.",
+    "cert_limit_title": "Кількість турнірів MERS на країну",
+    "cert_limit_desc": "Кожна країна може проводити до 3 турнірів MERS на рік і на набір правил, незалежно від ваги турніру.",
+    "cert_req_title": "Вимоги до турнірів MERS",
+    "cert_req_open": "Повинен бути відкритим для всіх гравців з європейських країн.",
+    "cert_req_players": "Повинні взяти участь щонайменше 16 гравців з країн-членів EMA.",
+    "cert_req_ema_num": "Гравцям потрібен реєстраційний номер EMA, щоб бути включеними до рейтингу.",
+    "cert_sessions_title": "Мінімальні сесії за тривалістю",
+    "cert_col_duration": "Тривалість",
+    "cert_col_sessions": "Мін. сесії",
+    "cert_col_time": "Час на сесію",
+    "cert_observer_title": "Спостерігач EMA",
+    "cert_observer_desc": "Організатори несуть відповідальність за призначення спостерігача EMA та оголошення їх імені принаймні за два тижні до заходу.",
+    "quotas_intro": "Квоти EMA визначають кількість місць, виділених кожній країні на Чемпіонатах Європи та Світу.",
+    "quotas_part_a_title": "Частина A — Базові місця",
+    "quotas_a1": "A1 — Одне місце для 3 найкращих країн EMA в рейтингу країн.",
+    "quotas_a2": "A2 — Одне місце для кожної країни EMA.",
+    "quotas_a3": "A3 — Одне місце для кожної країни з гравцями вище 700 очок.",
+    "quotas_part_b_title": "Частина B — Пропорційні місця",
+    "quotas_b1": "B1 — Відсоток гравців у рейтинговому списку (країна / загалом).",
+    "quotas_b2": "B2 — Відсоток гравців з рейтингом вище 700 очок (країна / загалом).",
+    "quotas_b3": "B3 — Середнє значення B1 та B2, застосоване до місць, що залишилися після частини A.",
+    "quotas_formula": "Q = [A1+A2+A3] + B3 × [Всього − Сума(Частина A)]",
+    "quotas_limits_title": "Обмеження та перерозподіл",
+    "quotas_limit_max": "Країна не може отримати більше місць, ніж кількість гравців, що мають рейтинг вище глобального середнього.",
+    "quotas_limit_min": "Кожна країна EMA має гарантоване щонайменше 1 місце.",
+    "quotas_invited_title": "Запрошені та гравці не з EMA",
+    "quotas_invited_desc": "Місця для гравців не з EMA та запрошених встановлюються EMA. Якщо гравці не зацікавлені, місця перерозподіляються в межах квоти EMA."
   }
 }

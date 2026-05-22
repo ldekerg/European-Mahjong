@@ -6,7 +6,8 @@
     "players": "Spillere",
     "countries": "Land",
     "tournaments": "Turneringer",
-    "formulas": "Formulas"
+    "formulas": "Formulas",
+    "ranking_system": "Rangeringssystem"
   },
   "common": {
     "dark_mode": "Mørk modus",
@@ -272,5 +273,41 @@
     "note_divergence_label": "Divergence from official EMA",
     "note_divergence_weekly": "The official EMA ranking does not specify an update frequency. This application recalculates the ranking every Monday.",
     "note_divergence_104": "The tournament contribution duration (104 active weeks) may differ from the official EMA definition, which expresses the period in calendar years rather than active weeks excluding the freeze."
+  },
+  "ranking_system": {
+    "tab_ranking": "Rankingformler",
+    "tab_certification": "Turneringssertifisering",
+    "tab_quotas": "Mesterskapsutledning",
+    "page_title": "MERS-systemet",
+    "cert_intro": "EMA sertifiserer turneringer under Mahjong European Ranking System (MERS).",
+    "cert_apply_title": "Søknad om sertifisering",
+    "cert_apply_desc": "En EMA-medlemsorganisasjon kan søke om sertifisering av en turnering. Søknaden må sendes av det nasjonale styremedlemmet til EMA-styret minst 3 måneder i forveien.",
+    "cert_limit_title": "Antall MERS-turneringer per land",
+    "cert_limit_desc": "Hvert land kan holde inntil 3 MERS-turneringer per år og regelsett, uavhengig av turneringens vekt.",
+    "cert_req_title": "Krav til MERS-turneringer",
+    "cert_req_open": "Må være åpent for alle spillere fra europeiske land.",
+    "cert_req_players": "Minst 16 spillere fra EMA-medlemsland må delta.",
+    "cert_req_ema_num": "Spillere trenger et EMA-registreringsnummer for å bli listet i rangeringen.",
+    "cert_sessions_title": "Minimum økter per varighet",
+    "cert_col_duration": "Varighet",
+    "cert_col_sessions": "Min. økter",
+    "cert_col_time": "Tid per økt",
+    "cert_observer_title": "EMA-observatør",
+    "cert_observer_desc": "Arrangørene er ansvarlige for å utpeke en EMA-observatør og kunngjøre deres navn minst to uker før arrangementet.",
+    "quotas_intro": "EMA-kvoter bestemmer antall plasser tildelt hvert land for europameisterskap og verdensmesterskap.",
+    "quotas_part_a_title": "Del A — Grunnplasser",
+    "quotas_a1": "A1 — En plass for de 3 beste EMA-landene i landsrangeringen.",
+    "quotas_a2": "A2 — En plass for hvert EMA-land.",
+    "quotas_a3": "A3 — En plass for hvert land med spillere rangert over 700 poeng.",
+    "quotas_part_b_title": "Del B — Proporsjonale plasser",
+    "quotas_b1": "B1 — Prosentandel av spillere på rangeringslisten (land / totalt).",
+    "quotas_b2": "B2 — Prosentandel av spillere med rangering over 700 poeng (land / totalt).",
+    "quotas_b3": "B3 — Gjennomsnitt av B1 og B2, brukt på gjenværende plasser etter del A.",
+    "quotas_formula": "Q = [A1+A2+A3] + B3 × [Totalt − Sum(Del A)]",
+    "quotas_limits_title": "Grenser og omfordeling",
+    "quotas_limit_max": "Et land kan ikke få flere plasser enn antallet spillere rangert over det globale gjennomsnittet.",
+    "quotas_limit_min": "Hvert EMA-land har minst 1 garantert plass.",
+    "quotas_invited_title": "Inviterte & ikke-EMA-spillere",
+    "quotas_invited_desc": "Plasser for ikke-EMA- og inviterte spillere fastsettes av EMA. Hvis spillere ikke er interesserte, omfordeles plassene innenfor EMA-kvoten."
   }
 }

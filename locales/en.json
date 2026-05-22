@@ -6,7 +6,8 @@
     "players": "Players",
     "countries": "Countries",
     "tournaments": "Tournaments",
-    "formulas": "Formulas"
+    "formulas": "Formulas",
+    "ranking_system": "Ranking System"
   },
   "common": {
     "dark_mode": "Dark mode",
@@ -272,5 +273,41 @@
     "note_divergence_label": "Divergence from official EMA",
     "note_divergence_weekly": "The official EMA ranking does not specify an update frequency. This application recalculates the ranking every Monday.",
     "note_divergence_104": "The tournament contribution duration (104 active weeks) may differ from the official EMA definition, which expresses the period in calendar years rather than active weeks excluding the freeze."
+  },
+  "ranking_system": {
+    "tab_ranking": "Ranking formulas",
+    "tab_certification": "Tournament certification",
+    "tab_quotas": "Championship quotas",
+    "page_title": "The MERS System",
+    "cert_intro": "The EMA certifies tournaments under the Mahjong European Ranking System (MERS). Certified tournaments contribute to players' rankings.",
+    "cert_apply_title": "Applying for certification",
+    "cert_apply_desc": "An EMA member organization can apply for certification of a tournament. The request must be sent by the national board member to the EMA board at least 3 months ahead of the tournament.",
+    "cert_limit_title": "Number of MERS tournaments per country",
+    "cert_limit_desc": "Each country can hold up to 3 MERS tournaments per year and rule set, regardless of the weight of the tournament.",
+    "cert_req_title": "Requirements for MERS tournaments",
+    "cert_req_open": "Must be open to all players from European countries.",
+    "cert_req_players": "At least 16 players from EMA member countries must participate.",
+    "cert_req_ema_num": "Players need an EMA registration number to be listed in the ranking.",
+    "cert_sessions_title": "Minimum sessions per duration",
+    "cert_col_duration": "Duration",
+    "cert_col_sessions": "Min. sessions",
+    "cert_col_time": "Time per session",
+    "cert_observer_title": "EMA Observer",
+    "cert_observer_desc": "Organisers are responsible for appointing an EMA observer, announcing their name at least two weeks before the event. The observer should preferably be an EMA board member from another country, or an experienced tournament player from another country.",
+    "quotas_intro": "EMA Quotas determine the number of seats allocated to each country for European and World Championships (OEMC, WMC, ERMC, WRC).",
+    "quotas_part_a_title": "Part A — Base seats",
+    "quotas_a1": "A1 — One seat for the 3 best EMA countries in the country ranking.",
+    "quotas_a2": "A2 — One seat for every EMA country.",
+    "quotas_a3": "A3 — One seat for each country with players ranked above 700 points.",
+    "quotas_part_b_title": "Part B — Proportional seats",
+    "quotas_b1": "B1 — Percentage of players in the ranking list (country / total).",
+    "quotas_b2": "B2 — Percentage of players with ranking above 700 points (country / total).",
+    "quotas_b3": "B3 — Average of B1 and B2, applied to remaining seats after Part A.",
+    "quotas_formula": "Q = [A1+A2+A3] + B3 × [Total − Sum(Part A)]",
+    "quotas_limits_title": "Limits & redistribution",
+    "quotas_limit_max": "A country cannot get more seats than the number of players ranked above the global average.",
+    "quotas_limit_min": "Every EMA country has at least 1 seat guaranteed.",
+    "quotas_invited_title": "Invited & non-EMA players",
+    "quotas_invited_desc": "Seats for non-EMA and invited players are set by EMA. If players are not interested, seats are redistributed within the EMA quota. Players from countries without organizations can apply in the quota for Rest of the World."
   }
 }
