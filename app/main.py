@@ -419,6 +419,12 @@ async def captcha_and_rate_limit(request: Request, call_next):
         else:
             del _ban_store[ip]
 
+    # Block unusual HTTP methods (WebDAV, scanners) → ban the IP
+    if request.method not in ("GET", "POST", "HEAD"):
+        _log_bot(ip, f"bad_method:{request.method}", path=path)
+        _ban_store[ip] = now + _ban_duration
+        return Response(status_code=405)
+
     # Block known bots by User-Agent → ban the IP
     ua = request.headers.get("user-agent", "").lower()
     if any(bad in ua for bad in _BAD_UA):
