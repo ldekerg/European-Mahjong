@@ -8,7 +8,15 @@
     "tournaments": "Turneringer",
     "formulas": "Formulas",
     "ranking_system": "Rangeringssystem",
-    "about": "Om EMA"
+    "about": "Om EMA",
+    "group_ema": "EMA",
+    "group_ranking": "Rangering",
+    "group_tournaments": "Turneringer",
+    "group_players": "Spillere",
+    "group_countries": "Lande",
+    "mahjong_rules": "Mahjong & Regler",
+    "referees": "Dommere",
+    "quotas": "Kvoter"
   },
   "common": {
     "dark_mode": "Mørk tilstand",
@@ -61,7 +69,8 @@
       "November",
       "December"
     ],
-    "player": "Spiller"
+    "player": "Spiller",
+    "coming_soon": "Kommer snart"
   },
   "home": {
     "intro": "Velkommen til den europæiske Mahjong-rangliste, der dækker disciplinerne <strong>MCR</strong> og <strong>RCR</strong>. Point beregnes ud fra turneringsresultater godkendt af <a href=\"http://mahjong-europe.org\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--accent)\">European Mahjong Association (EMA)</a>. Dette site viser ugentlige ranglister, turneringshistorik, rekorder for spillere og lande samt Hall of Fame.",

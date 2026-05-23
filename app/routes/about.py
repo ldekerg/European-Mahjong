@@ -15,6 +15,11 @@ with open(_FEDS_PATH, encoding="utf-8") as _f:
     _FEDERATIONS = json.load(_f)
 
 
+@router.get("/rules")
+def rules(request: Request):
+    return templates.TemplateResponse(request, "rules.html", {})
+
+
 @router.get("/about")
 def about(request: Request):
     return templates.TemplateResponse(request, "about.html", {

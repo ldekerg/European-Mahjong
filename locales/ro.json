@@ -8,7 +8,15 @@
     "tournaments": "Turnee",
     "formulas": "Formulas",
     "ranking_system": "Sistem de clasament",
-    "about": "Despre EMA"
+    "about": "Despre EMA",
+    "group_ema": "EMA",
+    "group_ranking": "Clasament",
+    "group_tournaments": "Turnee",
+    "group_players": "Jucători",
+    "group_countries": "Țări",
+    "mahjong_rules": "Mahjong & Reguli",
+    "referees": "Arbitri",
+    "quotas": "Cote"
   },
   "common": {
     "dark_mode": "Mod întunecat",
@@ -61,7 +69,8 @@
       "Noiembrie",
       "Decembrie"
     ],
-    "player": "Jucător"
+    "player": "Jucător",
+    "coming_soon": "În curând"
   },
   "home": {
     "intro": "Bun venit la clasamentul european de Mahjong, care acoperă disciplinele <strong>MCR</strong> și <strong>RCR</strong>. Punctele sunt calculate din rezultatele turneelor recunoscute de <a href=\"http://mahjong-europe.org\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--accent)\">European Mahjong Association (EMA)</a>. Acest site prezintă clasamentele săptămânale, istoricul turneelor, recordurile pe jucători și pe țări, precum și Hall of Fame.",

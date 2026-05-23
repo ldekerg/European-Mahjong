@@ -8,7 +8,15 @@
     "tournaments": "Turnīri",
     "formulas": "Formulas",
     "ranking_system": "Rangu sistēma",
-    "about": "Par EMA"
+    "about": "Par EMA",
+    "group_ema": "EMA",
+    "group_ranking": "Reitings",
+    "group_tournaments": "Turnīri",
+    "group_players": "Spēlētāji",
+    "group_countries": "Valstis",
+    "mahjong_rules": "Mahjong & Noteikumi",
+    "referees": "Tiesneši",
+    "quotas": "Kvotas"
   },
   "common": {
     "dark_mode": "Tumšais režīms",
@@ -61,7 +69,8 @@
       "Novembris",
       "Decembris"
     ],
-    "player": "Spēlētājs"
+    "player": "Spēlētājs",
+    "coming_soon": "Drīzumā"
   },
   "home": {
     "intro": "Laipni lūdzam Eiropas Madžonga rangā, kas aptver <strong>MCR</strong> un <strong>RCR</strong> disciplīnas. Punkti tiek aprēķināti no turnīru rezultātiem, ko atzinusi <a href=\"http://mahjong-europe.org\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--accent)\">European Mahjong Association (EMA)</a>. Šī vietne rāda nedēļas ranžējumus, turnīru vēsturi, spēlētāju un valstu rekordus un Slavas zāli.",

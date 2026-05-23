@@ -335,9 +335,9 @@ def hallfame(
     palmares_mcr = _palmares_championnats(db, "MCR")
     palmares_rcr = _palmares_championnats(db, "RCR")
 
-    from app.routes.tournaments import _incomplets_ids
+    from app.routes.tournaments import _incomplete_ids
     tous_ids = [item["tournoi"].id for item in palmares_mcr + palmares_rcr]
-    incomplete = _incomplets_ids(db, tous_ids)
+    incomplete = _incomplete_ids(db, tous_ids)
 
     records_mcr = _records(db, "MCR")
     records_rcr = _records(db, "RCR")

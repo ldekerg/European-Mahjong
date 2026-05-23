@@ -8,7 +8,15 @@
     "tournaments": "Turnaje",
     "formulas": "Formulas",
     "ranking_system": "Systém hodnocení",
-    "about": "O EMA"
+    "about": "O EMA",
+    "group_ema": "EMA",
+    "group_ranking": "Žebříček",
+    "group_tournaments": "Turnaje",
+    "group_players": "Hráči",
+    "group_countries": "Země",
+    "mahjong_rules": "Mahjong & Pravidla",
+    "referees": "Rozhodčí",
+    "quotas": "Kvóty"
   },
   "common": {
     "dark_mode": "Tmavý režim",
@@ -61,7 +69,8 @@
       "Listopad",
       "Prosinec"
     ],
-    "player": "Hráč"
+    "player": "Hráč",
+    "coming_soon": "Brzy k dispozici"
   },
   "home": {
     "intro": "Vítejte v evropském žebříčku Mahjong, který zahrnuje disciplíny <strong>MCR</strong> a <strong>RCR</strong>. Body se počítají z výsledků turnajů uznaných <a href=\"http://mahjong-europe.org\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--accent)\">European Mahjong Association (EMA)</a>. Tato stránka představuje týdenní žebříčky, historii turnajů, rekordy hráčů a zemí a Síň slávy.",

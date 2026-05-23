@@ -421,6 +421,7 @@ nav a:hover {
     transform: translateX(-50%);
 
     display: flex;
+    align-items: center;
     gap: 1.5rem;
 }
 
@@ -447,6 +448,105 @@ nav a:hover {
     font-size: 0.95rem;
   }
   #nav-links a:last-child { border-bottom: none; }
+}
+
+/* ── Nav dropdowns ── */
+.nav-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.nav-group-btn {
+  background: none;
+  border: none;
+  color: var(--text3);
+  font-weight: 500;
+  font-size: inherit;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+.nav-group-btn:hover { transform: scale(1.1); }
+.nav-group-btn::after {
+  content: '▾';
+  font-size: 0.65rem;
+  opacity: 0.7;
+}
+.nav-dropdown {
+  display: none;
+  position: absolute;
+  top: calc(100% + 0.6rem);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px var(--shadow);
+  min-width: 160px;
+  z-index: 100;
+  padding: 0.3rem 0;
+}
+.nav-dropdown a {
+  display: block;
+  padding: 0.45rem 1rem;
+  font-size: 0.88rem;
+  white-space: nowrap;
+  color: var(--text);
+}
+.nav-dropdown a:hover {
+  background: var(--bg3);
+  transform: none;
+}
+.nav-dropdown .nav-dd-disabled {
+  display: block;
+  padding: 0.45rem 1rem;
+  font-size: 0.88rem;
+  white-space: nowrap;
+  color: var(--text3);
+  opacity: 0.5;
+  cursor: default;
+  font-style: italic;
+}
+@media (hover: hover) and (min-width: 769px) {
+  .nav-group:hover .nav-dropdown,
+  .nav-group:focus-within .nav-dropdown { display: block; }
+}
+
+@media (max-width: 768px) {
+  .nav-group { display: block; }
+  .nav-group-btn {
+    padding: 0.65rem 1rem;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    width: 100%;
+    font-size: 0.95rem;
+    justify-content: space-between;
+  }
+  .nav-group-btn::after {
+    content: '▸';
+    font-size: 0.75rem;
+    opacity: 0.6;
+    transition: transform 0.15s;
+  }
+  .nav-group.open .nav-group-btn::after { content: '▾'; }
+  .nav-dropdown {
+    display: none;
+    position: static;
+    transform: none;
+    box-shadow: none;
+    border: none;
+    border-radius: 0;
+    background: var(--bg3);
+    padding: 0;
+  }
+  .nav-group.open .nav-dropdown { display: block; }
+  .nav-dropdown a, .nav-dropdown .nav-dd-disabled {
+    padding: 0.5rem 1.75rem;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    font-size: 0.88rem;
+    display: block;
+  }
 }
 
 /* ── Dark mode extras ── */

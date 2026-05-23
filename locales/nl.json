@@ -8,7 +8,15 @@
     "tournaments": "Toernooien",
     "formulas": "Formulas",
     "ranking_system": "Ranglijstsysteem",
-    "about": "Over EMA"
+    "about": "Over EMA",
+    "group_ema": "EMA",
+    "group_ranking": "Ranglijst",
+    "group_tournaments": "Toernooien",
+    "group_players": "Spelers",
+    "group_countries": "Landen",
+    "mahjong_rules": "Mahjong & Regels",
+    "referees": "Scheidsrechters",
+    "quotas": "Quota's"
   },
   "common": {
     "dark_mode": "Donkere modus",
@@ -61,7 +69,8 @@
       "November",
       "December"
     ],
-    "player": "Speler"
+    "player": "Speler",
+    "coming_soon": "Binnenkort beschikbaar"
   },
   "home": {
     "intro": "Welkom bij de Europese Mahjong-ranglijst, met de disciplines <strong>MCR</strong> en <strong>RCR</strong>. De punten worden berekend op basis van toernooiresultaten erkend door de <a href=\"http://mahjong-europe.org\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--accent)\">European Mahjong Association (EMA)</a>. Deze site toont wekelijkse ranglijsten, toernooigeschiedenis, speler- en landrecords, en de Hall of Fame.",

@@ -34,14 +34,55 @@
           <span></span><span></span><span></span>
         </button>
         <div id="nav-links">
-          <a href="/ranking">{{ trad('nav.ranking') }}</a>
-          <a href="/players/">{{ trad('nav.players') }}</a>
-          <a href="/countries/">{{ trad('nav.countries') }}</a>
-          <a href="/tournaments/">{{ trad('nav.tournaments') }}</a>
-          <a href="/tournaments/calendar">{{ trad('common.calendar') }}</a>
+
+          <!-- EMA -->
+          <div class="nav-group">
+            <button class="nav-group-btn">{{ trad('nav.group_ema') }}</button>
+            <div class="nav-dropdown">
+              <a href="/about">{{ trad('nav.about') }}</a>
+              <a href="/rules">{{ trad('nav.mahjong_rules') }}</a>
+            </div>
+          </div>
+
+          <!-- Ranking -->
+          <div class="nav-group">
+            <button class="nav-group-btn">{{ trad('nav.group_ranking') }}</button>
+            <div class="nav-dropdown">
+              <a href="/ranking">{{ trad('nav.ranking') }}</a>
+              <a href="/ranking-system">{{ trad('nav.ranking_system') }}</a>
+            </div>
+          </div>
+
+          <!-- Tournaments -->
+          <div class="nav-group">
+            <button class="nav-group-btn">{{ trad('nav.group_tournaments') }}</button>
+            <div class="nav-dropdown">
+              <a href="/tournaments/calendar">{{ trad('common.calendar') }}</a>
+              <a href="/tournaments/">{{ trad('nav.tournaments') }}</a>
+            </div>
+          </div>
+
+          <!-- Players -->
+          <div class="nav-group">
+            <button class="nav-group-btn">{{ trad('nav.group_players') }}</button>
+            <div class="nav-dropdown">
+              <a href="/players/">{{ trad('nav.players') }}</a>
+              <span class="nav-dd-disabled">{{ trad('nav.referees') }}</span>
+            </div>
+          </div>
+
+          <!-- Countries -->
+          <div class="nav-group">
+            <button class="nav-group-btn">{{ trad('nav.group_countries') }}</button>
+            <div class="nav-dropdown">
+              <a href="/countries/">{{ trad('nav.countries') }}</a>
+              <span class="nav-dd-disabled">{{ trad('nav.quotas') }}</span>
+            </div>
+          </div>
+
+          <!-- HOF -->
           <a href="/hof/">{{ trad('nav.hallfame') }}</a>
-          <a href="/about">{{ trad('nav.about') }}</a>
-          <a href="/ranking-system">{{ trad('nav.ranking_system') }}</a>
+
         </div>
         <div class="nav-controls">
         <button class="rules-toggle" onclick="toggleRegles()" title="Règle par défaut">MCR</button>
@@ -266,9 +307,22 @@
             if (!e.target.closest('nav')) {
                 links.classList.remove('nav-open');
                 btn.setAttribute('aria-expanded', 'false');
+                document.querySelectorAll('.nav-group.open').forEach(function(g) { g.classList.remove('open'); });
             }
         });
     })();
+
+    // ── Nav group dropdowns (mobile click) ───────────────────────────────────
+    document.getElementById('nav-links').addEventListener('click', function(e) {
+        if (window.innerWidth > 768) return;
+        var btn = e.target.closest('.nav-group-btn');
+        if (!btn) return;
+        e.stopPropagation();
+        var group = btn.closest('.nav-group');
+        var wasOpen = group.classList.contains('open');
+        document.querySelectorAll('.nav-group.open').forEach(function(g) { g.classList.remove('open'); });
+        if (!wasOpen) group.classList.add('open');
+    });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/twemoji@14/dist/twemoji.min.js" crossorigin="anonymous"></script>
     <script>document.addEventListener('DOMContentLoaded', function() { twemoji.parse(document.body, { folder: 'svg', ext: '.svg' }); });</script>

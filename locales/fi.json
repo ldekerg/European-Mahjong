@@ -8,7 +8,15 @@
     "tournaments": "Turnaukset",
     "formulas": "Formulas",
     "ranking_system": "Rankausjärjestelmä",
-    "about": "Tietoa"
+    "about": "Tietoa EMA:sta",
+    "group_ema": "EMA",
+    "group_ranking": "Ranking",
+    "group_tournaments": "Turnaukset",
+    "group_players": "Pelaajat",
+    "group_countries": "Maat",
+    "mahjong_rules": "Mahjong & Säännöt",
+    "referees": "Tuomarit",
+    "quotas": "Kiintiöt"
   },
   "common": {
     "dark_mode": "Tumma tila",
@@ -61,7 +69,8 @@
       "Marraskuu",
       "Joulukuu"
     ],
-    "player": "Pelaaja"
+    "player": "Pelaaja",
+    "coming_soon": "Tulossa pian"
   },
   "home": {
     "intro": "Tervetuloa eurooppalaiseen Mahjong-rankauslistaan, joka kattaa <strong>MCR</strong>- ja <strong>RCR</strong>-lajit. Pisteet lasketaan <a href=\"http://mahjong-europe.org\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--accent)\">European Mahjong Association (EMA)</a>:n hyväksymistä turnaustuloksista. Sivusto esittelee viikoittaiset sijoitukset, turnaushistorian, pelaaja- ja maakohtaiset ennätykset sekä Hall of Famen.",
