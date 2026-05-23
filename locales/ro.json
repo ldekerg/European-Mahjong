@@ -200,7 +200,9 @@
     "records_points": "Cel mai bun scor puncte (MCR)",
     "records_player": "Jucător",
     "records_all": "Toate formatele",
-    "records_2d": "Turnee 2 zile"
+    "records_2d": "Turnee 2 zile",
+    "podium_ratio": "% podium",
+    "podium_ratio_title": "Raport podium / turnee jucate"
   },
   "formulas": {
     "tournament_score_title": "Tournament EMA points (base rank)",

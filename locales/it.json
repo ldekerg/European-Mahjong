@@ -200,7 +200,9 @@
     "records_points": "Miglior punteggio punti (MCR)",
     "records_player": "Giocatore",
     "records_all": "Tutti i formati",
-    "records_2d": "Tornei 2 giorni"
+    "records_2d": "Tornei 2 giorni",
+    "podium_ratio": "% podi",
+    "podium_ratio_title": "Rapporto podi / tornei giocati"
   },
   "formulas": {
     "tournament_score_title": "Tournament EMA points (base rank)",

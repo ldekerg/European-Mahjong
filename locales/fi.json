@@ -200,7 +200,9 @@
     "records_points": "Paras pistemäärä (MCR)",
     "records_player": "Pelaaja",
     "records_all": "Kaikki formaatit",
-    "records_2d": "2 päivän turnaukset"
+    "records_2d": "2 päivän turnaukset",
+    "podium_ratio": "% palkintosijoitus",
+    "podium_ratio_title": "Palkintosijoitussuhde (palkintosijoitukset / pelatut turnaukset)"
   },
   "formulas": {
     "tournament_score_title": "Tournament EMA points (base rank)",

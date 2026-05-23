@@ -200,7 +200,9 @@
     "records_points": "Najlepšie bodové skóre (MCR)",
     "records_player": "Hráč",
     "records_all": "Všetky formáty",
-    "records_2d": "2-dňové turnaje"
+    "records_2d": "2-dňové turnaje",
+    "podium_ratio": "% stupňov",
+    "podium_ratio_title": "Pomer stupňov víťazov / odohraných turnajov"
   },
   "formulas": {
     "tournament_score_title": "Tournament EMA points (base rank)",

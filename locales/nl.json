@@ -200,7 +200,9 @@
     "records_points": "Beste puntenscore (MCR)",
     "records_player": "Speler",
     "records_all": "Alle formaten",
-    "records_2d": "2-daagse toernooien"
+    "records_2d": "2-daagse toernooien",
+    "podium_ratio": "% podiums",
+    "podium_ratio_title": "Podiumratio (podiums / gespeelde toernooien)"
   },
   "formulas": {
     "tournament_score_title": "Tournament EMA points (base rank)",

@@ -200,7 +200,9 @@
     "records_points": "Legjobb pontszám (MCR)",
     "records_player": "Játékos",
     "records_all": "Minden formátum",
-    "records_2d": "2 napos versenyek"
+    "records_2d": "2 napos versenyek",
+    "podium_ratio": "% dobogó",
+    "podium_ratio_title": "Dobogó arány (dobogó / lejátszott versenyek)"
   },
   "formulas": {
     "tournament_score_title": "Tournament EMA points (base rank)",

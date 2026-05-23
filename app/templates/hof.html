@@ -161,7 +161,7 @@ function sortTable(col, tableId) {
   _sortState[tableId] = {col: col, asc: asc};
 
   var rows = Array.from(table.tBodies[0].rows);
-  function getVal(row, c) { return parseInt(row.cells[c].dataset.val) || 0; }
+  function getVal(row, c) { return parseFloat(row.cells[c].dataset.val) || 0; }
   rows.sort(function(a, b) {
     var va = getVal(a, col), vb = getVal(b, col);
     if (va !== vb) return asc ? va - vb : vb - va;

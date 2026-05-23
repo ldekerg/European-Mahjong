@@ -200,7 +200,9 @@
     "records_points": "Labākais punktu rezultāts (MCR)",
     "records_player": "Spēlētājs",
     "records_all": "Visi formāti",
-    "records_2d": "2 dienu turnīri"
+    "records_2d": "2 dienu turnīri",
+    "podium_ratio": "% pjedestāls",
+    "podium_ratio_title": "Pjedestāla īpatsvars (pjedestāli / aizvadītie turnīri)"
   },
   "formulas": {
     "tournament_score_title": "Tournament EMA points (base rank)",

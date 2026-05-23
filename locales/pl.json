@@ -200,7 +200,9 @@
     "records_points": "Najlepszy wynik punktowy (MCR)",
     "records_player": "Gracz",
     "records_all": "Wszystkie formaty",
-    "records_2d": "Turnieje 2-dniowe"
+    "records_2d": "Turnieje 2-dniowe",
+    "podium_ratio": "% podium",
+    "podium_ratio_title": "Wskaźnik podium (podium / rozegrane turnieje)"
   },
   "formulas": {
     "tournament_score_title": "Tournament EMA points (base rank)",

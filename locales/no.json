@@ -200,7 +200,9 @@
     "records_points": "Beste poengsum (MCR)",
     "records_player": "Spiller",
     "records_all": "Alle formater",
-    "records_2d": "2-dagers turneringer"
+    "records_2d": "2-dagers turneringer",
+    "podium_ratio": "% pall",
+    "podium_ratio_title": "Pallplassandel (pallplasser / spilte turneringer)"
   },
   "formulas": {
     "tournament_score_title": "Tournament EMA points (base rank)",

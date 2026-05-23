@@ -200,7 +200,9 @@
     "records_points": "Bästa poängresultat (MCR)",
     "records_player": "Spelare",
     "records_all": "Alla format",
-    "records_2d": "2-dagarsturneringar"
+    "records_2d": "2-dagarsturneringar",
+    "podium_ratio": "% pall",
+    "podium_ratio_title": "Pallplatskvot (pallplatser / spelade turneringar)"
   },
   "formulas": {
     "tournament_score_title": "Tournament EMA points (base rank)",

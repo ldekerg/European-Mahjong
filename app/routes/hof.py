@@ -213,13 +213,21 @@ def _compute_hof(db: Session, regles: str, periode: str) -> dict:
     ).group_by(Result.player_id).subquery()
 
     medals_rows = db.query(medals_q, Player).join(Player, medals_q.c.player_id == Player.id).all()
-    medals_data = [{
-        "player":   row.Player,
-        "or_t":     row.or_t or 0,
-        "argent_t": row.argent_t or 0,
-        "bronze_t": row.bronze_t or 0,
-        "total_t":  row.total_t or 0,
-    } for row in medals_rows if (row.or_t or 0) + (row.argent_t or 0) + (row.bronze_t or 0) > 0]
+    medals_data = []
+    for row in medals_rows:
+        nb_podium = (row.or_t or 0) + (row.argent_t or 0) + (row.bronze_t or 0)
+        if nb_podium == 0:
+            continue
+        total = row.total_t or 0
+        medals_data.append({
+            "player":       row.Player,
+            "or_t":         row.or_t or 0,
+            "argent_t":     row.argent_t or 0,
+            "bronze_t":     row.bronze_t or 0,
+            "total_t":      total,
+            "nb_podium":    nb_podium,
+            "ratio_podium": round(nb_podium / total, 3) if total else 0,
+        })
     medals_data.sort(key=lambda x: (-x["or_t"], -x["argent_t"], -x["bronze_t"]))
 
     if periode == "encours" and streak_map:

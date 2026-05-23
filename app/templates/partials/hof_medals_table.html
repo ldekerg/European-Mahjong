@@ -8,7 +8,7 @@
   <colgroup>
     <col class="col-hof-pos"><col class="col-flag col-opt"><col class="col-joueur-nom">
     <col class="col-hof-stat"><col class="col-hof-stat"><col class="col-hof-stat">
-    <col class="col-hof-podium"><col class="col-hof-total col-opt">
+    <col class="col-hof-podium"><col class="col-hof-total col-opt"><col class="col-hof-total col-opt">
   </colgroup>
   <thead>
     <tr>
@@ -21,6 +21,7 @@
       <th class="col-hof-stat center sortable" onclick="sortTable(5,'{{ _tid }}')" title="{{ trad('hof.thirds_title') }}">🥉 <span class="sort-icon">⇅</span></th>
       <th class="col-hof-podium center sortable" onclick="sortTable(6,'{{ _tid }}')" title="{{ trad('hof.total_medals_title') }}">🏅 <span class="sort-icon">⇅</span></th>
       <th class="col-hof-total col-opt center sortable" onclick="sortTable(7,'{{ _tid }}')" title="{{ trad('common.tournaments_played') }}">{{ trad('common.tournaments') }} <span class="sort-icon">⇅</span></th>
+      <th class="col-hof-total col-opt center sortable" onclick="sortTable(8,'{{ _tid }}')" title="{{ trad('hof.podium_ratio_title') }}">{{ trad('hof.podium_ratio') }} <span class="sort-icon">⇅</span></th>
     </tr>
   </thead>
   <tbody>
@@ -35,6 +36,7 @@
       <td class="col-hof-stat center" data-val="{{ d.bronze_t }}">{{ d.bronze_t or '—' }}</td>
       <td class="col-hof-podium center" data-val="{{ total_medals }}"><strong>{{ total_medals }}</strong></td>
       <td class="col-hof-total col-opt center dim" data-val="{{ d.total_t }}">{{ d.total_t }}</td>
+      <td class="col-hof-total col-opt center dim" data-val="{{ d.ratio_podium }}">{{ "%.1f"|format(d.ratio_podium * 100) }}%</td>
     </tr>
     {% endfor %}
   </tbody>
