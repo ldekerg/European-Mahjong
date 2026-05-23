@@ -369,7 +369,7 @@ def _verify_cookie(value: str, ip: str) -> bool:
 # Simple in-memory rate limiter: 30 req/min per IP on public routes
 import time, collections, urllib.request, urllib.parse
 _rl_store: dict = collections.defaultdict(list)
-_rl_limit = 30
+_rl_limit = 120
 _rl_window = 60  # seconds
 
 # IP ban store: ip -> ban_until timestamp
