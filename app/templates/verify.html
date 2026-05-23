@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>EMA Ranking — Verification</title>
+  <title>🀄 EMA Ranking — Verification</title>
   <link rel="stylesheet" href="/static/style.css">
   <script>
   (function () {
@@ -46,9 +46,10 @@
     </form>
   </div>
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/twemoji@14/dist/twemoji.min.js" crossorigin="anonymous"></script>
   <script>
+  document.addEventListener('DOMContentLoaded', function() { twemoji.parse(document.body, { folder: 'svg', ext: '.svg' }); });
   function onVerified(token) {
-    // Auto-submit as soon as Turnstile validates
     document.getElementById('verify-form').submit();
   }
   </script>
