@@ -1,0 +1,44 @@
+{# ev.quotas = list of country quota dicts #}
+<table class="quota-table">
+  <colgroup>
+    <col class="quota-col-rank">
+    <col class="quota-col-country">
+    <col class="quota-col-nb">
+    <col class="quota-col-score">
+    <col class="quota-col-seats">
+  </colgroup>
+  <thead>
+    <tr>
+      <th class="quota-col-rank">#</th>
+      <th>{{ trad('common.country') }}</th>
+      <th class="quota-col-nb quota-col-center" title="{{ trad('quotas.nb_players_tip') }}">{{ trad('quotas.nb_players') }}</th>
+      <th class="quota-col-score quota-col-center" title="{{ trad('quotas.team_score_tip') }}">{{ trad('quotas.team_score') }}</th>
+      <th class="quota-col-seats quota-col-center">{{ trad('quotas.seats') }}</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% set total_quota = namespace(v=0) %}
+  {% for q in ev.quotas %}
+  {% set total_quota.v = total_quota.v + q.quota %}
+  <tr>
+    <td style="color:var(--text3);font-size:0.85rem">{{ q.country_rank }}</td>
+    <td>
+      <a href="/countries/{{ q.nationality }}" style="display:flex;align-items:center;gap:0.4rem" title="{{ q.nationality | country_name }}">
+        {{ q.nationality | flag }} <span>{{ q.nationality | country_name }}</span>
+      </a>
+    </td>
+    <td class="quota-col-center">{{ q.nb_players }}</td>
+    <td class="quota-col-center" style="color:var(--text2)">{{ q.team_score if q.nb_players > 0 else '—' }}</td>
+    <td class="quota-col-center quota-col-seats-val">
+      <span class="badge" style="background:var(--bg3);min-width:2rem;display:inline-block">{{ q.quota }}</span>
+    </td>
+  </tr>
+  {% endfor %}
+  </tbody>
+  <tfoot>
+    <tr>
+      <td colspan="4" style="text-align:right;font-weight:600;padding-right:1rem">Total</td>
+      <td class="quota-col-center" style="font-weight:700">{{ total_quota.v }}</td>
+    </tr>
+  </tfoot>
+</table>

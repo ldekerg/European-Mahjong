@@ -264,5 +264,6 @@ def _pretty_json(s: str) -> str:
         return s or ""
 
 templates.env.filters["pretty_json"] = _pretty_json
+templates.env.filters["country_name"] = lambda code: ISO_NOM_PAYS.get(code, code)
 
 templates.env.globals["today"] = lambda: _date.today()

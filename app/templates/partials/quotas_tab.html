@@ -1,0 +1,94 @@
+{# tab = mcr or rcr dict from route #}
+
+{# ===== Invited players (2 places) ===== #}
+{% if tab.invited %}
+<div class="manage-section" style="margin-bottom:1.5rem">
+  <h2 style="font-size:1rem;margin-bottom:0.75rem">{{ trad('quotas.invited_seats') }}</h2>
+  <table class="quota-table">
+    <thead>
+      <tr>
+        <th>{{ trad('quotas.championship') }}</th>
+        <th>{{ trad('quotas.best_ema_player') }}</th>
+        <th>{{ trad('common.country') }}</th>
+        <th style="text-align:center">{{ trad('quotas.position') }}</th>
+        <th style="text-align:center">{{ trad('quotas.seats') }}</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for p in tab.invited %}
+    <tr>
+      <td>{{ p.championship_label }} {{ p.year }}</td>
+      <td><a href="/players/{{ p.player_id }}">{{ p.name | title }}</a></td>
+      <td>{{ p.nationality | flag }} {{ p.nationality }}</td>
+      <td style="text-align:center">{{ p.position }}</td>
+      <td style="text-align:center">1</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+{# ===== Official event ===== #}
+{% if tab.event %}
+{% set ev = tab.event %}
+<div class="manage-section" style="margin-bottom:2rem">
+  <div style="display:flex;align-items:baseline;gap:1rem;flex-wrap:wrap;margin-bottom:1rem">
+    <h2 style="font-size:1.05rem;margin:0">{{ ev.name }}</h2>
+    {% if ev.status == 'official' %}
+    <span class="badge" style="background:var(--mcr);color:#fff;font-size:0.75rem">{{ trad('quotas.official') }}</span>
+    {% else %}
+    <span class="badge" style="background:var(--bg3);font-size:0.75rem">{{ trad('quotas.simulation') }}</span>
+    {% endif %}
+  </div>
+
+  <div class="quota-summary">
+    <div class="quota-summary-item">
+      <span class="dim">{{ trad('quotas.total_seats') }}</span>
+      <strong>{{ ev.total_seats }}</strong>
+    </div>
+    <div class="quota-summary-sep">−</div>
+    <div class="quota-summary-item">
+      <span class="dim">{{ trad('quotas.non_ema_seats') }}</span>
+      <strong>{{ ev.non_ema_seats }}</strong>
+    </div>
+    <div class="quota-summary-sep">−</div>
+    <div class="quota-summary-item">
+      <span class="dim">{{ trad('quotas.invited_seats') }}</span>
+      <strong>{{ ev.invited_seats }}</strong>
+    </div>
+    <div class="quota-summary-sep">=</div>
+    <div class="quota-summary-item quota-summary-total">
+      <span class="dim">{{ trad('quotas.ema_seats') }}</span>
+      <strong>{{ ev.ema_seats }}</strong>
+    </div>
+  </div>
+  <p class="dim" style="font-size:0.8rem;margin-bottom:1rem">
+    {{ trad('quotas.ranking_ref') }} : {{ ev.ranking_week }}
+  </p>
+
+  {% include "partials/quotas_table.html" with context %}
+</div>
+{% endif %}
+
+{# ===== Simulations side by side ===== #}
+{% if tab.simulations %}
+<h2 style="font-size:1rem;margin-bottom:1rem">{{ trad('quotas.simulations') }}</h2>
+<div class="home-grid">
+  {% for sim in tab.simulations %}
+  <div class="quota-sim-card">
+    <div style="margin-bottom:0.75rem">
+      <strong>{{ sim.ema_seats + sim.invited_seats }} {{ trad('quotas.total_seats') | lower }}</strong>
+      <span class="dim" style="font-size:0.8rem">
+        ({{ sim.ema_seats }} EMA + {{ sim.invited_seats }} {{ trad('quotas.invited_seats') | lower }})
+      </span>
+    </div>
+    <p class="dim" style="font-size:0.78rem;margin-bottom:0.75rem">
+      {{ trad('quotas.ranking_ref') }} : {{ sim.ranking_week }}
+    </p>
+    {% set ev = sim %}
+    {% include "partials/quotas_table.html" with context %}
+  </div>
+  {% endfor %}
+</div>
+{% endif %}

@@ -375,5 +375,25 @@
     "seminar": "Seminar",
     "player_link": "Spillerprofil",
     "no_rcr": "Ingen sertifiserte RCR-dommere oppført ennå."
+  },
+  "quotas": {
+    "subtitle": "Seat distribution by country for EMA championships",
+    "official": "Official",
+    "simulation": "Simulation",
+    "total_seats": "Total seats",
+    "non_ema_seats": "Non-EMA / ROW seats",
+    "invited_seats": "Invited seats",
+    "ema_seats": "EMA seats",
+    "ranking_ref": "Reference ranking",
+    "simulations": "Simulations",
+    "championship": "Championship",
+    "best_ema_player": "Best EMA player",
+    "position": "Position",
+    "seats": "Seats",
+    "nb_players": "Players",
+    "nb_players_tip": "Number of ranked players",
+    "nb_700_tip": "Players with score > 700 pts",
+    "team_score": "Team score",
+    "team_score_tip": "Average of top 3 scores (country ranking)"
   }
 }

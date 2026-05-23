@@ -375,5 +375,25 @@
     "seminar": "Séminaire",
     "player_link": "Profil joueur",
     "no_rcr": "Aucun arbitre RCR certifié répertorié pour l'instant."
+  },
+  "quotas": {
+    "subtitle": "Répartition des places par pays pour les championnats EMA",
+    "official": "Officiel",
+    "simulation": "Simulation",
+    "total_seats": "Places totales",
+    "non_ema_seats": "Places non-EMA / ROW",
+    "invited_seats": "Places invités",
+    "ema_seats": "Places EMA",
+    "ranking_ref": "Classement de référence",
+    "simulations": "Simulations",
+    "championship": "Championnat",
+    "best_ema_player": "Meilleur joueur EMA",
+    "position": "Position",
+    "seats": "Places",
+    "nb_players": "Joueurs",
+    "nb_players_tip": "Nombre de joueurs classés",
+    "nb_700_tip": "Joueurs avec score > 700 pts",
+    "team_score": "Score équipe",
+    "team_score_tip": "Moyenne des 3 meilleurs scores (classement pays)"
   }
 }

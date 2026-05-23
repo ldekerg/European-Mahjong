@@ -1247,6 +1247,7 @@ caption.t-count {
     gap: 1.5rem;
     margin-bottom: 1.5rem;
 }
+.home-grid > * { min-width: 0; }
 
 .hof-records-grid {
     display: grid;
@@ -1363,6 +1364,57 @@ caption.t-count {
 .site-warning a:hover {
     opacity: 0.9;
 }
+
+/* ===== Quotas ===== */
+.quota-summary {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.75rem;
+}
+.quota-summary-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  font-size: 0.9rem;
+}
+.quota-summary-item strong { font-size: 1.2rem; }
+.quota-summary-sep { color: var(--text3); font-size: 1.1rem; font-weight: 600; }
+.quota-summary-total strong { color: var(--accent); font-size: 1.35rem; }
+
+.quota-sim-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem;
+  min-width: 0;
+}
+
+.quota-table { width: 100%; max-width: 100%; min-width: 0; border-collapse: collapse; font-size: 0.9rem; table-layout: fixed; }
+.quota-table th, .quota-table td {
+  padding: 0.4rem 0.4rem;
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.quota-table thead th { font-size: 0.78rem; color: var(--text2); font-weight: 600; }
+.quota-table tbody tr:hover { background: var(--bg2); }
+.quota-table tfoot td { border-top: 2px solid var(--border); border-bottom: none; padding-top: 0.6rem; }
+.quota-col-rank    { width: 2rem; }
+.quota-col-country { width: 8rem; }
+.quota-col-nb      { width: 3.5rem; }
+.quota-col-score   { width: 5rem; }
+.quota-col-seats   { width: 3.5rem; }
+.quota-col-center  { text-align: center; }
+.quota-col-seats-val { font-size: 1rem; font-weight: 700; }
+
 
 @media (max-width: 768px) {
 
