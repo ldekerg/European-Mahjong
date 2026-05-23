@@ -113,11 +113,13 @@ def flag_emoji(value: str) -> str:
     iso = _to_iso(value) or (value.upper()[:2] if len(value) >= 2 else "")
     if not iso or len(iso) < 2:
         return ""
+    if iso == "UK":
+        iso = "GB"
     return "".join(chr(0x1F1E6 + ord(c) - ord("A")) for c in iso[:2])
 
 
 PAYS_EMA = {
-    'FR','DE','NL','BE','LU','GB','IE','ES','PT','IT','AT','CH','DK','SE','NO','FI',
+    'FR','DE','NL','BE','LU','UK','IE','ES','PT','IT','AT','CH','DK','SE','NO','FI',
     'PL','CZ','SK','HU','RO','UA','EE','LV','LT','HR','SI','RS','BG','GR','TR',
     'RU','BY','IL','MK','MD','AL','ME','BA',
 }
@@ -130,7 +132,9 @@ def flag_link(value: str, tab: str = "players") -> Markup:
     iso = _to_iso(value)
     if not iso:
         return Markup(flag_emoji(value))
-    emoji = flag_emoji(iso)
+    # UK is our internal code; emoji standard uses GB for the British flag
+    emoji_code = "GB" if iso == "UK" else iso
+    emoji = flag_emoji(emoji_code)
     if iso not in PAYS_EMA:
         return Markup(emoji)
     url = f"/countries/{iso}?tab={tab}"
@@ -145,7 +149,7 @@ ISO_NOM_PAYS = {
     "ES": "Spain",        "IT": "Italy",          "AT": "Austria",       "CH": "Switzerland",
     "DK": "Denmark",      "SE": "Sweden",         "FI": "Finland",       "NO": "Norway",
     "PL": "Poland",       "CZ": "Czech Republic", "HU": "Hungary",       "SK": "Slovakia",
-    "PT": "Portugal",     "GB": "Great Britain",  "UK": "United Kingdom","IE": "Ireland",
+    "PT": "Portugal",     "UK": "United Kingdom", "GB": "United Kingdom", "IE": "Ireland",
     "RU": "Russia",       "UA": "Ukraine",        "BY": "Belarus",       "LV": "Latvia",
     "LT": "Lithuania",    "EE": "Estonia",        "RO": "Romania",       "BG": "Bulgaria",
     "HR": "Croatia",      "SI": "Slovenia",       "RS": "Serbia",        "GR": "Greece",
@@ -160,7 +164,7 @@ _PAYS_ISO = {
     "spain": "ES", "italy": "IT", "austria": "AT", "switzerland": "CH",
     "denmark": "DK", "sweden": "SE", "finland": "FI", "norway": "NO",
     "poland": "PL", "czech republic": "CZ", "hungary": "HU", "slovakia": "SK",
-    "portugal": "PT", "great britain": "GB", "united kingdom": "GB",
+    "portugal": "PT", "great britain": "UK", "united kingdom": "UK",
     "russia": "RU", "ukraine": "UA", "belarus": "BY", "latvia": "LV",
     "lithuania": "LT", "estonia": "EE", "romania": "RO", "bulgaria": "BG",
     "croatia": "HR", "slovenia": "SI", "serbia": "RS", "greece": "GR",

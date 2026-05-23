@@ -18,9 +18,9 @@ NAME_TO_ISO = {
     "finland":                "FI",
     "fr":                     "FR",
     "france":                 "FR",
-    "gb":                     "GB",
+    "gb":                     "UK",
     "germany":                "DE",
-    "great britain":          "GB",
+    "great britain":          "UK",
     "hungary":                "HU",
     "ireland":                "IE",
     "italy":                  "IT",
@@ -38,7 +38,7 @@ NAME_TO_ISO = {
     "switzerland":            "CH",
     "ukraine":                "UA",
     "united states":          "US",
-    "farnham, great britain": "GB",
+    "farnham, great britain": "UK",
     # Special — leave country unchanged, city_id → NULL on tournaments
     "cruise liner mariner of the seas": "__SKIP__",
 }

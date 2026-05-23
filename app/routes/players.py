@@ -18,7 +18,7 @@ def list_players(
     request: Request,
     sort: str = "name",        # id | name | first_name | nationality | nb_mcr | nb_rcr | nb_total
     asc: int = 1,              # 1 = ascending, 0 = descending
-    rules: str = "all",        # all | MCR | RCR
+    rules: str = "all",        # all | MCR | RCR | referee_mcr | referee_rcr
     q: str = "",               # text search
     db: Session = Depends(get_db),
 ):
@@ -76,6 +76,11 @@ def list_players(
 
     from app.main import get_referee_ids
     referee_ids = get_referee_ids(db)
+
+    if rules == "referee_mcr":
+        players_list = [p for p in players_list if p["player"].id in referee_ids and "MCR" in referee_ids[p["player"].id]]
+    elif rules == "referee_rcr":
+        players_list = [p for p in players_list if p["player"].id in referee_ids and "RCR" in referee_ids[p["player"].id]]
 
     return templates.TemplateResponse(request, "players/list.html", {
         "players":      players_list,

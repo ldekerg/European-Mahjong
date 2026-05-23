@@ -19,9 +19,11 @@ COUNTRY_MAP = {
     "Austria":"AT","Belgium":"BE","China":"CN","Denmark":"DK","France":"FR",
     "Germany":"DE","Hungary":"HU","Italy":"IT","Japan":"JP","Portugal":"PT",
     "Russia":"RU","Spain":"ES","Sweden":"SE","Switzerland":"CH",
-    "The Netherlands":"NL","UK":"GB","Ukraine":"UA",
+    "The Netherlands":"NL","UK":"UK","United Kingdom":"UK","Ukraine":"UA",
     "Finland":"FI","Poland":"PL","Slovakia":"SK","Czech Republic":"CZ",
     "Czech Repu":"CZ","USA":"US","SWEDEN":"SE","CHINA":"CN",
+    "Ireland":"IE","Latvia":"LV","Norway":"NO","Canada":"CA",
+    "Austrua":"AT",  # typo on EMA site
 }
 
 ssl_ctx = ssl.create_default_context()
@@ -41,46 +43,87 @@ def fetch(url: str) -> str:
 
 
 def parse_referees_mcr(text: str, rules: str) -> list[dict]:
-    countries = "|".join(re.escape(c) for c in COUNTRY_MAP)
-    pattern = re.compile(
-        r'([A-ZÁÀÂÄÉÈÊËÍÎÏÓÔÖÚÛÜÇÑ][^\n]+?)\s+(' + countries + r')\s+([^,]+),\s*(\d{4})'
+    countries_re = "|".join(re.escape(c) for c in COUNTRY_MAP)
+    # Each entry ends with either:
+    #   "Location, YYYY"  (old format)
+    #   "Location, Country, Month YYYY"  (new format since 2024)
+    # We split the text on each new entry by detecting "Name Country " tokens.
+    chunk_pat = re.compile(
+        r'((?:[A-ZÀ-ɏØøÆæŒœ][\w\'\-\.]+)(?:\s+(?:[A-ZÀ-ɏØøÆæŒœ][\w\'\-\.]+|[a-zà-ɏøæœ][\w\'\-\.]+))*)\s+(' + countries_re + r')\s+'
     )
     entries = []
-    for m in pattern.finditer(text):
+    matches = list(chunk_pat.finditer(text))
+    for i, m in enumerate(matches):
+        # The "rest" is from end of this match to start of next match (or end of text)
+        rest_start = m.end()
+        rest_end = matches[i + 1].start() if i + 1 < len(matches) else len(text)
+        rest = text[rest_start:rest_end].strip()
+
         name = m.group(1).strip()
-        country_iso = COUNTRY_MAP.get(m.group(2).strip(), "")
+        country_raw = m.group(2).strip()
+        country_iso = COUNTRY_MAP.get(country_raw, "")
         if not country_iso:
             continue
+
+        # Extract year from rest
+        year_m = re.search(r'\b(\d{4})\b', rest)
+        if not year_m:
+            continue
+        year = int(year_m.group(1))
+
+        # Location = everything before the year (strip trailing punctuation/spaces)
+        location = rest[:year_m.start()].strip().rstrip(",").strip()
+        if not location:
+            location = rest.strip()
+
         entries.append({
             "name":             name,
             "country":          country_iso,
             "rules":            rules,
-            "seminar_year":     int(m.group(4)),
-            "seminar_location": m.group(3).strip(),
+            "seminar_year":     year,
+            "seminar_location": location,
         })
     return entries
 
 
 def parse_referees_rcr(text: str, rules: str) -> list[dict]:
-    # Format: "Name Country Location, Country, DD Month YYYY"
-    countries = "|".join(re.escape(c) for c in COUNTRY_MAP)
-    pattern = re.compile(
-        r'([A-ZÁÀÂÄÉÈÊËÍÎÏÓÔÖÚÛÜÇÑ][a-záàâäéèêëíîïóôöúûüçñ\-\' ]+(?:\s+[A-ZÁÀÂÄÉÈÊËÍÎÏÓÔÖÚÛÜÇÑ][A-Za-záàâäéèêëíîïóôöúûüçñ\-\']+)+)\s+(' + countries + r')\s+(.+?),\s*\d{1,2}\s+\w+\s+(\d{4})'
+    # Same chunk approach as MCR: detect "Name Country " boundaries, extract year from rest
+    countries_re = "|".join(re.escape(c) for c in COUNTRY_MAP)
+    chunk_pat = re.compile(
+        r'((?:[A-ZÀ-ɏØøÆæŒœ][\w\'\-\.]+)(?:\s+(?:[A-ZÀ-ɏØøÆæŒœ][\w\'\-\.]+|[a-zà-ɏøæœ][\w\'\-\.]+))*)\s+(' + countries_re + r')\s+'
     )
     entries = []
-    for m in pattern.finditer(text):
+    matches = list(chunk_pat.finditer(text))
+    seen = set()
+    for i, m in enumerate(matches):
+        rest_start = m.end()
+        rest_end = matches[i + 1].start() if i + 1 < len(matches) else len(text)
+        rest = text[rest_start:rest_end].strip()
+
         name = m.group(1).strip()
         country_iso = COUNTRY_MAP.get(m.group(2).strip(), "")
         if not country_iso:
             continue
-        # Location = first part before first comma
-        full_location = m.group(3).strip()
-        location = full_location.split(",")[0].strip()
+
+        year_m = re.search(r'\b(\d{4})\b', rest)
+        if not year_m:
+            continue
+        year = int(year_m.group(1))
+
+        key = (name, rules, year)
+        if key in seen:
+            continue
+        seen.add(key)
+
+        location = rest[:year_m.start()].strip().rstrip(",").strip()
+        if not location:
+            location = rest.strip()
+
         entries.append({
             "name":             name,
             "country":          country_iso,
             "rules":            rules,
-            "seminar_year":     int(m.group(4)),
+            "seminar_year":     year,
             "seminar_location": location,
         })
     return entries
@@ -115,8 +158,11 @@ CITY_ALIASES = {
     "Poznań":            "Poznan",
     "Riichi":            "IJsselstein",
     "Uppsala, Sweden, April 2024":                 "Uppsala",
+    "Uppsala, Sweden, April":                      "Uppsala",
     "Uppsala, Sweden, February 2025":              "Uppsala",
+    "Uppsala, Sweden, February":                   "Uppsala",
     "IJsselstein, The Netherlands, February 2025": "IJsselstein",
+    "IJsselstein, The Netherlands, February":      "IJsselstein",
 }
 
 def find_city(db, location: str, country: str) -> int | None:

@@ -65,7 +65,7 @@ def setup_db():
     # Players
     p1 = Player(id="04290001", last_name="DUPONT", first_name="Jean", nationality="FR", status="europeen")
     p2 = Player(id="04290002", last_name="MARTIN", first_name="Marie", nationality="FR", status="europeen")
-    p3 = Player(id="09990001", last_name="SMITH", first_name="John", nationality="GB", status="europeen")
+    p3 = Player(id="09990001", last_name="SMITH", first_name="John", nationality="UK", status="europeen")
     db.add_all([p1, p2, p3])
 
     # Tournaments

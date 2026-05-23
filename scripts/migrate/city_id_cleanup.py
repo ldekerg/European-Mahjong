@@ -16,8 +16,8 @@ con.row_factory = sqlite3.Row
 
 MISSING = [
     # (tournament_id, city_name, country, lat, lon)  — cruise liner gets NULL city_id
-    (877, "Cambridge",  "GB", 52.2053,  0.1218),
-    (891, "Guildford",  "GB", 51.2362, -0.5704),
+    (877, "Cambridge",  "UK", 52.2053,  0.1218),
+    (891, "Guildford",  "UK", 51.2362, -0.5704),
 ]
 
 for tid, name, country, lat, lon in MISSING:

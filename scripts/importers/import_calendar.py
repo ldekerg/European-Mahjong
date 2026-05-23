@@ -22,7 +22,7 @@ MOIS = {
 
 ISO_PAYS = {
     "fr":"France","de":"Germany","nl":"Netherlands","be":"Belgium","lu":"Luxembourg",
-    "gb":"Great Britain","ie":"Ireland","es":"Spain","pt":"Portugal","it":"Italy",
+    "gb":"United Kingdom","ie":"Ireland","es":"Spain","pt":"Portugal","it":"Italy",
     "at":"Austria","ch":"Switzerland","dk":"Denmark","se":"Sweden","no":"Norway",
     "fi":"Finland","pl":"Poland","cz":"Czech Republic","sk":"Slovakia","hu":"Hungary",
     "ro":"Romania","ua":"Ukraine","ee":"Estonia","lv":"Latvia","lt":"Lithuania",

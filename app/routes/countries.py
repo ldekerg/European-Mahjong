@@ -2,6 +2,7 @@ import sys, os, json
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from fastapi import APIRouter, Depends, Request, Query
+from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 from sqlalchemy import func, text, case
 from datetime import date as dt, timedelta
@@ -377,9 +378,12 @@ def pays_detail(
     sort: str = Query("nom"),
     asc: int = Query(1),
     tab: str = Query("ranking"),
+    player_filter: str = Query("all"),  # all | referee_mcr | referee_rcr
     db: Session = Depends(get_db),
 ):
     code = code.upper()
+    if code == "GB":
+        return RedirectResponse(url=str(request.url).replace("/GB", "/UK", 1), status_code=301)
     if not db.query(Player).filter(Player.nationality == code).first():
         return templates.TemplateResponse(request, "404.html", status_code=404)
     nom_pays = _pays_name(code)
@@ -522,6 +526,12 @@ def pays_detail(
     }.get(sort, lambda x: x["player"].last_name or "")
     joueurs_data.sort(key=_sort_key, reverse=(asc == 0))
 
+    referee_ids = _build_referee_ids(db)
+    if player_filter == "referee_mcr":
+        joueurs_data = [p for p in joueurs_data if p["player"].id in referee_ids and "MCR" in referee_ids[p["player"].id]]
+    elif player_filter == "referee_rcr":
+        joueurs_data = [p for p in joueurs_data if p["player"].id in referee_ids and "RCR" in referee_ids[p["player"].id]]
+
     nb_classes_mcr = len(mcr)
     nb_classes_rcr = len(rcr)
     meilleur_actuel_mcr = mcr[0]["position"] if mcr else None
@@ -569,11 +579,12 @@ def pays_detail(
         "sort":             sort,
         "asc":              asc,
         "tab":              tab,
+        "player_filter":    player_filter,
         # Chart
         "chart_json":       json.dumps(chart_detail),
         # National circuits
         "series_pays":      series_pays,
         # Federation
         "federation":       FEDERATIONS.get(code.upper()),
-        "referee_ids":      _build_referee_ids(db),
+        "referee_ids":      referee_ids,
     })

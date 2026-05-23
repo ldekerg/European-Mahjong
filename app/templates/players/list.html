@@ -18,6 +18,12 @@
          class="filter-btn {% if rules == r %}active{% endif %}">{{ label }}</a>
       {% endfor %}
     </div>
+    <div class="t-filter-group">
+      {% for r, label in [('referee_mcr', trad('common.referee') + ' MCR'), ('referee_rcr', trad('common.referee') + ' RCR')] %}
+      <a href="?sort={{ sort }}&asc={{ asc }}&rules={{ r }}&q={{ q }}"
+         class="filter-btn {% if rules == r %}active{% endif %}">{{ label }}</a>
+      {% endfor %}
+    </div>
   </div>
 </div>
 

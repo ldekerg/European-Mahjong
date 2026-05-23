@@ -136,9 +136,18 @@
      ONGLET JOUEURS
      ══════════════════════════════════════════════════════════════════════ -->
 <div id="tab-players" class="tab-content hidden">
+  <div class="t-filters" style="margin-bottom:0.75rem">
+    <div class="t-filter-group">
+      {% set _pf_base = '?tab=players&rules=' + active_tab + '&sort=' + sort + '&asc=' + asc|string %}
+      {% for r, label in [('all', trad('common.all')), ('referee_mcr', trad('common.referee') + ' MCR'), ('referee_rcr', trad('common.referee') + ' RCR')] %}
+      <a href="{{ _pf_base }}&player_filter={{ r }}"
+         class="filter-btn {% if player_filter == r %}active{% endif %}">{{ label }}</a>
+      {% endfor %}
+    </div>
+  </div>
   <div class="ranking-layout">
     <div class="ranking-left">
-      {% with show_apercu=true, sort_url_base='?tab=players&rules=' + active_tab, asc=asc, referee_ids=referee_ids %}
+      {% with show_apercu=true, sort_url_base='?tab=players&rules=' + active_tab + '&player_filter=' + player_filter, asc=asc, referee_ids=referee_ids %}
       {% include 'partials/players_table.html' %}
       {% endwith %}
     </div>
