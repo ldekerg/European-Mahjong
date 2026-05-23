@@ -2,7 +2,8 @@
 Import EMA certified referees from mahjong-europe.org.
 Run with: python3 scripts/importers/import_referees.py
 """
-import sys, os, re, urllib.request, ssl
+import sys, os, re, urllib.request, ssl, unicodedata
+from difflib import SequenceMatcher
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../.."))
 
 from bs4 import BeautifulSoup
@@ -134,30 +135,115 @@ def find_city(db, location: str, country: str) -> int | None:
     return city.id if city else None
 
 
+# Manual overrides: (referee_name_as_parsed, country) -> player_id
+NAME_OVERRIDES: dict[tuple[str, str], str] = {
+    ("Nobert TSCHINKEL",           "AT"): "01000009",
+    ("Michael Dusleag",            "AT"): "01000125",
+    ("Frank ROSTVED",              "DK"): "03000148",
+    ("Jeppe S. NIELSEN",           "DK"): "03000005",
+    ("Manuel Kameda-Schlich",      "DE"): "05100166",
+    ("David AURE",                 "FR"): "04030005",
+    ("Jean-Michel MORISSE",        "FR"): "04030022",
+    ("Pierre YEUNG-LET-CHEONG",    "FR"): "04030051",
+    ("Anneke KEIJL",               "NL"): "08010173",
+    ("Dimphy VAN GRINSVEN",        "NL"): "08010168",
+    ("Eric VAN BALKUM",            "NL"): "08010101",
+    ("Gerda VAN OORSCHOT",         "NL"): "08010003",
+    ("Gert VAN DER VEGT",          "NL"): "08010049",
+    ("Marjan VAN DEN NIEUWENDIJK", "NL"): "08010599",
+    ("Menno van Lienden",          "NL"): "08010495",
+    ("Twan VAN DEN NIEUWENDIJK",   "NL"): "08010667",
+    ("Marta BINKOWSKA",            "PL"): "19000007",
+}
+
+
+def _normalize(s: str) -> str:
+    """Lowercase, strip accents, collapse spaces."""
+    return unicodedata.normalize("NFD", s).encode("ascii", "ignore").decode().lower().strip()
+
+
+def _full_name(p) -> str:
+    return _normalize(f"{p.first_name} {p.last_name}")
+
+
+def _similarity(a: str, b: str) -> float:
+    return SequenceMatcher(None, a, b).ratio()
+
+
+# Cache all players once per run
+_ALL_PLAYERS: list | None = None
+
+def _get_all_players(db) -> list:
+    global _ALL_PLAYERS
+    if _ALL_PLAYERS is None:
+        _ALL_PLAYERS = db.query(Player).all()
+    return _ALL_PLAYERS
+
+
+MATCH_THRESHOLD = 0.82  # minimum similarity score to accept a fuzzy match
+
+
 def find_player(db, name: str, country: str) -> str | None:
-    """Try to match referee name to a player in DB."""
+    """Try to match referee name to a player in DB, with accent/case normalization and fuzzy fallback."""
+    if (name, country) in NAME_OVERRIDES:
+        return NAME_OVERRIDES[(name, country)]
+
     parts = name.strip().split()
     if len(parts) < 2:
         return None
-    # EMA stores last name first in uppercase, try both orderings
+
+    all_players = _get_all_players(db)
+    country_players = [p for p in all_players if p.nationality == country]
+
+    def exact_match(candidates, last, first):
+        nl, nf = _normalize(last), _normalize(first)
+        for p in candidates:
+            if _normalize(p.last_name) == nl and _normalize(p.first_name) == nf:
+                return p.id
+        return None
+
+    # 1. Exact match with country
     for i in range(1, len(parts)):
-        last = " ".join(parts[:i])
-        first = " ".join(parts[i:])
-        player = db.query(Player).filter(
-            Player.last_name.ilike(last),
-            Player.first_name.ilike(first),
-            Player.nationality == country,
-        ).first()
-        if player:
-            return player.id
-        # Try reversed
-        player = db.query(Player).filter(
-            Player.last_name.ilike(first),
-            Player.first_name.ilike(last),
-            Player.nationality == country,
-        ).first()
-        if player:
-            return player.id
+        last, first = " ".join(parts[:i]), " ".join(parts[i:])
+        pid = exact_match(country_players, last, first) or exact_match(country_players, first, last)
+        if pid:
+            return pid
+
+    # 2. Exact match without country
+    for i in range(1, len(parts)):
+        last, first = " ".join(parts[:i]), " ".join(parts[i:])
+        pid = exact_match(all_players, last, first) or exact_match(all_players, first, last)
+        if pid:
+            return pid
+
+    # 3. Fuzzy match: compare normalized full name against all permutations
+    ref_full = _normalize(name)
+    # also try "first last" and "last first" permutations
+    ref_variants = {ref_full}
+    for i in range(1, len(parts)):
+        ref_variants.add(_normalize(" ".join(parts[i:]) + " " + " ".join(parts[:i])))
+
+    best_id, best_score = None, 0.0
+    pool = country_players if country_players else all_players
+    for p in pool:
+        pfull = _full_name(p)
+        score = max(_similarity(v, pfull) for v in ref_variants)
+        if score > best_score:
+            best_score, best_id = score, p.id
+
+    if best_score >= MATCH_THRESHOLD:
+        return best_id
+
+    # 4. Fuzzy without country if no match found
+    if pool is not all_players:
+        for p in all_players:
+            pfull = _full_name(p)
+            score = max(_similarity(v, pfull) for v in ref_variants)
+            if score > best_score:
+                best_score, best_id = score, p.id
+        if best_score >= MATCH_THRESHOLD:
+            return best_id
+
     return None
 
 
