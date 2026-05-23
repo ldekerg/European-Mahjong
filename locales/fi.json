@@ -31,7 +31,7 @@
     "no_results": "Ei tuloksia.",
     "no_tournaments": "Ei turnauksia.",
     "calendar": "Kalenteri",
-    "loading": "Ladataan…",
+    "loading": "Loading...",
     "ranking": "Rankaus",
     "click_player": "← Napsauta pelaajaa",
     "duration": "Kesto",
@@ -70,7 +70,7 @@
       "Marraskuu",
       "Joulukuu"
     ],
-    "player": "Pelaaja",
+    "player": "Player",
     "coming_soon": "Tulossa pian",
     "year": "Vuosi",
     "referee": "Tuomari",
@@ -422,6 +422,10 @@
     "total_players": "Players",
     "compare_btn": "Compare",
     "best_rank": "Best ranking",
-    "rank_evolution": "Ranking evolution"
+    "rank_evolution": "Ranking evolution",
+    "frequent_opponents_one": "Most frequent opponents",
+    "frequent_opponents_all": "Most common shared opponent",
+    "nb_common_tournaments": "Tournaments in common",
+    "add": "Add"
   }
 }

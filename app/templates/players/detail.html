@@ -51,6 +51,12 @@
   </div>
   {% endif %}
 
+  <!-- Adversaires fréquents -->
+  <div class="opponents-section" id="opponents-{{ regles }}">
+    <h2 style="font-size:1rem;margin-bottom:0.5rem">{{ trad('compare.frequent_opponents_one') }}</h2>
+    <div id="opponents-{{ regles }}-list" class="dim" style="font-size:0.85rem">{{ trad('common.loading') }}</div>
+  </div>
+
   <!-- Liste des tournois -->
   {% if data.tournaments %}
   {% set inactifs = data.tournaments | selectattr('active', 'equalto', false) | list %}
@@ -374,6 +380,53 @@ buildChart('{{ regles }}', {{ data.history_chart | tojson }});
 {% endif %}
 {% endfor %}
 
+// Adversaires fréquents — chargés en lazy
+const PLAYER_ID_DETAIL = '{{ player.id }}';
+const _opponentsLoaded = {};
+function loadOpponents(rules) {
+  if (_opponentsLoaded[rules]) return;
+  _opponentsLoaded[rules] = true;
+  const container = document.getElementById('opponents-' + rules.toLowerCase() + '-list');
+  if (!container) return;
+  fetch('/api/players/' + PLAYER_ID_DETAIL + '/opponents?rules=' + rules + '&limit=10')
+    .then(r => r.json())
+    .then(data => {
+      if (!data.length) { container.textContent = '—'; return; }
+      const rows = data.map((opp, i) => {
+        const flag = flagEmojiDetail(opp.nationality);
+        return `<tr>
+          <td class="center dim" style="padding:0.25rem 0.4rem">${i+1}</td>
+          <td style="padding:0.25rem 0.4rem">
+            <a href="/players/${opp.id}" style="display:flex;align-items:center;gap:0.35rem">
+              ${flag} ${opp.first_name} ${opp.last_name.toUpperCase()}
+            </a>
+          </td>
+          <td class="center" style="padding:0.25rem 0.4rem"><strong>${opp.nb}</strong></td>
+          <td style="padding:0.25rem 0.4rem">
+            <a href="/compare?ids=${PLAYER_ID_DETAIL},${opp.id}&rules=${rules}"
+               class="btn-secondary" style="font-size:0.75rem;padding:0.15rem 0.4rem">⚖️</a>
+          </td>
+        </tr>`;
+      }).join('');
+      container.innerHTML = `<div class="scroll-table"><table style="font-size:0.85rem">
+        <thead><tr>
+          <th class="center" style="width:2rem">#</th>
+          <th>{{ trad('common.player') }}</th>
+          <th class="center" style="width:3rem" title="{{ trad('compare.nb_common_tournaments') }}">🎯</th>
+          <th style="width:4rem"></th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table></div>`;
+    });
+}
+function flagEmojiDetail(iso) {
+  if (!iso || iso.length < 2) return '';
+  const code = iso === 'UK' ? 'GB' : iso.toUpperCase();
+  return [...code].map(c => String.fromCodePoint(0x1F1E6 + c.charCodeAt(0) - 65)).join('');
+}
+// Charger MCR au démarrage (onglet par défaut)
+loadOpponents('MCR');
+
 var _villesFiltres = {};
 
 function filtreJoueurVille(ville, regles, el) {
@@ -424,6 +477,7 @@ function showTab(name, btn) {
   document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
   document.getElementById('tab-' + name).classList.remove('hidden');
   btn.classList.add('active');
+  if (name === 'mcr' || name === 'rcr') loadOpponents(name.toUpperCase());
 }
 
 const _inactifsVisible = {};

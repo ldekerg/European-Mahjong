@@ -31,7 +31,7 @@
     "no_results": "Geen resultaten.",
     "no_tournaments": "Geen toernooien.",
     "calendar": "Kalender",
-    "loading": "Laden…",
+    "loading": "Loading...",
     "ranking": "Ranglijst",
     "click_player": "← Klik op een speler",
     "duration": "Duur",
@@ -70,7 +70,7 @@
       "November",
       "December"
     ],
-    "player": "Speler",
+    "player": "Player",
     "coming_soon": "Binnenkort beschikbaar",
     "year": "Jaar",
     "referee": "Scheidsrechter",
@@ -422,6 +422,10 @@
     "total_players": "Players",
     "compare_btn": "Compare",
     "best_rank": "Best ranking",
-    "rank_evolution": "Ranking evolution"
+    "rank_evolution": "Ranking evolution",
+    "frequent_opponents_one": "Most frequent opponents",
+    "frequent_opponents_all": "Most common shared opponent",
+    "nb_common_tournaments": "Tournaments in common",
+    "add": "Add"
   }
 }

@@ -31,7 +31,7 @@
     "no_results": "Aucun résultat.",
     "no_tournaments": "Aucun tournoi.",
     "calendar": "Calendrier",
-    "loading": "Chargement…",
+    "loading": "Chargement...",
     "ranking": "Classement",
     "click_player": "← Clique sur un joueur",
     "duration": "Durée",
@@ -422,6 +422,10 @@
     "total_players": "Joueurs",
     "compare_btn": "Comparer",
     "best_rank": "Meilleur classement",
-    "rank_evolution": "Évolution du classement"
+    "rank_evolution": "Évolution du classement",
+    "frequent_opponents_one": "Adversaires les plus fréquents",
+    "frequent_opponents_all": "Adversaire commun le plus fréquent",
+    "nb_common_tournaments": "Tournois en commun",
+    "add": "Ajouter"
   }
 }

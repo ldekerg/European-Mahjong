@@ -31,7 +31,7 @@
     "no_results": "Nav rezultātu.",
     "no_tournaments": "Nav turnīru.",
     "calendar": "Kalendārs",
-    "loading": "Ielāde…",
+    "loading": "Loading...",
     "ranking": "Rangs",
     "click_player": "← Noklikšķiniet uz spēlētāja",
     "duration": "Ilgums",
@@ -70,7 +70,7 @@
       "Novembris",
       "Decembris"
     ],
-    "player": "Spēlētājs",
+    "player": "Player",
     "coming_soon": "Drīzumā",
     "year": "Gads",
     "referee": "Tiesnesis",
@@ -422,6 +422,10 @@
     "total_players": "Players",
     "compare_btn": "Compare",
     "best_rank": "Best ranking",
-    "rank_evolution": "Ranking evolution"
+    "rank_evolution": "Ranking evolution",
+    "frequent_opponents_one": "Most frequent opponents",
+    "frequent_opponents_all": "Most common shared opponent",
+    "nb_common_tournaments": "Tournaments in common",
+    "add": "Add"
   }
 }

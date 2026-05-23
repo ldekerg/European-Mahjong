@@ -127,6 +127,38 @@ def _head_to_head(common: list[dict], player_ids: list[str]) -> dict:
     return wins
 
 
+def _frequent_opponents(db: Session, player_ids: list[str], rules: str, limit: int = 10) -> list[dict]:
+    """Return the top opponents most frequently encountered by ALL player_ids together."""
+    if not player_ids:
+        return []
+    placeholders = ",".join(f":p{i}" for i in range(len(player_ids)))
+    params = {"r": rules, "n": len(player_ids)}
+    params.update({f"p{i}": pid for i, pid in enumerate(player_ids)})
+
+    rows = db.execute(text(f"""
+        SELECT r.player_id, p.first_name, p.last_name, p.nationality, COUNT(*) as nb
+        FROM results r
+        JOIN players p ON r.player_id = p.id
+        JOIN tournaments t ON r.tournament_id = t.id
+        WHERE t.rules = :r AND t.ema_id IS NOT NULL
+          AND r.player_id NOT IN ({placeholders})
+          AND t.id IN (
+            SELECT tournament_id FROM results
+            WHERE player_id IN ({placeholders})
+            GROUP BY tournament_id
+            HAVING COUNT(DISTINCT player_id) = :n
+          )
+        GROUP BY r.player_id
+        ORDER BY nb DESC
+        LIMIT :lim
+    """), {**params, "lim": limit}).fetchall()
+
+    return [
+        {"id": r[0], "first_name": r[1], "last_name": r[2], "nationality": r[3], "nb": r[4]}
+        for r in rows
+    ]
+
+
 @router.get("/api/players/search")
 def api_player_search(q: str = "", db: Session = Depends(get_db)):
     results = _search_players(db, q)
@@ -160,14 +192,29 @@ def compare_page(
             "current": current,
         })
 
-    common = _common_tournaments(db, [p["id"] for p in players_data], rules) if len(players_data) >= 2 else []
-    h2h = _head_to_head(common, [p["id"] for p in players_data]) if common else {}
+    pids = [p["id"] for p in players_data]
+    common = _common_tournaments(db, pids, rules) if len(players_data) >= 2 else []
+    h2h = _head_to_head(common, pids) if common else {}
+    opponents = _frequent_opponents(db, pids, rules, limit=10) if players_data else []
 
     return templates.TemplateResponse(request, "compare.html", {
         "players": players_data,
         "rules": rules,
-        "ids_str": ",".join(p["id"] for p in players_data),
+        "ids_str": ",".join(pids),
         "common": common,
         "h2h": h2h,
+        "opponents": opponents,
         "colors": COLORS,
     })
+
+
+@router.get("/api/players/{player_id}/opponents")
+def api_frequent_opponents(
+    player_id: str,
+    rules: str = "MCR",
+    limit: int = 10,
+    db: Session = Depends(get_db),
+):
+    rules = rules.upper() if rules.upper() in ("MCR", "RCR") else "MCR"
+    result = _frequent_opponents(db, [player_id], rules, limit=limit)
+    return JSONResponse(content=result)

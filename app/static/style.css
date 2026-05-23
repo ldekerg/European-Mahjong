@@ -946,6 +946,7 @@ tr.hidden { display: none; }
 
 /* Ranking Charts */
 .chart-section  { background: var(--bg2); border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; }
+.opponents-section { background: var(--bg2); border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; }
 .chart-controls { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; }
 .chart-title    { font-weight: 600; font-size: 0.95rem; color: var(--text2); }
 .chart-range-btns { display: flex; gap: 0.35rem; }

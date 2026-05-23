@@ -31,7 +31,7 @@
     "no_results": "Ingen resultater.",
     "no_tournaments": "Ingen turneringer.",
     "calendar": "Kalender",
-    "loading": "Indlæser…",
+    "loading": "Loading...",
     "ranking": "Rangliste",
     "click_player": "← Klik på en spiller",
     "duration": "Varighed",
@@ -70,7 +70,7 @@
       "November",
       "December"
     ],
-    "player": "Spiller",
+    "player": "Player",
     "coming_soon": "Kommer snart",
     "year": "År",
     "referee": "Dommer",
@@ -422,6 +422,10 @@
     "total_players": "Players",
     "compare_btn": "Compare",
     "best_rank": "Best ranking",
-    "rank_evolution": "Ranking evolution"
+    "rank_evolution": "Ranking evolution",
+    "frequent_opponents_one": "Most frequent opponents",
+    "frequent_opponents_all": "Most common shared opponent",
+    "nb_common_tournaments": "Tournaments in common",
+    "add": "Add"
   }
 }

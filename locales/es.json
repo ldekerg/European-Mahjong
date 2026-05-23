@@ -31,7 +31,7 @@
     "no_results": "Sin resultados.",
     "no_tournaments": "Sin torneos.",
     "calendar": "Calendario",
-    "loading": "Cargando…",
+    "loading": "Loading...",
     "ranking": "Clasificación",
     "click_player": "← Haz clic en un jugador",
     "duration": "Duración",
@@ -70,7 +70,7 @@
       "Noviembre",
       "Diciembre"
     ],
-    "player": "Jugador",
+    "player": "Player",
     "coming_soon": "Próximamente",
     "year": "Año",
     "referee": "Árbitro",
@@ -422,6 +422,10 @@
     "total_players": "Players",
     "compare_btn": "Compare",
     "best_rank": "Best ranking",
-    "rank_evolution": "Ranking evolution"
+    "rank_evolution": "Ranking evolution",
+    "frequent_opponents_one": "Most frequent opponents",
+    "frequent_opponents_all": "Most common shared opponent",
+    "nb_common_tournaments": "Tournaments in common",
+    "add": "Add"
   }
 }

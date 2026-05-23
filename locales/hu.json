@@ -31,7 +31,7 @@
     "no_results": "Nincs eredmény.",
     "no_tournaments": "Nincs verseny.",
     "calendar": "Naptár",
-    "loading": "Betöltés…",
+    "loading": "Loading...",
     "ranking": "Rangsor",
     "click_player": "← Kattints egy játékosra",
     "duration": "Időtartam",
@@ -70,7 +70,7 @@
       "November",
       "December"
     ],
-    "player": "Játékos",
+    "player": "Player",
     "coming_soon": "Hamarosan",
     "year": "Év",
     "referee": "Bíró",
@@ -422,6 +422,10 @@
     "total_players": "Players",
     "compare_btn": "Compare",
     "best_rank": "Best ranking",
-    "rank_evolution": "Ranking evolution"
+    "rank_evolution": "Ranking evolution",
+    "frequent_opponents_one": "Most frequent opponents",
+    "frequent_opponents_all": "Most common shared opponent",
+    "nb_common_tournaments": "Tournaments in common",
+    "add": "Add"
   }
 }

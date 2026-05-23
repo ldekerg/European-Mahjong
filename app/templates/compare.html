@@ -187,6 +187,53 @@
 <p class="dim" style="text-align:center;padding:2rem">{{ trad('compare.no_common') }}</p>
 {% endif %}
 
+{# ===== Adversaires fréquents ===== #}
+{% if opponents %}
+<div class="manage-section" style="margin-bottom:2rem">
+  <h2 style="font-size:1rem;margin-bottom:0.75rem">
+    {% if players | length == 1 %}{{ trad('compare.frequent_opponents_one') }}
+    {% else %}{{ trad('compare.frequent_opponents_all') }}{% endif %}
+  </h2>
+  <div class="scroll-table">
+  <table>
+    <colgroup>
+      <col style="width:2rem">
+      <col>
+      <col style="width:3rem">
+      <col style="width:6rem">
+    </colgroup>
+    <thead>
+      <tr>
+        <th class="center">#</th>
+        <th>{{ trad('common.player') }}</th>
+        <th class="center" title="{{ trad('compare.nb_common_tournaments') }}">🎯</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for opp in opponents %}
+    <tr>
+      <td class="center dim">{{ loop.index }}</td>
+      <td>
+        <a href="/players/{{ opp.id }}" style="display:flex;align-items:center;gap:0.4rem">
+          {{ opp.nationality | flag }} {{ opp.first_name | first_name }} {{ opp.last_name | upper }}
+        </a>
+      </td>
+      <td class="center"><strong>{{ opp.nb }}</strong></td>
+      <td>
+        <a href="/compare?ids={{ ids_str }},{{ opp.id }}&rules={{ rules }}"
+           class="btn-secondary" style="font-size:0.78rem;padding:0.2rem 0.5rem">
+          + {{ trad('compare.add') }}
+        </a>
+      </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</div>
+{% endif %}
+
 {% else %}
 <p class="dim" style="text-align:center;padding:3rem;font-size:0.95rem">{{ trad('compare.empty_hint') }}</p>
 {% endif %}
