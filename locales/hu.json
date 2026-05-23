@@ -7,7 +7,8 @@
     "countries": "Országok",
     "tournaments": "Versenyek",
     "formulas": "Formulas",
-    "ranking_system": "Rangsorolási rendszer"
+    "ranking_system": "Rangsorolási rendszer",
+    "about": "Az EMA-ról"
   },
   "common": {
     "dark_mode": "Sötét mód",
@@ -59,7 +60,8 @@
       "Október",
       "November",
       "December"
-    ]
+    ],
+    "player": "Játékos"
   },
   "home": {
     "intro": "Üdvözlünk az európai Mahjong-rangsorban, amely a <strong>MCR</strong> és <strong>RCR</strong> ágakat foglalja magában. A pontokat az <a href=\"http://mahjong-europe.org\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--accent)\">European Mahjong Association (EMA)</a> által elismert versenyeredmények alapján számítják. Az oldal heti rangsorokat, versenytörténetet, játékos- és országrekordokat, valamint Hírességek Csarnokát mutatja.",
@@ -121,7 +123,7 @@
     "mahjong_score_title": "Mahjong-pontszám"
   },
   "preview": {
-    "title": "Aktív versenyek — {regles} · {date}",
+    "title": "Aktív versenyek - {regles} · {date}",
     "position": "Hely."
   },
   "calendar": {
@@ -157,7 +159,8 @@
     "active_players_title": "Aktív / összes játékos",
     "tournaments_org_abbr": "Versenyek",
     "suspended": "⛔ Felfüggesztett",
-    "suspended_title": "Az EMA 2022 óta felfüggesztette"
+    "suspended_title": "Az EMA 2022 óta felfüggesztette",
+    "federation": "Szövetség"
   },
   "hof": {
     "medals": "🎖 Versenyérmek",
@@ -217,13 +220,13 @@
     "open_2d": "International 2-day open",
     "player_score_title": "Player ranking score",
     "player_score_intro": "A player's EMA score is the average of two parts, each weighted at 50%:",
-    "part_a_title": "Part A — Average of N best results",
+    "part_a_title": "Part A - Average of N best results",
     "part_a_desc": "The player's N best results are retained (sorted by descending EMA score). In case of a tie, the most recent result is preferred. N depends on the total number of tournaments played in the active period:",
     "nb_tournaments": "Tournaments played",
     "retained_a": "Retained in part A",
     "all": "All",
     "part_a_tiebreak": "If the player has fewer than 5 active tournaments, virtual results at 0 (weight 1) fill the average up to 5.",
-    "part_b_title": "Part B — Average of 4 best results",
+    "part_b_title": "Part B - Average of 4 best results",
     "part_b_desc": "The player's 4 best results are retained (sorted by descending EMA score). In case of a tie, the result with the highest coefficient is preferred.",
     "part_b_tiebreak": "If the player has fewer than 4 active tournaments, virtual results at 0 (weight 1) fill the average up to 4.",
     "weighted_avg_title": "Weighted average",
@@ -248,13 +251,13 @@
     "formula_part_a_n": "N_A = 5 + ⌈0.8 × max(0, N − 5)⌉",
     "formula_avg": "average = Σ(EMA × coeff × time) / (Σ(coeff × time) + missing)",
     "yes": "yes",
-    "none": "—",
+    "none": "-",
     "day_abbr": "d",
     "days_plus": "d+",
     "weekly_title": "Weekly ranking update",
     "weekly_desc": "The EMA ranking is recalculated once a week, every Monday.",
     "weekly_activation_title": "Tournament activation",
-    "weekly_activation_desc": "A tournament takes effect on the Monday of the week following its start date — regardless of its duration. This rule ensures that each tournament is active for exactly 104 active weeks (excluding the COVID freeze), i.e. 2 years.",
+    "weekly_activation_desc": "A tournament takes effect on the Monday of the week following its start date - regardless of its duration. This rule ensures that each tournament is active for exactly 104 active weeks (excluding the COVID freeze), i.e. 2 years.",
     "weekly_activation_note": "All tournaments in the same calendar week share the same first active week.",
     "weekly_examples_title": "Activation examples",
     "weekly_ex_col_start": "Tournament start",
@@ -295,19 +298,52 @@
     "cert_observer_title": "EMA-megfigyelő",
     "cert_observer_desc": "A szervezők felelősek az EMA-megfigyelő kinevezéséért, és nevüket legalább két héttel a rendezvény előtt be kell jelenteniük.",
     "quotas_intro": "Az EMA-kvóták meghatározzák az egyes országok számára az európai és világbajnokságokon kiosztott helyek számát.",
-    "quotas_part_a_title": "A rész — Alaphelyek",
-    "quotas_a1": "A1 — Egy hely a 3 legjobb EMA-ország számára az országrangsorban.",
-    "quotas_a2": "A2 — Egy hely minden EMA-ország számára.",
-    "quotas_a3": "A3 — Egy hely minden olyan ország számára, amelynek 700 pont feletti játékosai vannak.",
-    "quotas_part_b_title": "B rész — Arányos helyek",
-    "quotas_b1": "B1 — A rangsorban szereplő játékosok százaléka (ország / összes).",
-    "quotas_b2": "B2 — A 700 pont feletti rangsorban lévő játékosok százaléka (ország / összes).",
-    "quotas_b3": "B3 — B1 és B2 átlaga, az A rész utáni fennmaradó helyekre alkalmazva.",
+    "quotas_part_a_title": "A rész - Alaphelyek",
+    "quotas_a1": "A1 - Egy hely a 3 legjobb EMA-ország számára az országrangsorban.",
+    "quotas_a2": "A2 - Egy hely minden EMA-ország számára.",
+    "quotas_a3": "A3 - Egy hely minden olyan ország számára, amelynek 700 pont feletti játékosai vannak.",
+    "quotas_part_b_title": "B rész - Arányos helyek",
+    "quotas_b1": "B1 - A rangsorban szereplő játékosok százaléka (ország / összes).",
+    "quotas_b2": "B2 - A 700 pont feletti rangsorban lévő játékosok százaléka (ország / összes).",
+    "quotas_b3": "B3 - B1 és B2 átlaga, az A rész utáni fennmaradó helyekre alkalmazva.",
     "quotas_formula": "Q = [A1+A2+A3] + B3 × [Összesen − Összeg(A rész)]",
     "quotas_limits_title": "Korlátok és újraelosztás",
     "quotas_limit_max": "Egy ország nem kaphat több helyet, mint a globális átlag feletti játékosok száma.",
     "quotas_limit_min": "Minden EMA-ország legalább 1 helyet kap garantáltan.",
     "quotas_invited_title": "Meghívott & nem EMA játékosok",
     "quotas_invited_desc": "A nem EMA- és meghívott játékosok helyeit az EMA határozza meg. Ha a játékosok nem érdeklődnek, a helyek az EMA-kvótán belül kerülnek újraelosztásra."
+  },
+  "about": {
+    "page_title": "Az EMA-ról",
+    "tab_presidium": "Elnökség",
+    "tab_board": "Testület",
+    "tab_history": "Történelem",
+    "tab_documents": "Dokumentumok",
+    "presidium_desc": "Az EMA napi ügyeit az öttagú elnökség vezeti.",
+    "presidium_elected": "Elnökség megválasztva a {year}. évi Közgyűlésen",
+    "board_desc": "Minden EMA-tagország kinevez egy testületi képviselőt az EMA és a nemzeti szervezet közötti kapcsolattartóként.",
+    "board_representative": "Képviselő",
+    "board_appointed": "Testület kinevezve a {year}. évi Közgyűlésen",
+    "history_presidents": "Elnökök",
+    "history_ranking_managers": "Rangsor-menedzserek",
+    "history_period": "Időszak",
+    "documents_desc": "Hivatalos EMA dokumentumok, szabályok és döntések, elérhetők az EMA weboldalán.",
+    "doc_cat_organization": "Szervezet",
+    "doc_cat_rules": "Szabályok",
+    "doc_cat_ranking_and_mers": "Rangsor & MERS",
+    "doc_cat_decisions_and_rulings": "Döntések & Szabályozások",
+    "doc_cat_general_assembly": "Közgyűlés",
+    "role_president": "Elnök",
+    "role_vice_president": "Alelnök",
+    "role_presidium_member": "Elnökségi tag",
+    "doc_cat_organization_and_ga": "Szervezet & Közgyűlés",
+    "doc_statutes": "EMA alapszabály",
+    "doc_requirements": "EMA követelmények & irányelvek",
+    "doc_ga2023": "Közgyűlés 2023",
+    "doc_ga_all": "Összes közgyűlés",
+    "doc_country_transfer": "Országváltás - EMA határozat",
+    "doc_covid_ruling": "COVID-19 különleges szabályozás",
+    "doc_covid_end": "COVID-19 különleges szabályozás vége",
+    "doc_ukraine": "Ukrajna helyzete"
   }
 }

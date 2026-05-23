@@ -7,7 +7,8 @@
     "countries": "Країни",
     "tournaments": "Турніри",
     "formulas": "Formulas",
-    "ranking_system": "Система рейтингу"
+    "ranking_system": "Система рейтингу",
+    "about": "Про EMA"
   },
   "common": {
     "dark_mode": "Темна тема",
@@ -59,7 +60,8 @@
       "Жовтень",
       "Листопад",
       "Грудень"
-    ]
+    ],
+    "player": "Гравець"
   },
   "home": {
     "intro": "Ласкаво просимо до європейського рейтингу Маджонгу, що включає дисципліни <strong>MCR</strong> та <strong>RCR</strong>. Очки розраховуються за результатами турнірів, визнаних <a href=\"http://mahjong-europe.org\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--accent)\">European Mahjong Association (EMA)</a>. Цей сайт представляє тижневі рейтинги, історію турнірів, рекорди гравців і країн та Зал Слави.",
@@ -121,7 +123,7 @@
     "mahjong_score_title": "Очки Mahjong"
   },
   "preview": {
-    "title": "Активні турніри — {regles} · {date}",
+    "title": "Активні турніри - {regles} · {date}",
     "position": "Поз."
   },
   "calendar": {
@@ -157,7 +159,8 @@
     "active_players_title": "Активні / усі гравці",
     "tournaments_org_abbr": "Турніри",
     "suspended": "⛔ Відсторонено",
-    "suspended_title": "Відсторонено EMA з 2022 року"
+    "suspended_title": "Відсторонено EMA з 2022 року",
+    "federation": "Федерація"
   },
   "hof": {
     "medals": "🎖 Медалі турнірів",
@@ -217,13 +220,13 @@
     "open_2d": "International 2-day open",
     "player_score_title": "Player ranking score",
     "player_score_intro": "A player's EMA score is the average of two parts, each weighted at 50%:",
-    "part_a_title": "Part A — Average of N best results",
+    "part_a_title": "Part A - Average of N best results",
     "part_a_desc": "The player's N best results are retained (sorted by descending EMA score). In case of a tie, the most recent result is preferred. N depends on the total number of tournaments played in the active period:",
     "nb_tournaments": "Tournaments played",
     "retained_a": "Retained in part A",
     "all": "All",
     "part_a_tiebreak": "If the player has fewer than 5 active tournaments, virtual results at 0 (weight 1) fill the average up to 5.",
-    "part_b_title": "Part B — Average of 4 best results",
+    "part_b_title": "Part B - Average of 4 best results",
     "part_b_desc": "The player's 4 best results are retained (sorted by descending EMA score). In case of a tie, the result with the highest coefficient is preferred.",
     "part_b_tiebreak": "If the player has fewer than 4 active tournaments, virtual results at 0 (weight 1) fill the average up to 4.",
     "weighted_avg_title": "Weighted average",
@@ -248,13 +251,13 @@
     "formula_part_a_n": "N_A = 5 + ⌈0.8 × max(0, N − 5)⌉",
     "formula_avg": "average = Σ(EMA × coeff × time) / (Σ(coeff × time) + missing)",
     "yes": "yes",
-    "none": "—",
+    "none": "-",
     "day_abbr": "d",
     "days_plus": "d+",
     "weekly_title": "Weekly ranking update",
     "weekly_desc": "The EMA ranking is recalculated once a week, every Monday.",
     "weekly_activation_title": "Tournament activation",
-    "weekly_activation_desc": "A tournament takes effect on the Monday of the week following its start date — regardless of its duration. This rule ensures that each tournament is active for exactly 104 active weeks (excluding the COVID freeze), i.e. 2 years.",
+    "weekly_activation_desc": "A tournament takes effect on the Monday of the week following its start date - regardless of its duration. This rule ensures that each tournament is active for exactly 104 active weeks (excluding the COVID freeze), i.e. 2 years.",
     "weekly_activation_note": "All tournaments in the same calendar week share the same first active week.",
     "weekly_examples_title": "Activation examples",
     "weekly_ex_col_start": "Tournament start",
@@ -295,19 +298,52 @@
     "cert_observer_title": "Спостерігач EMA",
     "cert_observer_desc": "Організатори несуть відповідальність за призначення спостерігача EMA та оголошення їх імені принаймні за два тижні до заходу.",
     "quotas_intro": "Квоти EMA визначають кількість місць, виділених кожній країні на Чемпіонатах Європи та Світу.",
-    "quotas_part_a_title": "Частина A — Базові місця",
-    "quotas_a1": "A1 — Одне місце для 3 найкращих країн EMA в рейтингу країн.",
-    "quotas_a2": "A2 — Одне місце для кожної країни EMA.",
-    "quotas_a3": "A3 — Одне місце для кожної країни з гравцями вище 700 очок.",
-    "quotas_part_b_title": "Частина B — Пропорційні місця",
-    "quotas_b1": "B1 — Відсоток гравців у рейтинговому списку (країна / загалом).",
-    "quotas_b2": "B2 — Відсоток гравців з рейтингом вище 700 очок (країна / загалом).",
-    "quotas_b3": "B3 — Середнє значення B1 та B2, застосоване до місць, що залишилися після частини A.",
+    "quotas_part_a_title": "Частина A - Базові місця",
+    "quotas_a1": "A1 - Одне місце для 3 найкращих країн EMA в рейтингу країн.",
+    "quotas_a2": "A2 - Одне місце для кожної країни EMA.",
+    "quotas_a3": "A3 - Одне місце для кожної країни з гравцями вище 700 очок.",
+    "quotas_part_b_title": "Частина B - Пропорційні місця",
+    "quotas_b1": "B1 - Відсоток гравців у рейтинговому списку (країна / загалом).",
+    "quotas_b2": "B2 - Відсоток гравців з рейтингом вище 700 очок (країна / загалом).",
+    "quotas_b3": "B3 - Середнє значення B1 та B2, застосоване до місць, що залишилися після частини A.",
     "quotas_formula": "Q = [A1+A2+A3] + B3 × [Всього − Сума(Частина A)]",
     "quotas_limits_title": "Обмеження та перерозподіл",
     "quotas_limit_max": "Країна не може отримати більше місць, ніж кількість гравців, що мають рейтинг вище глобального середнього.",
     "quotas_limit_min": "Кожна країна EMA має гарантоване щонайменше 1 місце.",
     "quotas_invited_title": "Запрошені та гравці не з EMA",
     "quotas_invited_desc": "Місця для гравців не з EMA та запрошених встановлюються EMA. Якщо гравці не зацікавлені, місця перерозподіляються в межах квоти EMA."
+  },
+  "about": {
+    "page_title": "Про EMA",
+    "tab_presidium": "Президія",
+    "tab_board": "Рада",
+    "tab_history": "Історія",
+    "tab_documents": "Документи",
+    "presidium_desc": "Повсякденними справами EMA керує президія з п'яти членів.",
+    "presidium_elected": "Президія обрана на Генеральній асамблеї {year}",
+    "board_desc": "Кожна країна-член EMA призначає представника ради як контактну точку між EMA та національною організацією.",
+    "board_representative": "Представник",
+    "board_appointed": "Рада призначена на Генеральній асамблеї {year}",
+    "history_presidents": "Президенти",
+    "history_ranking_managers": "Менеджери рейтингу",
+    "history_period": "Період",
+    "documents_desc": "Офіційні документи EMA, правила та рішення, доступні на сайті EMA.",
+    "doc_cat_organization": "Організація",
+    "doc_cat_rules": "Правила",
+    "doc_cat_ranking_and_mers": "Рейтинг & MERS",
+    "doc_cat_decisions_and_rulings": "Рішення & Постанови",
+    "doc_cat_general_assembly": "Генеральна асамблея",
+    "role_president": "Президент",
+    "role_vice_president": "Віцепрезидент",
+    "role_presidium_member": "Член президії",
+    "doc_cat_organization_and_ga": "Організація & Генеральна асамблея",
+    "doc_statutes": "Статут EMA",
+    "doc_requirements": "Вимоги та рекомендації EMA",
+    "doc_ga2023": "Генеральна асамблея 2023",
+    "doc_ga_all": "Всі генеральні асамблеї",
+    "doc_country_transfer": "Зміна країни - Рішення EMA",
+    "doc_covid_ruling": "Спеціальне правило COVID-19",
+    "doc_covid_end": "Кінець спеціального правила COVID-19",
+    "doc_ukraine": "Ситуація в Україні"
   }
 }

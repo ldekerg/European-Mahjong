@@ -7,7 +7,8 @@
     "countries": "Valstis",
     "tournaments": "Turnīri",
     "formulas": "Formulas",
-    "ranking_system": "Rangu sistēma"
+    "ranking_system": "Rangu sistēma",
+    "about": "Par EMA"
   },
   "common": {
     "dark_mode": "Tumšais režīms",
@@ -59,7 +60,8 @@
       "Oktobris",
       "Novembris",
       "Decembris"
-    ]
+    ],
+    "player": "Spēlētājs"
   },
   "home": {
     "intro": "Laipni lūdzam Eiropas Madžonga rangā, kas aptver <strong>MCR</strong> un <strong>RCR</strong> disciplīnas. Punkti tiek aprēķināti no turnīru rezultātiem, ko atzinusi <a href=\"http://mahjong-europe.org\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--accent)\">European Mahjong Association (EMA)</a>. Šī vietne rāda nedēļas ranžējumus, turnīru vēsturi, spēlētāju un valstu rekordus un Slavas zāli.",
@@ -121,7 +123,7 @@
     "mahjong_score_title": "Mahjong punkti"
   },
   "preview": {
-    "title": "Aktīvie turnīri — {regles} · {date}",
+    "title": "Aktīvie turnīri - {regles} · {date}",
     "position": "Vieta"
   },
   "calendar": {
@@ -157,7 +159,8 @@
     "active_players_title": "Aktīvie / visi spēlētāji",
     "tournaments_org_abbr": "Turnīri",
     "suspended": "⛔ Apturēts",
-    "suspended_title": "EMA apturēts kopš 2022. gada"
+    "suspended_title": "EMA apturēts kopš 2022. gada",
+    "federation": "Federācija"
   },
   "hof": {
     "medals": "🎖 Turnīru medaļas",
@@ -217,13 +220,13 @@
     "open_2d": "International 2-day open",
     "player_score_title": "Player ranking score",
     "player_score_intro": "A player's EMA score is the average of two parts, each weighted at 50%:",
-    "part_a_title": "Part A — Average of N best results",
+    "part_a_title": "Part A - Average of N best results",
     "part_a_desc": "The player's N best results are retained (sorted by descending EMA score). In case of a tie, the most recent result is preferred. N depends on the total number of tournaments played in the active period:",
     "nb_tournaments": "Tournaments played",
     "retained_a": "Retained in part A",
     "all": "All",
     "part_a_tiebreak": "If the player has fewer than 5 active tournaments, virtual results at 0 (weight 1) fill the average up to 5.",
-    "part_b_title": "Part B — Average of 4 best results",
+    "part_b_title": "Part B - Average of 4 best results",
     "part_b_desc": "The player's 4 best results are retained (sorted by descending EMA score). In case of a tie, the result with the highest coefficient is preferred.",
     "part_b_tiebreak": "If the player has fewer than 4 active tournaments, virtual results at 0 (weight 1) fill the average up to 4.",
     "weighted_avg_title": "Weighted average",
@@ -248,13 +251,13 @@
     "formula_part_a_n": "N_A = 5 + ⌈0.8 × max(0, N − 5)⌉",
     "formula_avg": "average = Σ(EMA × coeff × time) / (Σ(coeff × time) + missing)",
     "yes": "yes",
-    "none": "—",
+    "none": "-",
     "day_abbr": "d",
     "days_plus": "d+",
     "weekly_title": "Weekly ranking update",
     "weekly_desc": "The EMA ranking is recalculated once a week, every Monday.",
     "weekly_activation_title": "Tournament activation",
-    "weekly_activation_desc": "A tournament takes effect on the Monday of the week following its start date — regardless of its duration. This rule ensures that each tournament is active for exactly 104 active weeks (excluding the COVID freeze), i.e. 2 years.",
+    "weekly_activation_desc": "A tournament takes effect on the Monday of the week following its start date - regardless of its duration. This rule ensures that each tournament is active for exactly 104 active weeks (excluding the COVID freeze), i.e. 2 years.",
     "weekly_activation_note": "All tournaments in the same calendar week share the same first active week.",
     "weekly_examples_title": "Activation examples",
     "weekly_ex_col_start": "Tournament start",
@@ -295,19 +298,52 @@
     "cert_observer_title": "EMA novērotājs",
     "cert_observer_desc": "Organizatori ir atbildīgi par EMA novērotāja iecelšanu, paziņojot viņu vārdu vismaz divas nedēļas pirms pasākuma.",
     "quotas_intro": "EMA kvotas nosaka katrai valstij piešķirto vietu skaitu Eiropas un Pasaules čempionātos.",
-    "quotas_part_a_title": "A daļa — Pamata vietas",
-    "quotas_a1": "A1 — Viena vieta 3 labākajām EMA valstīm valstu reitingā.",
-    "quotas_a2": "A2 — Viena vieta katrai EMA valstij.",
-    "quotas_a3": "A3 — Viena vieta katrai valstij ar spēlētājiem virs 700 punktiem.",
-    "quotas_part_b_title": "B daļa — Proporcionālās vietas",
-    "quotas_b1": "B1 — Spēlētāju procentuālā daļa reitingu sarakstā (valsts / kopā).",
-    "quotas_b2": "B2 — Spēlētāju procentuālā daļa ar reitingu virs 700 punktiem (valsts / kopā).",
-    "quotas_b3": "B3 — B1 un B2 vidējā vērtība, piemērota atlikušajām vietām pēc A daļas.",
+    "quotas_part_a_title": "A daļa - Pamata vietas",
+    "quotas_a1": "A1 - Viena vieta 3 labākajām EMA valstīm valstu reitingā.",
+    "quotas_a2": "A2 - Viena vieta katrai EMA valstij.",
+    "quotas_a3": "A3 - Viena vieta katrai valstij ar spēlētājiem virs 700 punktiem.",
+    "quotas_part_b_title": "B daļa - Proporcionālās vietas",
+    "quotas_b1": "B1 - Spēlētāju procentuālā daļa reitingu sarakstā (valsts / kopā).",
+    "quotas_b2": "B2 - Spēlētāju procentuālā daļa ar reitingu virs 700 punktiem (valsts / kopā).",
+    "quotas_b3": "B3 - B1 un B2 vidējā vērtība, piemērota atlikušajām vietām pēc A daļas.",
     "quotas_formula": "Q = [A1+A2+A3] + B3 × [Kopā − Summa(A daļa)]",
     "quotas_limits_title": "Ierobežojumi un pārdale",
     "quotas_limit_max": "Valsts nevar saņemt vairāk vietu, nekā ir spēlētāju, kuri ir vērtēti virs globālā vidējā.",
     "quotas_limit_min": "Katrai EMA valstij ir garantēta vismaz 1 vieta.",
     "quotas_invited_title": "Uzaicināti & ne-EMA spēlētāji",
     "quotas_invited_desc": "Vietas ne-EMA un uzaicinātajiem spēlētājiem nosaka EMA. Ja spēlētāji nav ieinteresēti, vietas tiek pārdales EMA kvotas ietvaros."
+  },
+  "about": {
+    "page_title": "Par EMA",
+    "tab_presidium": "Prezidijs",
+    "tab_board": "Valde",
+    "tab_history": "Vēsture",
+    "tab_documents": "Dokumenti",
+    "presidium_desc": "EMA ikdienas lietas kārto piecu locekļu prezidijs.",
+    "presidium_elected": "Prezidijs ievēlēts {year}. gada Ģenerālsapulcē",
+    "board_desc": "Katra EMA dalībvalsts ieceļ valdes pārstāvi kā kontaktpunktu starp EMA un nacionālo organizāciju.",
+    "board_representative": "Pārstāvis",
+    "board_appointed": "Valde iecelta {year}. gada Ģenerālsapulcē",
+    "history_presidents": "Prezidenti",
+    "history_ranking_managers": "Reitingu pārvaldnieki",
+    "history_period": "Periods",
+    "documents_desc": "Oficiālie EMA dokumenti, noteikumi un lēmumi, pieejami EMA vietnē.",
+    "doc_cat_organization": "Organizācija",
+    "doc_cat_rules": "Noteikumi",
+    "doc_cat_ranking_and_mers": "Reitings & MERS",
+    "doc_cat_decisions_and_rulings": "Lēmumi & Noteikumi",
+    "doc_cat_general_assembly": "Ģenerālsapulce",
+    "role_president": "Prezidents",
+    "role_vice_president": "Viceprezidents",
+    "role_presidium_member": "Prezidija loceklis",
+    "doc_cat_organization_and_ga": "Organizācija & Ģenerālsapulce",
+    "doc_statutes": "EMA statūti",
+    "doc_requirements": "EMA prasības & vadlīnijas",
+    "doc_ga2023": "Ģenerālsapulce 2023",
+    "doc_ga_all": "Visas ģenerālsapulces",
+    "doc_country_transfer": "Valsts maiņa - EMA lēmums",
+    "doc_covid_ruling": "COVID-19 īpašais noteikums",
+    "doc_covid_end": "COVID-19 īpašā noteikuma beigas",
+    "doc_ukraine": "Situācija Ukrainā"
   }
 }

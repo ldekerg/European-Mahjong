@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="ranking-header">
+  <h1>{{ trad('about.page_title') }}</h1>
+</div>
+
+<!-- Onglets -->
+<div class="tabs" id="main-tabs">
+  <button class="tab-btn active" onclick="showTab('ema', this)">{{ trad('about.tab_presidium') }}</button>
+  <button class="tab-btn"        onclick="showTab('documents', this)">{{ trad('about.tab_documents') }}</button>
+</div>
+
+<div style="max-width:900px;margin:0 auto;padding:0 1rem 3rem">
+
+<!-- ══════════════════════════════════════════════════════════════════
+     ONGLET EMA (Présidium + Conseil + Historique)
+     ══════════════════════════════════════════════════════════════════ -->
+<div id="tab-ema" class="tab-content">
+
+  <!-- Présidium actuel -->
+  <section style="margin-top:1.5rem;margin-bottom:2.5rem">
+    <h2 class="about-section-title">{{ trad('about.tab_presidium') }}</h2>
+    <p class="dim" style="margin-bottom:1rem;font-size:0.9rem">{{ trad('about.presidium_desc') }}</p>
+    <div class="presidium-grid">
+      {% for m in presidium.members %}
+      <div class="presidium-card">
+        <div class="presidium-role">{{ trad('about.' + m.role_key) }}</div>
+        <div class="presidium-flag"><a href="/countries/{{ m.country }}">{{ m.country | flag }}</a></div>
+        <div class="presidium-name">{{ m.first_name }} {{ m.last_name | upper }}</div>
+      </div>
+      {% endfor %}
+    </div>
+    <p class="dim" style="margin-top:1rem;font-size:0.8rem">
+      {{ trad('about.presidium_elected', year=presidium.year) }}
+      — <a href="http://mahjong-europe.org/portal/index.php?option=com_content&view=article&id=8&Itemid=152"
+           target="_blank" rel="noopener">mahjong-europe.org ↗</a>
+    </p>
+  </section>
+
+  <!-- Conseil -->
+  <section style="margin-bottom:2.5rem">
+    <h2 class="about-section-title">{{ trad('about.tab_board') }}</h2>
+    <p class="dim" style="margin-bottom:1rem;font-size:0.9rem">{{ trad('about.board_desc') }}</p>
+    <div class="scroll-table">
+    <table>
+      <colgroup>
+        <col class="col-flag">
+        <col class="col-board-rep">
+        <col class="col-board-fed col-opt">
+      </colgroup>
+      <thead>
+        <tr>
+          <th class="col-flag center">🌍</th>
+          <th class="col-board-rep">{{ trad('about.board_representative') }}</th>
+          <th class="col-board-fed col-opt">{{ trad('country.federation') }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for m in board.members | sort(attribute='country') %}
+        {% set fed = federations.get(m.country) %}
+        <tr>
+          <td class="col-flag center" style="font-size:1.2rem"><a href="/countries/{{ m.country }}">{{ m.country | flag }}</a></td>
+          <td>{{ m.first_name }} {{ m.last_name | upper }}</td>
+          <td class="col-board-fed col-opt">
+            {% if fed %}<a href="{{ fed.url }}" target="_blank" rel="noopener" class="dim" style="font-size:0.8rem">{{ fed.name }}</a>{% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    </div>
+    <p class="dim" style="margin-top:0.75rem;font-size:0.8rem">
+      {{ trad('about.board_appointed', year=board.year) }}
+      — <a href="http://mahjong-europe.org/portal/index.php?option=com_content&view=article&id=8&Itemid=152"
+           target="_blank" rel="noopener">mahjong-europe.org ↗</a>
+    </p>
+  </section>
+
+  <!-- Historique -->
+  <section style="margin-bottom:2.5rem">
+    <h2 class="about-section-title">{{ trad('about.tab_history') }}</h2>
+
+    <div class="home-grid" style="margin-top:0.75rem">
+      <div style="min-width:0;overflow:hidden">
+        <table style="width:100%">
+          <colgroup><col style="width:6rem"><col style="width:2.5rem"><col></colgroup>
+          <thead>
+            <tr>
+              <th style="width:6rem">{{ trad('about.history_period') }}</th>
+              <th style="width:2.5rem" class="center">🌍</th>
+              <th>{{ trad('about.role_president') }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for p in presidium_history.presidents %}
+            <tr {% if loop.last %}class="row-actif"{% endif %}>
+              <td><strong>{{ p.period }}</strong></td>
+              <td class="center" style="font-size:1.2rem"><a href="/countries/{{ p.country }}">{{ p.country | flag }}</a></td>
+              <td>{{ p.first_name }} {{ p.last_name | upper }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div style="min-width:0;overflow:hidden">
+        <table style="width:100%">
+          <colgroup><col style="width:6rem"><col style="width:2.5rem"><col></colgroup>
+          <thead>
+            <tr>
+              <th style="width:6rem">{{ trad('about.history_period') }}</th>
+              <th style="width:2.5rem" class="center">🌍</th>
+              <th>{{ trad('about.history_ranking_managers') }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for m in presidium_history.ranking_managers %}
+            <tr {% if loop.last %}class="row-actif"{% endif %}>
+              <td><strong>{{ m.period }}</strong></td>
+              <td class="center" style="font-size:1.2rem"><a href="/countries/{{ m.country }}">{{ m.country | flag }}</a></td>
+              <td>{{ m.first_name }} {{ m.last_name | upper }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     ONGLET DOCUMENTS
+     ══════════════════════════════════════════════════════════════════ -->
+<div id="tab-documents" class="tab-content hidden">
+  <p class="dim" style="margin:1rem 0 1.5rem;font-size:0.9rem">{{ trad('about.documents_desc') }}</p>
+
+  {% for cat in documents %}
+  <section style="margin-bottom:2rem">
+    <h2 class="about-section-title">{{ trad('about.' + cat.i18n_key) }}</h2>
+    <ul style="list-style:none;padding:0;margin:0">
+      {% for doc in cat.links %}
+      <li style="padding:0.6rem 0;border-bottom:1px solid var(--border)">
+        <div style="font-weight:600;font-size:0.88rem;margin-bottom:0.3rem">
+          {% if doc.title_key %}{{ trad('about.' + doc.title_key) }}{% else %}{{ doc.title }}{% endif %}
+        </div>
+        {% if doc.note %}
+          <p class="dim" style="font-size:0.82rem;margin:0 0 0.3rem">{{ doc.note }}</p>
+        {% endif %}
+        {% for pdf in doc.pdfs %}
+        <div style="display:flex;align-items:baseline;gap:0.6rem;margin-bottom:0.2rem">
+          <a href="{{ pdf.local }}" target="_blank" rel="noopener" style="white-space:nowrap;font-size:0.82rem">📄 {{ pdf.title }}</a>
+          {% if pdf.description %}<span class="dim" style="font-size:0.78rem">{{ pdf.description }}</span>{% endif %}
+        </div>
+        {% endfor %}
+      </li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endfor %}
+</div>
+
+</div><!-- /wrapper -->
+
+<style>
+.col-board-rep   { width: 10rem; }
+.col-board-fed   { min-width: 12rem; white-space: normal; }
+.presidium-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.presidium-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+  min-width: 140px;
+  flex: 1;
+}
+.presidium-role {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text2);
+  margin-bottom: 0.5rem;
+}
+.presidium-flag { font-size: 2rem; margin-bottom: 0.35rem; }
+.presidium-name { font-weight: 600; font-size: 0.95rem; }
+.about-section-title {
+  font-size: 1rem;
+  font-weight: 700;
+  border-bottom: 2px solid var(--accent);
+  padding-bottom: 0.3rem;
+  margin-bottom: 0.75rem;
+  color: var(--text);
+}
+</style>
+
+<script>
+function showTab(name, btn) {
+  ['ema','documents'].forEach(function(t) {
+    document.getElementById('tab-' + t).classList.add('hidden');
+  });
+  document.querySelectorAll('#main-tabs .tab-btn').forEach(function(b) { b.classList.remove('active'); });
+  document.getElementById('tab-' + name).classList.remove('hidden');
+  btn.classList.add('active');
+  var url = new URL(window.location.href);
+  if (name === 'ema') url.searchParams.delete('tab');
+  else url.searchParams.set('tab', name);
+  history.replaceState(null, '', url.toString());
+}
+window.addEventListener('DOMContentLoaded', function() {
+  var tab = new URLSearchParams(window.location.search).get('tab');
+  if (tab === 'documents') {
+    var btn = document.querySelector('#main-tabs .tab-btn[onclick*="documents"]');
+    if (btn) showTab('documents', btn);
+  }
+});
+</script>
+
+{% endblock %}

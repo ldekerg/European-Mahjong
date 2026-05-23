@@ -7,7 +7,8 @@
     "countries": "Țări",
     "tournaments": "Turnee",
     "formulas": "Formulas",
-    "ranking_system": "Sistem de clasament"
+    "ranking_system": "Sistem de clasament",
+    "about": "Despre EMA"
   },
   "common": {
     "dark_mode": "Mod întunecat",
@@ -59,7 +60,8 @@
       "Octombrie",
       "Noiembrie",
       "Decembrie"
-    ]
+    ],
+    "player": "Jucător"
   },
   "home": {
     "intro": "Bun venit la clasamentul european de Mahjong, care acoperă disciplinele <strong>MCR</strong> și <strong>RCR</strong>. Punctele sunt calculate din rezultatele turneelor recunoscute de <a href=\"http://mahjong-europe.org\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--accent)\">European Mahjong Association (EMA)</a>. Acest site prezintă clasamentele săptămânale, istoricul turneelor, recordurile pe jucători și pe țări, precum și Hall of Fame.",
@@ -121,7 +123,7 @@
     "mahjong_score_title": "Punctaj Mahjong"
   },
   "preview": {
-    "title": "Turnee active — {regles} · {date}",
+    "title": "Turnee active - {regles} · {date}",
     "position": "Poz."
   },
   "calendar": {
@@ -157,7 +159,8 @@
     "active_players_title": "Jucători activi / totali",
     "tournaments_org_abbr": "Turnee",
     "suspended": "⛔ Suspendat",
-    "suspended_title": "Suspendat de EMA din 2022"
+    "suspended_title": "Suspendat de EMA din 2022",
+    "federation": "Federație"
   },
   "hof": {
     "medals": "🎖 Medalii turnee",
@@ -217,13 +220,13 @@
     "open_2d": "International 2-day open",
     "player_score_title": "Player ranking score",
     "player_score_intro": "A player's EMA score is the average of two parts, each weighted at 50%:",
-    "part_a_title": "Part A — Average of N best results",
+    "part_a_title": "Part A - Average of N best results",
     "part_a_desc": "The player's N best results are retained (sorted by descending EMA score). In case of a tie, the most recent result is preferred. N depends on the total number of tournaments played in the active period:",
     "nb_tournaments": "Tournaments played",
     "retained_a": "Retained in part A",
     "all": "All",
     "part_a_tiebreak": "If the player has fewer than 5 active tournaments, virtual results at 0 (weight 1) fill the average up to 5.",
-    "part_b_title": "Part B — Average of 4 best results",
+    "part_b_title": "Part B - Average of 4 best results",
     "part_b_desc": "The player's 4 best results are retained (sorted by descending EMA score). In case of a tie, the result with the highest coefficient is preferred.",
     "part_b_tiebreak": "If the player has fewer than 4 active tournaments, virtual results at 0 (weight 1) fill the average up to 4.",
     "weighted_avg_title": "Weighted average",
@@ -248,13 +251,13 @@
     "formula_part_a_n": "N_A = 5 + ⌈0.8 × max(0, N − 5)⌉",
     "formula_avg": "average = Σ(EMA × coeff × time) / (Σ(coeff × time) + missing)",
     "yes": "yes",
-    "none": "—",
+    "none": "-",
     "day_abbr": "d",
     "days_plus": "d+",
     "weekly_title": "Weekly ranking update",
     "weekly_desc": "The EMA ranking is recalculated once a week, every Monday.",
     "weekly_activation_title": "Tournament activation",
-    "weekly_activation_desc": "A tournament takes effect on the Monday of the week following its start date — regardless of its duration. This rule ensures that each tournament is active for exactly 104 active weeks (excluding the COVID freeze), i.e. 2 years.",
+    "weekly_activation_desc": "A tournament takes effect on the Monday of the week following its start date - regardless of its duration. This rule ensures that each tournament is active for exactly 104 active weeks (excluding the COVID freeze), i.e. 2 years.",
     "weekly_activation_note": "All tournaments in the same calendar week share the same first active week.",
     "weekly_examples_title": "Activation examples",
     "weekly_ex_col_start": "Tournament start",
@@ -295,19 +298,52 @@
     "cert_observer_title": "Observator EMA",
     "cert_observer_desc": "Organizatorii sunt responsabili pentru numirea unui observator EMA, anunțând numele acestuia cu cel puțin două săptămâni înainte de eveniment.",
     "quotas_intro": "Cotele EMA determină numărul de locuri alocate fiecărei țări pentru campionatele europene și mondiale.",
-    "quotas_part_a_title": "Partea A — Locuri de bază",
-    "quotas_a1": "A1 — Un loc pentru cele 3 țări EMA de top în clasamentul pe țări.",
-    "quotas_a2": "A2 — Un loc pentru fiecare țară EMA.",
-    "quotas_a3": "A3 — Un loc pentru fiecare țară cu jucători clasați peste 700 de puncte.",
-    "quotas_part_b_title": "Partea B — Locuri proporționale",
-    "quotas_b1": "B1 — Procentul jucătorilor din lista de clasament (țară / total).",
-    "quotas_b2": "B2 — Procentul jucătorilor cu clasament peste 700 de puncte (țară / total).",
-    "quotas_b3": "B3 — Media B1 și B2, aplicată locurilor rămase după Partea A.",
+    "quotas_part_a_title": "Partea A - Locuri de bază",
+    "quotas_a1": "A1 - Un loc pentru cele 3 țări EMA de top în clasamentul pe țări.",
+    "quotas_a2": "A2 - Un loc pentru fiecare țară EMA.",
+    "quotas_a3": "A3 - Un loc pentru fiecare țară cu jucători clasați peste 700 de puncte.",
+    "quotas_part_b_title": "Partea B - Locuri proporționale",
+    "quotas_b1": "B1 - Procentul jucătorilor din lista de clasament (țară / total).",
+    "quotas_b2": "B2 - Procentul jucătorilor cu clasament peste 700 de puncte (țară / total).",
+    "quotas_b3": "B3 - Media B1 și B2, aplicată locurilor rămase după Partea A.",
     "quotas_formula": "Q = [A1+A2+A3] + B3 × [Total − Sumă(Partea A)]",
     "quotas_limits_title": "Limite și redistribuire",
     "quotas_limit_max": "O țară nu poate obține mai multe locuri decât numărul de jucători clasați peste media globală.",
     "quotas_limit_min": "Fiecare țară EMA are garantat cel puțin 1 loc.",
     "quotas_invited_title": "Jucători invitați & non-EMA",
     "quotas_invited_desc": "Locurile pentru jucătorii non-EMA și invitați sunt stabilite de EMA. Dacă jucătorii nu sunt interesați, locurile sunt redistribuite în cadrul cotei EMA."
+  },
+  "about": {
+    "page_title": "Despre EMA",
+    "tab_presidium": "Prezidiu",
+    "tab_board": "Consiliu",
+    "tab_history": "Istoric",
+    "tab_documents": "Documente",
+    "presidium_desc": "Activitățile zilnice ale EMA sunt desfășurate de prezidiul cu cinci membri.",
+    "presidium_elected": "Prezidiu ales la Adunarea Generală {year}",
+    "board_desc": "Fiecare țară membră EMA numește un reprezentant al consiliului ca punct de contact între EMA și organizația națională.",
+    "board_representative": "Reprezentant",
+    "board_appointed": "Consiliu numit la Adunarea Generală {year}",
+    "history_presidents": "Președinți",
+    "history_ranking_managers": "Manageri de clasament",
+    "history_period": "Perioadă",
+    "documents_desc": "Documente oficiale EMA, reguli și decizii, disponibile pe site-ul EMA.",
+    "doc_cat_organization": "Organizație",
+    "doc_cat_rules": "Reguli",
+    "doc_cat_ranking_and_mers": "Clasament & MERS",
+    "doc_cat_decisions_and_rulings": "Decizii & Reglementări",
+    "doc_cat_general_assembly": "Adunarea Generală",
+    "role_president": "Președinte",
+    "role_vice_president": "Vicepreședinte",
+    "role_presidium_member": "Membru al prezidiului",
+    "doc_cat_organization_and_ga": "Organizație & Adunarea Generală",
+    "doc_statutes": "Statutul EMA",
+    "doc_requirements": "Cerințe & ghiduri EMA",
+    "doc_ga2023": "Adunarea Generală 2023",
+    "doc_ga_all": "Toate adunările generale",
+    "doc_country_transfer": "Transfer de țară - Decizie EMA",
+    "doc_covid_ruling": "Regulament special COVID-19",
+    "doc_covid_end": "Sfârșitul regulamentului special COVID-19",
+    "doc_ukraine": "Situația din Ucraina"
   }
 }

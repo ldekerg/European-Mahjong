@@ -7,7 +7,8 @@
     "countries": "Länder",
     "tournaments": "Turneringar",
     "formulas": "Formulas",
-    "ranking_system": "Rankningsystem"
+    "ranking_system": "Rankningsystem",
+    "about": "Om EMA"
   },
   "common": {
     "dark_mode": "Mörkt läge",
@@ -59,7 +60,8 @@
       "Oktober",
       "November",
       "December"
-    ]
+    ],
+    "player": "Spelare"
   },
   "home": {
     "intro": "Välkommen till den europeiska Mahjong-rankningen för <strong>MCR</strong> och <strong>RCR</strong>. Poäng beräknas utifrån turneringsresultat godkända av <a href=\"http://mahjong-europe.org\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--accent)\">European Mahjong Association (EMA)</a>. Webbplatsen visar veckoranking, turneringshistorik, spelare- och landsrekord samt Hall of Fame.",
@@ -121,7 +123,7 @@
     "mahjong_score_title": "Mahjong-poäng"
   },
   "preview": {
-    "title": "Aktiva turneringar — {regles} · {date}",
+    "title": "Aktiva turneringar - {regles} · {date}",
     "position": "Pos."
   },
   "calendar": {
@@ -157,7 +159,8 @@
     "active_players_title": "Aktiva / alla spelare",
     "tournaments_org_abbr": "Turneringar",
     "suspended": "⛔ Avstängd",
-    "suspended_title": "Avstängd från EMA sedan 2022"
+    "suspended_title": "Avstängd från EMA sedan 2022",
+    "federation": "Förbund"
   },
   "hof": {
     "medals": "🎖 Turnerings­medaljer",
@@ -217,13 +220,13 @@
     "open_2d": "International 2-day open",
     "player_score_title": "Player ranking score",
     "player_score_intro": "A player's EMA score is the average of two parts, each weighted at 50%:",
-    "part_a_title": "Part A — Average of N best results",
+    "part_a_title": "Part A - Average of N best results",
     "part_a_desc": "The player's N best results are retained (sorted by descending EMA score). In case of a tie, the most recent result is preferred. N depends on the total number of tournaments played in the active period:",
     "nb_tournaments": "Tournaments played",
     "retained_a": "Retained in part A",
     "all": "All",
     "part_a_tiebreak": "If the player has fewer than 5 active tournaments, virtual results at 0 (weight 1) fill the average up to 5.",
-    "part_b_title": "Part B — Average of 4 best results",
+    "part_b_title": "Part B - Average of 4 best results",
     "part_b_desc": "The player's 4 best results are retained (sorted by descending EMA score). In case of a tie, the result with the highest coefficient is preferred.",
     "part_b_tiebreak": "If the player has fewer than 4 active tournaments, virtual results at 0 (weight 1) fill the average up to 4.",
     "weighted_avg_title": "Weighted average",
@@ -248,13 +251,13 @@
     "formula_part_a_n": "N_A = 5 + ⌈0.8 × max(0, N − 5)⌉",
     "formula_avg": "average = Σ(EMA × coeff × time) / (Σ(coeff × time) + missing)",
     "yes": "yes",
-    "none": "—",
+    "none": "-",
     "day_abbr": "d",
     "days_plus": "d+",
     "weekly_title": "Weekly ranking update",
     "weekly_desc": "The EMA ranking is recalculated once a week, every Monday.",
     "weekly_activation_title": "Tournament activation",
-    "weekly_activation_desc": "A tournament takes effect on the Monday of the week following its start date — regardless of its duration. This rule ensures that each tournament is active for exactly 104 active weeks (excluding the COVID freeze), i.e. 2 years.",
+    "weekly_activation_desc": "A tournament takes effect on the Monday of the week following its start date - regardless of its duration. This rule ensures that each tournament is active for exactly 104 active weeks (excluding the COVID freeze), i.e. 2 years.",
     "weekly_activation_note": "All tournaments in the same calendar week share the same first active week.",
     "weekly_examples_title": "Activation examples",
     "weekly_ex_col_start": "Tournament start",
@@ -295,19 +298,52 @@
     "cert_observer_title": "EMA-observatör",
     "cert_observer_desc": "Arrangörerna ansvarar för att utse en EMA-observatör och meddela dennes namn minst två veckor innan evenemanget.",
     "quotas_intro": "EMA-kvoter bestämmer antalet platser som tilldelas varje land för europeiska och världsmästerskap.",
-    "quotas_part_a_title": "Del A — Basplatser",
-    "quotas_a1": "A1 — En plats för de 3 bästa EMA-länderna i landsrankingen.",
-    "quotas_a2": "A2 — En plats för varje EMA-land.",
-    "quotas_a3": "A3 — En plats för varje land med spelare rankade över 700 poäng.",
-    "quotas_part_b_title": "Del B — Proportionella platser",
-    "quotas_b1": "B1 — Procentandel spelare i rankingslistan (land / totalt).",
-    "quotas_b2": "B2 — Procentandel spelare med ranking över 700 poäng (land / totalt).",
-    "quotas_b3": "B3 — Genomsnitt av B1 och B2, tillämpat på återstående platser efter del A.",
+    "quotas_part_a_title": "Del A - Basplatser",
+    "quotas_a1": "A1 - En plats för de 3 bästa EMA-länderna i landsrankingen.",
+    "quotas_a2": "A2 - En plats för varje EMA-land.",
+    "quotas_a3": "A3 - En plats för varje land med spelare rankade över 700 poäng.",
+    "quotas_part_b_title": "Del B - Proportionella platser",
+    "quotas_b1": "B1 - Procentandel spelare i rankingslistan (land / totalt).",
+    "quotas_b2": "B2 - Procentandel spelare med ranking över 700 poäng (land / totalt).",
+    "quotas_b3": "B3 - Genomsnitt av B1 och B2, tillämpat på återstående platser efter del A.",
     "quotas_formula": "Q = [A1+A2+A3] + B3 × [Totalt − Summa(Del A)]",
     "quotas_limits_title": "Gränser och omfördelning",
     "quotas_limit_max": "Ett land kan inte få fler platser än antalet spelare som är rankade över det globala genomsnittet.",
     "quotas_limit_min": "Varje EMA-land har minst 1 garanterad plats.",
     "quotas_invited_title": "Inbjudna & icke-EMA-spelare",
     "quotas_invited_desc": "Platser för icke-EMA- och inbjudna spelare fastställs av EMA. Om spelare inte är intresserade omfördelas platserna inom EMA-kvoten."
+  },
+  "about": {
+    "page_title": "Om EMA",
+    "tab_presidium": "Presidium",
+    "tab_board": "Styrelse",
+    "tab_history": "Historia",
+    "tab_documents": "Dokument",
+    "presidium_desc": "EMA:s dagliga verksamhet sköts av det femmannapresidium.",
+    "presidium_elected": "Presidium valt vid Generalförsamlingen {year}",
+    "board_desc": "Varje EMA-medlemsland utser en styrelsens representant som kontaktpunkt mellan EMA och den nationella organisationen.",
+    "board_representative": "Representant",
+    "board_appointed": "Styrelse utsedd vid Generalförsamlingen {year}",
+    "history_presidents": "Presidenter",
+    "history_ranking_managers": "Rankningsansvariga",
+    "history_period": "Period",
+    "documents_desc": "Officiella EMA-dokument, regler och beslut, tillgängliga på EMA-webbplatsen.",
+    "doc_cat_organization": "Organisation",
+    "doc_cat_rules": "Regler",
+    "doc_cat_ranking_and_mers": "Ranking & MERS",
+    "doc_cat_decisions_and_rulings": "Beslut & Regler",
+    "doc_cat_general_assembly": "Generalförsamling",
+    "role_president": "President",
+    "role_vice_president": "Vice president",
+    "role_presidium_member": "Presidiummedlem",
+    "doc_cat_organization_and_ga": "Organisation & Generalförsamling",
+    "doc_statutes": "EMA-stadgar",
+    "doc_requirements": "EMA-krav & riktlinjer",
+    "doc_ga2023": "Generalförsamling 2023",
+    "doc_ga_all": "Alla generalförsamlingar",
+    "doc_country_transfer": "Landbyte - EMA-beslut",
+    "doc_covid_ruling": "COVID-19 särskilt beslut",
+    "doc_covid_end": "Slut på COVID-19 särskilt beslut",
+    "doc_ukraine": "Situationen i Ukraina"
   }
 }

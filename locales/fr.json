@@ -7,7 +7,8 @@
     "countries": "Pays",
     "tournaments": "Tournois",
     "formulas": "Formules",
-    "ranking_system": "Système de classement"
+    "ranking_system": "Système de classement",
+    "about": "À propos"
   },
   "common": {
     "dark_mode": "Mode sombre",
@@ -59,7 +60,8 @@
       "Octobre",
       "Novembre",
       "Décembre"
-    ]
+    ],
+    "player": "Joueur"
   },
   "home": {
     "intro": "Bienvenue sur le classement européen de Mahjong, regroupant les disciplines <strong>MCR</strong> (Mahjong Compétitif Riichi) et <strong>RCR</strong> (Riichi Compétitif). Les points sont calculés à partir des résultats des tournois reconnus par l'<a href=\"http://mahjong-europe.org\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--accent)\">European Mahjong Association (EMA)</a>. Ce site présente les classements hebdomadaires, l'historique des tournois, les palmarès par joueur et par pays, ainsi que le Hall of Fame.",
@@ -121,7 +123,7 @@
     "mahjong_score_title": "Score Mahjong"
   },
   "preview": {
-    "title": "Tournois actifs — {regles} · {date}",
+    "title": "Tournois actifs - {regles} · {date}",
     "position": "Pos."
   },
   "calendar": {
@@ -157,7 +159,8 @@
     "active_players_title": "Joueurs actifs / all-time",
     "tournaments_org_abbr": "Tournois org.",
     "suspended": "⛔ Suspendu",
-    "suspended_title": "Suspendu(e) de l'EMA depuis 2022"
+    "suspended_title": "Suspendu(e) de l'EMA depuis 2022",
+    "federation": "Fédération"
   },
   "hof": {
     "medals": "🎖 Médailles tournois",
@@ -217,13 +220,13 @@
     "open_2d": "Open international 2 jours",
     "player_score_title": "Score de classement d'un joueur",
     "player_score_intro": "Le score EMA d'un joueur est la moyenne de deux parties, chacune pondérée à 50 % :",
-    "part_a_title": "Partie A — Moyenne des N meilleurs résultats",
+    "part_a_title": "Partie A - Moyenne des N meilleurs résultats",
     "part_a_desc": "On retient les N meilleurs résultats du joueur (triés par score EMA décroissant). En cas d'égalité, on préfère le résultat le plus récent. N dépend du nombre total de tournois joués dans la période active :",
     "nb_tournaments": "Tournois joués",
     "retained_a": "Retenus en partie A",
     "all": "Tous",
     "part_a_tiebreak": "Si le joueur a moins de 5 tournois actifs, des résultats fictifs à 0 (poids 1) complètent la moyenne jusqu'à 5.",
-    "part_b_title": "Partie B — Moyenne des 4 meilleurs résultats",
+    "part_b_title": "Partie B - Moyenne des 4 meilleurs résultats",
     "part_b_desc": "On retient les 4 meilleurs résultats du joueur (triés par score EMA décroissant). En cas d'égalité, on préfère le résultat au coefficient le plus élevé.",
     "part_b_tiebreak": "Si le joueur a moins de 4 tournois actifs, des résultats fictifs à 0 (poids 1) complètent la moyenne jusqu'à 4.",
     "weighted_avg_title": "Moyenne pondérée",
@@ -248,13 +251,13 @@
     "formula_part_a_n": "N_A = 5 + ⌈0,8 × max(0, N − 5)⌉",
     "formula_avg": "moyenne = Σ(EMA × coeff × temps) / (Σ(coeff × temps) + manquants)",
     "yes": "oui",
-    "none": "—",
+    "none": "-",
     "day_abbr": "j",
     "days_plus": "j+",
     "weekly_title": "Mise à jour hebdomadaire du classement",
     "weekly_desc": "Le classement EMA est recalculé une fois par semaine, chaque lundi.",
     "weekly_activation_title": "Activation d'un tournoi",
-    "weekly_activation_desc": "Un tournoi entre en vigueur le lundi de la semaine suivant sa date de début — peu importe sa durée. Cette règle garantit que chaque tournoi est actif pendant exactement 104 semaines actives (hors gel COVID), soit 2 ans.",
+    "weekly_activation_desc": "Un tournoi entre en vigueur le lundi de la semaine suivant sa date de début - peu importe sa durée. Cette règle garantit que chaque tournoi est actif pendant exactement 104 semaines actives (hors gel COVID), soit 2 ans.",
     "weekly_activation_note": "Tous les tournois d'une même semaine calendaire partagent la même première semaine active.",
     "weekly_examples_title": "Exemples d'activation",
     "weekly_ex_col_start": "Début du tournoi",
@@ -295,19 +298,52 @@
     "cert_observer_title": "Observateur EMA",
     "cert_observer_desc": "Les organisateurs sont responsables de la désignation d'un observateur EMA et doivent annoncer son nom au moins deux semaines avant l'événement. L'observateur devrait de préférence être un membre du conseil EMA d'un autre pays, ou un joueur de tournoi expérimenté d'un autre pays.",
     "quotas_intro": "Les quotas EMA déterminent le nombre de places allouées à chaque pays pour les Championnats d'Europe et du Monde (OEMC, WMC, ERMC, WRC).",
-    "quotas_part_a_title": "Partie A — Places de base",
-    "quotas_a1": "A1 — Une place pour les 3 meilleurs pays EMA au classement par équipes.",
-    "quotas_a2": "A2 — Une place pour chaque pays EMA.",
-    "quotas_a3": "A3 — Une place pour chaque pays ayant des joueurs classés au-dessus de 700 points.",
-    "quotas_part_b_title": "Partie B — Places proportionnelles",
-    "quotas_b1": "B1 — Pourcentage de joueurs dans la liste de classement (pays / total).",
-    "quotas_b2": "B2 — Pourcentage de joueurs avec un classement supérieur à 700 points (pays / total).",
-    "quotas_b3": "B3 — Moyenne de B1 et B2, appliquée aux places restantes après la partie A.",
+    "quotas_part_a_title": "Partie A - Places de base",
+    "quotas_a1": "A1 - Une place pour les 3 meilleurs pays EMA au classement par équipes.",
+    "quotas_a2": "A2 - Une place pour chaque pays EMA.",
+    "quotas_a3": "A3 - Une place pour chaque pays ayant des joueurs classés au-dessus de 700 points.",
+    "quotas_part_b_title": "Partie B - Places proportionnelles",
+    "quotas_b1": "B1 - Pourcentage de joueurs dans la liste de classement (pays / total).",
+    "quotas_b2": "B2 - Pourcentage de joueurs avec un classement supérieur à 700 points (pays / total).",
+    "quotas_b3": "B3 - Moyenne de B1 et B2, appliquée aux places restantes après la partie A.",
     "quotas_formula": "Q = [A1+A2+A3] + B3 × [Total − Somme(Partie A)]",
     "quotas_limits_title": "Limites et redistribution",
     "quotas_limit_max": "Un pays ne peut pas obtenir plus de places que le nombre de joueurs classés au-dessus de la moyenne mondiale.",
     "quotas_limit_min": "Chaque pays EMA a au moins 1 place garantie.",
     "quotas_invited_title": "Joueurs invités et hors EMA",
     "quotas_invited_desc": "Les places pour les joueurs non-EMA et invités sont fixées par l'EMA. Si les joueurs ne sont pas intéressés, les places sont redistribuées dans le quota EMA. Les joueurs de pays sans organisation peuvent postuler dans le quota pour le Reste du Monde."
+  },
+  "about": {
+    "page_title": "À propos de l'EMA",
+    "tab_presidium": "Présidium",
+    "tab_board": "Conseil",
+    "tab_history": "Historique",
+    "tab_documents": "Documents",
+    "presidium_desc": "Les affaires courantes de l'EMA sont gérées par le présidium de cinq membres.",
+    "presidium_elected": "Présidium élu lors de l'Assemblée Générale {year}",
+    "board_desc": "Chaque pays membre de l'EMA désigne un représentant au conseil, point de contact entre l'EMA et l'organisation nationale.",
+    "board_representative": "Représentant",
+    "board_appointed": "Conseil désigné lors de l'Assemblée Générale {year}",
+    "history_presidents": "Présidents",
+    "history_ranking_managers": "Responsables du classement",
+    "history_period": "Période",
+    "documents_desc": "Documents officiels de l'EMA, règles et décisions, disponibles sur le site de l'EMA.",
+    "doc_cat_organization": "Organisation",
+    "doc_cat_rules": "Règles",
+    "doc_cat_ranking_and_mers": "Classement & MERS",
+    "doc_cat_decisions_and_rulings": "Décisions & Règlements",
+    "doc_cat_general_assembly": "Assemblée Générale",
+    "role_president": "Président",
+    "role_vice_president": "Vice-Président",
+    "role_presidium_member": "Membre du présidium",
+    "doc_cat_organization_and_ga": "Organisation & Assemblée Générale",
+    "doc_statutes": "Statuts EMA",
+    "doc_requirements": "Exigences & Lignes directrices EMA",
+    "doc_ga2023": "Assemblée Générale 2023",
+    "doc_ga_all": "Toutes les Assemblées Générales",
+    "doc_country_transfer": "Transfert de pays - Décision EMA",
+    "doc_covid_ruling": "Règlement spécial COVID-19",
+    "doc_covid_end": "Fin du règlement spécial COVID-19",
+    "doc_ukraine": "Situation en Ukraine"
   }
 }

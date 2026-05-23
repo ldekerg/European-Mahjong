@@ -7,7 +7,8 @@
     "countries": "Maat",
     "tournaments": "Turnaukset",
     "formulas": "Formulas",
-    "ranking_system": "Rankausjärjestelmä"
+    "ranking_system": "Rankausjärjestelmä",
+    "about": "Tietoa"
   },
   "common": {
     "dark_mode": "Tumma tila",
@@ -59,7 +60,8 @@
       "Lokakuu",
       "Marraskuu",
       "Joulukuu"
-    ]
+    ],
+    "player": "Pelaaja"
   },
   "home": {
     "intro": "Tervetuloa eurooppalaiseen Mahjong-rankauslistaan, joka kattaa <strong>MCR</strong>- ja <strong>RCR</strong>-lajit. Pisteet lasketaan <a href=\"http://mahjong-europe.org\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--accent)\">European Mahjong Association (EMA)</a>:n hyväksymistä turnaustuloksista. Sivusto esittelee viikoittaiset sijoitukset, turnaushistorian, pelaaja- ja maakohtaiset ennätykset sekä Hall of Famen.",
@@ -121,7 +123,7 @@
     "mahjong_score_title": "Mahjong-pisteet"
   },
   "preview": {
-    "title": "Aktiiviset turnaukset — {regles} · {date}",
+    "title": "Aktiiviset turnaukset - {regles} · {date}",
     "position": "Sij."
   },
   "calendar": {
@@ -157,7 +159,8 @@
     "active_players_title": "Aktiiviset / kaikki pelaajat",
     "tournaments_org_abbr": "Turnaukset",
     "suspended": "⛔ Jäädytetty",
-    "suspended_title": "EMA:n jäädyttämä vuodesta 2022"
+    "suspended_title": "EMA:n jäädyttämä vuodesta 2022",
+    "federation": "Liitto"
   },
   "hof": {
     "medals": "🎖 Turnausmitalit",
@@ -217,13 +220,13 @@
     "open_2d": "International 2-day open",
     "player_score_title": "Player ranking score",
     "player_score_intro": "A player's EMA score is the average of two parts, each weighted at 50%:",
-    "part_a_title": "Part A — Average of N best results",
+    "part_a_title": "Part A - Average of N best results",
     "part_a_desc": "The player's N best results are retained (sorted by descending EMA score). In case of a tie, the most recent result is preferred. N depends on the total number of tournaments played in the active period:",
     "nb_tournaments": "Tournaments played",
     "retained_a": "Retained in part A",
     "all": "All",
     "part_a_tiebreak": "If the player has fewer than 5 active tournaments, virtual results at 0 (weight 1) fill the average up to 5.",
-    "part_b_title": "Part B — Average of 4 best results",
+    "part_b_title": "Part B - Average of 4 best results",
     "part_b_desc": "The player's 4 best results are retained (sorted by descending EMA score). In case of a tie, the result with the highest coefficient is preferred.",
     "part_b_tiebreak": "If the player has fewer than 4 active tournaments, virtual results at 0 (weight 1) fill the average up to 4.",
     "weighted_avg_title": "Weighted average",
@@ -248,13 +251,13 @@
     "formula_part_a_n": "N_A = 5 + ⌈0.8 × max(0, N − 5)⌉",
     "formula_avg": "average = Σ(EMA × coeff × time) / (Σ(coeff × time) + missing)",
     "yes": "yes",
-    "none": "—",
+    "none": "-",
     "day_abbr": "d",
     "days_plus": "d+",
     "weekly_title": "Weekly ranking update",
     "weekly_desc": "The EMA ranking is recalculated once a week, every Monday.",
     "weekly_activation_title": "Tournament activation",
-    "weekly_activation_desc": "A tournament takes effect on the Monday of the week following its start date — regardless of its duration. This rule ensures that each tournament is active for exactly 104 active weeks (excluding the COVID freeze), i.e. 2 years.",
+    "weekly_activation_desc": "A tournament takes effect on the Monday of the week following its start date - regardless of its duration. This rule ensures that each tournament is active for exactly 104 active weeks (excluding the COVID freeze), i.e. 2 years.",
     "weekly_activation_note": "All tournaments in the same calendar week share the same first active week.",
     "weekly_examples_title": "Activation examples",
     "weekly_ex_col_start": "Tournament start",
@@ -295,19 +298,52 @@
     "cert_observer_title": "EMA-tarkkailija",
     "cert_observer_desc": "Järjestäjät ovat vastuussa EMA-tarkkailijan nimeämisestä ja heidän nimensä ilmoittamisesta vähintään kaksi viikkoa ennen tapahtumaa.",
     "quotas_intro": "EMA-kiintiöt määrittävät kullekin maalle jaettujen paikkojen määrän Euroopan ja maailman mestaruuskilpailuissa.",
-    "quotas_part_a_title": "Osa A — Perussijoitukset",
-    "quotas_a1": "A1 — Yksi paikka 3 parhaalle EMA-maalle maarankinissa.",
-    "quotas_a2": "A2 — Yksi paikka jokaiselle EMA-maalle.",
-    "quotas_a3": "A3 — Yksi paikka jokaiselle maalle, jolla on yli 700 pisteen pelaajia.",
-    "quotas_part_b_title": "Osa B — Suhteelliset sijoitukset",
-    "quotas_b1": "B1 — Prosenttiosuus pelaajista rankinglistalla (maa / yhteensä).",
-    "quotas_b2": "B2 — Prosenttiosuus pelaajista, joiden ranking on yli 700 pistettä (maa / yhteensä).",
-    "quotas_b3": "B3 — B1:n ja B2:n keskiarvo, sovelletaan jäljellä oleviin sijoituksiin osan A jälkeen.",
+    "quotas_part_a_title": "Osa A - Perussijoitukset",
+    "quotas_a1": "A1 - Yksi paikka 3 parhaalle EMA-maalle maarankinissa.",
+    "quotas_a2": "A2 - Yksi paikka jokaiselle EMA-maalle.",
+    "quotas_a3": "A3 - Yksi paikka jokaiselle maalle, jolla on yli 700 pisteen pelaajia.",
+    "quotas_part_b_title": "Osa B - Suhteelliset sijoitukset",
+    "quotas_b1": "B1 - Prosenttiosuus pelaajista rankinglistalla (maa / yhteensä).",
+    "quotas_b2": "B2 - Prosenttiosuus pelaajista, joiden ranking on yli 700 pistettä (maa / yhteensä).",
+    "quotas_b3": "B3 - B1:n ja B2:n keskiarvo, sovelletaan jäljellä oleviin sijoituksiin osan A jälkeen.",
     "quotas_formula": "Q = [A1+A2+A3] + B3 × [Yhteensä − Summa(Osa A)]",
     "quotas_limits_title": "Rajat ja uudelleenjako",
     "quotas_limit_max": "Maa ei voi saada enemmän paikkoja kuin globaalin keskiarvon ylittävien pelaajien määrä.",
     "quotas_limit_min": "Jokaisella EMA-maalla on vähintään 1 taattu paikka.",
     "quotas_invited_title": "Kutsutut & ei-EMA-pelaajat",
     "quotas_invited_desc": "EMA asettaa ei-EMA- ja kutsuttujen pelaajien paikat. Jos pelaajat eivät ole kiinnostuneita, paikat jaetaan uudelleen EMA-kiintiön sisällä."
+  },
+  "about": {
+    "page_title": "Tietoa EMA:sta",
+    "tab_presidium": "Presidiumi",
+    "tab_board": "Hallitus",
+    "tab_history": "Historia",
+    "tab_documents": "Asiakirjat",
+    "presidium_desc": "EMA:n päivittäistä toimintaa hoitaa viisijäseninen presidiumi.",
+    "presidium_elected": "Presidiumi valittu yleiskokouksessa {year}",
+    "board_desc": "Jokainen EMA:n jäsenmaa nimittää hallituksen edustajan EMA:n ja kansallisen järjestön välisenä yhteyspisteenä.",
+    "board_representative": "Edustaja",
+    "board_appointed": "Hallitus nimitetty yleiskokouksessa {year}",
+    "history_presidents": "Puheenjohtajat",
+    "history_ranking_managers": "Rankingvastaavat",
+    "history_period": "Kausi",
+    "documents_desc": "Viralliset EMA-asiakirjat, säännöt ja päätökset, saatavilla EMA:n verkkosivustolla.",
+    "doc_cat_organization": "Organisaatio",
+    "doc_cat_rules": "Säännöt",
+    "doc_cat_ranking_and_mers": "Ranking & MERS",
+    "doc_cat_decisions_and_rulings": "Päätökset & Säädökset",
+    "doc_cat_general_assembly": "Yleiskokous",
+    "role_president": "Puheenjohtaja",
+    "role_vice_president": "Varapuheenjohtaja",
+    "role_presidium_member": "Presidiumin jäsen",
+    "doc_cat_organization_and_ga": "Organisaatio & Yleiskokous",
+    "doc_statutes": "EMA:n säännöt",
+    "doc_requirements": "EMA:n vaatimukset & ohjeet",
+    "doc_ga2023": "Yleiskokous 2023",
+    "doc_ga_all": "Kaikki yleiskokoukset",
+    "doc_country_transfer": "Maanvaihto - EMA:n päätös",
+    "doc_covid_ruling": "COVID-19-erityismääräys",
+    "doc_covid_end": "COVID-19-erityismääräyksen loppu",
+    "doc_ukraine": "Tilanne Ukrainassa"
   }
 }

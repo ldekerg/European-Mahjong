@@ -17,6 +17,7 @@ import app.models as models
 from app.routes import players, tournaments, hof, championships
 from app.routes import countries
 from app.routes import formulas
+from app.routes import about
 from app.routes import manage
 from app.routes import manage_championships
 from app.i18n import templates
@@ -244,6 +245,7 @@ app.include_router(hof.router)
 app.include_router(countries.router)
 app.include_router(championships.router)
 app.include_router(formulas.router)
+app.include_router(about.router)
 app.include_router(manage.router)
 app.include_router(manage_championships.router)
 

@@ -7,7 +7,8 @@
     "countries": "Země",
     "tournaments": "Turnaje",
     "formulas": "Formulas",
-    "ranking_system": "Systém hodnocení"
+    "ranking_system": "Systém hodnocení",
+    "about": "O EMA"
   },
   "common": {
     "dark_mode": "Tmavý režim",
@@ -59,7 +60,8 @@
       "Říjen",
       "Listopad",
       "Prosinec"
-    ]
+    ],
+    "player": "Hráč"
   },
   "home": {
     "intro": "Vítejte v evropském žebříčku Mahjong, který zahrnuje disciplíny <strong>MCR</strong> a <strong>RCR</strong>. Body se počítají z výsledků turnajů uznaných <a href=\"http://mahjong-europe.org\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--accent)\">European Mahjong Association (EMA)</a>. Tato stránka představuje týdenní žebříčky, historii turnajů, rekordy hráčů a zemí a Síň slávy.",
@@ -121,7 +123,7 @@
     "mahjong_score_title": "Skóre Mahjong"
   },
   "preview": {
-    "title": "Aktivní turnaje — {regles} · {date}",
+    "title": "Aktivní turnaje - {regles} · {date}",
     "position": "Um."
   },
   "calendar": {
@@ -157,7 +159,8 @@
     "active_players_title": "Aktivní / všichni hráči",
     "tournaments_org_abbr": "Turnaje",
     "suspended": "⛔ Pozastaveno",
-    "suspended_title": "Pozastaveno EMA od roku 2022"
+    "suspended_title": "Pozastaveno EMA od roku 2022",
+    "federation": "Federace"
   },
   "hof": {
     "medals": "🎖 Turnajové medaile",
@@ -217,13 +220,13 @@
     "open_2d": "International 2-day open",
     "player_score_title": "Player ranking score",
     "player_score_intro": "A player's EMA score is the average of two parts, each weighted at 50%:",
-    "part_a_title": "Part A — Average of N best results",
+    "part_a_title": "Part A - Average of N best results",
     "part_a_desc": "The player's N best results are retained (sorted by descending EMA score). In case of a tie, the most recent result is preferred. N depends on the total number of tournaments played in the active period:",
     "nb_tournaments": "Tournaments played",
     "retained_a": "Retained in part A",
     "all": "All",
     "part_a_tiebreak": "If the player has fewer than 5 active tournaments, virtual results at 0 (weight 1) fill the average up to 5.",
-    "part_b_title": "Part B — Average of 4 best results",
+    "part_b_title": "Part B - Average of 4 best results",
     "part_b_desc": "The player's 4 best results are retained (sorted by descending EMA score). In case of a tie, the result with the highest coefficient is preferred.",
     "part_b_tiebreak": "If the player has fewer than 4 active tournaments, virtual results at 0 (weight 1) fill the average up to 4.",
     "weighted_avg_title": "Weighted average",
@@ -248,13 +251,13 @@
     "formula_part_a_n": "N_A = 5 + ⌈0.8 × max(0, N − 5)⌉",
     "formula_avg": "average = Σ(EMA × coeff × time) / (Σ(coeff × time) + missing)",
     "yes": "yes",
-    "none": "—",
+    "none": "-",
     "day_abbr": "d",
     "days_plus": "d+",
     "weekly_title": "Weekly ranking update",
     "weekly_desc": "The EMA ranking is recalculated once a week, every Monday.",
     "weekly_activation_title": "Tournament activation",
-    "weekly_activation_desc": "A tournament takes effect on the Monday of the week following its start date — regardless of its duration. This rule ensures that each tournament is active for exactly 104 active weeks (excluding the COVID freeze), i.e. 2 years.",
+    "weekly_activation_desc": "A tournament takes effect on the Monday of the week following its start date - regardless of its duration. This rule ensures that each tournament is active for exactly 104 active weeks (excluding the COVID freeze), i.e. 2 years.",
     "weekly_activation_note": "All tournaments in the same calendar week share the same first active week.",
     "weekly_examples_title": "Activation examples",
     "weekly_ex_col_start": "Tournament start",
@@ -295,19 +298,52 @@
     "cert_observer_title": "EMA pozorovatel",
     "cert_observer_desc": "Organizátoři jsou odpovědní za jmenování pozorovatele EMA a oznámení jeho jména nejméně dva týdny před akcí.",
     "quotas_intro": "Kvóty EMA určují počet míst přidělených každé zemi pro evropská a světová mistrovství.",
-    "quotas_part_a_title": "Část A — Základní místa",
-    "quotas_a1": "A1 — Jedno místo pro 3 nejlepší země EMA v národním žebříčku.",
-    "quotas_a2": "A2 — Jedno místo pro každou zemi EMA.",
-    "quotas_a3": "A3 — Jedno místo pro každou zemi s hráči nad 700 bodů.",
-    "quotas_part_b_title": "Část B — Proporcionální místa",
-    "quotas_b1": "B1 — Procento hráčů v žebříčku (země / celkem).",
-    "quotas_b2": "B2 — Procento hráčů s hodnocením nad 700 bodů (země / celkem).",
-    "quotas_b3": "B3 — Průměr B1 a B2, aplikovaný na zbývající místa po části A.",
+    "quotas_part_a_title": "Část A - Základní místa",
+    "quotas_a1": "A1 - Jedno místo pro 3 nejlepší země EMA v národním žebříčku.",
+    "quotas_a2": "A2 - Jedno místo pro každou zemi EMA.",
+    "quotas_a3": "A3 - Jedno místo pro každou zemi s hráči nad 700 bodů.",
+    "quotas_part_b_title": "Část B - Proporcionální místa",
+    "quotas_b1": "B1 - Procento hráčů v žebříčku (země / celkem).",
+    "quotas_b2": "B2 - Procento hráčů s hodnocením nad 700 bodů (země / celkem).",
+    "quotas_b3": "B3 - Průměr B1 a B2, aplikovaný na zbývající místa po části A.",
     "quotas_formula": "Q = [A1+A2+A3] + B3 × [Celkem − Součet(Část A)]",
     "quotas_limits_title": "Limity a přerozdělení",
     "quotas_limit_max": "Země nemůže získat více míst, než je počet hráčů v žebříčku nad globálním průměrem.",
     "quotas_limit_min": "Každá země EMA má garantováno alespoň 1 místo.",
     "quotas_invited_title": "Pozvaní & hráči mimo EMA",
     "quotas_invited_desc": "Místa pro hráče mimo EMA a pozvané jsou stanovena EMA. Pokud hráči nemají zájem, místa jsou přerozdělena v rámci kvóty EMA."
+  },
+  "about": {
+    "page_title": "O EMA",
+    "tab_presidium": "Prezidium",
+    "tab_board": "Představenstvo",
+    "tab_history": "Historie",
+    "tab_documents": "Dokumenty",
+    "presidium_desc": "Každodenní záležitosti EMA zajišťuje pětičlenné prezidium.",
+    "presidium_elected": "Prezidium zvoleno na Valné hromadě {year}",
+    "board_desc": "Každá členská země EMA jmenuje zástupce představenstva jako kontaktní místo mezi EMA a národní organizací.",
+    "board_representative": "Zástupce",
+    "board_appointed": "Představenstvo jmenováno na Valné hromadě {year}",
+    "history_presidents": "Prezidenti",
+    "history_ranking_managers": "Správci žebříčku",
+    "history_period": "Období",
+    "documents_desc": "Oficiální dokumenty EMA, pravidla a rozhodnutí, dostupné na webu EMA.",
+    "doc_cat_organization": "Organizace",
+    "doc_cat_rules": "Pravidla",
+    "doc_cat_ranking_and_mers": "Žebříček & MERS",
+    "doc_cat_decisions_and_rulings": "Rozhodnutí & Nařízení",
+    "doc_cat_general_assembly": "Valná hromada",
+    "role_president": "Prezident",
+    "role_vice_president": "Viceprezident",
+    "role_presidium_member": "Člen prezídia",
+    "doc_cat_organization_and_ga": "Organizace & Valná hromada",
+    "doc_statutes": "Stanovy EMA",
+    "doc_requirements": "Požadavky & pokyny EMA",
+    "doc_ga2023": "Valná hromada 2023",
+    "doc_ga_all": "Všechny valné hromady",
+    "doc_country_transfer": "Přestup země - Rozhodnutí EMA",
+    "doc_covid_ruling": "Zvláštní pravidla COVID-19",
+    "doc_covid_end": "Konec zvláštních pravidel COVID-19",
+    "doc_ukraine": "Situace na Ukrajině"
   }
 }

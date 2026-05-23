@@ -33,7 +33,8 @@ Thumbs.db
 *.log
 
 # Todo
-Todo.md 
+Todo.md
+EMA_SITEMAP.md
 
 # Testing
 app/static/test_flags.html
