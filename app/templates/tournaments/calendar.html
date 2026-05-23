@@ -7,7 +7,12 @@
     <div class="t-filter-group">
       <a href="/tournaments/" class="filter-btn">{{ trad('calendar.all_tournaments') }}</a>
     </div>
-    <span class="dim" style="font-size:0.82rem">{{ trad('calendar.upcoming', n=nb_total) }}</span>
+    <div class="t-filter-group" id="cal-rules-btns">
+      <button class="filter-btn active" onclick="calFilterRules('all', this)">{{ trad('common.all') }}</button>
+      <button class="filter-btn" onclick="calFilterRules('MCR', this)"><span class="badge badge-mcr">MCR</span></button>
+      <button class="filter-btn" onclick="calFilterRules('RCR', this)"><span class="badge badge-rcr">RCR</span></button>
+    </div>
+    <span class="dim" style="font-size:0.82rem" id="cal-count">{{ trad('calendar.upcoming', n=nb_total) }}</span>
   </div>
 </div>
 
@@ -15,4 +20,31 @@
 {% include 'partials/calendar_list.html' %}
 {% endwith %}
 
+<script>
+function calFilterRules(rules, btn) {
+  document.querySelectorAll('#cal-rules-btns .filter-btn').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+
+  var total = 0;
+  document.querySelectorAll('.tournois-table tbody tr').forEach(function(row) {
+    if (row.querySelector('.empty')) return;
+    var badge = row.querySelector('.badge-mcr, .badge-rcr');
+    var rowRules = badge ? (badge.classList.contains('badge-mcr') ? 'MCR' : 'RCR') : '';
+    var show = rules === 'all' || rowRules === rules;
+    row.style.display = show ? '' : 'none';
+    if (show) total++;
+  });
+
+  // Masquer les sections de mois vides
+  document.querySelectorAll('.tournois-table').forEach(function(table) {
+    var section = table.closest('div[style*="margin-bottom"]');
+    if (!section) return;
+    var visible = Array.from(table.querySelectorAll('tbody tr:not([style*="display: none"])')).filter(function(r) { return !r.querySelector('.empty'); });
+    section.style.display = visible.length === 0 ? 'none' : '';
+  });
+
+  var countEl = document.getElementById('cal-count');
+  if (countEl) countEl.textContent = total + ' {{ trad("calendar.upcoming_short") }}';
+}
+</script>
 {% endblock %}

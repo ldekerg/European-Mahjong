@@ -17,7 +17,8 @@
     "mahjong_rules": "Mahjong & Säännöt",
     "referees": "Tuomarit",
     "quotas": "Kiintiöt",
-    "compare": "Compare"
+    "compare": "Compare",
+    "help": "How it works"
   },
   "common": {
     "dark_mode": "Tumma tila",
@@ -155,7 +156,8 @@
     "registration_open": "Registration open",
     "registration_open_abbr": "Reg. open",
     "soon": "pian",
-    "opened": "auki"
+    "opened": "auki",
+    "upcoming_short": "turnausta"
   },
   "country": {
     "registered_players": "Rekisteröidyt pelaajat",
@@ -427,5 +429,105 @@
     "frequent_opponents_all": "Most common shared opponent",
     "nb_common_tournaments": "Tournaments in common",
     "add": "Add"
+  },
+  "help": {
+    "title": "How it works",
+    "subtitle": "A guide to every page and feature of EMA Ranking.",
+    "open_page": "Open page",
+    "about": {
+      "desc": "Learn about the European Mahjong Association: its history, structure, and official documents.",
+      "li1": "Presidium and member federations",
+      "li2": "Official General Assembly documents (2005–2023)",
+      "li3": "Regulations and press releases"
+    },
+    "rules": {
+      "desc": "Overview of the two rule sets used in EMA competitions.",
+      "li1": "MCR (Mahjong Competition Rules)",
+      "li2": "RCR (Riichi Competition Rules)"
+    },
+    "ranking": {
+      "desc": "The live EMA ranking for MCR and RCR, updated weekly.",
+      "li1": "Browse the ranking history week by week",
+      "li2": "Switch between MCR and RCR with the tab buttons",
+      "li3": "Search for a player by name",
+      "li4": "Click a player row to see their full profile"
+    },
+    "compare": {
+      "desc": "Compare up to 5 players side by side on a single chart.",
+      "li1": "Search and add players using the autocomplete bar",
+      "li2": "Toggle between score and ranking on the Y axis",
+      "li3": "Zoom into 1 year, 3 years, or the full history",
+      "li4": "See head-to-head results in common tournaments and frequent shared opponents"
+    },
+    "ranking_system": {
+      "desc": "Detailed explanation of how EMA ranking points are calculated.",
+      "li1": "Point formulas for each tournament type and coefficient",
+      "li2": "Decay and eligibility rules"
+    },
+    "calendar": {
+      "desc": "Upcoming and past EMA-approved tournaments displayed on a calendar.",
+      "li1": "Tournaments are grouped by month",
+      "li2": "Click a tournament name to visit the organiser's website",
+      "li3": "Filter by rule set (MCR / RCR) using the buttons at the top"
+    },
+    "tournaments": {
+      "desc": "Full list of all EMA-registered tournaments with results.",
+      "li1": "Sort by date, country, or number of players",
+      "li2": "Click a tournament to see the full results table",
+      "li3": "Sort by date, country, or number of players"
+    },
+    "players": {
+      "desc": "Browse all registered EMA players.",
+      "li1": "Search by name or filter by country",
+      "li2": "Sort by number of tournaments or name",
+      "li3": "Click a player to open their detail page"
+    },
+    "player_detail": {
+      "title": "Player profile",
+      "desc": "Complete profile for a single player.",
+      "li1": "Score and ranking evolution chart (MCR / RCR)",
+      "li2": "Tournament history with position and points earned",
+      "li3": "Most frequent opponents",
+      "li4": "Quick link to compare with another player"
+    },
+    "referees": {
+      "desc": "List of EMA-certified referees."
+    },
+    "countries": {
+      "desc": "Statistics and ranking by country.",
+      "li1": "Number of players and tournaments per country",
+      "li2": "Click a country to see its players and results",
+      "li3": "Country ranking based on the top 3 players per country"
+    },
+    "quotas": {
+      "desc": "World Mahjong Championship and Open European qualification quotas.",
+      "li1": "MCR and RCR quotas per country, based on the current ranking",
+      "li2": "Updated automatically after each ranking week"
+    },
+    "hof": {
+      "desc": "Records and historical achievements across all EMA competitions.",
+      "li1": "Longest time at #1, highest score ever, most tournaments played",
+      "li2": "Best results at WMC and OEMC",
+      "li3": "Individual medal table (WMC, OEMC)"
+    },
+    "general": {
+      "title": "General",
+      "navbar": {
+        "title": "Navigation bar",
+        "desc": "Three utility buttons are always visible in the top-right corner of the navbar:",
+        "btn_rules": "sets your default rule set (MCR or RCR). Pages with a MCR/RCR tab will automatically show your preference first.",
+        "btn_theme": "toggles between light and dark mode.",
+        "btn_lang": "opens the language selector to change the interface language."
+      }
+    },
+    "country_detail": {
+      "title": "Country page",
+      "desc": "Detailed view for a single country.",
+      "li1": "Ranked list of the country's players for MCR and RCR",
+      "li2": "Tournament history hosted by that country",
+      "li3": "Map of cities where tournaments have been held",
+      "circuit_note": "National federations can also have their own circuit page — for example, see the",
+      "circuit_example": "French circuit"
+    }
   }
 }

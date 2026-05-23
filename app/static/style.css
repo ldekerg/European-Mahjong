@@ -1444,3 +1444,122 @@ caption.t-count {
   }
 
 }
+/* ===== Help page ===== */
+.help-page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1rem 4rem;
+}
+
+.help-hero {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.help-hero h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.help-subtitle {
+  color: var(--text2);
+  font-size: 1.05rem;
+}
+
+.help-group {
+  margin-bottom: 3rem;
+}
+
+.help-group-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--accent);
+  border-bottom: 2px solid var(--border);
+  padding-bottom: 0.4rem;
+  margin-bottom: 1.25rem;
+}
+
+.help-card {
+  display: flex;
+  gap: 1.5rem;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.help-card-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.help-card-text h3 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+}
+
+.help-card-text p {
+  color: var(--text2);
+  font-size: 0.9rem;
+  margin-bottom: 0.6rem;
+  line-height: 1.5;
+}
+
+.help-card-text ul {
+  padding-left: 1.2rem;
+  color: var(--text2);
+  font-size: 0.875rem;
+  line-height: 1.7;
+  margin-bottom: 0.75rem;
+}
+
+.help-link {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.help-link:hover { text-decoration: underline; }
+
+.help-note {
+  color: var(--text2);
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+  line-height: 1.5;
+}
+
+.help-card-img {
+  width: 260px;
+  flex-shrink: 0;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  min-height: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text3);
+  font-size: 0.8rem;
+}
+
+.help-card-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 6px;
+  display: block;
+}
+
+.help-card-img:not(:has(img))::after {
+  content: attr(data-page);
+  opacity: 0.4;
+}
+
+@media (max-width: 640px) {
+  .help-card { flex-direction: column; }
+  .help-card-img { width: 100%; min-height: 100px; }
+}

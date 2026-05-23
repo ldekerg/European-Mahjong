@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="help-page">
+
+  <div class="help-hero">
+    <h1>{{ trad('help.title') }}</h1>
+    <p class="help-subtitle">{{ trad('help.subtitle') }}</p>
+  </div>
+
+  <!-- ── General ──────────────────────────────────────────────────── -->
+  <section class="help-group" id="general">
+    <h2 class="help-group-title">{{ trad('help.general.title') }}</h2>
+
+    <div class="help-card">
+      <div class="help-card-text">
+        <h3>{{ trad('help.general.navbar.title') }}</h3>
+        <p>{{ trad('help.general.navbar.desc') }}</p>
+        <ul>
+          <li><strong>MCR / RCR</strong> — {{ trad('help.general.navbar.btn_rules') }}</li>
+          <li><strong>🌙 / ☀️</strong> — {{ trad('help.general.navbar.btn_theme') }}</li>
+          <li><strong>🇫🇷 …</strong> — {{ trad('help.general.navbar.btn_lang') }}</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── EMA ──────────────────────────────────────────────────────── -->
+  <section class="help-group" id="ema">
+    <h2 class="help-group-title">{{ trad('nav.group_ema') }}</h2>
+
+    <div class="help-card" id="about">
+      <div class="help-card-text">
+        <h3>{{ trad('nav.about') }}</h3>
+        <p>{{ trad('help.about.desc') }}</p>
+        <ul>
+          <li>{{ trad('help.about.li1') }}</li>
+          <li>{{ trad('help.about.li2') }}</li>
+          <li>{{ trad('help.about.li3') }}</li>
+        </ul>
+        <a href="/about" class="help-link">{{ trad('help.open_page') }} →</a>
+      </div>
+    </div>
+
+    <div class="help-card" id="rules">
+      <div class="help-card-text">
+        <h3>{{ trad('nav.mahjong_rules') }}</h3>
+        <p>{{ trad('help.rules.desc') }}</p>
+        <ul>
+          <li>{{ trad('help.rules.li1') }}</li>
+          <li>{{ trad('help.rules.li2') }}</li>
+        </ul>
+        <a href="/rules" class="help-link">{{ trad('help.open_page') }} →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Ranking ──────────────────────────────────────────────────── -->
+  <section class="help-group" id="ranking">
+    <h2 class="help-group-title">{{ trad('nav.group_ranking') }}</h2>
+
+    <div class="help-card" id="ranking-page">
+      <div class="help-card-text">
+        <h3>{{ trad('nav.ranking') }}</h3>
+        <p>{{ trad('help.ranking.desc') }}</p>
+        <ul>
+          <li>{{ trad('help.ranking.li1') }}</li>
+          <li>{{ trad('help.ranking.li2') }}</li>
+          <li>{{ trad('help.ranking.li3') }}</li>
+          <li>{{ trad('help.ranking.li4') }}</li>
+        </ul>
+        <a href="/ranking" class="help-link">{{ trad('help.open_page') }} →</a>
+      </div>
+    </div>
+
+    <div class="help-card" id="compare">
+      <div class="help-card-text">
+        <h3>{{ trad('nav.compare') }}</h3>
+        <p>{{ trad('help.compare.desc') }}</p>
+        <ul>
+          <li>{{ trad('help.compare.li1') }}</li>
+          <li>{{ trad('help.compare.li2') }}</li>
+          <li>{{ trad('help.compare.li3') }}</li>
+          <li>{{ trad('help.compare.li4') }}</li>
+        </ul>
+        <a href="/compare" class="help-link">{{ trad('help.open_page') }} →</a>
+      </div>
+    </div>
+
+    <div class="help-card" id="ranking-system">
+      <div class="help-card-text">
+        <h3>{{ trad('nav.ranking_system') }}</h3>
+        <p>{{ trad('help.ranking_system.desc') }}</p>
+        <ul>
+          <li>{{ trad('help.ranking_system.li1') }}</li>
+          <li>{{ trad('help.ranking_system.li2') }}</li>
+        </ul>
+        <a href="/ranking-system" class="help-link">{{ trad('help.open_page') }} →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Tournaments ──────────────────────────────────────────────── -->
+  <section class="help-group" id="tournaments">
+    <h2 class="help-group-title">{{ trad('nav.group_tournaments') }}</h2>
+
+    <div class="help-card" id="calendar">
+      <div class="help-card-text">
+        <h3>{{ trad('common.calendar') }}</h3>
+        <p>{{ trad('help.calendar.desc') }}</p>
+        <ul>
+          <li>{{ trad('help.calendar.li1') }}</li>
+          <li>{{ trad('help.calendar.li2') }}</li>
+          <li>{{ trad('help.calendar.li3') }}</li>
+        </ul>
+        <a href="/tournaments/calendar" class="help-link">{{ trad('help.open_page') }} →</a>
+      </div>
+    </div>
+
+    <div class="help-card" id="tournaments-list">
+      <div class="help-card-text">
+        <h3>{{ trad('nav.tournaments') }}</h3>
+        <p>{{ trad('help.tournaments.desc') }}</p>
+        <ul>
+          <li>{{ trad('help.tournaments.li1') }}</li>
+          <li>{{ trad('help.tournaments.li2') }}</li>
+          <li>{{ trad('help.tournaments.li3') }}</li>
+        </ul>
+        <a href="/tournaments/" class="help-link">{{ trad('help.open_page') }} →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Players ──────────────────────────────────────────────────── -->
+  <section class="help-group" id="players">
+    <h2 class="help-group-title">{{ trad('nav.group_players') }}</h2>
+
+    <div class="help-card" id="players-list">
+      <div class="help-card-text">
+        <h3>{{ trad('nav.players') }}</h3>
+        <p>{{ trad('help.players.desc') }}</p>
+        <ul>
+          <li>{{ trad('help.players.li1') }}</li>
+          <li>{{ trad('help.players.li2') }}</li>
+          <li>{{ trad('help.players.li3') }}</li>
+        </ul>
+        <a href="/players/" class="help-link">{{ trad('help.open_page') }} →</a>
+      </div>
+    </div>
+
+    <div class="help-card" id="player-detail">
+      <div class="help-card-text">
+        <h3>{{ trad('help.player_detail.title') }}</h3>
+        <p>{{ trad('help.player_detail.desc') }}</p>
+        <ul>
+          <li>{{ trad('help.player_detail.li1') }}</li>
+          <li>{{ trad('help.player_detail.li2') }}</li>
+          <li>{{ trad('help.player_detail.li3') }}</li>
+          <li>{{ trad('help.player_detail.li4') }}</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="help-card" id="referees">
+      <div class="help-card-text">
+        <h3>{{ trad('nav.referees') }}</h3>
+        <p>{{ trad('help.referees.desc') }}</p>
+        <a href="/referees" class="help-link">{{ trad('help.open_page') }} →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Countries ────────────────────────────────────────────────── -->
+  <section class="help-group" id="countries">
+    <h2 class="help-group-title">{{ trad('nav.group_countries') }}</h2>
+
+    <div class="help-card" id="countries-list">
+      <div class="help-card-text">
+        <h3>{{ trad('nav.countries') }}</h3>
+        <p>{{ trad('help.countries.desc') }}</p>
+        <ul>
+          <li>{{ trad('help.countries.li1') }}</li>
+          <li>{{ trad('help.countries.li2') }}</li>
+          <li>{{ trad('help.countries.li3') }}</li>
+        </ul>
+        <a href="/countries/" class="help-link">{{ trad('help.open_page') }} →</a>
+      </div>
+    </div>
+
+    <div class="help-card" id="country-detail">
+      <div class="help-card-text">
+        <h3>{{ trad('help.country_detail.title') }}</h3>
+        <p>{{ trad('help.country_detail.desc') }}</p>
+        <ul>
+          <li>{{ trad('help.country_detail.li1') }}</li>
+          <li>{{ trad('help.country_detail.li2') }}</li>
+          <li>{{ trad('help.country_detail.li3') }}</li>
+        </ul>
+        <p class="help-note">{{ trad('help.country_detail.circuit_note') }} <a href="/countries/FR?tab=circuits" class="help-link">{{ trad('help.country_detail.circuit_example') }}</a>.</p>
+      </div>
+    </div>
+
+    <div class="help-card" id="quotas">
+      <div class="help-card-text">
+        <h3>{{ trad('nav.quotas') }}</h3>
+        <p>{{ trad('help.quotas.desc') }}</p>
+        <ul>
+          <li>{{ trad('help.quotas.li1') }}</li>
+          <li>{{ trad('help.quotas.li2') }}</li>
+        </ul>
+        <a href="/quotas" class="help-link">{{ trad('help.open_page') }} →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Hall of Fame ─────────────────────────────────────────────── -->
+  <section class="help-group" id="hof">
+    <h2 class="help-group-title">{{ trad('nav.hallfame') }}</h2>
+
+    <div class="help-card">
+      <div class="help-card-text">
+        <h3>{{ trad('nav.hallfame') }}</h3>
+        <p>{{ trad('help.hof.desc') }}</p>
+        <ul>
+          <li>{{ trad('help.hof.li1') }}</li>
+          <li>{{ trad('help.hof.li2') }}</li>
+          <li>{{ trad('help.hof.li3') }}</li>
+        </ul>
+        <a href="/hof/" class="help-link">{{ trad('help.open_page') }} →</a>
+      </div>
+    </div>
+  </section>
+
+</div>
+{% endblock %}

@@ -17,7 +17,8 @@
     "mahjong_rules": "Mahjong & Règles",
     "referees": "Arbitres",
     "quotas": "Quotas",
-    "compare": "Comparer"
+    "compare": "Comparer",
+    "help": "Comment ça marche ?"
   },
   "common": {
     "dark_mode": "Mode sombre",
@@ -155,7 +156,8 @@
     "registration_open": "Ouverture des inscriptions",
     "registration_open_abbr": "Inscriptions",
     "soon": "bientôt",
-    "opened": "ouvert"
+    "opened": "ouvert",
+    "upcoming_short": "tournois"
   },
   "country": {
     "registered_players": "Joueurs enregistrés",
@@ -427,5 +429,105 @@
     "frequent_opponents_all": "Adversaire commun le plus fréquent",
     "nb_common_tournaments": "Tournois en commun",
     "add": "Ajouter"
+  },
+  "help": {
+    "title": "Comment ça marche",
+    "subtitle": "Guide de toutes les pages et fonctionnalités d'EMA Ranking.",
+    "open_page": "Ouvrir la page",
+    "about": {
+      "desc": "Découvrez l'Association Européenne de Mahjong : son histoire, sa structure et ses documents officiels.",
+      "li1": "Présidium et fédérations membres",
+      "li2": "Documents des Assemblées Générales (2005–2023)",
+      "li3": "Règlements et communiqués de presse"
+    },
+    "rules": {
+      "desc": "Présentation des deux systèmes de règles utilisés dans les compétitions EMA.",
+      "li1": "MCR (Mahjong Competition Rules)",
+      "li2": "RCR (Riichi Competition Rules)"
+    },
+    "ranking": {
+      "desc": "Le classement EMA en direct pour MCR et RCR, mis à jour chaque semaine.",
+      "li1": "Consulter l'historique du classement semaine par semaine",
+      "li2": "Basculer entre MCR et RCR avec les onglets",
+      "li3": "Rechercher un joueur par nom",
+      "li4": "Cliquer sur une ligne pour voir le profil complet"
+    },
+    "compare": {
+      "desc": "Comparez jusqu'à 5 joueurs côte à côte sur un même graphique.",
+      "li1": "Recherchez et ajoutez des joueurs via la barre de recherche",
+      "li2": "Basculez entre score et classement sur l'axe Y",
+      "li3": "Zoomez sur 1 an, 3 ans ou l'historique complet",
+      "li4": "Consultez les confrontations directes et les adversaires communs"
+    },
+    "ranking_system": {
+      "desc": "Explication détaillée du calcul des points de classement EMA.",
+      "li1": "Formules de points selon le type et le coefficient du tournoi",
+      "li2": "Règles de décote et d'éligibilité"
+    },
+    "calendar": {
+      "desc": "Tournois EMA à venir et passés affichés sur un calendrier.",
+      "li1": "Les tournois sont regroupés par mois",
+      "li2": "Cliquer sur un tournoi renvoie vers le site de l'organisateur",
+      "li3": "Filtrer par règle (MCR / RCR) avec les boutons en haut"
+    },
+    "tournaments": {
+      "desc": "Liste complète de tous les tournois EMA enregistrés avec leurs résultats.",
+      "li1": "Trier par date, pays ou nombre de joueurs",
+      "li2": "Cliquer sur un tournoi pour voir le tableau complet des résultats",
+      "li3": "Trier par date, pays ou nombre de joueurs"
+    },
+    "players": {
+      "desc": "Parcourir tous les joueurs EMA enregistrés.",
+      "li1": "Rechercher par nom ou filtrer par pays",
+      "li2": "Trier par nombre de tournois ou par nom",
+      "li3": "Cliquer sur un joueur pour ouvrir son profil"
+    },
+    "player_detail": {
+      "title": "Profil joueur",
+      "desc": "Profil complet d'un joueur.",
+      "li1": "Graphique d'évolution du score et du classement (MCR / RCR)",
+      "li2": "Historique des tournois avec position et points obtenus",
+      "li3": "Adversaires les plus fréquents",
+      "li4": "Lien rapide pour comparer avec un autre joueur"
+    },
+    "referees": {
+      "desc": "Liste des arbitres certifiés EMA."
+    },
+    "countries": {
+      "desc": "Statistiques et classement par pays.",
+      "li1": "Nombre de joueurs et de tournois par pays",
+      "li2": "Cliquer sur un pays pour voir ses joueurs et résultats",
+      "li3": "Classement des pays en fonction des 3 meilleurs joueurs"
+    },
+    "quotas": {
+      "desc": "Quotas de qualification pour le Championnat du Monde et l'Open Européen.",
+      "li1": "Quotas MCR et RCR par pays, basés sur le classement actuel",
+      "li2": "Mis à jour automatiquement après chaque semaine de classement"
+    },
+    "hof": {
+      "desc": "Records et achievements historiques de toutes les compétitions EMA.",
+      "li1": "Plus longue période à la 1ère place, meilleur score, plus de tournois joués",
+      "li2": "Meilleurs résultats au WMC et à l'OEMC",
+      "li3": "Tableau des médailles individuelles (WMC, OEMC)"
+    },
+    "general": {
+      "title": "Général",
+      "navbar": {
+        "title": "Barre de navigation",
+        "desc": "Trois boutons utilitaires sont toujours visibles en haut à droite de la barre de navigation :",
+        "btn_rules": "définit votre règle par défaut (MCR ou RCR). Les pages avec un onglet MCR/RCR afficheront automatiquement votre préférence en premier.",
+        "btn_theme": "bascule entre le mode clair et le mode sombre.",
+        "btn_lang": "ouvre le sélecteur de langue pour changer la langue de l'interface."
+      }
+    },
+    "country_detail": {
+      "title": "Page pays",
+      "desc": "Vue détaillée d'un pays.",
+      "li1": "Classement des joueurs du pays en MCR et RCR",
+      "li2": "Historique des tournois organisés dans ce pays",
+      "li3": "Carte des villes où des tournois ont eu lieu",
+      "circuit_note": "Les fédérations nationales peuvent aussi avoir leur propre page de circuit — par exemple, voir le",
+      "circuit_example": "circuit français"
+    }
   }
 }
