@@ -505,6 +505,9 @@ async def tournament_obs_post(tournament_id: int, request: Request, db: Session 
         return JSONResponse({"error": "Forbidden"}, status_code=403)
 
     form = await request.form()
+    old_obs = t.obs_observer
+    old_path = t.obs_report_path
+
     obs = form.get("obs_observer", "").strip()
     t.obs_observer = obs or None
 
@@ -513,13 +516,24 @@ async def tournament_obs_post(tournament_id: int, request: Request, db: Session 
         import os as _os
         reports_dir = _os.path.join(_os.path.dirname(__file__), "../../app/static/obs_reports")
         _os.makedirs(reports_dir, exist_ok=True)
-        # Use TR{ema_id}_ prefix if available, else tournament id
         prefix = f"TR{t.ema_id}" if t.ema_id else f"T{t.id}"
         safe_name = f"{prefix}_{pdf_file.filename}"
         dest = _os.path.join(reports_dir, safe_name)
         with open(dest, "wb") as f:
             f.write(await pdf_file.read())
         t.obs_report_path = f"/static/obs_reports/{safe_name}"
+
+    changes = []
+    if old_obs != t.obs_observer:
+        changes.append(f"observer: {old_obs!r} → {t.obs_observer!r}")
+    if old_path != t.obs_report_path:
+        changes.append(f"report: {t.obs_report_path}")
+    if changes:
+        db.add(AuditLog(
+            admin_user=request.session.get("admin_username", "?"),
+            action="UPDATE", table_name="tournaments", row_id=str(t.id),
+            description=f"Observer/report updated on «{t.name}»: {'; '.join(changes)}",
+        ))
 
     db.commit()
     return JSONResponse({"ok": True, "obs_observer": t.obs_observer, "obs_report_path": t.obs_report_path})
@@ -553,6 +567,11 @@ async def tournament_referee_add(tournament_id: int, request: Request, db: Sessi
         player_id=str(player_id) if player_id else None,
     )
     db.add(ra)
+    db.add(AuditLog(
+        admin_user=request.session.get("admin_username", "?"),
+        action="CREATE", table_name="tournament_referees", row_id=str(tournament_id),
+        description=f"Added referee «{name}» to «{t.name}»",
+    ))
     db.commit()
     db.refresh(ra)
     return JSONResponse({"id": ra.id, "name": ra.name, "referee_id": ra.referee_id, "player_id": ra.player_id})
@@ -573,6 +592,11 @@ async def tournament_referee_remove(tournament_id: int, ra_id: int, request: Req
 
     ra = db.query(TournamentReferee).filter_by(id=ra_id, tournament_id=tournament_id).first()
     if ra:
+        db.add(AuditLog(
+            admin_user=request.session.get("admin_username", "?"),
+            action="DELETE", table_name="tournament_referees", row_id=str(tournament_id),
+            description=f"Removed referee «{ra.name}» from «{t.name}»",
+        ))
         db.delete(ra)
         db.commit()
     return JSONResponse({"ok": True})
@@ -1432,12 +1456,58 @@ async def audit_undo(entry_id: int, request: Request, db: Session = Depends(get_
         _set_flash(request, "Audit entry not found.", "error")
         return RedirectResponse("/manage/audit/", status_code=302)
 
-    if entry.action == "DELETE":
-        _set_flash(request, "DELETE cannot be undone automatically — restore a snapshot instead.", "error")
+    if entry.action not in ("UPDATE", "CREATE", "DELETE"):
+        _set_flash(request, f"Action «{entry.action}» cannot be undone automatically.", "error")
         return RedirectResponse("/manage/audit/", status_code=302)
 
-    if entry.action not in ("UPDATE", "CREATE"):
-        _set_flash(request, f"Action «{entry.action}» cannot be undone automatically.", "error")
+    # ── tournament_referees: special handling ────────────────────────────────
+    if entry.table_name == "tournament_referees":
+        try:
+            tournament_id = int(entry.row_id)
+            if entry.action == "CREATE":
+                # Undo CREATE = find and delete the row matching description
+                # row_id is tournament_id; find the last matching TournamentReferee
+                # We stored the name in the description — parse it out
+                import re as _re
+                m = _re.search(r"Added referee «(.+?)»", entry.description or "")
+                name = m.group(1) if m else None
+                if name:
+                    ra = db.query(TournamentReferee).filter_by(
+                        tournament_id=tournament_id, name=name
+                    ).order_by(TournamentReferee.id.desc()).first()
+                    if ra:
+                        db.delete(ra)
+                        _audit(db, request, "UNDO", "tournament_referees", str(tournament_id),
+                               description=f"Undid #{entry_id}: removed referee «{name}»")
+                        db.commit()
+                        _set_flash(request, f"Undone: removed referee «{name}».")
+                    else:
+                        _set_flash(request, "Referee row not found (already removed?).", "error")
+                else:
+                    _set_flash(request, "Cannot parse referee name from log.", "error")
+
+            elif entry.action == "DELETE":
+                # Undo DELETE = re-add the TournamentReferee row
+                import re as _re
+                m = _re.search(r"Removed referee «(.+?)»", entry.description or "")
+                name = m.group(1) if m else None
+                if name:
+                    db.add(TournamentReferee(tournament_id=tournament_id, name=name))
+                    _audit(db, request, "UNDO", "tournament_referees", str(tournament_id),
+                           description=f"Undid #{entry_id}: restored referee «{name}»")
+                    db.commit()
+                    _set_flash(request, f"Undone: restored referee «{name}» (as free text, re-link manually if needed).")
+                else:
+                    _set_flash(request, "Cannot parse referee name from log.", "error")
+
+            else:
+                _set_flash(request, "UPDATE on tournament_referees not supported.", "error")
+        except Exception as e:
+            _set_flash(request, f"Undo failed: {e}", "error")
+        return RedirectResponse("/manage/audit/", status_code=302)
+
+    if entry.action == "DELETE":
+        _set_flash(request, "DELETE cannot be undone automatically — restore a snapshot instead.", "error")
         return RedirectResponse("/manage/audit/", status_code=302)
 
     _TABLE_MODEL = {

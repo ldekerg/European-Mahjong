@@ -133,41 +133,32 @@
   </div>
   {% endif %}
 
-  <div class="form-actions">
-    <button type="submit" class="btn btn-primary">💾 Save</button>
-    <a href="/manage/tournaments/" class="btn btn-secondary">Cancel</a>
-    {% if tournament and tournament.ema_id %}
-    <a href="/tournaments/{{ tournament.rules }}_{{ tournament.ema_id }}" target="_blank" class="btn btn-secondary" style="margin-left:auto">👁 View on site</a>
-    {% endif %}
+  {% if tournament %}
+  <!-- ── Observer & Report ────────────────────────────────────────────── -->
+  <div class="manage-section">
+    <h2>EMA Observer &amp; Report</h2>
+    <div style="display:flex;flex-wrap:wrap;gap:0.75rem;align-items:flex-end">
+      <div class="form-group" style="min-width:220px;flex:1">
+        <label>Observer name</label>
+        <input type="text" name="obs_observer" id="obs-observer-input"
+               value="{{ tournament.obs_observer or '' }}" class="manage-input" placeholder="e.g. Joke de Jong">
+      </div>
+      <div class="form-group" style="min-width:220px;flex:2">
+        <label>Report PDF
+          {% if tournament.obs_report_path %}
+            <a href="{{ tournament.obs_report_path }}" target="_blank" class="dim" style="font-size:0.8rem">Current: {{ tournament.obs_report_path.split('/')[-1] }} ↗</a>
+          {% endif %}
+        </label>
+        <input type="file" name="obs_report_file" id="obs-report-file" accept=".pdf" class="manage-input">
+      </div>
+      <button type="button" class="btn btn-secondary" onclick="saveObs()">💾 Save observer</button>
+    </div>
+    <p id="obs-feedback" class="form-hint" style="margin-top:0.4rem"></p>
   </div>
-</form>
 
-{% if tournament %}
-<!-- ── Observer & Report ──────────────────────────────────────────────── -->
-<div class="manage-section" style="margin-top:1.5rem">
-  <h2>EMA Observer &amp; Report</h2>
-  <form id="obs-form" style="display:flex;flex-wrap:wrap;gap:0.75rem;align-items:flex-end">
-    <div class="form-group" style="min-width:220px;flex:1">
-      <label>Observer name</label>
-      <input type="text" name="obs_observer" id="obs-observer-input"
-             value="{{ tournament.obs_observer or '' }}" class="manage-input" placeholder="e.g. Joke de Jong">
-    </div>
-    <div class="form-group" style="min-width:220px;flex:2">
-      <label>Report PDF
-        {% if tournament.obs_report_path %}
-          <a href="{{ tournament.obs_report_path }}" target="_blank" class="dim" style="font-size:0.8rem">Current: {{ tournament.obs_report_path.split('/')[-1] }} ↗</a>
-        {% endif %}
-      </label>
-      <input type="file" name="obs_report_file" id="obs-report-file" accept=".pdf" class="manage-input">
-    </div>
-    <button type="button" class="btn btn-primary" onclick="saveObs()">💾 Save</button>
-  </form>
-  <p id="obs-feedback" class="form-hint" style="margin-top:0.4rem"></p>
-</div>
-
-<!-- ── Referees ──────────────────────────────────────────────────────── -->
-<div class="manage-section" style="margin-top:1.5rem">
-  <h2>Referees</h2>
+  <!-- ── Referees ──────────────────────────────────────────────────────── -->
+  <div class="manage-section">
+    <h2>Referees</h2>
   <ul id="referee-list" style="list-style:none;padding:0;margin:0 0 1rem">
     {% for ra in referee_assignments %}
     <li id="ra-{{ ra.id }}" style="display:flex;align-items:center;gap:0.5rem;padding:0.3rem 0;border-bottom:1px solid var(--border)">
@@ -193,8 +184,19 @@
     <button type="button" class="btn btn-primary" onclick="addRefereeSelected()">+ Add</button>
   </div>
   <p id="referee-feedback" class="form-hint" style="margin-top:0.4rem"></p>
-</div>
+  </div><!-- /referees manage-section -->
+  {% endif %}
 
+  <div class="form-actions">
+    <button type="submit" class="btn btn-primary">💾 Save</button>
+    <a href="/manage/tournaments/" class="btn btn-secondary">Cancel</a>
+    {% if tournament and tournament.ema_id %}
+    <a href="/tournaments/{{ tournament.rules }}_{{ tournament.ema_id }}" target="_blank" class="btn btn-secondary" style="margin-left:auto">👁 View on site</a>
+    {% endif %}
+  </div>
+</form>
+
+{% if tournament %}
 <script>
 var _TID = {{ tournament.id }};
 var _selectedReferee = null;
@@ -314,7 +316,7 @@ document.addEventListener('click', function(e) {
   }
 });
 </script>
-{% endif %}
+{% endif %}<!-- /if tournament script -->
 
 <!-- Modal nouvelle ville -->
 <div id="city-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center">
