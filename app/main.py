@@ -342,6 +342,29 @@ EXEMPT_PREFIXES = ("/static", "/manage", "/admin", "/verify")
 
 _TURNSTILE_SECRET = os.getenv("TURNSTILE_SECRET", "")
 _TURNSTILE_VERIFY_URL = "https://challenges.cloudflare.com/turnstile/v0/siteverify"
+_COOKIE_SECRET = os.getenv("SECRET_KEY", "ema-admin-secret").encode()
+_COOKIE_MAX_AGE = 86400  # 24h
+_IS_PROD = bool(_TURNSTILE_SECRET)  # prod = Turnstile configured
+
+import hmac as _hmac, hashlib as _hashlib
+
+def _sign_cookie(ip: str, ts: int) -> str:
+    msg = f"{ts}:{ip}".encode()
+    sig = _hmac.new(_COOKIE_SECRET, msg, _hashlib.sha256).hexdigest()[:16]
+    return f"{ts}:{ip}:{sig}"
+
+def _verify_cookie(value: str, ip: str) -> bool:
+    try:
+        ts_str, cookie_ip, sig = value.split(":", 2)
+        ts = int(ts_str)
+    except (ValueError, AttributeError):
+        return False
+    if cookie_ip != ip:
+        return False
+    if time.time() - ts > _COOKIE_MAX_AGE:
+        return False
+    expected = _sign_cookie(ip, ts)
+    return _hmac.compare_digest(value, expected)
 
 # Simple in-memory rate limiter: 30 req/min per IP on public routes
 import time, collections, urllib.request, urllib.parse
@@ -408,8 +431,8 @@ async def captcha_and_rate_limit(request: Request, call_next):
             )
         _rl_store[ip].append(now)
 
-        # 2. Turnstile captcha — check via cookie directly (session not yet available in middleware)
-        if _TURNSTILE_SECRET and request.cookies.get("human_verified") != "true":
+        # 2. Turnstile captcha — check via signed cookie
+        if _TURNSTILE_SECRET and not _verify_cookie(request.cookies.get("human_verified", ""), ip):
             next_url = str(request.url)
             return RedirectResponse(f"/verify?next={urllib.parse.quote(next_url)}", status_code=302)
 
@@ -450,8 +473,14 @@ async def verify_post(request: Request):
 
     if verified:
         response = RedirectResponse(next_url, status_code=302)
-        # Cookie de session navigateur (expire à la fermeture du navigateur)
-        response.set_cookie("human_verified", "true", httponly=True, samesite="lax")
+        cookie_ip = get_remote_address(request)
+        cookie_val = _sign_cookie(cookie_ip, int(time.time()))
+        response.set_cookie(
+            "human_verified", cookie_val,
+            httponly=True, samesite="lax",
+            max_age=_COOKIE_MAX_AGE,
+            secure=_IS_PROD,
+        )
         return response
 
     return RedirectResponse(f"/verify?next={urllib.parse.quote(next_url)}", status_code=302)
