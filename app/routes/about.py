@@ -1,7 +1,11 @@
 import json
 from pathlib import Path
 from fastapi import APIRouter, Request
+from fastapi.params import Depends
+from sqlalchemy.orm import Session
 from app.i18n import templates
+from app.database import get_db
+from app.models import Referee
 
 router = APIRouter()
 
@@ -22,6 +26,20 @@ with open(_RULES_PATH, encoding="utf-8") as _f:
 @router.get("/rules")
 def rules(request: Request):
     return templates.TemplateResponse(request, "rules.html", {"rules": _RULES})
+
+
+@router.get("/referees")
+def referees(request: Request, db: Session = Depends(get_db)):
+    mcr = db.query(Referee).filter(Referee.rules == "MCR").order_by(
+        Referee.country, Referee.seminar_year, Referee.name
+    ).all()
+    rcr = db.query(Referee).filter(Referee.rules == "RCR").order_by(
+        Referee.country, Referee.seminar_year, Referee.name
+    ).all()
+    return templates.TemplateResponse(request, "referees.html", {
+        "mcr": mcr,
+        "rcr": rcr,
+    })
 
 
 @router.get("/about")

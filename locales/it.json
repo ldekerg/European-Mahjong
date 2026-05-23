@@ -70,7 +70,8 @@
       "Dicembre"
     ],
     "player": "Giocatore",
-    "coming_soon": "Prossimamente"
+    "coming_soon": "Prossimamente",
+    "year": "Anno"
   },
   "home": {
     "intro": "Benvenuto nella classifica europea di Mahjong, che comprende le discipline <strong>MCR</strong> e <strong>RCR</strong>. I punti vengono calcolati dai risultati dei tornei riconosciuti dalla <a href=\"http://mahjong-europe.org\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--accent)\">European Mahjong Association (EMA)</a>. Questo sito presenta le classifiche settimanali, la storia dei tornei, i palmares per giocatore e per paese, e la Hall of Fame.",
@@ -362,5 +363,11 @@
     "official": "Documenti ufficiali",
     "translations": "Traduzioni (non ufficiali)",
     "no_translations": "Nessuna traduzione disponibile al momento."
+  },
+  "referees": {
+    "page_title": "Arbitri certificati EMA",
+    "seminar": "Seminario",
+    "player_link": "Profilo giocatore",
+    "no_rcr": "Nessun arbitro RCR certificato elencato per ora."
   }
 }

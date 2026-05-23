@@ -70,7 +70,8 @@
       "Prosinec"
     ],
     "player": "Hráč",
-    "coming_soon": "Brzy k dispozici"
+    "coming_soon": "Brzy k dispozici",
+    "year": "Rok"
   },
   "home": {
     "intro": "Vítejte v evropském žebříčku Mahjong, který zahrnuje disciplíny <strong>MCR</strong> a <strong>RCR</strong>. Body se počítají z výsledků turnajů uznaných <a href=\"http://mahjong-europe.org\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--accent)\">European Mahjong Association (EMA)</a>. Tato stránka představuje týdenní žebříčky, historii turnajů, rekordy hráčů a zemí a Síň slávy.",
@@ -362,5 +363,11 @@
     "official": "Oficiální dokumenty",
     "translations": "Překlady (neoficiální)",
     "no_translations": "Zatím nejsou k dispozici žádné překlady."
+  },
+  "referees": {
+    "page_title": "Certifikovaní rozhodčí EMA",
+    "seminar": "Seminář",
+    "player_link": "Profil hráče",
+    "no_rcr": "Zatím nejsou uvedeni žádní certifikovaní rozhodčí RCR."
   }
 }

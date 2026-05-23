@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="ranking-header">
+  <h1>{{ trad('referees.page_title') }}</h1>
+</div>
+
+<div class="tabs" id="main-tabs">
+  <button class="tab-btn active" onclick="showTab('mcr', this)"><span class="badge badge-mcr">MCR</span> ({{ mcr | length }})</button>
+  <button class="tab-btn"        onclick="showTab('rcr', this)"><span class="badge badge-rcr">RCR</span> ({{ rcr | length }})</button>
+</div>
+
+{% for rules_key, referees in [('mcr', mcr), ('rcr', rcr)] %}
+<div id="tab-{{ rules_key }}" class="tab-content {% if rules_key != 'mcr' %}hidden{% endif %}">
+  {% if referees %}
+  <div class="scroll-table">
+  <table>
+    <colgroup>
+      <col class="col-flag">
+      <col class="col-nom">
+      <col class="col-ville col-opt">
+      <col class="col-date col-opt">
+    </colgroup>
+    <thead>
+      <tr>
+        <th class="col-flag center">🌍</th>
+        <th>{{ trad('common.player') }}</th>
+        <th class="col-ville col-opt">{{ trad('referees.seminar') }}</th>
+        <th class="col-date col-opt center">{{ trad('common.year') }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for ref in referees %}
+      <tr>
+        <td class="col-flag center" style="font-size:1.2rem">
+          <a href="/countries/{{ ref.country }}">{{ ref.country | flag }}</a>
+        </td>
+        <td>
+          {% if ref.player %}
+            <a href="/players/{{ ref.player_id }}">{{ ref.name }}</a>
+          {% else %}
+            {{ ref.name }}
+          {% endif %}
+        </td>
+        <td class="col-ville col-opt">
+          {% if ref.city %}
+            <a href="/countries/{{ ref.city.country }}" class="dim">{{ ref.seminar_location }}</a>
+          {% else %}
+            <span class="dim">{{ ref.seminar_location }}</span>
+          {% endif %}
+        </td>
+        <td class="col-date center dim">{{ ref.seminar_year }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+  {% else %}
+  <p class="dim" style="margin:1.5rem 0;font-size:0.9rem">{{ trad('referees.no_rcr') }}</p>
+  {% endif %}
+</div>
+{% endfor %}
+
+<script>
+function showTab(name, btn) {
+  ['mcr','rcr'].forEach(function(t) {
+    document.getElementById('tab-' + t).classList.add('hidden');
+  });
+  document.querySelectorAll('#main-tabs .tab-btn').forEach(function(b) { b.classList.remove('active'); });
+  document.getElementById('tab-' + name).classList.remove('hidden');
+  btn.classList.add('active');
+}
+</script>
+
+{% endblock %}

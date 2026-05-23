@@ -70,7 +70,8 @@
       "December"
     ],
     "player": "Spelare",
-    "coming_soon": "Kommer snart"
+    "coming_soon": "Kommer snart",
+    "year": "År"
   },
   "home": {
     "intro": "Välkommen till den europeiska Mahjong-rankningen för <strong>MCR</strong> och <strong>RCR</strong>. Poäng beräknas utifrån turneringsresultat godkända av <a href=\"http://mahjong-europe.org\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--accent)\">European Mahjong Association (EMA)</a>. Webbplatsen visar veckoranking, turneringshistorik, spelare- och landsrekord samt Hall of Fame.",
@@ -362,5 +363,11 @@
     "official": "Officiella dokument",
     "translations": "Översättningar (inofficiella)",
     "no_translations": "Inga översättningar tillgängliga ännu."
+  },
+  "referees": {
+    "page_title": "EMA-certifierade domare",
+    "seminar": "Seminarium",
+    "player_link": "Spelarprofil",
+    "no_rcr": "Inga certifierade RCR-domare listade ännu."
   }
 }

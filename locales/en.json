@@ -70,7 +70,8 @@
       "December"
     ],
     "player": "Player",
-    "coming_soon": "Coming soon"
+    "coming_soon": "Coming soon",
+    "year": "Year"
   },
   "home": {
     "intro": "Welcome to the European Mahjong rankings, covering both <strong>MCR</strong> (Mahjong Competition Rules) and <strong>RCR</strong> (Riichi Competition Rules). Points are calculated from tournament results certified by the <a href=\"http://mahjong-europe.org\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--accent)\">European Mahjong Association (EMA)</a>. This site presents weekly rankings, tournament history, player and country records, and the Hall of Fame.",
@@ -362,5 +363,11 @@
     "official": "Official documents",
     "translations": "Translations (unofficial)",
     "no_translations": "No translations available yet."
+  },
+  "referees": {
+    "page_title": "EMA Certified Referees",
+    "seminar": "Seminar",
+    "player_link": "Player profile",
+    "no_rcr": "No certified RCR referees listed yet."
   }
 }

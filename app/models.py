@@ -225,3 +225,19 @@ class RankingHistory(Base):
         Index("ix_classement_joueur", "player_id", "rules", "week"),
         Index("ix_classement_semaine", "week", "rules"),
     )
+
+
+class Referee(Base):
+    __tablename__ = "referees"
+
+    id               = Column(Integer, primary_key=True, autoincrement=True)
+    name             = Column(String, nullable=False)        # nom brut depuis EMA
+    country          = Column(String, nullable=False)        # code ISO 2 lettres
+    rules            = Column(String, nullable=False)        # MCR | RCR
+    seminar_year     = Column(Integer, nullable=True)
+    seminar_location = Column(String, nullable=True)         # texte brut
+    seminar_city_id  = Column(Integer, ForeignKey("cities.id"), nullable=True)
+    player_id        = Column(String, ForeignKey("players.id"), nullable=True)
+
+    city   = relationship("City")
+    player = relationship("Player")
