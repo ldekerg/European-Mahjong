@@ -477,7 +477,7 @@ nav a:hover {
 .nav-dropdown {
   display: none;
   position: absolute;
-  top: calc(100% + 0.6rem);
+  top: 100%;
   left: 50%;
   transform: translateX(-50%);
   background: var(--bg2);
@@ -486,7 +486,7 @@ nav a:hover {
   box-shadow: 0 4px 16px var(--shadow);
   min-width: 160px;
   z-index: 100;
-  padding: 0.3rem 0;
+  padding: 0.6rem 0 0.3rem;
 }
 .nav-dropdown a {
   display: block;
@@ -514,7 +514,7 @@ nav a:hover {
   .nav-group:hover .nav-dropdown,
   .nav-group:focus-within .nav-dropdown { display: block; }
 }
-/* Clic (tous appareils) */
+/* Dropdown ouvert via JS */
 .nav-group.open .nav-dropdown { display: block; }
 
 @media (max-width: 768px) {

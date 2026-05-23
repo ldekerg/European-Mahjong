@@ -313,22 +313,49 @@
         });
     })();
 
-    // ── Nav group dropdowns (click, toujours actif) ──────────────────────────
-    document.getElementById('nav-links').addEventListener('click', function(e) {
-        var btn = e.target.closest('.nav-group-btn');
-        if (!btn) return;
-        e.stopPropagation();
-        var group = btn.closest('.nav-group');
-        var wasOpen = group.classList.contains('open');
-        document.querySelectorAll('.nav-group.open').forEach(function(g) { g.classList.remove('open'); });
-        if (!wasOpen) group.classList.add('open');
-    });
+    // ── Nav group dropdowns ──────────────────────────────────────────────────
+    document.addEventListener('DOMContentLoaded', function() {
+        var isHoverDevice = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+        var closeTimers = new WeakMap();
 
-    // Fermer en cliquant ailleurs
-    document.addEventListener('click', function(e) {
-        if (!e.target.closest('.nav-group')) {
-            document.querySelectorAll('.nav-group.open').forEach(function(g) { g.classList.remove('open'); });
+        function openGroup(group) {
+            var t = closeTimers.get(group);
+            if (t) { clearTimeout(t); closeTimers.delete(group); }
+            document.querySelectorAll('.nav-group.open').forEach(function(g) {
+                if (g !== group) { g.classList.remove('open'); }
+            });
+            group.classList.add('open');
         }
+
+        function closeGroup(group, delay) {
+            var t = setTimeout(function() { group.classList.remove('open'); }, delay || 150);
+            closeTimers.set(group, t);
+        }
+
+        document.querySelectorAll('.nav-group').forEach(function(group) {
+            if (isHoverDevice) {
+                group.addEventListener('mouseenter', function() { openGroup(group); });
+                group.addEventListener('mouseleave', function() { closeGroup(group); });
+                // bloquer le clic sur le bouton (évite focus parasite)
+                group.querySelector('.nav-group-btn').addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                });
+            } else {
+                group.querySelector('.nav-group-btn').addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    var wasOpen = group.classList.contains('open');
+                    document.querySelectorAll('.nav-group.open').forEach(function(g) { g.classList.remove('open'); });
+                    if (!wasOpen) group.classList.add('open');
+                });
+            }
+        });
+
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.nav-group')) {
+                document.querySelectorAll('.nav-group.open').forEach(function(g) { g.classList.remove('open'); });
+            }
+        });
     });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/twemoji@14/dist/twemoji.min.js" crossorigin="anonymous"></script>
