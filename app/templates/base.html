@@ -312,18 +312,22 @@
         });
     })();
 
-    // ── Nav group dropdowns (touch/mobile click) ─────────────────────────────
+    // ── Nav group dropdowns (click, toujours actif) ──────────────────────────
     document.getElementById('nav-links').addEventListener('click', function(e) {
         var btn = e.target.closest('.nav-group-btn');
         if (!btn) return;
-        // On desktop with real hover, let CSS handle it — only intercept on touch or narrow screen
-        var isTouchOrMobile = window.innerWidth <= 768 || window.matchMedia('(hover: none)').matches;
-        if (!isTouchOrMobile) return;
         e.stopPropagation();
         var group = btn.closest('.nav-group');
         var wasOpen = group.classList.contains('open');
         document.querySelectorAll('.nav-group.open').forEach(function(g) { g.classList.remove('open'); });
         if (!wasOpen) group.classList.add('open');
+    });
+
+    // Fermer en cliquant ailleurs
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.nav-group')) {
+            document.querySelectorAll('.nav-group.open').forEach(function(g) { g.classList.remove('open'); });
+        }
     });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/twemoji@14/dist/twemoji.min.js" crossorigin="anonymous"></script>

@@ -509,10 +509,13 @@ nav a:hover {
   cursor: default;
   font-style: italic;
 }
+/* Hover desktop uniquement */
 @media (hover: hover) and (min-width: 769px) {
   .nav-group:hover .nav-dropdown,
   .nav-group:focus-within .nav-dropdown { display: block; }
 }
+/* Clic (tous appareils) */
+.nav-group.open .nav-dropdown { display: block; }
 
 @media (max-width: 768px) {
   .nav-group { display: block; }
