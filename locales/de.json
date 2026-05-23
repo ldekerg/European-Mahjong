@@ -131,7 +131,10 @@
     "points_title": "Turnierpunkte",
     "position_title": "Position",
     "results": "Ergebnisse",
-    "mahjong_score_title": "Mahjong-Punkte"
+    "mahjong_score_title": "Mahjong-Punkte",
+    "observer": "Beobachter",
+    "obs_report": "Bericht",
+    "referees": "Schiedsrichter"
   },
   "preview": {
     "title": "Aktive Turniere - {regles} · {date}",

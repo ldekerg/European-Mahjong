@@ -131,7 +131,10 @@
     "points_title": "Toernooi­punten",
     "position_title": "Positie",
     "results": "Resultaten",
-    "mahjong_score_title": "Mahjong-score"
+    "mahjong_score_title": "Mahjong-score",
+    "observer": "Waarnemer",
+    "obs_report": "Rapport",
+    "referees": "Scheidsrechters"
   },
   "preview": {
     "title": "Actieve toernooien - {regles} · {date}",

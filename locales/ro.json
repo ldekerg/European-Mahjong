@@ -131,7 +131,10 @@
     "points_title": "Puncte turneu",
     "position_title": "Poziție",
     "results": "Rezultate",
-    "mahjong_score_title": "Punctaj Mahjong"
+    "mahjong_score_title": "Punctaj Mahjong",
+    "observer": "Observator",
+    "obs_report": "Raport",
+    "referees": "Arbitri"
   },
   "preview": {
     "title": "Turnee active - {regles} · {date}",

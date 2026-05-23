@@ -131,7 +131,10 @@
     "points_title": "Turneringspoeng",
     "position_title": "Plassering",
     "results": "Resultater",
-    "mahjong_score_title": "Mahjong-poeng"
+    "mahjong_score_title": "Mahjong-poeng",
+    "observer": "Observatør",
+    "obs_report": "Rapport",
+    "referees": "Dommere"
   },
   "preview": {
     "title": "Aktive turneringer - {regles} · {date}",

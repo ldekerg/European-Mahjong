@@ -131,7 +131,10 @@
     "points_title": "Versenypontok",
     "position_title": "Helyezés",
     "results": "Eredmények",
-    "mahjong_score_title": "Mahjong-pontszám"
+    "mahjong_score_title": "Mahjong-pontszám",
+    "observer": "Megfigyelő",
+    "obs_report": "Jelentés",
+    "referees": "Bírók"
   },
   "preview": {
     "title": "Aktív versenyek - {regles} · {date}",

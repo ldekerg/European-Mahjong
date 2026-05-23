@@ -131,7 +131,10 @@
     "points_title": "Turnajové body",
     "position_title": "Umístění",
     "results": "Výsledky",
-    "mahjong_score_title": "Skóre Mahjong"
+    "mahjong_score_title": "Skóre Mahjong",
+    "observer": "Pozorovatel",
+    "obs_report": "Zpráva",
+    "referees": "Rozhodčí"
   },
   "preview": {
     "title": "Aktivní turnaje - {regles} · {date}",

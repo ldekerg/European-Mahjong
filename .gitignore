@@ -19,6 +19,8 @@ data/
 *.db-shm
 *.db-wal
 
+app/static/obs_reports/
+
 # IDE
 .vscode/
 .idea/

@@ -131,7 +131,10 @@
     "points_title": "Punkty turniejowe",
     "position_title": "Pozycja",
     "results": "Wyniki",
-    "mahjong_score_title": "Wynik Mahjong"
+    "mahjong_score_title": "Wynik Mahjong",
+    "observer": "Obserwator",
+    "obs_report": "Raport",
+    "referees": "Sędziowie"
   },
   "preview": {
     "title": "Aktywne turnieje - {regles} · {date}",

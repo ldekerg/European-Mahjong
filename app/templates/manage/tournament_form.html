@@ -142,6 +142,180 @@
   </div>
 </form>
 
+{% if tournament %}
+<!-- ── Observer & Report ──────────────────────────────────────────────── -->
+<div class="manage-section" style="margin-top:1.5rem">
+  <h2>EMA Observer &amp; Report</h2>
+  <form id="obs-form" style="display:flex;flex-wrap:wrap;gap:0.75rem;align-items:flex-end">
+    <div class="form-group" style="min-width:220px;flex:1">
+      <label>Observer name</label>
+      <input type="text" name="obs_observer" id="obs-observer-input"
+             value="{{ tournament.obs_observer or '' }}" class="manage-input" placeholder="e.g. Joke de Jong">
+    </div>
+    <div class="form-group" style="min-width:220px;flex:2">
+      <label>Report PDF
+        {% if tournament.obs_report_path %}
+          <a href="{{ tournament.obs_report_path }}" target="_blank" class="dim" style="font-size:0.8rem">Current: {{ tournament.obs_report_path.split('/')[-1] }} ↗</a>
+        {% endif %}
+      </label>
+      <input type="file" name="obs_report_file" id="obs-report-file" accept=".pdf" class="manage-input">
+    </div>
+    <button type="button" class="btn btn-primary" onclick="saveObs()">💾 Save</button>
+  </form>
+  <p id="obs-feedback" class="form-hint" style="margin-top:0.4rem"></p>
+</div>
+
+<!-- ── Referees ──────────────────────────────────────────────────────── -->
+<div class="manage-section" style="margin-top:1.5rem">
+  <h2>Referees</h2>
+  <ul id="referee-list" style="list-style:none;padding:0;margin:0 0 1rem">
+    {% for ra in referee_assignments %}
+    <li id="ra-{{ ra.id }}" style="display:flex;align-items:center;gap:0.5rem;padding:0.3rem 0;border-bottom:1px solid var(--border)">
+      <span style="flex:1">
+        {{ ra.name }}
+        {% if ra.referee %}<span class="badge badge-referee">{{ ra.referee.rules }}</span>{% endif %}
+        {% if ra.player and not ra.referee %}<span class="badge dim">player</span>{% endif %}
+      </span>
+      <button type="button" class="btn btn-secondary" style="padding:0.2rem 0.5rem;font-size:0.8rem"
+              onclick="removeReferee({{ ra.id }})">✕</button>
+    </li>
+    {% else %}
+    <li id="ra-empty" class="dim" style="font-size:0.9rem">No referees assigned.</li>
+    {% endfor %}
+  </ul>
+
+  <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap">
+    <div style="position:relative;flex:1;min-width:200px">
+      <input type="text" id="referee-search" class="manage-input" placeholder="Search by name…"
+             oninput="searchReferee(this.value)" autocomplete="off">
+      <ul id="referee-suggestions" style="display:none;position:absolute;z-index:100;background:var(--bg2);border:1px solid var(--border);border-radius:6px;list-style:none;padding:0.25rem 0;margin:0;width:100%;max-height:200px;overflow-y:auto"></ul>
+    </div>
+    <button type="button" class="btn btn-primary" onclick="addRefereeSelected()">+ Add</button>
+  </div>
+  <p id="referee-feedback" class="form-hint" style="margin-top:0.4rem"></p>
+</div>
+
+<script>
+var _TID = {{ tournament.id }};
+var _selectedReferee = null;
+
+// ── Observer save ──────────────────────────────────────────────────────
+function saveObs() {
+  var fd = new FormData();
+  fd.append('obs_observer', document.getElementById('obs-observer-input').value);
+  var file = document.getElementById('obs-report-file').files[0];
+  if (file) fd.append('obs_report_file', file);
+
+  fetch('/manage/tournaments/' + _TID + '/obs', { method: 'POST', body: fd })
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      if (d.error) { document.getElementById('obs-feedback').textContent = '❌ ' + d.error; return; }
+      document.getElementById('obs-feedback').textContent = '✓ Saved';
+      setTimeout(function() { document.getElementById('obs-feedback').textContent = ''; }, 2000);
+    })
+    .catch(function() { document.getElementById('obs-feedback').textContent = '❌ Network error'; });
+}
+
+// ── Referee autocomplete ───────────────────────────────────────────────
+var _searchTimer = null;
+
+function searchReferee(q) {
+  clearTimeout(_searchTimer);
+  var ul = document.getElementById('referee-suggestions');
+  if (!q || q.length < 2) { ul.style.display = 'none'; _selectedReferee = null; return; }
+  _searchTimer = setTimeout(function() {
+    fetch('/manage/tournaments/' + _TID + '/referees/search?q=' + encodeURIComponent(q))
+      .then(function(r) { return r.json(); })
+      .then(function(items) {
+        ul.innerHTML = '';
+        if (!items.length) {
+          var li = document.createElement('li');
+          li.style.cssText = 'padding:0.4rem 0.75rem;color:var(--dim);font-size:0.85rem';
+          li.textContent = 'No match — will add as free text';
+          ul.appendChild(li);
+          _selectedReferee = { name: q, referee_id: null, player_id: null };
+        } else {
+          items.forEach(function(item) {
+            var li = document.createElement('li');
+            li.style.cssText = 'padding:0.4rem 0.75rem;cursor:pointer;font-size:0.9rem';
+            li.textContent = item.name + (item.rules ? ' [' + item.type + ' ' + item.rules + ']' : ' [player]');
+            li.addEventListener('mouseover', function() { this.style.background = 'var(--bg3)'; });
+            li.addEventListener('mouseout',  function() { this.style.background = ''; });
+            li.addEventListener('click', function() {
+              _selectedReferee = item;
+              document.getElementById('referee-search').value = item.name;
+              ul.style.display = 'none';
+            });
+            ul.appendChild(li);
+          });
+        }
+        ul.style.display = 'block';
+      });
+  }, 200);
+}
+
+function addRefereeSelected() {
+  var q = document.getElementById('referee-search').value.trim();
+  if (!q) return;
+  var payload = _selectedReferee && _selectedReferee.name === q
+    ? _selectedReferee
+    : { name: q, referee_id: null, player_id: null };
+
+  fetch('/manage/tournaments/' + _TID + '/referees/add', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name: payload.name, referee_id: payload.referee_id, player_id: payload.player_id })
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(d) {
+    if (d.error) { document.getElementById('referee-feedback').textContent = '❌ ' + d.error; return; }
+    // Remove empty placeholder
+    var empty = document.getElementById('ra-empty');
+    if (empty) empty.remove();
+    // Add row
+    var li = document.createElement('li');
+    li.id = 'ra-' + d.id;
+    li.style.cssText = 'display:flex;align-items:center;gap:0.5rem;padding:0.3rem 0;border-bottom:1px solid var(--border)';
+    li.innerHTML = '<span style="flex:1">' + d.name +
+      (d.referee_id ? ' <span class="badge badge-referee">' + (payload.rules || 'ref') + '</span>' : '') +
+      '</span>' +
+      '<button type="button" class="btn btn-secondary" style="padding:0.2rem 0.5rem;font-size:0.8rem" onclick="removeReferee(' + d.id + ')">✕</button>';
+    document.getElementById('referee-list').appendChild(li);
+    document.getElementById('referee-search').value = '';
+    _selectedReferee = null;
+    document.getElementById('referee-suggestions').style.display = 'none';
+  })
+  .catch(function() { document.getElementById('referee-feedback').textContent = '❌ Network error'; });
+}
+
+function removeReferee(raId) {
+  fetch('/manage/tournaments/' + _TID + '/referees/' + raId + '/remove', { method: 'POST' })
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      if (d.ok) {
+        var li = document.getElementById('ra-' + raId);
+        if (li) li.remove();
+        if (!document.querySelector('#referee-list li:not([id="ra-empty"])')) {
+          var empty = document.createElement('li');
+          empty.id = 'ra-empty';
+          empty.style.cssText = 'font-size:0.9rem';
+          empty.className = 'dim';
+          empty.textContent = 'No referees assigned.';
+          document.getElementById('referee-list').appendChild(empty);
+        }
+      }
+    });
+}
+
+// Close suggestions on outside click
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('#referee-search') && !e.target.closest('#referee-suggestions')) {
+    document.getElementById('referee-suggestions').style.display = 'none';
+  }
+});
+</script>
+{% endif %}
+
 <!-- Modal nouvelle ville -->
 <div id="city-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center">
   <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1.5rem;width:100%;max-width:440px;box-shadow:0 8px 32px rgba(0,0,0,0.2)">

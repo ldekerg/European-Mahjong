@@ -41,7 +41,7 @@ from pathlib import Path
 from datetime import datetime as _dt
 
 from app.database import get_db, SessionLocal
-from app.models import AdminUser, Tournament, Player, Result, AnonymousResult, City, NationalityChange, Championship, ChampionshipSeries, ChampionshipTournament, AuditLog
+from app.models import AdminUser, Tournament, Player, Result, AnonymousResult, City, NationalityChange, Championship, ChampionshipSeries, ChampionshipTournament, AuditLog, Referee, TournamentReferee
 from app.i18n import templates, ISO_NOM_PAYS
 
 # ---------------------------------------------------------------------------
@@ -426,6 +426,7 @@ def tournament_edit(tournament_id: int, request: Request, db: Session = Depends(
         "allowed_countries": allowed,
         "championships": _championships_for_select(db),
         "current_championship_id": _current_championship_id(db, tournament_id),
+        "referee_assignments": db.query(TournamentReferee).filter_by(tournament_id=tournament_id).all(),
     })
     return templates.TemplateResponse(request, "manage/tournament_form.html", ctx)
 
@@ -484,6 +485,131 @@ async def tournament_edit_post(tournament_id: int, request: Request, db: Session
     db.commit()
     _set_flash(request, f"Tournoi « {t.name} » mis à jour.")
     return RedirectResponse("/manage/tournaments/", status_code=302)
+
+
+# ---------------------------------------------------------------------------
+# Tournament observers / referees / report upload
+# ---------------------------------------------------------------------------
+
+@router.post("/tournaments/{tournament_id}/obs")
+async def tournament_obs_post(tournament_id: int, request: Request, db: Session = Depends(get_db)):
+    """Save obs_observer field and optionally upload a PDF report."""
+    user = _require_auth(request)
+    if isinstance(user, RedirectResponse):
+        return user
+    t = db.query(Tournament).filter_by(id=tournament_id).first()
+    if not t:
+        return JSONResponse({"error": "Not found"}, status_code=404)
+    allowed = _allowed_countries(user)
+    if user.role != "superadmin" and t.country not in allowed:
+        return JSONResponse({"error": "Forbidden"}, status_code=403)
+
+    form = await request.form()
+    obs = form.get("obs_observer", "").strip()
+    t.obs_observer = obs or None
+
+    pdf_file: UploadFile | None = form.get("obs_report_file")
+    if pdf_file and pdf_file.filename:
+        import os as _os
+        reports_dir = _os.path.join(_os.path.dirname(__file__), "../../app/static/obs_reports")
+        _os.makedirs(reports_dir, exist_ok=True)
+        # Use TR{ema_id}_ prefix if available, else tournament id
+        prefix = f"TR{t.ema_id}" if t.ema_id else f"T{t.id}"
+        safe_name = f"{prefix}_{pdf_file.filename}"
+        dest = _os.path.join(reports_dir, safe_name)
+        with open(dest, "wb") as f:
+            f.write(await pdf_file.read())
+        t.obs_report_path = f"/static/obs_reports/{safe_name}"
+
+    db.commit()
+    return JSONResponse({"ok": True, "obs_observer": t.obs_observer, "obs_report_path": t.obs_report_path})
+
+
+@router.post("/tournaments/{tournament_id}/referees/add")
+async def tournament_referee_add(tournament_id: int, request: Request, db: Session = Depends(get_db)):
+    """Add a referee assignment to a tournament."""
+    user = _require_auth(request)
+    if isinstance(user, RedirectResponse):
+        return user
+    t = db.query(Tournament).filter_by(id=tournament_id).first()
+    if not t:
+        return JSONResponse({"error": "Not found"}, status_code=404)
+    allowed = _allowed_countries(user)
+    if user.role != "superadmin" and t.country not in allowed:
+        return JSONResponse({"error": "Forbidden"}, status_code=403)
+
+    data = await request.json()
+    name      = (data.get("name") or "").strip()
+    referee_id = data.get("referee_id")  # int or None
+    player_id  = data.get("player_id")   # str or None
+
+    if not name:
+        return JSONResponse({"error": "Name required"}, status_code=400)
+
+    ra = TournamentReferee(
+        tournament_id=tournament_id,
+        name=name,
+        referee_id=int(referee_id) if referee_id else None,
+        player_id=str(player_id) if player_id else None,
+    )
+    db.add(ra)
+    db.commit()
+    db.refresh(ra)
+    return JSONResponse({"id": ra.id, "name": ra.name, "referee_id": ra.referee_id, "player_id": ra.player_id})
+
+
+@router.post("/tournaments/{tournament_id}/referees/{ra_id}/remove")
+async def tournament_referee_remove(tournament_id: int, ra_id: int, request: Request, db: Session = Depends(get_db)):
+    """Remove a referee assignment from a tournament."""
+    user = _require_auth(request)
+    if isinstance(user, RedirectResponse):
+        return user
+    t = db.query(Tournament).filter_by(id=tournament_id).first()
+    if not t:
+        return JSONResponse({"error": "Not found"}, status_code=404)
+    allowed = _allowed_countries(user)
+    if user.role != "superadmin" and t.country not in allowed:
+        return JSONResponse({"error": "Forbidden"}, status_code=403)
+
+    ra = db.query(TournamentReferee).filter_by(id=ra_id, tournament_id=tournament_id).first()
+    if ra:
+        db.delete(ra)
+        db.commit()
+    return JSONResponse({"ok": True})
+
+
+@router.get("/tournaments/{tournament_id}/referees/search")
+def tournament_referee_search(tournament_id: int, q: str, request: Request, db: Session = Depends(get_db)):
+    """Search players and referees by name for autocomplete."""
+    user = _require_auth(request)
+    if isinstance(user, RedirectResponse):
+        return user
+    q = q.strip().lower()
+    if not q or len(q) < 2:
+        return JSONResponse([])
+
+    results = []
+    # Search referees first
+    refs = db.query(Referee).filter(
+        Referee.name.ilike(f"%{q}%")
+    ).limit(10).all()
+    seen_player_ids = set()
+    for r in refs:
+        entry = {"type": "referee", "referee_id": r.id, "player_id": r.player_id, "rules": r.rules, "name": r.name}
+        if r.player_id:
+            seen_player_ids.add(r.player_id)
+        results.append(entry)
+
+    # Search players (not already covered via referee)
+    players = db.query(Player).filter(
+        (Player.last_name + " " + Player.first_name).ilike(f"%{q}%")
+    ).limit(10).all()
+    for p in players:
+        if p.id not in seen_player_ids:
+            results.append({"type": "player", "referee_id": None, "player_id": p.id, "rules": None,
+                            "name": f"{p.last_name} {p.first_name}"})
+
+    return JSONResponse(results[:15])
 
 
 @router.get("/tournaments/{tournament_id}/results/template")

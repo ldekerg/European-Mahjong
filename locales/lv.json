@@ -131,7 +131,10 @@
     "points_title": "Turnīra punkti",
     "position_title": "Vieta",
     "results": "Rezultāti",
-    "mahjong_score_title": "Mahjong punkti"
+    "mahjong_score_title": "Mahjong punkti",
+    "observer": "Novērotājs",
+    "obs_report": "Ziņojums",
+    "referees": "Tiesneši"
   },
   "preview": {
     "title": "Aktīvie turnīri - {regles} · {date}",

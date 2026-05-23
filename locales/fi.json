@@ -131,7 +131,10 @@
     "points_title": "Turnauspisteet",
     "position_title": "Sijoitus",
     "results": "Tulokset",
-    "mahjong_score_title": "Mahjong-pisteet"
+    "mahjong_score_title": "Mahjong-pisteet",
+    "observer": "Tarkkailija",
+    "obs_report": "Raportti",
+    "referees": "Tuomarit"
   },
   "preview": {
     "title": "Aktiiviset turnaukset - {regles} · {date}",

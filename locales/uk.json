@@ -131,7 +131,10 @@
     "points_title": "Очки турніру",
     "position_title": "Позиція",
     "results": "Результати",
-    "mahjong_score_title": "Очки Mahjong"
+    "mahjong_score_title": "Очки Mahjong",
+    "observer": "Спостерігач",
+    "obs_report": "Звіт",
+    "referees": "Судді"
   },
   "preview": {
     "title": "Активні турніри - {regles} · {date}",

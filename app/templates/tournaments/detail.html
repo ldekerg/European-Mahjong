@@ -20,6 +20,34 @@
   <dl style="font-size:0.85rem;margin:0">
     <dt>{{ trad('common.players') }}</dt><dd>{{ tournoi.nb_players }}</dd>
     {% if not is_mondial %}<dt>{{ trad('common.coeff') }}</dt><dd>{{ tournoi.coefficient }}</dd>{% endif %}
+    {% if tournoi.referee_assignments %}
+    <dt>{{ trad('tournament.referees') }}</dt>
+    <dd style="display:flex;flex-wrap:wrap;gap:0.3rem;align-items:center">
+      {% for ra in tournoi.referee_assignments %}
+        <span style="display:inline-flex;align-items:center;gap:0.25rem">
+          {% if ra.player %}
+            <a href="/players/{{ ra.player.id }}">{{ ra.name }}</a>
+          {% else %}
+            {{ ra.name }}
+          {% endif %}
+          {% if ra.referee_id %}
+            <span class="badge badge-referee-{{ ra.referee.rules | lower }}" title="{{ trad('common.certified_referee') }} {{ ra.referee.rules }}">{{ ra.referee.rules }}</span>
+          {% endif %}
+        </span>{% if not loop.last %}<span class="dim">,</span>{% endif %}
+      {% endfor %}
+    </dd>
+    {% endif %}
+    {% if tournoi.obs_observer %}
+    <dt>{{ trad('tournament.observer') }}</dt>
+    <dd>
+      {% if tournoi.obs_player %}
+        <a href="/players/{{ tournoi.obs_player.id }}">{{ tournoi.obs_observer }}</a>
+      {% else %}
+        {{ tournoi.obs_observer }}
+      {% endif %}
+    </dd>
+    {% endif %}
+    {% if tournoi.obs_report_path %}<dt>{{ trad('tournament.obs_report') }}</dt><dd><a href="{{ tournoi.obs_report_path }}" target="_blank" rel="noopener">PDF ↗</a></dd>{% endif %}
     <dt>{{ trad('common.country') }}</dt>
     <dd>
       {{ nb_pays }}

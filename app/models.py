@@ -64,6 +64,11 @@ class Tournament(Base):
     website              = Column(String, nullable=True)     # link to tournament website
     registration_open    = Column(Date, nullable=True)       # date inscriptions ouvrent
     created_at           = Column(DateTime, nullable=True, default=datetime.utcnow)
+    obs_report_path      = Column(String, nullable=True)     # local path e.g. /static/obs_reports/TR456_20260508_reu.pdf
+    obs_observer         = Column(String, nullable=True)     # name of the EMA observer
+    obs_player_id        = Column(String, ForeignKey("players.id"), nullable=True)
+
+    obs_player = relationship("Player", foreign_keys=[obs_player_id])
 
     __table_args__ = (
         Index("uq_tournoi_ema_regles", "ema_id", "rules", unique=True,
@@ -241,3 +246,20 @@ class Referee(Base):
 
     city   = relationship("City")
     player = relationship("Player")
+
+
+class TournamentReferee(Base):
+    __tablename__ = "tournament_referees"
+
+    id            = Column(Integer, primary_key=True, autoincrement=True)
+    tournament_id = Column(Integer, ForeignKey("tournaments.id"), nullable=False)
+    # At most one of these is set; both nullable — a free-text name is always present
+    referee_id    = Column(Integer, ForeignKey("referees.id"), nullable=True)
+    player_id     = Column(String, ForeignKey("players.id"), nullable=True)
+    name          = Column(String, nullable=False)  # display name (always filled)
+
+    tournament = relationship("Tournament", back_populates="referee_assignments")
+    referee    = relationship("Referee")
+    player     = relationship("Player")
+
+Tournament.referee_assignments = relationship("TournamentReferee", back_populates="tournament", order_by="TournamentReferee.id")

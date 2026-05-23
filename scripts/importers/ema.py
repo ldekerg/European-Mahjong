@@ -61,6 +61,29 @@ ssl_ctx = ssl.create_default_context()
 ssl_ctx.check_hostname = False
 ssl_ctx.verify_mode = ssl.CERT_NONE
 
+OBS_REPORTS_DIR = os.path.join(os.path.dirname(__file__), "../../app/static/obs_reports")
+OBS_BASE_URL = "http://mahjong-europe.org/ranking/reports/"
+
+
+def _download_obs_report(pdf_filename: str, ema_id: int | None) -> str | None:
+    """Download observer report PDF, save with TR{id}_ prefix. Returns local path or None."""
+    os.makedirs(OBS_REPORTS_DIR, exist_ok=True)
+    if ema_id:
+        local_name = f"TR{ema_id}_{pdf_filename}"
+    else:
+        local_name = pdf_filename
+    local_path = os.path.join(OBS_REPORTS_DIR, local_name)
+    if not os.path.exists(local_path):
+        url = OBS_BASE_URL + pdf_filename
+        try:
+            with urllib.request.urlopen(url, context=ssl_ctx, timeout=15) as r:
+                with open(local_path, "wb") as f:
+                    f.write(r.read())
+        except Exception as e:
+            print(f"  [WARN] Could not download {url}: {e}")
+            return None
+    return f"/static/obs_reports/{local_name}"
+
 
 def fetch_page(tournament_id, prefix: str = "TR") -> str | None:
     url = BASE_URL.format(prefix, tournament_id)
@@ -323,6 +346,22 @@ def parse_tournament(html: str, tournament_id: int) -> dict | None:
                 "ranking":    ranking,
             })
 
+    # Observer report
+    import re as _re
+    obs_pdf = None
+    obs_observer = None
+    obs_h3 = soup.find("h3", string=_re.compile(r"EMA Observer", _re.I))
+    if obs_h3:
+        # Text node after h3 contains the observer name
+        next_text = obs_h3.next_sibling
+        if next_text:
+            raw = next_text.strip().removeprefix("EMA Observer :").strip()
+            obs_observer = raw if raw and raw != "-" else None
+        pdf_a = obs_h3.find_next("a", href=_re.compile(r"reports/.*\.pdf", _re.I))
+        if pdf_a:
+            href = pdf_a["href"]
+            obs_pdf = href.split("reports/")[-1]  # just the filename
+
     return {
         "ema_id": t_id,
         "name": nom,
@@ -334,6 +373,8 @@ def parse_tournament(html: str, tournament_id: int) -> dict | None:
         "coefficient": coefficient,
         "rules": regles,
         "results": results,
+        "obs_pdf": obs_pdf,
+        "obs_observer": obs_observer,
     }
 
 
@@ -381,6 +422,14 @@ def import_tournament(db: Session, data: dict, reset: bool = False):
         tournoi.end_date = data["end_date"]
         tournoi.nb_players = data["nb_players"]
         tournoi.coefficient = data["coefficient"]
+
+    # Observer report — download PDF and store local path
+    if data.get("obs_pdf"):
+        local_path = _download_obs_report(data["obs_pdf"], data["ema_id"])
+        if local_path:
+            tournoi.obs_report_path = local_path
+    if data.get("obs_observer"):
+        tournoi.obs_observer = data["obs_observer"]
 
     # Upsert players + results
     for r in data["results"]:
