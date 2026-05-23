@@ -37,7 +37,7 @@
         </td>
         <td>
           {% if ref.player %}
-            <a href="/players/{{ ref.player_id }}">{{ ref.name }}</a>
+            <a href="/players/{{ ref.player_id }}">{{ ref.player.first_name | first_name }} {{ ref.player.last_name | title }}</a>
           {% else %}
             {{ ref.name }}
           {% endif %}
