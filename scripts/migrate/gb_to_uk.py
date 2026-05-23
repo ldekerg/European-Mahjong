@@ -14,7 +14,7 @@ UPDATES = [
     ("anonymous_results","nationality"),
     ("cities",           "country"),
     ("tournaments",      "country"),
-    ("referee",          "country"),
+    ("referees",         "country"),
 ]
 
 with engine.begin() as conn:
