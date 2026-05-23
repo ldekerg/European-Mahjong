@@ -23,7 +23,7 @@
 
 <div class="ranking-layout">
   <div class="ranking-left">
-    {% with sort_url_base='?rules=' + rules + '&q=' + q, asc=asc, show_apercu=true %}
+    {% with sort_url_base='?rules=' + rules + '&q=' + q, asc=asc, show_apercu=true, referee_ids=referee_ids %}
     {% include 'partials/players_table.html' %}
     {% endwith %}
   </div>

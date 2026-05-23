@@ -71,7 +71,8 @@
     ],
     "player": "Gracz",
     "coming_soon": "Wkrótce",
-    "year": "Rok"
+    "year": "Rok",
+    "referee": "Sędzia"
   },
   "home": {
     "intro": "Witamy w europejskim rankingu Mahjong, obejmującym dyscypliny <strong>MCR</strong> i <strong>RCR</strong>. Punkty są obliczane na podstawie wyników turniejów uznanych przez <a href=\"http://mahjong-europe.org\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--accent)\">European Mahjong Association (EMA)</a>. Strona prezentuje tygodniowe rankingi, historię turniejów, rekordy graczy i krajów oraz Hall of Fame.",

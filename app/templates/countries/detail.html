@@ -90,7 +90,7 @@
     <div class="ranking-left">
       {% for regles_key, data in [('mcr', mcr), ('rcr', rcr)] %}
       <div id="tab-{{ regles_key }}" class="tab-content {% if active_tab|lower != regles_key %}hidden{% endif %}">
-        {% with ranking_data=data, show_apercu=true, show_rang_national=true, rang_national_flag=code %}
+        {% with ranking_data=data, show_apercu=true, show_rang_national=true, rang_national_flag=code, referee_ids=referee_ids %}
         {% include 'partials/ranking_table.html' %}
         {% endwith %}
       </div>
@@ -138,7 +138,7 @@
 <div id="tab-players" class="tab-content hidden">
   <div class="ranking-layout">
     <div class="ranking-left">
-      {% with show_apercu=true, sort_url_base='?tab=players&rules=' + active_tab, asc=asc %}
+      {% with show_apercu=true, sort_url_base='?tab=players&rules=' + active_tab, asc=asc, referee_ids=referee_ids %}
       {% include 'partials/players_table.html' %}
       {% endwith %}
     </div>

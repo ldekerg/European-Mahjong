@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from datetime import date
 
 from app.database import get_db
-from app.models import Player, Tournament, Result, RankingHistory, NationalityChange
+from app.models import Player, Tournament, Result, RankingHistory, NationalityChange, Referee
 from app.ranking import week_monday, active_tournaments, _player_results, contribution, FREEZE_START, FREEZE_END
 
 router = APIRouter(prefix="/players")
@@ -74,14 +74,18 @@ def list_players(
     rows = qr.all()
     players_list = [{"player": r[0], "nb_mcr": r[1], "nb_rcr": r[2], "nb_total": r[1]+r[2], "first": r[3]} for r in rows]
 
+    from app.main import get_referee_ids
+    referee_ids = get_referee_ids(db)
+
     return templates.TemplateResponse(request, "players/list.html", {
-        "players":          players_list,
-        "sort":             sort,
-        "asc":              asc,
-        "rules":            rules,
-        "q":                q,
-        "total":            len(players_list),
+        "players":      players_list,
+        "sort":         sort,
+        "asc":          asc,
+        "rules":        rules,
+        "q":            q,
+        "total":        len(players_list),
         "current_week": week_monday(date.today()),
+        "referee_ids":  referee_ids,
     })
 
 
@@ -233,6 +237,10 @@ def player_detail(player_id: str, request: Request, db: Session = Depends(get_db
         NationalityChange.player_id == player_id
     ).order_by(NationalityChange.change_date).all()
 
+    referee_rules = [
+        r.rules for r in db.query(Referee.rules).filter(Referee.player_id == player_id).all()
+    ]
+
     return templates.TemplateResponse(request, "players/detail.html", {
         "player": player,
         "mcr": build_tab("MCR"),
@@ -241,6 +249,7 @@ def player_detail(player_id: str, request: Request, db: Session = Depends(get_db
         "nationality_changes": nationality_changes,
         "freeze_start": FREEZE_START.isoformat(),
         "freeze_end": FREEZE_END.isoformat(),
+        "referee_rules": referee_rules,
     })
 
 

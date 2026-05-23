@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 from fastapi import APIRouter, Request
 from fastapi.params import Depends
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from app.i18n import templates
 from app.database import get_db
 from app.models import Referee
@@ -30,10 +30,11 @@ def rules(request: Request):
 
 @router.get("/referees")
 def referees(request: Request, db: Session = Depends(get_db)):
-    mcr = db.query(Referee).filter(Referee.rules == "MCR").order_by(
+    opts = [joinedload(Referee.city), joinedload(Referee.player)]
+    mcr = db.query(Referee).options(*opts).filter(Referee.rules == "MCR").order_by(
         Referee.country, Referee.seminar_year, Referee.name
     ).all()
-    rcr = db.query(Referee).filter(Referee.rules == "RCR").order_by(
+    rcr = db.query(Referee).options(*opts).filter(Referee.rules == "RCR").order_by(
         Referee.country, Referee.seminar_year, Referee.name
     ).all()
     return templates.TemplateResponse(request, "referees.html", {

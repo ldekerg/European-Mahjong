@@ -130,7 +130,7 @@
   <div class="ranking-left">
     {% for regles, data in [('mcr', mcr), ('rcr', rcr)] %}
     <div id="tab-{{ regles }}" class="tab-content {% if active_tab|lower != regles %}hidden{% endif %}">
-      {% with ranking_data=data, show_apercu=true %}
+      {% with ranking_data=data, show_apercu=true, referee_ids=referee_ids %}
       {% include 'partials/ranking_table.html' %}
       {% endwith %}
     </div>

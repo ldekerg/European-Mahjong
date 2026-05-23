@@ -57,7 +57,7 @@
         {% else %}<span class="dim">—</span>{% endif %}
       </td>
       <td class="col-flag col-opt">{{ r.nationality | flag_link('ranking') }}</td>
-      <td class="col-nom"><span class="mobile-flag">{{ r.nationality | flag_link('ranking') }}</span><a href="/players/{{ r.player_id }}" {% if show_apercu %}onclick="event.stopPropagation()"{% endif %}>{{ r.first_name | first_name }} {{ r.name | title }}</a></td>
+      <td class="col-nom"><span class="mobile-flag">{{ r.nationality | flag_link('ranking') }}</span><a href="/players/{{ r.player_id }}" {% if show_apercu %}onclick="event.stopPropagation()"{% endif %}>{{ r.first_name | first_name }} {{ r.name | title }}</a>{% if referee_ids is defined and r.player_id in referee_ids %}{% for rl in referee_ids[r.player_id] %} <span class="badge badge-referee-{{ rl | lower }}">{{ trad('common.referee') }}</span>{% endfor %}{% endif %}</td>
       <td class="col-score col-sticky score-val">{{ r.score | round(2) }}</td>
       <td class="col-joueurs rank-num">{{ r.nb_tournaments }}</td>
       <td class="col-podiums col-opt">

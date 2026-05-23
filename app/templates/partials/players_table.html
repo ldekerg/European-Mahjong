@@ -71,7 +71,7 @@
     <tr {% if _apercu %}class="ranking-row" onclick="loadApercu('{{ j.id }}', this)"{% endif %}>
       <td class="col-flag col-opt">{{ j.nationality | flag_link('players') }}</td>
       <td class="col-nom">
-        <span class="mobile-flag">{{ j.nationality | flag_link('players') }}</span> <a href="/players/{{ j.id }}" {% if _apercu %}onclick="event.stopPropagation()"{% endif %}>{{ j.last_name | title }}</a></td>
+        <span class="mobile-flag">{{ j.nationality | flag_link('players') }}</span> <a href="/players/{{ j.id }}" {% if _apercu %}onclick="event.stopPropagation()"{% endif %}>{{ j.last_name | title }}</a>{% if referee_ids is defined and j.id in referee_ids %}{% for rl in referee_ids[j.id] %} <span class="badge badge-referee-{{ rl | lower }}">{{ trad('common.referee') }}</span>{% endfor %}{% endif %}</td>
       <td class="col-prenom">{{ j.first_name | first_name }}</td>
       <td class="col-date-lg col-opt center dim" style="font-size:0.82rem">{{ row.premier.strftime('%d/%m/%Y') if row.premier else '—' }}</td>
       <td class="col-joueurs-sort col-opt center {% if row.nb_mcr %}rank-num{% else %}dim{% endif %}">{{ row.nb_mcr or '—' }}</td>

@@ -878,7 +878,7 @@ tr:hover           td { --row-bg: var(--row-hover); }
 .contrib-100 { color: #2a6a2a; font-weight: 600; }
 .contrib-50  { color: #806020; }
 .pts-actif   { font-weight: 700; color: var(--accent); }
-.badge       { font-size: 0.7rem; background: #e0e8f8; color: var(--accent); padding: 0.1rem 0.4rem; border-radius: 8px; margin-left: 0.3rem; }
+.badge       { font-size: 0.7rem; background: #e0e8f8; padding: 0.1rem 0.4rem; border-radius: 8px; margin-left: 0.3rem; }
 .badge-sm    { font-size: 0.65rem; margin-left: 0; margin-right: 0.2rem; }
 
 .badge-wmc    { background: var(--wmc-fg); color: var(--wmc-bg); border: 1px solid var(--wmc-fg); }
@@ -1084,6 +1084,8 @@ caption.t-count {
 
 .badge-mcr { background: var(--mcr-bg); color: var(--mcr-fg); border: 1px solid var(--mcr-fg) }
 .badge-rcr { background: var(--rcr-bg); color: var(--rcr-fg); border: 1px solid var(--rcr-fg) }
+.badge-referee-mcr { background: var(--mcr-bg); color: var(--mcr-fg); border: 1px solid var(--mcr-fg); padding: 0.05rem 0.3rem; font-size: 0.62rem; vertical-align: middle; }
+.badge-referee-rcr { background: var(--rcr-bg); color: var(--rcr-fg); border: 1px solid var(--rcr-fg); padding: 0.05rem 0.3rem; font-size: 0.62rem; vertical-align: middle; }
 
 #t-table { table-layout: fixed; width: 100%; }
 #t-table td, #t-table th { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

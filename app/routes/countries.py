@@ -9,7 +9,7 @@ from typing import Optional
 from collections import defaultdict
 
 from app.database import get_db
-from app.models import Player, Tournament, Result, RankingHistory
+from app.models import Player, Tournament, Result, RankingHistory, Referee
 from app.ranking import week_monday, active_tournaments, FREEZE_START, FREEZE_END
 from app.i18n import templates, ISO_NOM_PAYS, _PAYS_ISO
 
@@ -21,6 +21,12 @@ except Exception:
     FEDERATIONS = {}
 
 router = APIRouter(prefix="/countries")
+
+
+def _build_referee_ids(db: Session) -> dict:
+    from app.main import get_referee_ids
+    return get_referee_ids(db)
+
 
 def _chart_joueurs_liste(db):
     """Two global curves MCR + RCR (total ranked players per week)."""
@@ -569,4 +575,5 @@ def pays_detail(
         "series_pays":      series_pays,
         # Federation
         "federation":       FEDERATIONS.get(code.upper()),
+        "referee_ids":      _build_referee_ids(db),
     })

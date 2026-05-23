@@ -250,6 +250,29 @@ app.include_router(manage.router)
 app.include_router(manage_championships.router)
 
 
+_referee_ids_cache: dict | None = None
+
+def get_referee_ids(db: Session) -> dict:
+    """Returns {player_id: [rules]} for all referees linked to a player. Cached in memory."""
+    global _referee_ids_cache
+    if _referee_ids_cache is not None:
+        return _referee_ids_cache
+    from app.models import Referee
+    rows = db.query(Referee.player_id, Referee.rules).filter(Referee.player_id.isnot(None)).all()
+    result: dict = {}
+    for pid, rules in rows:
+        result.setdefault(pid, [])
+        if rules not in result[pid]:
+            result[pid].append(rules)
+    _referee_ids_cache = result
+    return result
+
+
+def invalidate_referee_cache():
+    global _referee_ids_cache
+    _referee_ids_cache = None
+
+
 def get_rank_delta(db: Session, week: date, regles: str) -> dict:
     """Returns {player_id: previous_week_position} to compute the rank delta."""
     from datetime import timedelta
@@ -570,9 +593,12 @@ def accueil(
     current_week = week_monday(date.today())
     today_date = date.today()
 
+    referee_ids = get_referee_ids(db)
+
     return templates.TemplateResponse(request, "ranking.html", {
         "mcr": mcr,
         "rcr": rcr,
+        "referee_ids": referee_ids,
         "current_week": current_week,
         "today_date": today_date,
         "week": week_date,

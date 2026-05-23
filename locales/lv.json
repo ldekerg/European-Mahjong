@@ -71,7 +71,8 @@
     ],
     "player": "Spēlētājs",
     "coming_soon": "Drīzumā",
-    "year": "Gads"
+    "year": "Gads",
+    "referee": "Tiesnesis"
   },
   "home": {
     "intro": "Laipni lūdzam Eiropas Madžonga rangā, kas aptver <strong>MCR</strong> un <strong>RCR</strong> disciplīnas. Punkti tiek aprēķināti no turnīru rezultātiem, ko atzinusi <a href=\"http://mahjong-europe.org\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--accent)\">European Mahjong Association (EMA)</a>. Šī vietne rāda nedēļas ranžējumus, turnīru vēsturi, spēlētāju un valstu rekordus un Slavas zāli.",

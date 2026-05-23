@@ -71,7 +71,8 @@
     ],
     "player": "Spiller",
     "coming_soon": "Kommer snart",
-    "year": "År"
+    "year": "År",
+    "referee": "Dommer"
   },
   "home": {
     "intro": "Velkommen til den europeiske Mahjong-rangeringen, som dekker disiplinene <strong>MCR</strong> og <strong>RCR</strong>. Poeng beregnes fra turneringsresultater godkjent av <a href=\"http://mahjong-europe.org\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--accent)\">European Mahjong Association (EMA)</a>. Nettstedet viser ukentlige rangeringer, turneringshistorikk, rekorder for spillere og land, samt Hall of Fame.",
