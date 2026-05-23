@@ -41,7 +41,7 @@ from pathlib import Path
 from datetime import datetime as _dt
 
 from app.database import get_db, SessionLocal
-from app.models import AdminUser, Tournament, Player, Result, AnonymousResult, City, NationalityChange, Championship, ChampionshipSeries, ChampionshipTournament, AuditLog, Referee, TournamentReferee
+from app.models import AdminUser, Tournament, Player, Result, AnonymousResult, City, NationalityChange, Championship, ChampionshipSeries, ChampionshipTournament, AuditLog, Referee, TournamentReferee, RankingHistory
 from app.i18n import templates, ISO_NOM_PAYS
 
 # ---------------------------------------------------------------------------
@@ -1063,8 +1063,9 @@ def player_edit(player_id: str, request: Request, db: Session = Depends(get_db))
         return RedirectResponse("/manage/players/", status_code=302)
 
     changements = db.query(NationalityChange).filter_by(player_id=player_id).order_by(NationalityChange.change_date).all()
+    photo_path = os.path.join(os.path.dirname(__file__), "../static/photos", f"{player_id}.jpg")
     ctx = _base_ctx(request, user, "players")
-    ctx.update({"player": p, "changements": changements, "allowed_countries": allowed})
+    ctx.update({"player": p, "changements": changements, "allowed_countries": allowed, "player_photo": os.path.exists(photo_path)})
     return templates.TemplateResponse(request, "manage/player_form.html", ctx)
 
 
@@ -1110,6 +1111,82 @@ async def player_edit_post(player_id: str, request: Request, db: Session = Depen
     db.commit()
     _set_flash(request, f"Joueur {p.first_name} {p.last_name} mis à jour.")
     return RedirectResponse("/manage/players/", status_code=302)
+
+
+@router.post("/players/{player_id}/delete")
+async def player_delete(player_id: str, request: Request, db: Session = Depends(get_db)):
+    user = _require_auth(request)
+    if isinstance(user, RedirectResponse):
+        return user
+    p = db.query(Player).filter_by(id=player_id).first()
+    if not p:
+        return RedirectResponse("/manage/players/", status_code=302)
+
+    # Check all linked data
+    links = {
+        "results":             db.query(Result).filter_by(player_id=player_id).count(),
+        "ranking history":     db.query(RankingHistory).filter_by(player_id=player_id).count(),
+        "referee records":     db.query(Referee).filter_by(player_id=player_id).count(),
+        "referee assignments": db.query(TournamentReferee).filter_by(player_id=player_id).count(),
+        "nationality changes": db.query(NationalityChange).filter_by(player_id=player_id).count(),
+        "observed tournaments": db.query(Tournament).filter_by(obs_player_id=player_id).count(),
+    }
+    blocking = {k: v for k, v in links.items() if v > 0}
+    if blocking:
+        detail = ", ".join(f"{v} {k}" for k, v in blocking.items())
+        _set_flash(request, f"Cannot delete {p.first_name} {p.last_name}: linked to {detail}.", "error")
+        return RedirectResponse(f"/manage/players/{player_id}/edit", status_code=302)
+
+    _audit(db, request, "DELETE", "players", p.id,
+           description=f"Deleted player {p.first_name} {p.last_name} ({p.id})",
+           old=p)
+    db.delete(p)
+    db.commit()
+
+    # Remove photo if present
+    photo = os.path.join(os.path.dirname(__file__), "../static/photos", f"{player_id}.jpg")
+    if os.path.exists(photo):
+        os.remove(photo)
+
+    _set_flash(request, f"Player {p.first_name} {p.last_name} ({player_id}) deleted.")
+    return RedirectResponse("/manage/players/", status_code=302)
+
+
+PHOTOS_DIR = os.path.join(os.path.dirname(__file__), "../static/photos")
+
+@router.post("/players/{player_id}/photo")
+async def player_photo_upload(player_id: str, request: Request, photo: UploadFile = File(...), db: Session = Depends(get_db)):
+    user = _require_auth(request)
+    if isinstance(user, RedirectResponse):
+        return user
+    p = db.query(Player).filter_by(id=player_id).first()
+    if not p:
+        return RedirectResponse("/manage/players/", status_code=302)
+
+    content = await photo.read()
+    if len(content) > 5 * 1024 * 1024:
+        _set_flash(request, "Photo trop lourde (max 5 Mo).", "error")
+        return RedirectResponse(f"/manage/players/{player_id}/edit", status_code=302)
+
+    os.makedirs(PHOTOS_DIR, exist_ok=True)
+    dest = os.path.join(PHOTOS_DIR, f"{player_id}.jpg")
+    with open(dest, "wb") as f:
+        f.write(content)
+
+    _set_flash(request, "Photo mise à jour.")
+    return RedirectResponse(f"/manage/players/{player_id}/edit", status_code=302)
+
+
+@router.post("/players/{player_id}/photo/delete")
+async def player_photo_delete(player_id: str, request: Request, db: Session = Depends(get_db)):
+    user = _require_auth(request)
+    if isinstance(user, RedirectResponse):
+        return user
+    dest = os.path.join(PHOTOS_DIR, f"{player_id}.jpg")
+    if os.path.exists(dest):
+        os.remove(dest)
+        _set_flash(request, "Photo supprimée.")
+    return RedirectResponse(f"/manage/players/{player_id}/edit", status_code=302)
 
 
 # ---------------------------------------------------------------------------

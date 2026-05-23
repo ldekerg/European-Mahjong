@@ -49,6 +49,29 @@
 
   </div>
 
+  {% if player %}
+  <div class="manage-section">
+    <h2>Photo</h2>
+    <div style="display:flex; align-items:center; gap:1.5rem; flex-wrap:wrap;">
+      <img id="photo-preview" src="/static/photos/{{ player.id }}.jpg"
+           onerror="this.src='/static/photos/placeholder.svg'"
+           style="width:96px;height:96px;object-fit:cover;border-radius:50%;border:2px solid var(--border);">
+      <form method="post" action="/manage/players/{{ player.id }}/photo" enctype="multipart/form-data" style="display:flex;flex-direction:column;gap:0.5rem;">
+        <label style="font-size:0.9rem;font-weight:600;">Upload a new photo</label>
+        <input type="file" name="photo" accept="image/*" required class="manage-input"
+               onchange="previewPhoto(this)">
+        <button type="submit" class="btn btn-primary" style="width:fit-content">📷 Upload</button>
+      </form>
+      {% if player_photo %}
+      <form method="post" action="/manage/players/{{ player.id }}/photo/delete" style="margin-left:auto; align-self:flex-end;">
+        <button type="submit" class="btn btn-danger btn-sm"
+                onclick="return confirm('Delete this photo?')">🗑 Delete photo</button>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+
   {% if player and changements %}
   <div class="manage-section">
     <h2>Nationality history</h2>
@@ -72,8 +95,21 @@
     <a href="/manage/players/" class="btn btn-secondary">Cancel</a>
     {% if player %}
     <a href="/players/{{ player.id }}" target="_blank" class="btn btn-secondary" style="margin-left:auto">👁 View on site</a>
+    <form method="post" action="/manage/players/{{ player.id }}/delete" style="margin-left:0.5rem"
+          onsubmit="return confirm('Delete player {{ player.first_name }} {{ player.last_name }} ({{ player.id }}) ? This cannot be undone.')">
+      <button type="submit" class="btn btn-danger btn-sm">🗑 Delete player</button>
+    </form>
     {% endif %}
   </div>
 </form>
+
+<script>
+function previewPhoto(input) {
+  if (!input.files || !input.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = e => document.getElementById('photo-preview').src = e.target.result;
+  reader.readAsDataURL(input.files[0]);
+}
+</script>
 
 {% endblock %}
