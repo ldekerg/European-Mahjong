@@ -43,11 +43,7 @@
           {% endif %}
         </td>
         <td class="col-ville col-opt">
-          {% if ref.city %}
-            <a href="/countries/{{ ref.city.country }}" class="dim">{{ ref.seminar_location }}</a>
-          {% else %}
             <span class="dim">{{ ref.seminar_location }}</span>
-          {% endif %}
         </td>
         <td class="col-date center dim">{{ ref.seminar_year }}</td>
       </tr>
