@@ -16,7 +16,8 @@
     "group_countries": "Landen",
     "mahjong_rules": "Mahjong & Regels",
     "referees": "Scheidsrechters",
-    "quotas": "Quota's"
+    "quotas": "Quota's",
+    "compare": "Compare"
   },
   "common": {
     "dark_mode": "Donkere modus",
@@ -72,7 +73,8 @@
     "player": "Speler",
     "coming_soon": "Binnenkort beschikbaar",
     "year": "Jaar",
-    "referee": "Scheidsrechter"
+    "referee": "Scheidsrechter",
+    "stat": "Stat"
   },
   "home": {
     "intro": "Welkom bij de Europese Mahjong-ranglijst, met de disciplines <strong>MCR</strong> en <strong>RCR</strong>. De punten worden berekend op basis van toernooiresultaten erkend door de <a href=\"http://mahjong-europe.org\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--accent)\">European Mahjong Association (EMA)</a>. Deze site toont wekelijkse ranglijsten, toernooigeschiedenis, speler- en landrecords, en de Hall of Fame.",
@@ -404,5 +406,22 @@
     "nb_700_tip": "Players with score > 700 pts",
     "team_score": "Team score",
     "team_score_tip": "Average of top 3 scores (country ranking)"
+  },
+  "compare": {
+    "page_title": "Player Comparison",
+    "subtitle": "Select up to 5 players to compare their ranking evolution and head-to-head record.",
+    "search_placeholder": "Search a player...",
+    "score_evolution": "Score evolution",
+    "stats_title": "Statistics",
+    "best_score": "Best score",
+    "nb_tournaments": "Tournaments played",
+    "h2h_title": "Head-to-head",
+    "h2h_common": "{n} tournaments in common",
+    "no_common": "No tournaments in common for this ruleset.",
+    "empty_hint": "Search and select players above to start comparing.",
+    "total_players": "Players",
+    "compare_btn": "Compare",
+    "best_rank": "Best ranking",
+    "rank_evolution": "Ranking evolution"
   }
 }

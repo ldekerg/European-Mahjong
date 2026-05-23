@@ -16,7 +16,8 @@
     "group_countries": "Țări",
     "mahjong_rules": "Mahjong & Reguli",
     "referees": "Arbitri",
-    "quotas": "Cote"
+    "quotas": "Cote",
+    "compare": "Compare"
   },
   "common": {
     "dark_mode": "Mod întunecat",
@@ -72,7 +73,8 @@
     "player": "Jucător",
     "coming_soon": "În curând",
     "year": "An",
-    "referee": "Arbitru"
+    "referee": "Arbitru",
+    "stat": "Stat"
   },
   "home": {
     "intro": "Bun venit la clasamentul european de Mahjong, care acoperă disciplinele <strong>MCR</strong> și <strong>RCR</strong>. Punctele sunt calculate din rezultatele turneelor recunoscute de <a href=\"http://mahjong-europe.org\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--accent)\">European Mahjong Association (EMA)</a>. Acest site prezintă clasamentele săptămânale, istoricul turneelor, recordurile pe jucători și pe țări, precum și Hall of Fame.",
@@ -404,5 +406,22 @@
     "nb_700_tip": "Players with score > 700 pts",
     "team_score": "Team score",
     "team_score_tip": "Average of top 3 scores (country ranking)"
+  },
+  "compare": {
+    "page_title": "Player Comparison",
+    "subtitle": "Select up to 5 players to compare their ranking evolution and head-to-head record.",
+    "search_placeholder": "Search a player...",
+    "score_evolution": "Score evolution",
+    "stats_title": "Statistics",
+    "best_score": "Best score",
+    "nb_tournaments": "Tournaments played",
+    "h2h_title": "Head-to-head",
+    "h2h_common": "{n} tournaments in common",
+    "no_common": "No tournaments in common for this ruleset.",
+    "empty_hint": "Search and select players above to start comparing.",
+    "total_players": "Players",
+    "compare_btn": "Compare",
+    "best_rank": "Best ranking",
+    "rank_evolution": "Ranking evolution"
   }
 }

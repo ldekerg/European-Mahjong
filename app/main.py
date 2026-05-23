@@ -21,6 +21,7 @@ from app.routes import about
 from app.routes import manage
 from app.routes import manage_championships
 from app.routes import quotas
+from app.routes import compare
 from app.i18n import templates
 from app.models import RankingHistory, Player
 from app.ranking import week_monday, ranking
@@ -250,6 +251,7 @@ app.include_router(about.router)
 app.include_router(manage.router)
 app.include_router(manage_championships.router)
 app.include_router(quotas.router)
+app.include_router(compare.router)
 
 
 _referee_ids_cache: dict | None = None

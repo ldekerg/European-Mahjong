@@ -16,7 +16,8 @@
     "group_countries": "Countries",
     "mahjong_rules": "Mahjong & Rules",
     "referees": "Referees",
-    "quotas": "Quotas"
+    "quotas": "Quotas",
+    "compare": "Compare"
   },
   "common": {
     "dark_mode": "Dark mode",
@@ -73,7 +74,8 @@
     "coming_soon": "Coming soon",
     "year": "Year",
     "referee": "Referee",
-    "certified_referee": "Certified referee"
+    "certified_referee": "Certified referee",
+    "stat": "Stat"
   },
   "home": {
     "intro": "Welcome to the European Mahjong rankings, covering both <strong>MCR</strong> (Mahjong Competition Rules) and <strong>RCR</strong> (Riichi Competition Rules). Points are calculated from tournament results certified by the <a href=\"http://mahjong-europe.org\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--accent)\">European Mahjong Association (EMA)</a>. This site presents weekly rankings, tournament history, player and country records, and the Hall of Fame.",
@@ -405,5 +407,22 @@
     "nb_700_tip": "Players with score > 700 pts",
     "team_score": "Team score",
     "team_score_tip": "Average of top 3 scores (country ranking)"
+  },
+  "compare": {
+    "page_title": "Player Comparison",
+    "subtitle": "Select up to 5 players to compare their ranking evolution and head-to-head record.",
+    "search_placeholder": "Search a player...",
+    "score_evolution": "Score evolution",
+    "stats_title": "Statistics",
+    "best_score": "Best score",
+    "nb_tournaments": "Tournaments played",
+    "h2h_title": "Head-to-head",
+    "h2h_common": "{n} tournaments in common",
+    "no_common": "No tournaments in common for this ruleset.",
+    "empty_hint": "Search and select players above to start comparing.",
+    "total_players": "Players",
+    "compare_btn": "Compare",
+    "best_rank": "Best ranking",
+    "rank_evolution": "Ranking evolution"
   }
 }

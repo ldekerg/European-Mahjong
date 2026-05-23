@@ -1,0 +1,413 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="ranking-header">
+  <h1>{{ trad('compare.page_title') }}</h1>
+  <p class="dim" style="margin-top:0.25rem;font-size:0.9rem">{{ trad('compare.subtitle') }}</p>
+</div>
+
+<div style="max-width:1100px;margin:0 auto;padding:0 1rem 3rem">
+
+{# ===== Barre de recherche / sélection joueurs ===== #}
+<div class="compare-search-bar">
+  <input type="text" id="compare-search" class="compare-search-input"
+         placeholder="{{ trad('compare.search_placeholder') }}" autocomplete="off">
+  <div id="compare-autocomplete" class="compare-autocomplete hidden"></div>
+</div>
+
+{# Joueurs sélectionnés #}
+<div id="compare-chips" class="compare-chips">
+  {% for p in players %}
+  <div class="compare-chip" style="border-color:{{ p.color }}" data-id="{{ p.id }}">
+    <span style="color:{{ p.color }}">{{ p.nationality | flag }}</span>
+    <span>{{ p.first_name | first_name }} {{ p.last_name | upper }}</span>
+    <button class="compare-chip-remove" onclick="removePlayer('{{ p.id }}')" title="Retirer">✕</button>
+  </div>
+  {% endfor %}
+</div>
+
+{% if players %}
+{# ===== Switcher MCR / RCR ===== #}
+<div class="tabs" id="rules-tabs" style="margin-bottom:1.5rem">
+  <button class="tab-btn {% if rules == 'MCR' %}active{% endif %}"
+          onclick="switchRules('MCR', this)">MCR</button>
+  <button class="tab-btn {% if rules == 'RCR' %}active{% endif %}"
+          onclick="switchRules('RCR', this)">RCR</button>
+</div>
+
+{# ===== Graphique ===== #}
+{% if players | selectattr('history') | list %}
+<div class="chart-section" style="margin-bottom:2rem">
+  <div class="chart-controls">
+    <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap">
+      <span class="chart-title" id="compare-chart-title">{{ trad('compare.score_evolution') }}</span>
+      <div class="chart-range-btns">
+        <button onclick="setAxisCompare('score', this)" class="range-btn active" id="btn-axis-score">{{ trad('common.score') }}</button>
+        <button onclick="setAxisCompare('pos', this)"   class="range-btn"        id="btn-axis-pos">{{ trad('common.ranking') }}</button>
+      </div>
+    </div>
+    <div class="chart-range-btns">
+      <button onclick="setRangeCompare(52)"  class="range-btn">{{ trad('common.range_1y') }}</button>
+      <button onclick="setRangeCompare(156)" class="range-btn">{{ trad('common.range_3y') }}</button>
+      <button onclick="setRangeCompare(0)"   class="range-btn active">{{ trad('common.range_all') }}</button>
+    </div>
+  </div>
+  <canvas id="compare-chart" height="100"></canvas>
+</div>
+{% endif %}
+
+{# ===== Tableau stats ===== #}
+<div class="manage-section" style="margin-bottom:2rem">
+  <h2 style="font-size:1rem;margin-bottom:0.75rem">{{ trad('compare.stats_title') }}</h2>
+  <div class="scroll-table">
+  <table>
+    <thead>
+      <tr>
+        <th style="width:9rem">{{ trad('common.stat') }}</th>
+        {% for p in players %}
+        <th style="text-align:center;color:{{ p.color }}">
+          {{ p.first_name | first_name }} {{ p.last_name | upper }}
+        </th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="dim">{{ trad('common.score') }}</td>
+        {% for p in players %}
+        <td class="center">
+          {% if p.current %}{{ p.current.score }}{% else %}<span class="dim">—</span>{% endif %}
+        </td>
+        {% endfor %}
+      </tr>
+      <tr>
+        <td class="dim">{{ trad('common.ranking') }}</td>
+        {% for p in players %}
+        <td class="center">
+          {% if p.current %}<strong>#{{ p.current.position }}</strong>{% else %}<span class="dim">—</span>{% endif %}
+        </td>
+        {% endfor %}
+      </tr>
+      <tr>
+        <td class="dim">{{ trad('compare.best_score') }}</td>
+        {% for p in players %}
+        <td class="center">
+          {% if p.current and p.current.best_score %}{{ p.current.best_score }}{% else %}<span class="dim">—</span>{% endif %}
+        </td>
+        {% endfor %}
+      </tr>
+      <tr>
+        <td class="dim">{{ trad('compare.best_rank') }}</td>
+        {% for p in players %}
+        <td class="center">
+          {% if p.current and p.current.best_rank %}<strong>#{{ p.current.best_rank }}</strong>{% else %}<span class="dim">—</span>{% endif %}
+        </td>
+        {% endfor %}
+      </tr>
+      <tr>
+        <td class="dim">{{ trad('compare.nb_tournaments') }}</td>
+        {% for p in players %}
+        <td class="center">
+          {% if p.current %}{{ p.current.nb_tournaments }}{% else %}<span class="dim">—</span>{% endif %}
+        </td>
+        {% endfor %}
+      </tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+{# ===== Head-to-head ===== #}
+{% if common %}
+<div class="manage-section" style="margin-bottom:2rem">
+  <h2 style="font-size:1rem;margin-bottom:0.5rem">{{ trad('compare.h2h_title') }}</h2>
+  <p class="dim" style="font-size:0.85rem;margin-bottom:1rem">
+    {{ trad('compare.h2h_common', n=common|length) }}
+  </p>
+
+  {# Bilan #}
+  <div class="compare-h2h-bilan">
+    {% for p in players %}
+    <div class="compare-h2h-item">
+      <span style="color:{{ p.color }};font-weight:700;font-size:1.2rem">{{ h2h.get(p.id, 0) }}</span>
+      <span class="dim" style="font-size:0.8rem">{{ p.first_name | first_name }} {{ p.last_name | upper }}</span>
+    </div>
+    {% if not loop.last %}<div class="compare-h2h-sep">vs</div>{% endif %}
+    {% endfor %}
+  </div>
+
+  {# Tableau tournois communs #}
+  <div class="scroll-table" style="margin-top:1.25rem">
+  <table>
+    <colgroup>
+      <col style="width:6rem">
+      <col>
+      <col style="width:5rem">
+      {% for p in players %}<col style="width:4rem">{% endfor %}
+    </colgroup>
+    <thead>
+      <tr>
+        <th>{{ trad('common.date') }}</th>
+        <th>{{ trad('common.tournament') }}</th>
+        <th class="center">{{ trad('compare.total_players') }}</th>
+        {% for p in players %}
+        <th class="center" style="color:{{ p.color }}" title="{{ p.first_name | first_name }} {{ p.last_name | upper }}">
+          {{ p.last_name | upper | truncate(8, true, '') }}
+        </th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+    {% for t in common %}
+    <tr>
+      <td class="dim" style="white-space:nowrap">{{ t.start_date | fmt_date }}</td>
+      <td>
+        <a href="/tournaments/{{ t.id }}">{{ t.name }}</a>
+        {% if t.city %}<span class="dim" style="font-size:0.8rem"> — {{ t.city }}</span>{% endif %}
+      </td>
+      <td class="center dim">{{ t.nb_players }}</td>
+      {% for p in players %}
+      {% set pos = t.positions.get(p.id) %}
+      <td class="center">
+        {% if pos %}
+          {% set is_best = pos == t.positions.values() | min %}
+          <span {% if is_best %}style="color:{{ p.color }};font-weight:700"{% endif %}>
+            {{ pos }}
+          </span>
+        {% else %}<span class="dim">—</span>{% endif %}
+      </td>
+      {% endfor %}
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</div>
+{% elif players | length >= 2 %}
+<p class="dim" style="text-align:center;padding:2rem">{{ trad('compare.no_common') }}</p>
+{% endif %}
+
+{% else %}
+<p class="dim" style="text-align:center;padding:3rem;font-size:0.95rem">{{ trad('compare.empty_hint') }}</p>
+{% endif %}
+
+</div><!-- /wrapper -->
+
+<style>
+.compare-search-bar { position: relative; margin-bottom: 1rem; max-width: 420px; }
+.compare-search-input {
+  width: 100%; padding: 0.55rem 0.85rem; border: 1px solid var(--border);
+  border-radius: 8px; background: var(--bg2); color: var(--text);
+  font-size: 0.95rem; box-sizing: border-box;
+}
+.compare-search-input:focus { outline: none; border-color: var(--accent); }
+.compare-autocomplete {
+  position: absolute; top: calc(100% + 4px); left: 0; right: 0;
+  background: var(--bg2); border: 1px solid var(--border); border-radius: 8px;
+  z-index: 100; box-shadow: 0 4px 16px rgba(0,0,0,0.12); overflow: hidden;
+}
+.compare-autocomplete-item {
+  padding: 0.5rem 0.85rem; cursor: pointer; font-size: 0.9rem;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.compare-autocomplete-item:hover { background: var(--bg3); }
+.compare-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.25rem; min-height: 1rem; }
+.compare-chip {
+  display: flex; align-items: center; gap: 0.4rem;
+  padding: 0.3rem 0.6rem; border-radius: 20px;
+  border: 2px solid; background: var(--bg2); font-size: 0.88rem;
+}
+.compare-chip-remove {
+  background: none; border: none; cursor: pointer; color: var(--text2);
+  font-size: 0.85rem; padding: 0 0 0 0.2rem; line-height: 1;
+}
+.compare-chip-remove:hover { color: var(--text); }
+.compare-h2h-bilan {
+  display: flex; align-items: center; gap: 1.5rem;
+  background: var(--bg2); border-radius: 8px; padding: 1rem 1.5rem;
+  flex-wrap: wrap;
+}
+.compare-h2h-item { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; }
+.compare-h2h-sep { color: var(--text3); font-weight: 700; font-size: 1rem; }
+</style>
+
+<script>
+const PLAYER_IDS   = {{ players | map(attribute='id') | list | tojson }};
+const PLAYER_NAMES = {{ players | map(attribute='last_name') | list | tojson }};
+const PLAYER_COLORS = {{ players | map(attribute='color') | list | tojson }};
+const HISTORIES = {
+  {% for p in players %}
+  "{{ p.id }}": {{ p.history | tojson }},
+  {% endfor %}
+};
+let compareChart = null;
+let currentAxis = 'score';
+const LABEL_SCORE = '{{ trad("common.score") }}';
+const LABEL_RANK  = '{{ trad("common.ranking") }}';
+const TITLE_SCORE = '{{ trad("compare.score_evolution") }}';
+const TITLE_RANK  = '{{ trad("compare.rank_evolution") }}';
+
+// Union of all weeks across all players
+const ALL_WEEKS = [...new Set(
+  PLAYER_IDS.flatMap(id => (HISTORIES[id] || []).map(d => d.week))
+)].sort();
+
+// Start from the most recent "first week" across players (latest debut)
+const CHART_MIN = PLAYER_IDS.reduce((acc, id) => {
+  const weeks = (HISTORIES[id] || []).map(d => d.week);
+  if (!weeks.length) return acc;
+  const first = weeks[0];
+  return (!acc || first > acc) ? first : acc;
+}, null);
+
+function buildCompareChart() {
+  const ctx = document.getElementById('compare-chart');
+  if (!ctx) return;
+  const style = getComputedStyle(document.documentElement);
+  const textColor = style.getPropertyValue('--text2').trim();
+  const gridColor = style.getPropertyValue('--chart-grid').trim() || 'rgba(0,0,0,0.07)';
+
+  const isScore = currentAxis === 'score';
+  const datasets = PLAYER_IDS.map((id, i) => {
+    const hist = HISTORIES[id] || [];
+    const byWeek = Object.fromEntries(hist.map(d => [d.week, isScore ? d.score : d.position]));
+    return {
+      label: PLAYER_NAMES[i],
+      data: ALL_WEEKS.map(w => byWeek[w] ?? null),
+      borderColor: PLAYER_COLORS[i],
+      backgroundColor: 'transparent',
+      borderWidth: 2,
+      pointRadius: 0,
+      tension: 0.2,
+      spanGaps: false,
+    };
+  });
+
+  if (compareChart) compareChart.destroy();
+  compareChart = new Chart(ctx, {
+    type: 'line',
+    data: { labels: ALL_WEEKS, datasets },
+    options: {
+      animation: false,
+      responsive: true,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { labels: { color: textColor, boxWidth: 20 } },
+      },
+      scales: {
+        x: {
+          type: 'time',
+          time: { unit: 'year', tooltipFormat: 'dd/MM/yyyy' },
+          grid: { color: gridColor },
+          ticks: { color: textColor, maxTicksLimit: 10 },
+          min: CHART_MIN || undefined,
+        },
+        y: {
+          reverse: !isScore,
+          min: isScore ? 0 : 1,
+          max: isScore ? 1000 : undefined,
+          grid: { color: gridColor },
+          ticks: { color: textColor },
+          title: { display: true, text: isScore ? LABEL_SCORE : LABEL_RANK, color: textColor },
+        },
+      },
+    },
+  });
+}
+
+function setAxisCompare(axis, btn) {
+  if (axis === currentAxis) return;
+  currentAxis = axis;
+  document.querySelectorAll('#btn-axis-score, #btn-axis-pos').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('compare-chart-title').textContent = axis === 'score' ? TITLE_SCORE : TITLE_RANK;
+  buildCompareChart();
+}
+
+function setRangeCompare(weeks) {
+  if (!compareChart) return;
+  // Only update range buttons (not axis buttons)
+  event.target.closest('.chart-range-btns').querySelectorAll('.range-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  if (weeks === 0) {
+    compareChart.options.scales.x.min = CHART_MIN || undefined;
+    compareChart.options.scales.x.max = undefined;
+  } else {
+    const now = new Date();
+    const from = new Date(now);
+    from.setDate(from.getDate() - weeks * 7);
+    compareChart.options.scales.x.min = from.toISOString().slice(0, 10);
+    compareChart.options.scales.x.max = now.toISOString().slice(0, 10);
+  }
+  compareChart.update();
+}
+
+function switchRules(rules, btn) {
+  const url = new URL(window.location.href);
+  url.searchParams.set('rules', rules);
+  window.location.href = url.toString();
+}
+
+function removePlayer(id) {
+  const ids = PLAYER_IDS.filter(x => x !== id);
+  const url = new URL(window.location.href);
+  url.searchParams.set('ids', ids.join(','));
+  window.location.href = url.toString();
+}
+
+// Autocomplete
+const searchInput = document.getElementById('compare-search');
+const dropdown = document.getElementById('compare-autocomplete');
+let debounceTimer = null;
+
+searchInput.addEventListener('input', function() {
+  clearTimeout(debounceTimer);
+  const q = this.value.trim();
+  if (q.length < 2) { dropdown.classList.add('hidden'); return; }
+  debounceTimer = setTimeout(() => fetchSuggestions(q), 200);
+});
+
+searchInput.addEventListener('blur', function() {
+  setTimeout(() => dropdown.classList.add('hidden'), 150);
+});
+
+async function fetchSuggestions(q) {
+  const res = await fetch('/api/players/search?q=' + encodeURIComponent(q));
+  const data = await res.json();
+  renderDropdown(data);
+}
+
+function renderDropdown(players) {
+  dropdown.innerHTML = '';
+  const filtered = players.filter(p => !PLAYER_IDS.includes(String(p.id)));
+  if (!filtered.length) { dropdown.classList.add('hidden'); return; }
+  filtered.forEach(p => {
+    const item = document.createElement('div');
+    item.className = 'compare-autocomplete-item';
+    item.innerHTML = `<span>${p.nationality ? flagEmoji(p.nationality) : ''}</span><span>${p.first_name} ${p.last_name.toUpperCase()}</span>`;
+    item.addEventListener('mousedown', () => addPlayer(p));
+    dropdown.appendChild(item);
+  });
+  dropdown.classList.remove('hidden');
+}
+
+function flagEmoji(iso) {
+  if (!iso || iso.length < 2) return '';
+  const code = iso === 'UK' ? 'GB' : iso.toUpperCase();
+  return [...code].map(c => String.fromCodePoint(0x1F1E6 + c.charCodeAt(0) - 65)).join('');
+}
+
+function addPlayer(p) {
+  if (PLAYER_IDS.length >= 5) return;
+  const url = new URL(window.location.href);
+  const ids = [...PLAYER_IDS, String(p.id)];
+  url.searchParams.set('ids', ids.join(','));
+  window.location.href = url.toString();
+}
+
+{% if players %}
+buildCompareChart();
+{% endif %}
+</script>
+
+{% endblock %}

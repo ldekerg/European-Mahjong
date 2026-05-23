@@ -18,11 +18,16 @@
 {% endif %}
 
 <!-- Onglets -->
-<div class="tabs">
-  <button class="tab-btn active" onclick="showTab('mcr', this)"><span class="badge badge-mcr">MCR</span></button>
-  <button class="tab-btn"       onclick="showTab('rcr', this)"><span class="badge badge-rcr">RCR</span></button>
-  {% if referee_assignments %}<button class="tab-btn" onclick="showTab('referee', this)">🏅 {{ trad('tournament.referees') }}</button>{% endif %}
-  {% if obs_tournaments %}<button class="tab-btn" onclick="showTab('observer', this)">👁 {{ trad('tournament.observer') }}</button>{% endif %}
+<div class="tabs" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.5rem">
+  <div style="display:flex;gap:0.25rem;flex-wrap:wrap">
+    <button class="tab-btn active" onclick="showTab('mcr', this)"><span class="badge badge-mcr">MCR</span></button>
+    <button class="tab-btn"       onclick="showTab('rcr', this)"><span class="badge badge-rcr">RCR</span></button>
+    {% if referee_assignments %}<button class="tab-btn" onclick="showTab('referee', this)">🏅 {{ trad('tournament.referees') }}</button>{% endif %}
+    {% if obs_tournaments %}<button class="tab-btn" onclick="showTab('observer', this)">👁 {{ trad('tournament.observer') }}</button>{% endif %}
+  </div>
+  <a href="/compare?ids={{ player.id }}" class="btn-secondary" style="font-size:0.82rem;padding:0.3rem 0.75rem;white-space:nowrap">
+    ⚖️ {{ trad('compare.compare_btn') }}
+  </a>
 </div>
 
 {% for regles, data in [('mcr', mcr), ('rcr', rcr)] %}
