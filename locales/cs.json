@@ -354,5 +354,13 @@
     "doc_covid_ruling": "Zvláštní pravidla COVID-19",
     "doc_covid_end": "Konec zvláštních pravidel COVID-19",
     "doc_ukraine": "Situace na Ukrajině"
+  },
+  "rules": {
+    "page_title": "Mahjong & Pravidla",
+    "tab_mcr": "MCR",
+    "tab_rcr": "Riichi (RCR)",
+    "official": "Oficiální dokumenty",
+    "translations": "Překlady (neoficiální)",
+    "no_translations": "Zatím nejsou k dispozici žádné překlady."
   }
 }

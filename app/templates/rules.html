@@ -1,9 +1,74 @@
 {% extends "base.html" %}
 {% block content %}
+
 <div class="ranking-header">
-  <h1>{{ trad('nav.mahjong_rules') }}</h1>
+  <h1>{{ trad('rules.page_title') }}</h1>
 </div>
-<div style="max-width:780px;margin:2rem auto;padding:0 1rem">
-  <p class="dim">{{ trad('common.coming_soon') }}</p>
+
+<div class="tabs" id="main-tabs">
+  <button class="tab-btn active" onclick="showTab('mcr', this)"><span class="badge badge-mcr">MCR</span></button>
+  <button class="tab-btn"        onclick="showTab('rcr', this)"><span class="badge badge-rcr">RCR</span></button>
 </div>
+
+<div style="max-width:780px;margin:0 auto;padding:0 1rem 3rem">
+
+{% for ruleset_key, ruleset_label in [('mcr', trad('rules.tab_mcr')), ('rcr', trad('rules.tab_rcr'))] %}
+<div id="tab-{{ ruleset_key }}" class="tab-content {% if ruleset_key != 'mcr' %}hidden{% endif %}">
+
+  <!-- Officiels -->
+  <section style="margin-top:1.5rem;margin-bottom:2rem">
+    <h2 class="rules-section-title">{{ trad('rules.official') }}</h2>
+    <ul style="list-style:none;padding:0;margin:0">
+      {% for doc in rules[ruleset_key].official %}
+      <li style="padding:0.5rem 0;border-bottom:1px solid var(--border);display:flex;align-items:baseline;gap:0.6rem">
+        <a href="{{ doc.local }}" target="_blank" rel="noopener" style="font-size:0.88rem;white-space:nowrap">📄 {{ doc.title }}</a>
+        <span class="dim" style="font-size:0.8rem">{{ doc.description }}</span>
+      </li>
+      {% endfor %}
+    </ul>
+  </section>
+
+  <!-- Traductions -->
+  <section style="margin-bottom:2rem">
+    <h2 class="rules-section-title">{{ trad('rules.translations') }}</h2>
+    {% if rules[ruleset_key].translations %}
+    <ul style="list-style:none;padding:0;margin:0">
+      {% for doc in rules[ruleset_key].translations %}
+      <li style="padding:0.5rem 0;border-bottom:1px solid var(--border);display:flex;align-items:baseline;gap:0.6rem">
+        <a href="{{ doc.local }}" target="_blank" rel="noopener" style="font-size:0.88rem;white-space:nowrap">📄 {{ doc.title }}</a>
+        <span class="dim" style="font-size:0.8rem">{{ doc.description }}</span>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="dim" style="font-size:0.88rem">{{ trad('rules.no_translations') }}</p>
+    {% endif %}
+  </section>
+
+</div>
+{% endfor %}
+
+</div>
+
+<style>
+.rules-section-title {
+  font-size: 1rem;
+  font-weight: 700;
+  border-bottom: 2px solid var(--accent);
+  padding-bottom: 0.3rem;
+  margin-bottom: 0.75rem;
+}
+</style>
+
+<script>
+function showTab(name, btn) {
+  ['mcr','rcr'].forEach(function(t) {
+    document.getElementById('tab-' + t).classList.add('hidden');
+  });
+  document.querySelectorAll('#main-tabs .tab-btn').forEach(function(b) { b.classList.remove('active'); });
+  document.getElementById('tab-' + name).classList.remove('hidden');
+  btn.classList.add('active');
+}
+</script>
+
 {% endblock %}

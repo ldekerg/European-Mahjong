@@ -354,5 +354,13 @@
     "doc_covid_ruling": "COVID-19 különleges szabályozás",
     "doc_covid_end": "COVID-19 különleges szabályozás vége",
     "doc_ukraine": "Ukrajna helyzete"
+  },
+  "rules": {
+    "page_title": "Mahjong & Szabályok",
+    "tab_mcr": "MCR",
+    "tab_rcr": "Riichi (RCR)",
+    "official": "Hivatalos dokumentumok",
+    "translations": "Fordítások (nem hivatalos)",
+    "no_translations": "Még nem állnak rendelkezésre fordítások."
   }
 }

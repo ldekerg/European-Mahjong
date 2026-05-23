@@ -354,5 +354,13 @@
     "doc_covid_ruling": "Спеціальне правило COVID-19",
     "doc_covid_end": "Кінець спеціального правила COVID-19",
     "doc_ukraine": "Ситуація в Україні"
+  },
+  "rules": {
+    "page_title": "Маджонг & Правила",
+    "tab_mcr": "MCR",
+    "tab_rcr": "Riichi (RCR)",
+    "official": "Офіційні документи",
+    "translations": "Переклади (неофіційні)",
+    "no_translations": "Поки немає доступних перекладів."
   }
 }

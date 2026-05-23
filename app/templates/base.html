@@ -312,11 +312,13 @@
         });
     })();
 
-    // ── Nav group dropdowns (mobile click) ───────────────────────────────────
+    // ── Nav group dropdowns (touch/mobile click) ─────────────────────────────
     document.getElementById('nav-links').addEventListener('click', function(e) {
-        if (window.innerWidth > 768) return;
         var btn = e.target.closest('.nav-group-btn');
         if (!btn) return;
+        // On desktop with real hover, let CSS handle it — only intercept on touch or narrow screen
+        var isTouchOrMobile = window.innerWidth <= 768 || window.matchMedia('(hover: none)').matches;
+        if (!isTouchOrMobile) return;
         e.stopPropagation();
         var group = btn.closest('.nav-group');
         var wasOpen = group.classList.contains('open');

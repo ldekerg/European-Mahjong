@@ -7,6 +7,7 @@ router = APIRouter()
 
 _ABOUT_PATH = Path(__file__).parent.parent.parent / "data" / "about.json"
 _FEDS_PATH  = Path(__file__).parent.parent.parent / "data" / "federations.json"
+_RULES_PATH = Path(__file__).parent.parent.parent / "data" / "rules.json"
 
 with open(_ABOUT_PATH, encoding="utf-8") as _f:
     _ABOUT = json.load(_f)
@@ -14,10 +15,13 @@ with open(_ABOUT_PATH, encoding="utf-8") as _f:
 with open(_FEDS_PATH, encoding="utf-8") as _f:
     _FEDERATIONS = json.load(_f)
 
+with open(_RULES_PATH, encoding="utf-8") as _f:
+    _RULES = json.load(_f)
+
 
 @router.get("/rules")
 def rules(request: Request):
-    return templates.TemplateResponse(request, "rules.html", {})
+    return templates.TemplateResponse(request, "rules.html", {"rules": _RULES})
 
 
 @router.get("/about")

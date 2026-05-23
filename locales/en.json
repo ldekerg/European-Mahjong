@@ -354,5 +354,13 @@
     "doc_covid_ruling": "COVID-19 Special Ruling",
     "doc_covid_end": "COVID-19 End of Special Ruling",
     "doc_ukraine": "Situation in Ukraine"
+  },
+  "rules": {
+    "page_title": "Mahjong & Rules",
+    "tab_mcr": "MCR",
+    "tab_rcr": "Riichi (RCR)",
+    "official": "Official documents",
+    "translations": "Translations (unofficial)",
+    "no_translations": "No translations available yet."
   }
 }

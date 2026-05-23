@@ -354,5 +354,13 @@
     "doc_covid_ruling": "COVID-19-erityismääräys",
     "doc_covid_end": "COVID-19-erityismääräyksen loppu",
     "doc_ukraine": "Tilanne Ukrainassa"
+  },
+  "rules": {
+    "page_title": "Mahjong & Säännöt",
+    "tab_mcr": "MCR",
+    "tab_rcr": "Riichi (RCR)",
+    "official": "Viralliset asiakirjat",
+    "translations": "Käännökset (epäviralliset)",
+    "no_translations": "Ei käännöksiä saatavilla vielä."
   }
 }

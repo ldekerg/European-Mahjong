@@ -354,5 +354,13 @@
     "doc_covid_ruling": "COVID-19 īpašais noteikums",
     "doc_covid_end": "COVID-19 īpašā noteikuma beigas",
     "doc_ukraine": "Situācija Ukrainā"
+  },
+  "rules": {
+    "page_title": "Mahjong & Noteikumi",
+    "tab_mcr": "MCR",
+    "tab_rcr": "Riichi (RCR)",
+    "official": "Oficiālie dokumenti",
+    "translations": "Tulkojumi (neoficiāli)",
+    "no_translations": "Pagaidām nav pieejamu tulkojumu."
   }
 }
