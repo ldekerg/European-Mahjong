@@ -1,0 +1,142 @@
+{% extends "manage/base.html" %}
+{% block content %}
+<div class="manage-section">
+  <div class="manage-header">
+    <h2>Admin users</h2>
+  </div>
+
+  <!-- ── Create form ─────────────────────────────────────────────── -->
+  <div class="manage-card" style="margin-bottom:2rem">
+    <h3 style="font-size:1rem;font-weight:600;margin-bottom:1rem">Create new admin</h3>
+    <form method="post" action="/manage/admins/create" class="manage-form-grid">
+      <div class="form-field">
+        <label>Username</label>
+        <input type="text" name="username" required class="manage-input" placeholder="username">
+      </div>
+      <div class="form-field">
+        <label>Password <span class="dim" style="font-size:0.8rem">(min. 8 chars)</span></label>
+        <input type="password" name="password" required minlength="8" class="manage-input" placeholder="••••••••">
+      </div>
+      <div class="form-field">
+        <label>Role</label>
+        <select name="role" class="manage-input">
+          <option value="admin">admin</option>
+          <option value="superadmin">superadmin</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label>Countries <span class="dim" style="font-size:0.8rem">(comma-separated ISO, empty = all)</span></label>
+        <input type="text" name="countries" class="manage-input" placeholder="FR,BE,LU">
+      </div>
+      <div class="form-field" style="align-self:flex-end">
+        <button type="submit" class="btn btn-primary">Create</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- ── Admin list ──────────────────────────────────────────────── -->
+  <div class="scroll-table">
+  <table class="manage-table">
+    <thead>
+      <tr>
+        <th>Username</th>
+        <th>Role</th>
+        <th>Countries</th>
+        <th>Created</th>
+        <th>Last login</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for a in admins %}
+    <tr>
+      <td><strong>{{ a.username }}</strong>{% if a.username == manage_user.username %} <span class="dim" style="font-size:0.75rem">(you)</span>{% endif %}</td>
+      <td>
+        {% if a.role == 'superadmin' %}
+        <span class="badge badge-mcr" style="font-size:0.7rem">superadmin</span>
+        {% else %}
+        <span class="badge" style="font-size:0.7rem;background:var(--bg3)">admin</span>
+        {% endif %}
+      </td>
+      <td>{{ a.countries or '<span class="dim">all</span>' | safe }}</td>
+      <td class="dim" style="font-size:0.82rem">{{ a.created_at.strftime('%Y-%m-%d') if a.created_at else '—' }}</td>
+      <td class="dim" style="font-size:0.82rem">{{ a.last_login.strftime('%Y-%m-%d %H:%M') if a.last_login else '—' }}</td>
+      <td style="white-space:nowrap;text-align:right">
+        <button class="btn btn-sm" onclick="toggleEditForm({{ a.id }})">Edit</button>
+        {% if a.username != manage_user.username %}
+        <form method="post" action="/manage/admins/{{ a.id }}/delete" style="display:inline"
+              onsubmit="return confirm('Delete {{ a.username }}?')">
+          <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+        </form>
+        {% endif %}
+      </td>
+    </tr>
+    <!-- Edit form row -->
+    <tr id="edit-form-{{ a.id }}" style="display:none;background:var(--bg3)">
+      <td colspan="6" style="padding:1rem">
+        <form method="post" action="/manage/admins/{{ a.id }}/update" class="manage-form-grid">
+          <div class="form-field">
+            <label>Username</label>
+            <input type="text" name="username" value="{{ a.username }}" class="manage-input">
+          </div>
+          <div class="form-field">
+            <label>New password <span class="dim" style="font-size:0.8rem">(leave empty to keep)</span></label>
+            <input type="password" name="password" minlength="8" class="manage-input" placeholder="••••••••">
+          </div>
+          <div class="form-field">
+            <label>Role</label>
+            <select name="role" class="manage-input">
+              <option value="admin" {% if a.role == 'admin' %}selected{% endif %}>admin</option>
+              <option value="superadmin" {% if a.role == 'superadmin' %}selected{% endif %}>superadmin</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label>Countries <span class="dim" style="font-size:0.8rem">(empty = all)</span></label>
+            <input type="text" name="countries" value="{{ a.countries or '' }}" class="manage-input" placeholder="FR,BE,LU">
+          </div>
+          <div class="form-field" style="align-self:flex-end;display:flex;gap:0.5rem">
+            <button type="submit" class="btn btn-primary btn-sm">Save</button>
+            <button type="button" class="btn btn-sm" onclick="toggleEditForm({{ a.id }})">Cancel</button>
+          </div>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<script>
+function toggleEditForm(id) {
+  var row = document.getElementById('edit-form-' + id);
+  row.style.display = row.style.display === 'none' ? 'table-row' : 'none';
+}
+</script>
+
+<style>
+.manage-form-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+  align-items: flex-start;
+}
+.manage-form-grid .form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 160px;
+}
+.manage-form-grid label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text2);
+}
+.btn-danger {
+  background: #dc2626;
+  color: #fff;
+  border: none;
+}
+.btn-danger:hover { background: #b91c1c; }
+</style>
+{% endblock %}

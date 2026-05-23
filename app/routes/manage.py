@@ -1766,3 +1766,122 @@ def bot_unban(ip: str, request: Request):
     _ban_store.pop(ip, None)
     _set_flash(request, f"IP {ip} unbanned.")
     return RedirectResponse("/manage/bots/", status_code=302)
+
+
+# ---------------------------------------------------------------------------
+# Admins (superadmin only)
+# ---------------------------------------------------------------------------
+
+def _require_superadmin(request: Request):
+    user = _require_auth(request)
+    if isinstance(user, RedirectResponse):
+        return user
+    if user.role != "superadmin":
+        return RedirectResponse("/manage/", status_code=302)
+    return user
+
+
+@router.get("/admins/")
+def admins_list(request: Request, db: Session = Depends(get_db)):
+    user = _require_superadmin(request)
+    if isinstance(user, RedirectResponse):
+        return user
+    admins = db.query(AdminUser).order_by(AdminUser.username).all()
+    ctx = _base_ctx(request, user, "admins")
+    ctx["admins"] = admins
+    return templates.TemplateResponse(request, "manage/admins.html", ctx)
+
+
+@router.post("/admins/create")
+async def admins_create(request: Request, db: Session = Depends(get_db)):
+    user = _require_superadmin(request)
+    if isinstance(user, RedirectResponse):
+        return user
+    form = await request.form()
+    username  = form.get("username", "").strip()
+    password  = form.get("password", "").strip()
+    role      = form.get("role", "admin")
+    countries = form.get("countries", "").strip()
+
+    if not username or not password:
+        _set_flash(request, "Username and password are required.", "error")
+        return RedirectResponse("/manage/admins/", status_code=302)
+    if len(password) < 8:
+        _set_flash(request, "Password must be at least 8 characters.", "error")
+        return RedirectResponse("/manage/admins/", status_code=302)
+    if db.query(AdminUser).filter_by(username=username).first():
+        _set_flash(request, f"Username '{username}' already exists.", "error")
+        return RedirectResponse("/manage/admins/", status_code=302)
+    if role not in ("superadmin", "admin"):
+        role = "admin"
+
+    pw_hash = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
+    new_admin = AdminUser(
+        username=username,
+        password_hash=pw_hash,
+        role=role,
+        countries=countries or None,
+    )
+    db.add(new_admin)
+    db.commit()
+    _set_flash(request, f"Admin '{username}' created.")
+    return RedirectResponse("/manage/admins/", status_code=302)
+
+
+@router.post("/admins/{admin_id}/update")
+async def admins_update(admin_id: int, request: Request, db: Session = Depends(get_db)):
+    user = _require_superadmin(request)
+    if isinstance(user, RedirectResponse):
+        return user
+    target = db.query(AdminUser).filter_by(id=admin_id).first()
+    if not target:
+        _set_flash(request, "Admin not found.", "error")
+        return RedirectResponse("/manage/admins/", status_code=302)
+
+    form = await request.form()
+    new_username  = form.get("username", "").strip()
+    new_password  = form.get("password", "").strip()
+    new_role      = form.get("role", target.role)
+    new_countries = form.get("countries", "").strip()
+
+    if new_username and new_username != target.username:
+        if db.query(AdminUser).filter_by(username=new_username).first():
+            _set_flash(request, f"Username '{new_username}' already taken.", "error")
+            return RedirectResponse("/manage/admins/", status_code=302)
+        target.username = new_username
+
+    if new_password:
+        if len(new_password) < 8:
+            _set_flash(request, "New password must be at least 8 characters.", "error")
+            return RedirectResponse("/manage/admins/", status_code=302)
+        target.password_hash = bcrypt.hashpw(new_password.encode(), bcrypt.gensalt()).decode()
+
+    if new_role in ("superadmin", "admin"):
+        # Prevent removing own superadmin role
+        if target.username == user.username and new_role != "superadmin":
+            _set_flash(request, "You cannot remove your own superadmin role.", "error")
+            return RedirectResponse("/manage/admins/", status_code=302)
+        target.role = new_role
+
+    target.countries = new_countries or None
+    db.commit()
+    _set_flash(request, f"Admin '{target.username}' updated.")
+    return RedirectResponse("/manage/admins/", status_code=302)
+
+
+@router.post("/admins/{admin_id}/delete")
+async def admins_delete(admin_id: int, request: Request, db: Session = Depends(get_db)):
+    user = _require_superadmin(request)
+    if isinstance(user, RedirectResponse):
+        return user
+    target = db.query(AdminUser).filter_by(id=admin_id).first()
+    if not target:
+        _set_flash(request, "Admin not found.", "error")
+        return RedirectResponse("/manage/admins/", status_code=302)
+    if target.username == user.username:
+        _set_flash(request, "You cannot delete your own account.", "error")
+        return RedirectResponse("/manage/admins/", status_code=302)
+    db.delete(target)
+    db.commit()
+    _set_flash(request, f"Admin '{target.username}' deleted.")
+    return RedirectResponse("/manage/admins/", status_code=302)
