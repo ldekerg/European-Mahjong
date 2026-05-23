@@ -360,7 +360,16 @@
     "doc_country_transfer": "Prestup krajiny - Rozhodnutie EMA",
     "doc_covid_ruling": "Špeciálne pravidlá COVID-19",
     "doc_covid_end": "Koniec špeciálnych pravidiel COVID-19",
-    "doc_ukraine": "Situácia na Ukrajine"
+    "doc_ukraine": "Situácia na Ukrajine",
+    "doc_ga_2023": "General Assembly 2023",
+    "doc_ga_2019": "General Assembly 2019",
+    "doc_ga_2017": "General Assembly 2017",
+    "doc_ga_2015": "General Assembly 2015",
+    "doc_ga_2013": "General Assembly 2013",
+    "doc_ga_2011": "General Assembly 2011",
+    "doc_ga_2009": "General Assembly 2009",
+    "doc_ga_2007": "General Assembly 2007",
+    "doc_ga_2005": "General Assembly 2005"
   },
   "rules": {
     "page_title": "Mahjong & Pravidlá",

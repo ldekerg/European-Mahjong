@@ -154,6 +154,21 @@
           {% if pdf.description %}<span class="dim" style="font-size:0.78rem">{{ pdf.description }}</span>{% endif %}
         </div>
         {% endfor %}
+        {% if doc.subsections %}
+        <div style="margin-top:0.5rem">
+          {% for sub in doc.subsections %}
+          <div class="ga-subsection">
+            <span class="ga-subsection-year">{{ sub.year }}</span>
+            {% if sub.note %}<span class="dim" style="font-size:0.78rem">{{ sub.note }}</span>{% endif %}
+            <span class="ga-subsection-pdfs">
+              {% for pdf in sub.pdfs %}
+              <a href="{{ pdf.local }}" target="_blank" rel="noopener">📄 {{ pdf.title }}</a>
+              {% endfor %}
+            </span>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
       </li>
       {% endfor %}
     </ul>
@@ -190,6 +205,28 @@
 }
 .presidium-flag { font-size: 2rem; margin-bottom: 0.35rem; }
 .presidium-name { font-weight: 600; font-size: 0.95rem; }
+.ga-subsection {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding: 0.3rem 0;
+  border-top: 1px solid var(--border);
+  font-size: 0.82rem;
+}
+.ga-subsection-year {
+  font-weight: 600;
+  min-width: 2.5rem;
+  color: var(--text2);
+}
+.ga-subsection-pdfs {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+.ga-subsection-pdfs a {
+  white-space: nowrap;
+}
 .about-section-title {
   font-size: 1rem;
   font-weight: 700;
