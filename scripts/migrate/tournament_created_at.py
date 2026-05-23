@@ -6,11 +6,10 @@ from app.database import engine
 from sqlalchemy import text
 
 if __name__ == "__main__":
-    with engine.connect() as conn:
+    with engine.begin() as conn:
         # Add column — NULL for existing rows (unknown creation date)
         try:
             conn.execute(text("ALTER TABLE tournaments ADD COLUMN created_at DATETIME"))
-            conn.commit()
             print("Column created_at added to tournaments.")
         except Exception as e:
             if "duplicate column" in str(e).lower():

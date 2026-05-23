@@ -24,10 +24,9 @@ CREATE INDEX IF NOT EXISTS ix_audit_log_session    ON audit_log (session_id);
 """
 
 if __name__ == "__main__":
-    with engine.connect() as conn:
+    with engine.begin() as conn:
         for stmt in DDL.strip().split(";"):
             stmt = stmt.strip()
             if stmt:
                 conn.execute(text(stmt))
-        conn.commit()
     print("audit_log table created (or already exists).")
