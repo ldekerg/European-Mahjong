@@ -21,6 +21,8 @@
 <div class="tabs">
   <button class="tab-btn active" onclick="showTab('mcr', this)"><span class="badge badge-mcr">MCR</span></button>
   <button class="tab-btn"       onclick="showTab('rcr', this)"><span class="badge badge-rcr">RCR</span></button>
+  {% if referee_assignments %}<button class="tab-btn" onclick="showTab('referee', this)">🏅 {{ trad('tournament.referees') }}</button>{% endif %}
+  {% if obs_tournaments %}<button class="tab-btn" onclick="showTab('observer', this)">👁 {{ trad('tournament.observer') }}</button>{% endif %}
 </div>
 
 {% for regles, data in [('mcr', mcr), ('rcr', rcr)] %}
@@ -139,6 +141,71 @@
 
 </div>
 {% endfor %}
+
+{% if referee_assignments %}
+<div id="tab-referee" class="tab-content hidden">
+  <h2>{{ trad('tournament.referees') }}</h2>
+  <div class="scroll-table"><table>
+    <colgroup>
+      <col class="col-flag col-opt">
+      <col>
+      <col class="col-opt" style="width:5rem">
+      <col class="col-opt" style="width:4rem">
+    </colgroup>
+    <thead><tr>
+      <th class="col-flag col-opt center" title="{{ trad('common.country') }}">🌍</th>
+      <th>{{ trad('common.tournament') }}</th>
+      <th class="center col-opt">MCR/RCR</th>
+      <th class="center col-opt">{{ trad('common.date') }}</th>
+    </tr></thead>
+    <tbody>
+    {% for ra in referee_assignments %}
+    {% set t = ra.tournament %}
+    <tr>
+      <td class="col-flag col-opt center">{{ t.country | flag_link('tournaments') }}</td>
+      <td><a href="/tournaments/{{ t.id }}">{{ t.name }}</a></td>
+      <td class="center">
+        <span class="badge {% if t.rules == 'MCR' %}badge-mcr{% else %}badge-rcr{% endif %}">{{ t.rules }}</span>
+      </td>
+      <td class="center dim">{{ t.start_date.strftime('%Y') }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table></div>
+</div>
+{% endif %}
+
+{% if obs_tournaments %}
+<div id="tab-observer" class="tab-content hidden">
+  <h2>{{ trad('tournament.observer') }}</h2>
+  <div class="scroll-table"><table>
+    <colgroup>
+      <col class="col-flag col-opt">
+      <col>
+      <col class="col-opt" style="width:4rem">
+      <col class="col-opt" style="width:4rem">
+    </colgroup>
+    <thead><tr>
+      <th class="col-flag col-opt center" title="{{ trad('common.country') }}">🌍</th>
+      <th>{{ trad('common.tournament') }}</th>
+      <th class="center col-opt">MCR/RCR</th>
+      <th class="center col-opt">{{ trad('common.date') }}</th>
+      <th class="col-opt"></th>
+    </tr></thead>
+    <tbody>
+    {% for t in obs_tournaments %}
+    <tr>
+      <td class="col-flag col-opt center">{{ t.country | flag_link('tournaments') }}</td>
+      <td><a href="/tournaments/{{ t.id }}">{{ t.name }}</a></td>
+      <td class="center"><span class="badge {% if t.rules == 'MCR' %}badge-mcr{% else %}badge-rcr{% endif %}">{{ t.rules }}</span></td>
+      <td class="center dim">{{ t.start_date.strftime('%Y') }}</td>
+      <td class="col-opt">{% if t.obs_report_path %}<a href="{{ t.obs_report_path }}" target="_blank" rel="noopener">PDF ↗</a>{% endif %}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table></div>
+</div>
+{% endif %}
 
 <script>
 var _I18N_DETAIL = {

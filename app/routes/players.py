@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from datetime import date
 
 from app.database import get_db
-from app.models import Player, Tournament, Result, RankingHistory, NationalityChange, Referee
+from app.models import Player, Tournament, Result, RankingHistory, NationalityChange, Referee, TournamentReferee
 from app.ranking import week_monday, active_tournaments, _player_results, contribution, FREEZE_START, FREEZE_END
 
 router = APIRouter(prefix="/players")
@@ -246,6 +246,23 @@ def player_detail(player_id: str, request: Request, db: Session = Depends(get_db
         r.rules for r in db.query(Referee.rules).filter(Referee.player_id == player_id).all()
     ]
 
+    # Tournaments where this player was EMA observer
+    obs_tournaments = (
+        db.query(Tournament)
+        .filter(Tournament.obs_player_id == player_id)
+        .order_by(Tournament.start_date.desc())
+        .all()
+    )
+
+    # Tournaments where this player was referee (via TournamentReferee)
+    referee_assignments = (
+        db.query(TournamentReferee)
+        .filter(TournamentReferee.player_id == player_id)
+        .join(Tournament, TournamentReferee.tournament_id == Tournament.id)
+        .order_by(Tournament.start_date.desc())
+        .all()
+    )
+
     return templates.TemplateResponse(request, "players/detail.html", {
         "player": player,
         "mcr": build_tab("MCR"),
@@ -255,6 +272,8 @@ def player_detail(player_id: str, request: Request, db: Session = Depends(get_db
         "freeze_start": FREEZE_START.isoformat(),
         "freeze_end": FREEZE_END.isoformat(),
         "referee_rules": referee_rules,
+        "obs_tournaments": obs_tournaments,
+        "referee_assignments": referee_assignments,
     })
 
 
