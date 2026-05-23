@@ -2,9 +2,7 @@
 <p class="empty">{{ trad('common.click_player') }}</p>
 {% else %}
 <div class="apercu-header">
-  {% if player_photo %}
-  <img src="/static/photos/{{ player.id }}.jpg" alt="{{ player.last_name }}" class="apercu-photo">
-  {% endif %}
+  <img src="/static/photos/{{ player.id }}.jpg" alt="{{ player.last_name }}" class="apercu-photo" onerror="this.src='/static/photos/placeholder.svg'">
   <div class="apercu-header-info">
     <div class="apercu-name">{{ player.first_name | first_name }} {{ player.last_name | title }}</div>
     <div class="apercu-meta">

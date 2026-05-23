@@ -20,6 +20,7 @@ data/
 *.db-wal
 
 app/static/obs_reports/
+app/static/photos/
 
 # IDE
 .vscode/

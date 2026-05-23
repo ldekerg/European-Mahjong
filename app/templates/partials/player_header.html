@@ -5,9 +5,7 @@
      show_edit — bool (défaut false) : affiche le bouton Modifier
 #}
 <div class="player-header">
-  {% if player_photo %}
-  <img src="/static/photos/{{ player.id }}.jpg" alt="{{ player.last_name }}" class="player-photo">
-  {% endif %}
+  <img src="/static/photos/{{ player.id }}.jpg" alt="{{ player.last_name }}" class="player-photo" onerror="this.src='/static/photos/placeholder.svg'">
   <div class="player-header-info">
     <div class="player-id">{{ player.id }}</div>
     <div class="player-name">{{ player.first_name | first_name }} {{ player.last_name | title }}</div>
