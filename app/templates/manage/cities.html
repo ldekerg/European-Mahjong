@@ -24,10 +24,9 @@
   <span id="selection-count" class="dim" style="font-size:0.82rem"></span>
 </div>
 
-<form method="post" action="/manage/cities/merge-preview" id="merge-form" style="display:block">
-<form method="post" action="/manage/cities/delete" id="delete-form" style="display:block">
+<form method="post" action="/manage/cities/merge-preview" id="merge-form" style="display:none"></form>
+<form method="post" action="/manage/cities/delete" id="delete-form" style="display:none"></form>
 
-<!-- Hidden inputs duplicated into both forms by JS -->
 <div class="scroll-table">
 <table>
   <thead>
@@ -65,9 +64,6 @@
   </tbody>
 </table>
 </div>
-
-</form>
-</form>
 
 {% if total_pages > 1 %}
 <div class="manage-pagination">
