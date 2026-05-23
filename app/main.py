@@ -349,10 +349,47 @@ _rl_store: dict = collections.defaultdict(list)
 _rl_limit = 30
 _rl_window = 60  # seconds
 
+# IP ban store: ip -> ban_until timestamp
+_ban_store: dict = {}
+_ban_duration = 3600  # 1 hour
+
+# User-agent blocklist — bots and scrapers
+_BAD_UA = [
+    "python-requests", "python-urllib", "aiohttp",
+    "curl/", "wget/",
+    "go-http-client", "java/", "okhttp",
+    "scrapy", "mechanize", "beautifulsoup",
+    "zgrab", "masscan", "nmap",
+    "semrushbot", "ahrefsbot", "dotbot", "mj12bot",
+    "petalbot", "bytespider", "claudebot", "gptbot",
+    "facebookexternalhit/1.0",
+]
+
 
 @app.middleware("http")
 async def captcha_and_rate_limit(request: Request, call_next):
     path = request.url.path
+
+    ip = get_remote_address(request)
+    now = time.time()
+
+    # Check ban list first
+    if ip in _ban_store:
+        if now < _ban_store[ip]:
+            return Response(status_code=403)
+        else:
+            del _ban_store[ip]
+
+    # Block known bots by User-Agent → ban the IP
+    ua = request.headers.get("user-agent", "").lower()
+    if any(bad in ua for bad in _BAD_UA):
+        _ban_store[ip] = now + _ban_duration
+        return Response(status_code=403)
+
+    # Honeypot: any visit to this path = instant ban
+    if path == "/_ems/data/sync":
+        _ban_store[ip] = now + _ban_duration
+        return Response(status_code=404)
 
     # Skip exempt routes
     if any(path.startswith(p) for p in EXEMPT_PREFIXES):
@@ -362,8 +399,6 @@ async def captcha_and_rate_limit(request: Request, call_next):
 
     if is_public:
         # 1. Rate limiting
-        ip = get_remote_address(request)
-        now = time.time()
         _rl_store[ip] = [t for t in _rl_store[ip] if t > now - _rl_window]
         if len(_rl_store[ip]) >= _rl_limit:
             return JSONResponse(
