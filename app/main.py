@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Request, Query, Depends
-from fastapi.responses import RedirectResponse, JSONResponse
+from fastapi.responses import RedirectResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
@@ -376,6 +376,22 @@ _rl_window = 60  # seconds
 _ban_store: dict = {}
 _ban_duration = 3600  # 1 hour
 
+# Bot event log (in-memory, last 500 events)
+import datetime as _dt
+_bot_log: list = []   # list of dicts
+_bot_log_max = 500
+
+def _log_bot(ip: str, reason: str, ua: str = "", path: str = ""):
+    _bot_log.append({
+        "ts":     _dt.datetime.now().isoformat(timespec="seconds"),
+        "ip":     ip,
+        "reason": reason,
+        "ua":     ua[:120],
+        "path":   path[:80],
+    })
+    if len(_bot_log) > _bot_log_max:
+        _bot_log.pop(0)
+
 # User-agent blocklist — bots and scrapers
 _BAD_UA = [
     "python-requests", "python-urllib", "aiohttp",
@@ -406,11 +422,15 @@ async def captcha_and_rate_limit(request: Request, call_next):
     # Block known bots by User-Agent → ban the IP
     ua = request.headers.get("user-agent", "").lower()
     if any(bad in ua for bad in _BAD_UA):
+        if ip not in _ban_store:
+            _log_bot(ip, "bad_ua", ua=ua, path=path)
         _ban_store[ip] = now + _ban_duration
         return Response(status_code=403)
 
     # Honeypot: any visit to this path = instant ban
     if path == "/_ems/data/sync":
+        if ip not in _ban_store:
+            _log_bot(ip, "honeypot", ua=ua, path=path)
         _ban_store[ip] = now + _ban_duration
         return Response(status_code=404)
 

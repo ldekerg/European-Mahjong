@@ -1,0 +1,72 @@
+{% extends "manage/base.html" %}
+{% block title %} — Bots & Bans{% endblock %}
+{% block content %}
+
+<div class="manage-header">
+  <h1>Bots &amp; Bans</h1>
+</div>
+
+<div class="manage-section">
+  <h2>IPs actuellement bannies ({{ banned | length }})</h2>
+  {% if banned %}
+  <table>
+    <thead><tr><th>IP</th><th>Bannie jusqu'à</th><th>Temps restant</th><th></th></tr></thead>
+    <tbody>
+    {% for b in banned %}
+    <tr>
+      <td><code>{{ b.ip }}</code></td>
+      <td>{{ (b.until | int) | datetimeformat if datetimeformat is defined else b.until | int }}</td>
+      <td>{{ (b.remaining // 60) }}m {{ (b.remaining % 60) }}s</td>
+      <td>
+        <form method="post" action="/manage/bots/{{ b.ip }}/unban">
+          <button class="btn btn-secondary btn-sm">Débannir</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="empty">Aucune IP bannie.</p>
+  {% endif %}
+</div>
+
+<div class="manage-section">
+  <h2>Événements détectés ({{ events | length }}, derniers 500)</h2>
+  {% if events %}
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>IP</th>
+        <th>Raison</th>
+        <th>User-Agent</th>
+        <th>Path</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for e in events %}
+    <tr>
+      <td style="white-space:nowrap">{{ e.ts }}</td>
+      <td><code>{{ e.ip }}</code></td>
+      <td>
+        {% if e.reason == "bad_ua" %}
+          <span class="badge badge-rcl" style="background:#e74c3c;color:#fff">UA bloqué</span>
+        {% elif e.reason == "honeypot" %}
+          <span class="badge badge-rcl" style="background:#8e44ad;color:#fff">Honeypot</span>
+        {% else %}
+          {{ e.reason }}
+        {% endif %}
+      </td>
+      <td style="font-size:0.8rem;color:var(--text3)">{{ e.ua }}</td>
+      <td style="font-size:0.8rem">{{ e.path }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="empty">Aucun événement détecté.</p>
+  {% endif %}
+</div>
+
+{% endblock %}

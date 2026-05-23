@@ -1733,3 +1733,36 @@ def backups_download(filename: str, request: Request):
     if not path.exists():
         return JSONResponse({"error": "File not found."}, status_code=404)
     return FileResponse(path, media_type="application/octet-stream", filename=filename)
+
+
+@router.get("/bots/")
+def bots_list(request: Request):
+    user = _require_auth(request)
+    if isinstance(user, RedirectResponse):
+        return user
+    if user.role != "superadmin":
+        _set_flash(request, "Access denied.", "error")
+        return RedirectResponse("/manage/", status_code=302)
+
+    from app.main import _bot_log, _ban_store
+    import time as _time
+    now = _time.time()
+    banned = [
+        {"ip": ip, "until": ban_until, "remaining": int(ban_until - now)}
+        for ip, ban_until in sorted(_ban_store.items(), key=lambda x: -x[1])
+        if ban_until > now
+    ]
+    ctx = _base_ctx(request, user, "bots")
+    ctx.update({"events": list(reversed(_bot_log)), "banned": banned})
+    return templates.TemplateResponse(request, "manage/bots.html", ctx)
+
+
+@router.post("/bots/{ip}/unban")
+def bot_unban(ip: str, request: Request):
+    user = _require_auth(request)
+    if isinstance(user, RedirectResponse):
+        return user
+    from app.main import _ban_store
+    _ban_store.pop(ip, None)
+    _set_flash(request, f"IP {ip} unbanned.")
+    return RedirectResponse("/manage/bots/", status_code=302)
