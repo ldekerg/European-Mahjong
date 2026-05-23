@@ -769,7 +769,9 @@ nav a:hover {
 .ranking-row:hover td { background: var(--row-hover) !important; }
 .row-selected td { background: var(--row-hover) !important; }
 
-.apercu-header  { margin-bottom: 1rem; }
+.apercu-header      { margin-bottom: 1rem; display: flex; align-items: center; gap: 0.75rem; }
+.apercu-header-info { display: flex; flex-direction: column; flex: 1; }
+.apercu-photo       { width: 56px; height: 56px; object-fit: cover; border-radius: 50%; border: 2px solid var(--border); flex-shrink: 0; }
 .apercu-name    { font-size: 1.2rem; font-weight: 700; }
 .apercu-meta    { color: var(--text2); font-size: 0.9rem; margin: 0.2rem 0; }
 .apercu-id      { font-size: 0.8rem; color: var(--text3); font-family: monospace; }
@@ -800,8 +802,12 @@ nav a:hover {
     display: flex;
     align-items: center;
     gap: 1rem;
-    flex-wrap: wrap;
 }
+.player-photo { width: 72px; height: 72px; object-fit: cover; border-radius: 50%; border: 2px solid var(--border); flex-shrink: 0; align-self: center; cursor: pointer; }
+.apercu-photo { cursor: pointer; }
+#photo-lightbox { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 9999; display: flex; align-items: center; justify-content: center; cursor: zoom-out; }
+#photo-lightbox img { max-width: 90vw; max-height: 90vh; border-radius: 6px; object-fit: contain; box-shadow: 0 8px 32px rgba(0,0,0,0.6); }
+.player-header-info { display: flex; flex-direction: column; gap: 0.25rem; flex: 1; }
 .player-id   { font-size: 0.85rem; color: var(--text3); font-family: monospace; }
 .player-name { font-size: 1.6rem; font-weight: 700; flex: 1; }
 .player-meta { display: flex; align-items: center; gap: 0.75rem; }
@@ -1289,7 +1295,7 @@ caption.t-count {
 
   /* ── Sticky → static sur mobile ─────────────────────────────── */
   .ranking-header { position: static; }
-  .player-header  { position: static; flex-direction: column; align-items: flex-start; }
+  .player-header  { position: static; }
 
   /* ── Grid ranking : colonne unique ──────────────────────────── */
   .ranking-layout {

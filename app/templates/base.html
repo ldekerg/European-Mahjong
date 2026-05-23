@@ -332,5 +332,21 @@
     </script>
     <script src="https://cdn.jsdelivr.net/npm/twemoji@14/dist/twemoji.min.js" crossorigin="anonymous"></script>
     <script>document.addEventListener('DOMContentLoaded', function() { twemoji.parse(document.body, { folder: 'svg', ext: '.svg' }); });</script>
+
+<div id="photo-lightbox" style="display:none" onclick="this.style.display='none'">
+  <img id="photo-lightbox-img" src="" alt="">
+</div>
+<script>
+document.addEventListener('click', function(e) {
+  const img = e.target.closest('.player-photo, .apercu-photo');
+  if (!img) return;
+  const lb = document.getElementById('photo-lightbox');
+  document.getElementById('photo-lightbox-img').src = img.src;
+  lb.style.display = 'flex';
+});
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') document.getElementById('photo-lightbox').style.display = 'none';
+});
+</script>
 </body>
 </html>

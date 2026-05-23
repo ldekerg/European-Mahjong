@@ -5,11 +5,16 @@
      show_edit — bool (défaut false) : affiche le bouton Modifier
 #}
 <div class="player-header">
-  <div class="player-id">{{ player.id }}</div>
-  <div class="player-name">{{ player.first_name | first_name }} {{ player.last_name | title }}</div>
-  <div class="player-meta">
-    <span class="flag">{{ player.nationality | flag_link('players') }} {{ player.nationality }}</span>
-    {% if player.status != 'europeen' %}<span class="statut statut-{{ player.status }}">{{ player.status }}</span>{% endif %}
-    {% if referee_rules is defined %}{% for rl in referee_rules %}<span class="badge badge-{{ rl | lower }}" style="margin-left:0.4rem">{{ trad('common.referee') }} {{ rl }}</span>{% endfor %}{% endif %}
+  {% if player_photo %}
+  <img src="/static/photos/{{ player.id }}.jpg" alt="{{ player.last_name }}" class="player-photo">
+  {% endif %}
+  <div class="player-header-info">
+    <div class="player-id">{{ player.id }}</div>
+    <div class="player-name">{{ player.first_name | first_name }} {{ player.last_name | title }}</div>
+    <div class="player-meta">
+      <span class="flag">{{ player.nationality | flag_link('players') }} {{ player.nationality }}</span>
+      {% if player.status != 'europeen' %}<span class="statut statut-{{ player.status }}">{{ player.status }}</span>{% endif %}
+      {% if referee_rules is defined %}{% for rl in referee_rules %}<span class="badge badge-{{ rl | lower }}" style="margin-left:0.4rem">{{ trad('common.referee') }} {{ rl }}</span>{% endfor %}{% endif %}
+    </div>
   </div>
 </div>

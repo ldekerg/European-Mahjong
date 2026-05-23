@@ -263,6 +263,10 @@ def player_detail(player_id: str, request: Request, db: Session = Depends(get_db
         .all()
     )
 
+    import os as _os
+    photo_path = _os.path.join(_os.path.dirname(__file__), "../static/photos", f"{player_id}.jpg")
+    player_photo = _os.path.exists(photo_path)
+
     return templates.TemplateResponse(request, "players/detail.html", {
         "player": player,
         "mcr": build_tab("MCR"),
@@ -274,6 +278,7 @@ def player_detail(player_id: str, request: Request, db: Session = Depends(get_db
         "referee_rules": referee_rules,
         "obs_tournaments": obs_tournaments,
         "referee_assignments": referee_assignments,
+        "player_photo": player_photo,
     })
 
 
@@ -381,6 +386,10 @@ def player_preview(
     active_rules = rules.upper() if rules else "MCR"
     base_ranking = f"/countries/{country_code}" if country_code else "/ranking"
 
+    import os as _os
+    photo_path = _os.path.join(_os.path.dirname(__file__), "../static/photos", f"{player_id}.jpg")
+    player_photo = _os.path.exists(photo_path)
+
     return templates.TemplateResponse(request, "players/preview.html", {
         "player":        player,
         "mcr":           stats("MCR"),
@@ -388,4 +397,5 @@ def player_preview(
         "rules":         active_rules,
         "week":          week,
         "base_ranking":  base_ranking,
+        "player_photo":  player_photo,
     })
