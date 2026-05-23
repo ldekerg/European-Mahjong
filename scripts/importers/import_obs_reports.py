@@ -4,15 +4,54 @@ Fetches each TR_ page, extracts observer name + PDF link, downloads PDF.
 Run with: python3 scripts/importers/import_obs_reports.py [--force]
   --force : re-download even if obs_report_path already set
 """
-import sys, os, re, time, argparse
+import sys, os, re, time, argparse, ssl, urllib.request
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../.."))
 
 from app.database import SessionLocal
 from app.models import Tournament
-from scripts.importers.ema import fetch_page, _download_obs_report
 
 import re as _re
 from bs4 import BeautifulSoup
+
+BASE_URL = "http://mahjong-europe.org/ranking/Tournament/{}_{}.html"
+OBS_REPORTS_DIR = os.path.join(os.path.dirname(__file__), "../../app/static/obs_reports")
+OBS_BASE_URL = "http://mahjong-europe.org/ranking/reports/"
+
+ssl_ctx = ssl.create_default_context()
+ssl_ctx.check_hostname = False
+ssl_ctx.verify_mode = ssl.CERT_NONE
+
+
+def fetch_page(tournament_id, prefix: str = "TR") -> str | None:
+    url = BASE_URL.format(prefix, tournament_id)
+    try:
+        with urllib.request.urlopen(url, context=ssl_ctx, timeout=10) as r:
+            raw = r.read()
+        for encoding in ("utf-8", "windows-1252", "latin-1"):
+            try:
+                return raw.decode(encoding)
+            except UnicodeDecodeError:
+                continue
+        return raw.decode("latin-1", errors="replace")
+    except Exception as e:
+        print(f"  [WARN] Could not fetch {url}: {e}")
+        return None
+
+
+def _download_obs_report(pdf_filename: str, ema_id: int | None) -> str | None:
+    os.makedirs(OBS_REPORTS_DIR, exist_ok=True)
+    local_name = f"TR{ema_id}_{pdf_filename}" if ema_id else pdf_filename
+    local_path = os.path.join(OBS_REPORTS_DIR, local_name)
+    if not os.path.exists(local_path):
+        url = OBS_BASE_URL + pdf_filename
+        try:
+            with urllib.request.urlopen(url, context=ssl_ctx, timeout=15) as r:
+                with open(local_path, "wb") as f:
+                    f.write(r.read())
+        except Exception as e:
+            print(f"  [WARN] Could not download {url}: {e}")
+            return None
+    return f"/static/obs_reports/{local_name}"
 
 
 def extract_obs(html: str) -> tuple[str | None, str | None]:
