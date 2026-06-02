@@ -531,6 +531,9 @@
       "li3": "Map of cities where tournaments have been held",
       "circuit_note": "National federations can also have their own circuit page — for example, see the",
       "circuit_example": "French circuit"
+    },
+    "whats_new": {
+      "title": "What's new"
     }
   }
 }

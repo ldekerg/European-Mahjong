@@ -7,6 +7,23 @@
     <p class="help-subtitle">{{ trad('help.subtitle') }}</p>
   </div>
 
+  <!-- ── What's new ───────────────────────────────────────────────── -->
+  {% set features = active_features(lang) %}
+  {% if features %}
+  <section class="help-group" id="whats-new">
+    <h2 class="help-group-title">{{ trad('help.whats_new.title') }} <span class="new-badge">new</span></h2>
+    {% for f in features %}
+    <div class="help-card whatsnew-card">
+      <div class="help-card-text">
+        <h3><a href="{{ f.page }}" class="help-link">{{ f.title }}</a></h3>
+        <p>{{ f.desc }}</p>
+        <span class="dim" style="font-size:0.78rem">{{ f.date }}</span>
+      </div>
+    </div>
+    {% endfor %}
+  </section>
+  {% endif %}
+
   <!-- ── General ──────────────────────────────────────────────────── -->
   <section class="help-group" id="general">
     <h2 class="help-group-title">{{ trad('help.general.title') }}</h2>

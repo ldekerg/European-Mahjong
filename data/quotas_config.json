@@ -1,0 +1,16 @@
+{
+  "MCR": {
+    "next_event": {
+      "name": "OEMC 2026 - Uppsala, Sweden",
+      "total_seats": 168,
+      "non_ema_seats": 29,
+      "ranking_week": "2025-12-29",
+      "status": "official"
+    },
+    "simulation_seats": [40, 130]
+  },
+  "RCR": {
+    "next_event": null,
+    "simulation_seats": [40, 100]
+  }
+}

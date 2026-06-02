@@ -1,0 +1,16 @@
+{
+  "version": "2026-06-02",
+  "features": [
+    {
+      "key": "country_members",
+      "page": "/countries/",
+      "nav_group": "countries",
+      "expires": "2026-06-16",
+      "date": "2026-06-02",
+      "title_fr": "Nombre d'adhérents par pays",
+      "title_en": "Member count per country",
+      "desc_fr": "Les pages pays affichent désormais le nombre d'adhérents officiels par fédération, avec l'historique sur le graphique d'évolution.",
+      "desc_en": "Country pages now display the official member count per federation, with historical data on the evolution chart."
+    }
+  ]
+}

@@ -1,0 +1,427 @@
+{
+  "presidium": {
+    "year": 2023,
+    "members": [
+      {
+        "role": "President",
+        "first_name": "Marco",
+        "last_name": "Montebelli",
+        "country": "IT",
+        "role_key": "role_president"
+      },
+      {
+        "role": "Vice President",
+        "first_name": "Gemma",
+        "last_name": "Sakamoto",
+        "country": "UK",
+        "role_key": "role_vice_president"
+      },
+      {
+        "role": "Vice President",
+        "first_name": "Tina",
+        "last_name": "Christensen",
+        "country": "DK",
+        "role_key": "role_vice_president"
+      },
+      {
+        "role": "Presidium member",
+        "first_name": "Luc",
+        "last_name": "Humbert",
+        "country": "CH",
+        "role_key": "role_presidium_member"
+      },
+      {
+        "role": "Presidium member",
+        "first_name": "Manuel",
+        "last_name": "Kameda Schlich",
+        "country": "DE",
+        "role_key": "role_presidium_member"
+      }
+    ]
+  },
+  "presidium_history": {
+    "presidents": [
+      {
+        "period": "2005–2009",
+        "first_name": "Uwe",
+        "last_name": "Martens",
+        "country": "DE"
+      },
+      {
+        "period": "2009–2011",
+        "first_name": "Robert",
+        "last_name": "Rijnders",
+        "country": "NL"
+      },
+      {
+        "period": "2011–2017",
+        "first_name": "Tina",
+        "last_name": "Christensen",
+        "country": "DK"
+      },
+      {
+        "period": "2017–2023",
+        "first_name": "Luc",
+        "last_name": "Humbert",
+        "country": "CH"
+      },
+      {
+        "period": "2023–…",
+        "first_name": "Marco",
+        "last_name": "Montebelli",
+        "country": "IT"
+      }
+    ],
+    "ranking_managers": [
+      {
+        "period": "2005–2008",
+        "first_name": "Uwe",
+        "last_name": "Martens",
+        "country": "DE"
+      },
+      {
+        "period": "2008–…",
+        "first_name": "Sébastien",
+        "last_name": "Berret",
+        "country": "FR"
+      }
+    ]
+  },
+  "board": {
+    "year": 2023,
+    "members": [
+      {
+        "country": "AT",
+        "first_name": "Michael",
+        "last_name": "Gürtl-Dusleag"
+      },
+      {
+        "country": "BE",
+        "first_name": "Nathan",
+        "last_name": "Germeau"
+      },
+      {
+        "country": "CZ",
+        "first_name": "Vojtech",
+        "last_name": "Trmal"
+      },
+      {
+        "country": "DK",
+        "first_name": "Tina",
+        "last_name": "Christensen"
+      },
+      {
+        "country": "FI",
+        "first_name": "Klaudia",
+        "last_name": "Lensu"
+      },
+      {
+        "country": "FR",
+        "first_name": "Nicolas",
+        "last_name": "Baptiste"
+      },
+      {
+        "country": "DE",
+        "first_name": "Manuel",
+        "last_name": "Kameda Schlich"
+      },
+      {
+        "country": "UK",
+        "first_name": "Gemma",
+        "last_name": "Sakamoto"
+      },
+      {
+        "country": "HU",
+        "first_name": "Ildikó",
+        "last_name": "Hargitai"
+      },
+      {
+        "country": "IE",
+        "first_name": "Joaquín",
+        "last_name": "Padilla Rivero"
+      },
+      {
+        "country": "IT",
+        "first_name": "Marco",
+        "last_name": "Montebelli"
+      },
+      {
+        "country": "LV",
+        "first_name": "Max",
+        "last_name": "White"
+      },
+      {
+        "country": "NL",
+        "first_name": "Ivar",
+        "last_name": "Bouwman"
+      },
+      {
+        "country": "NO",
+        "first_name": "Glenn Ivar",
+        "last_name": "Husom"
+      },
+      {
+        "country": "PL",
+        "first_name": "Michał",
+        "last_name": "Tkaczyk"
+      },
+      {
+        "country": "PT",
+        "first_name": "Sergio",
+        "last_name": "Matos Lima"
+      },
+      {
+        "country": "RO",
+        "first_name": "Rene",
+        "last_name": "Khezam"
+      },
+      {
+        "country": "SK",
+        "first_name": "Tomas",
+        "last_name": "Siron"
+      },
+      {
+        "country": "ES",
+        "first_name": "Edgar",
+        "last_name": "Rubio Rodilla"
+      },
+      {
+        "country": "SE",
+        "first_name": "Petter",
+        "last_name": "Ranefall"
+      },
+      {
+        "country": "CH",
+        "first_name": "Luc",
+        "last_name": "Humbert"
+      },
+      {
+        "country": "UA",
+        "first_name": "Maksym",
+        "last_name": "Ivanov"
+      }
+    ]
+  },
+  "documents": [
+    {
+      "category": "Organization & General Assembly",
+      "i18n_key": "doc_cat_organization_and_ga",
+      "links": [
+        {
+          "title": "EMA Statutes",
+          "url": "http://mahjong-europe.org/portal/index.php?option=com_content&view=article&id=12&Itemid=178",
+          "pdfs": [
+            {
+              "title": "Statutes",
+              "local": "/static/docs/statutes.pdf",
+              "source": "http://mahjong-europe.org/portal/images/docs/statutes.pdf",
+              "description": "Official statutes of the European Mahjong Association, registered in Denmark."
+            }
+          ],
+          "title_key": "doc_statutes"
+        },
+        {
+          "title": "EMA Requirements & Guidelines",
+          "url": "http://mahjong-europe.org/portal/index.php?option=com_content&view=article&id=22&Itemid=179",
+          "pdfs": [
+            {
+              "title": "EMA requirements for member organizations",
+              "local": "/static/docs/2_EMA_requirements_for_member_organizations.pdf",
+              "source": "http://mahjong-europe.org/portal/images/docs/2_EMA_requirements_for_member_organizations.pdf",
+              "description": "Requirements for EMA member organizations (website, reporting, activities)."
+            },
+            {
+              "title": "The Mahjong Europea Ranking System (MERS)",
+              "local": "/static/docs/3_MERS.pdf",
+              "source": "http://mahjong-europe.org/portal/images/docs/3_MERS.pdf",
+              "description": "Description of the Mahjong Europe Ranking System (MERS) and its goals."
+            },
+            {
+              "title": "EMA requirements and guidelines for MERS tournaments",
+              "local": "/static/docs/4_EMA_requirements_guidelines.pdf",
+              "source": "http://mahjong-europe.org/portal/images/docs/4_EMA_requirements_guidelines.pdf",
+              "description": "Requirements and guidelines for MERS-certified tournaments (certification, referees, rules)."
+            }
+          ],
+          "title_key": "doc_requirements"
+        },
+        {
+          "title_key": "doc_ga_all",
+          "pdfs": [],
+          "subsections": [
+            {
+              "year": 2023,
+              "note": "Valencia, Spain",
+              "pdfs": [
+                {
+                  "title": "Agenda & Minutes",
+                  "local": "/static/docs/GA2023_minutes.pdf",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "year": 2019,
+              "note": "Villefranche-sur-Saône, France",
+              "pdfs": [
+                {
+                  "title": "Agenda & Minutes",
+                  "local": "/static/docs/ga2019.pdf",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "year": 2017,
+              "note": "Póvoa de Varzim, Portugal",
+              "pdfs": [
+                {
+                  "title": "Agenda & Minutes",
+                  "local": "/static/docs/ga2017.pdf",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "year": 2015,
+              "note": "Copenhagen, Denmark",
+              "pdfs": [
+                {
+                  "title": "Agenda & Minutes",
+                  "local": "/static/docs/ga2015.pdf",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "year": 2013,
+              "note": "Bad Vöslau, Austria",
+              "pdfs": [
+                {
+                  "title": "Agenda & Minutes",
+                  "local": "/static/docs/ga2013.pdf",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "year": 2011,
+              "note": "Mestre, Italy",
+              "pdfs": [
+                {
+                  "title": "Agenda",
+                  "local": "/static/docs/ga2011.pdf",
+                  "description": ""
+                },
+                {
+                  "title": "Press Release",
+                  "local": "/static/docs/ga2011_pr.pdf",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "year": 2009,
+              "note": "Baden, Austria",
+              "pdfs": [
+                {
+                  "title": "Agenda",
+                  "local": "/static/docs/ga2009.pdf",
+                  "description": ""
+                },
+                {
+                  "title": "Minutes",
+                  "local": "/static/docs/ga2009_minutes.pdf",
+                  "description": ""
+                },
+                {
+                  "title": "Press Release",
+                  "local": "/static/docs/ga2009_pr.pdf",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "year": 2007,
+              "note": "Copenhagen, Denmark",
+              "pdfs": [
+                {
+                  "title": "Agenda",
+                  "local": "/static/docs/ga2007.pdf",
+                  "description": ""
+                },
+                {
+                  "title": "Minutes",
+                  "local": "/static/docs/ga2007_minutes.pdf",
+                  "description": ""
+                },
+                {
+                  "title": "Press Release",
+                  "local": "/static/docs/ga2007_pr.pdf",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "year": 2005,
+              "note": "Nijmegen, Netherlands",
+              "pdfs": [
+                {
+                  "title": "Agenda",
+                  "local": "/static/docs/ga2005.pdf",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "category": "Decisions & Rulings",
+      "i18n_key": "doc_cat_decisions_and_rulings",
+      "links": [
+        {
+          "title": "Country Transfer - EMA Presidium Ruling",
+          "url": "http://mahjong-europe.org/portal/index.php?option=com_content&view=article&id=22&Itemid=179",
+          "pdfs": [
+            {
+              "title": "EMA Presidium ruling about Country transfer",
+              "local": "/static/docs/5_EMA_regulations_rulings.pdf",
+              "source": "http://mahjong-europe.org/portal/images/docs/5_EMA_regulations_rulings.pdf",
+              "description": "EMA Presidium ruling on country transfers between member countries."
+            }
+          ],
+          "title_key": "doc_country_transfer"
+        },
+        {
+          "title": "COVID-19 Special Ruling",
+          "url": "http://mahjong-europe.org/portal/index.php?option=com_content&view=article&id=59&catid=11&Itemid=101",
+          "pdfs": [
+            {
+              "title": "COVID-19-special-ruling",
+              "local": "/static/docs/COVID-19-special-ruling.pdf",
+              "source": "http://mahjong-europe.org/portal/images/docs/COVID-19-special-ruling.pdf",
+              "description": "EMA special ruling for tournaments during the COVID-19 period."
+            }
+          ],
+          "title_key": "doc_covid_ruling"
+        },
+        {
+          "title": "COVID-19 End of Special Ruling",
+          "url": "http://mahjong-europe.org/portal/index.php?option=com_content&view=article&id=61&catid=2&Itemid=101",
+          "note": "EMA Board decided on July 4th 2022 to end the COVID-19 special ruling, officially abrogated with immediate effect.",
+          "pdfs": [],
+          "title_key": "doc_covid_end"
+        },
+        {
+          "title": "Situation in Ukraine",
+          "url": "http://mahjong-europe.org/portal/index.php?option=com_content&view=article&id=60&catid=11&Itemid=101",
+          "note": "EMA Board decided on March 31st 2022 not to allow EMA certified tournaments in Russia and Belarus, and not to grant ranking points to players representing these countries.",
+          "pdfs": [],
+          "title_key": "doc_ukraine"
+        }
+      ]
+    }
+  ]
+}

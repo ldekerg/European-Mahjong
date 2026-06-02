@@ -267,3 +267,31 @@ templates.env.filters["pretty_json"] = _pretty_json
 templates.env.filters["country_name"] = lambda code: ISO_NOM_PAYS.get(code, code)
 
 templates.env.globals["today"] = lambda: _date.today()
+
+# ── What's new ──────────────────────────────────────────────────────────────
+import json as _json_wn, os as _os_wn
+_WHATS_NEW_PATH = _os_wn.path.join(_os_wn.path.dirname(__file__), "..", "data", "whats_new.json")
+try:
+    with open(_WHATS_NEW_PATH, encoding="utf-8") as _f:
+        _whats_new_data = _json_wn.load(_f)
+except Exception:
+    _whats_new_data = {"version": "", "features": []}
+
+def _active_features(lang: str = "en") -> list:
+    from datetime import date as _d
+    today = _d.today().isoformat()
+    result = []
+    for f in _whats_new_data.get("features", []):
+        if f.get("expires", "9999") >= today:
+            result.append({
+                "key":   f["key"],
+                "page":  f["page"],
+                "nav_group": f.get("nav_group", ""),
+                "date":  f.get("date", ""),
+                "title": f.get(f"title_{lang}") or f.get("title_en", ""),
+                "desc":  f.get(f"desc_{lang}") or f.get("desc_en", ""),
+            })
+    return result
+
+templates.env.globals["whats_new_version"] = _whats_new_data.get("version", "")
+templates.env.globals["active_features"]   = _active_features

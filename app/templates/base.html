@@ -36,7 +36,7 @@
         <div id="nav-links">
 
           <!-- Help -->
-          <a href="/help">{{ trad('nav.help') }}</a>
+          <a href="/help" id="nav-help-link">{{ trad('nav.help') }}{% if active_features(lang) %}<span class="new-badge" id="badge-help">new</span>{% endif %}</a>
 
           <!-- EMA -->
           <div class="nav-group">
@@ -77,7 +77,7 @@
 
           <!-- Countries -->
           <div class="nav-group">
-            <button class="nav-group-btn">{{ trad('nav.group_countries') }}</button>
+            <button class="nav-group-btn">{{ trad('nav.group_countries') }}{% for f in active_features(lang) %}{% if f.nav_group == 'countries' %}<span class="new-badge" id="badge-nav-{{ f.key }}">new</span>{% endif %}{% endfor %}</button>
             <div class="nav-dropdown">
               <a href="/countries/">{{ trad('nav.countries') }}</a>
               <a href="/quotas">{{ trad('nav.quotas') }}</a>
@@ -360,6 +360,45 @@
             }
         });
     });
+    </script>
+    <script>
+    (function() {
+      var VERSION = '{{ whats_new_version }}';
+      var FEATURES = {{ active_features(lang) | tojson }};
+      var CURRENT_PATH = window.location.pathname;
+
+      // Hide badges for already-seen features
+      FEATURES.forEach(function(f) {
+        var seen = localStorage.getItem('wn_seen_' + f.key);
+        if (seen) {
+          var el = document.getElementById('badge-nav-' + f.key);
+          if (el) el.style.display = 'none';
+        }
+      });
+
+      // Hide help badge if all features are seen
+      var allSeen = FEATURES.every(function(f) {
+        return !!localStorage.getItem('wn_seen_' + f.key);
+      });
+      if (allSeen) {
+        var helpBadge = document.getElementById('badge-help');
+        if (helpBadge) helpBadge.style.display = 'none';
+      }
+
+      // Mark feature as seen when visiting its page
+      FEATURES.forEach(function(f) {
+        if (CURRENT_PATH === f.page || CURRENT_PATH.startsWith(f.page.replace(/\/$/, ''))) {
+          localStorage.setItem('wn_seen_' + f.key, VERSION);
+        }
+      });
+
+      // Mark help as seen when visiting /help
+      if (CURRENT_PATH === '/help') {
+        FEATURES.forEach(function(f) {
+          localStorage.setItem('wn_seen_' + f.key, VERSION);
+        });
+      }
+    })();
     </script>
     <script src="https://cdn.jsdelivr.net/npm/twemoji@14/dist/twemoji.min.js" crossorigin="anonymous"></script>
     <script>document.addEventListener('DOMContentLoaded', function() { twemoji.parse(document.body, { folder: 'svg', ext: '.svg' }); });</script>

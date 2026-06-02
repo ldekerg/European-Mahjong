@@ -1,0 +1,91 @@
+{
+  "AT": {
+    "name": "Österreichischer mahjong verband",
+    "url": "http://mahjong-baden.at"
+  },
+  "BE": {
+    "name": "Belgian Mahjong Association",
+    "url": "http://www.mahjongbelgium.be",
+    "logo": "/static/logos/BE.jpg"
+  },
+  "CZ": {
+    "name": "Czech Mahjong Association",
+    "url": "http://yakuman.cz/"
+  },
+  "DK": {
+    "name": "Mahjong Denmark",
+    "url": "https://mahjong.dk/",
+    "logo": "/static/logos/DK.png"
+  },
+  "FI": {
+    "name": "Mahjong Finland",
+    "url": "http://www.mahjongfinland.fi/english/",
+    "logo": "/static/logos/FI.jpg"
+  },
+  "FR": {
+    "name": "Fédération Française de Mah-Jong",
+    "url": "http://www.ffmahjong.fr/",
+    "logo": "/static/logos/FR.svg"
+  },
+  "DE": {
+    "name": "Deutsche Mah-Jongg Liga",
+    "url": "https://dmjl.de/",
+    "logo": "/static/logos/DE.jpg"
+  },
+  "HU": {
+    "name": "Magyar Mah-jong Szövetség",
+    "url": "https://mahjong.hu/",
+    "logo": "/static/logos/HU.png"
+  },
+  "IT": {
+    "name": "Federazione Italiana Mah Jong",
+    "url": "https://www.fimj.it/",
+    "logo": "/static/logos/IT.png"
+  },
+  "NL": {
+    "name": "Nederlandse Mahjong Bond",
+    "url": "https://mahjongbond.org/",
+    "logo": "/static/logos/NL.jpg"
+  },
+  "PL": {
+    "name": "Polska Liga Mahjonga",
+    "url": "http://mahjong.waw.pl/"
+  },
+  "PT": {
+    "name": "União de Mahjong de Portugal",
+    "url": "https://discord.gg/wAN5MWfxXh"
+  },
+  "SK": {
+    "name": "Slovensky Mahjongovy Zväz",
+    "url": "http://www.mahjong.sk/"
+  },
+  "ES": {
+    "name": "Federación Española de Mahjong",
+    "url": "https://femj.es/",
+    "logo": "/static/logos/ES.png"
+  },
+  "SE": {
+    "name": "Svenska mahjongförbundet",
+    "url": "https://www.svenskmahjong.se/",
+    "logo": "/static/logos/SE.png"
+  },
+  "CH": {
+    "name": "Association Suisse de Mah-Jong ASM-SMV",
+    "url": "http://www.swissmahjong.ch",
+    "logo": "/static/logos/CH.png"
+  },
+  "UA": {
+    "name": "Ukrainian Mahjong Federation",
+    "url": "https://mahjong.in.ua/en/"
+  },
+  "IE": {
+    "name": "All-Ireland Mahjong",
+    "url": "https://mahjong.ie/",
+    "logo": "/static/logos/IE.svg"
+  },
+  "UK": {
+    "name": "United Kingdom Mahjong Association",
+    "url": "https://ukmahjong.co.uk/",
+    "logo": "/static/logos/UK.png"
+  }
+}

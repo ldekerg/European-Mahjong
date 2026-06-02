@@ -15,6 +15,11 @@ venv/
 
 # Base de données
 data/
+!data/whats_new.json
+!data/federations.json
+!data/rules.json
+!data/about.json
+!data/quotas_config.json
 *.db
 *.db-shm
 *.db-wal

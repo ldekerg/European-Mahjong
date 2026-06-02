@@ -530,6 +530,9 @@
       "li3": "Carte des villes où des tournois ont eu lieu",
       "circuit_note": "Les fédérations nationales peuvent aussi avoir leur propre page de circuit — par exemple, voir le",
       "circuit_example": "circuit français"
+    },
+    "whats_new": {
+      "title": "Nouveautés"
     }
   }
 }

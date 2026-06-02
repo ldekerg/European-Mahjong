@@ -1,0 +1,53 @@
+{
+  "mcr": {
+    "official": [
+      {
+        "title": "Green Book (A4)",
+        "local": "/static/docs/mcr_EN.pdf",
+        "description": "Official MCR rules, English (A4)."
+      },
+      {
+        "title": "Green Book (A5)",
+        "local": "/static/docs/mcr_ENa5.pdf",
+        "description": "Official MCR rules, English (A5)."
+      },
+      {
+        "title": "Penalty overview",
+        "local": "/static/docs/mcr_penalties.pdf",
+        "description": "Warnings, dead hands and point penalties."
+      },
+      {
+        "title": "MERS tournament regulations (2010)",
+        "local": "/static/docs/mcr_regulations.pdf",
+        "description": "Clarifications on rules and penalties for MERS tournaments."
+      }
+    ],
+    "translations": [
+      {
+        "title": "Green Book — Spanish",
+        "local": "/static/docs/GreenBookTranslatedintoSpanishbyIvanMaestreRos.pdf",
+        "description": "Translated by Iván Maestre Ros."
+      },
+      {
+        "title": "MERS regulations — Spanish",
+        "local": "/static/docs/mcr_regulations_spanish.pdf",
+        "description": "Tournament regulations, Spanish version (2010)."
+      },
+      {
+        "title": "Green Book — Italian",
+        "local": "/static/docs/regolamento_a4_v02.pdf",
+        "description": "Italian translation."
+      }
+    ]
+  },
+  "rcr": {
+    "official": [
+      {
+        "title": "Riichi Rules for Japanese Mahjong (2025)",
+        "local": "/static/docs/Riichi-rules-2025-EN.pdf",
+        "description": "Official RCR rules, 2025 edition."
+      }
+    ],
+    "translations": []
+  }
+}
