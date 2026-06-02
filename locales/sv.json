@@ -178,7 +178,9 @@
     "tournaments_org_abbr": "Turneringar",
     "suspended": "⛔ Avstängd",
     "suspended_title": "Avstängd från EMA sedan 2022",
-    "federation": "Förbund"
+    "federation": "Förbund",
+    "members_abbr": "Members",
+    "members_title": "Total registered members (latest year)"
   },
   "hof": {
     "medals": "🎖 Turnerings­medaljer",

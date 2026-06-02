@@ -1,0 +1,103 @@
+{% extends "manage/base.html" %}
+{% block content %}
+<div class="manage-section">
+  <div class="manage-header">
+    <h2>Country memberships</h2>
+  </div>
+
+  <!-- ── Add / update entry ──────────────────────────────────────────── -->
+  <div class="manage-card" style="margin-bottom:2rem">
+    <h3 style="font-size:1rem;font-weight:600;margin-bottom:1rem">Add / update entry</h3>
+    <form method="post" action="/manage/countries/memberships/create" class="manage-form-grid">
+      <div class="form-field">
+        <label>Country</label>
+        <select name="country" class="manage-input" required>
+          <option value="">— select —</option>
+          {% for code, name in countries %}
+          <option value="{{ code }}">{{ code | flag }} {{ name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-field">
+        <label>Year</label>
+        <input type="number" name="year" class="manage-input" required
+               min="1990" max="{{ current_year }}" value="{{ current_year }}" style="width:100px">
+      </div>
+      <div class="form-field">
+        <label>Members</label>
+        <input type="number" name="count" class="manage-input" required min="0" placeholder="0" style="width:120px">
+      </div>
+      <div class="form-field" style="align-self:flex-end">
+        <button type="submit" class="btn btn-primary">Save</button>
+      </div>
+    </form>
+    <p class="dim" style="font-size:0.8rem;margin-top:0.5rem">If an entry already exists for (country, year), it will be overwritten.</p>
+  </div>
+
+  <!-- ── Data table ──────────────────────────────────────────────────── -->
+  {% if by_country %}
+  <div class="scroll-table">
+  <table class="manage-table">
+    <thead>
+      <tr>
+        <th>Country</th>
+        {% set all_years = [] %}
+        {% for country, rows in by_country.items() %}
+          {% for r in rows %}{% if r.year not in all_years %}{% set _ = all_years.append(r.year) %}{% endif %}{% endfor %}
+        {% endfor %}
+        {% set all_years = all_years | sort | reverse | list %}
+        {% for y in all_years %}<th style="text-align:right">{{ y }}</th>{% endfor %}
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for country, rows in by_country.items() %}
+    {% set by_year = {} %}
+    {% for r in rows %}{% set _ = by_year.update({r.year: r}) %}{% endfor %}
+    <tr>
+      <td>{{ country | flag }} <strong>{{ country }}</strong> <span class="dim" style="font-size:0.82rem">{{ country | country_name }}</span></td>
+      {% for y in all_years %}
+      {% if by_year[y] is defined %}
+      <td style="text-align:right">
+        {{ by_year[y].count }}
+        <form method="post" action="/manage/countries/memberships/{{ by_year[y].id }}/delete"
+              style="display:inline;margin-left:0.3rem"
+              onsubmit="return confirm('Delete {{ country }} {{ y }}?')">
+          <button type="submit" class="btn btn-sm btn-danger" title="Delete" style="padding:0.1rem 0.4rem;font-size:0.7rem">×</button>
+        </form>
+      </td>
+      {% else %}
+      <td style="text-align:right;color:var(--text3)">—</td>
+      {% endif %}
+      {% endfor %}
+      <td></td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+  {% else %}
+  <p class="dim">No membership data yet.</p>
+  {% endif %}
+</div>
+
+<style>
+.manage-form-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+  align-items: flex-start;
+}
+.manage-form-grid .form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 120px;
+}
+.manage-form-grid label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text2);
+}
+</style>
+{% endblock %}

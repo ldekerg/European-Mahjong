@@ -189,6 +189,20 @@ class ChampionshipTournament(Base):
     )
 
 
+class CountryMembership(Base):
+    __tablename__ = "country_memberships"
+
+    id      = Column(Integer, primary_key=True, autoincrement=True)
+    country = Column(String, nullable=False)   # ISO code e.g. "FR"
+    year    = Column(Integer, nullable=False)
+    count   = Column(Integer, nullable=False)  # number of registered members
+
+    __table_args__ = (
+        UniqueConstraint("country", "year", name="uq_membership_country_year"),
+        Index("ix_membership_country", "country"),
+    )
+
+
 class AuditLog(Base):
     """Admin action audit log — each row is one CREATE/UPDATE/DELETE by an admin user."""
     __tablename__ = "audit_log"

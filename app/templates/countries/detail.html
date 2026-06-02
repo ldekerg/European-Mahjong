@@ -31,8 +31,24 @@
 <!-- ── Stats fixes ──────────────────────────────────────────────────────── -->
 <div class="stats-grid" style="margin-bottom:1.25rem">
   <div class="stat-card">
-    <div class="stat-label">{{ trad('common.players') }}</div>
-    <div class="stat-value">{{ nb_players }}</div>
+    <div class="stat-label">
+      {{ trad('country.members_abbr') }}
+      {% if not membership_latest %}
+      <span class="warn-badge" title="No membership data available">!</span>
+      {% elif membership_stale %}
+      <span class="warn-badge" title="Data from {{ membership_latest.year }}, may be outdated">!</span>
+      {% endif %}
+    </div>
+    <div class="stat-value">
+      {% if membership_latest %}
+      {{ membership_latest.count }}
+      {% else %}
+      {{ nb_actifs }}
+      {% endif %}
+    </div>
+    {% if membership_latest %}
+    <div class="stat-sub">{{ membership_latest.year }}</div>
+    {% endif %}
   </div>
   <div class="stat-card">
     <div class="stat-label">{{ trad('country.ranked_mcr') }}</div>

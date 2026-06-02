@@ -178,7 +178,9 @@
     "tournaments_org_abbr": "Toernooien",
     "suspended": "⛔ Geschorst",
     "suspended_title": "Geschorst door de EMA sinds 2022",
-    "federation": "Federatie"
+    "federation": "Federatie",
+    "members_abbr": "Members",
+    "members_title": "Total registered members (latest year)"
   },
   "hof": {
     "medals": "🎖 Toernooimedailles",

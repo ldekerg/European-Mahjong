@@ -178,7 +178,9 @@
     "tournaments_org_abbr": "Turnaje",
     "suspended": "⛔ Pozastavený",
     "suspended_title": "Pozastavený EMA od roku 2022",
-    "federation": "Federácia"
+    "federation": "Federácia",
+    "members_abbr": "Members",
+    "members_title": "Total registered members (latest year)"
   },
   "hof": {
     "medals": "🎖 Turnajové medaily",

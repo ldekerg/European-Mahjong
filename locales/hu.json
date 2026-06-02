@@ -178,7 +178,9 @@
     "tournaments_org_abbr": "Versenyek",
     "suspended": "⛔ Felfüggesztett",
     "suspended_title": "Az EMA 2022 óta felfüggesztette",
-    "federation": "Szövetség"
+    "federation": "Szövetség",
+    "members_abbr": "Members",
+    "members_title": "Total registered members (latest year)"
   },
   "hof": {
     "medals": "🎖 Versenyérmek",

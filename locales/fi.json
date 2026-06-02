@@ -178,7 +178,9 @@
     "tournaments_org_abbr": "Turnaukset",
     "suspended": "⛔ Jäädytetty",
     "suspended_title": "EMA:n jäädyttämä vuodesta 2022",
-    "federation": "Liitto"
+    "federation": "Liitto",
+    "members_abbr": "Members",
+    "members_title": "Total registered members (latest year)"
   },
   "hof": {
     "medals": "🎖 Turnausmitalit",

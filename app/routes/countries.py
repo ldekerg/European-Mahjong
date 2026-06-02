@@ -10,7 +10,7 @@ from typing import Optional
 from collections import defaultdict
 
 from app.database import get_db
-from app.models import Player, Tournament, Result, RankingHistory, Referee
+from app.models import Player, Tournament, Result, RankingHistory, Referee, CountryMembership
 from app.ranking import week_monday, active_tournaments, FREEZE_START, FREEZE_END
 from app.i18n import templates, ISO_NOM_PAYS, _PAYS_ISO
 
@@ -30,7 +30,7 @@ def _build_referee_ids(db: Session) -> dict:
 
 
 def _chart_joueurs_liste(db):
-    """Two global curves MCR + RCR (total ranked players per week)."""
+    """Two global curves MCR + RCR (total ranked players per week) + membership curve."""
     rows = db.execute(text('''
         SELECT ch.week, ch.rules, COUNT(DISTINCT ch.player_id) AS nb
         FROM ranking_history ch
@@ -62,22 +62,92 @@ def _chart_joueurs_liste(db):
     mcr = by_rules['MCR']
     rcr = by_rules['RCR']
 
+    # ── Membership curve ────────────────────────────────────────────────
+    # All membership data grouped by country and year
+    mem_rows = db.execute(text('''
+        SELECT country, year, count FROM country_memberships ORDER BY country, year
+    ''')).fetchall()
+
+    # countries with at least one membership entry
+    mem_by_country_year: dict = defaultdict(dict)  # country -> {year -> count}
+    countries_with_data: set = set()
+    for country, year, count in mem_rows:
+        mem_by_country_year[country][year] = count
+        countries_with_data.add(country)
+
+    # ranked players per week per country (for fallback)
+    ranked_per_week_country = db.execute(text('''
+        SELECT ch.week, j.nationality, COUNT(DISTINCT ch.player_id) AS nb
+        FROM ranking_history ch
+        JOIN players j ON j.id = ch.player_id
+        WHERE j.nationality NOT IN ('', 'GUEST')
+        GROUP BY ch.week, j.nationality
+    ''')).fetchall()
+    # {(week, country) -> nb}
+    ranked_wc: dict = {}
+    for week, country, nb in ranked_per_week_country:
+        ranked_wc[(week, country)] = nb
+
+    all_countries = set(c for _, c in ranked_wc.keys())
+
+    from datetime import date as _d
+    def _to_date(s):
+        return s if hasattr(s, 'year') else _d.fromisoformat(str(s))
+
+    # For each year that has membership data, compute the global total:
+    # sum of membership counts for countries with data + ranked players for others
+    years_with_data = sorted({year for _, year, _ in mem_rows})
+
+    membership_by_iso: dict = {}
+    for year in years_with_data:
+        mid = _d(year, 7, 1)
+        # find closest week label to July 1
+        closest_week = min(labels, key=lambda s: abs((_to_date(s) - mid).days)) if labels else None
+        if not closest_week:
+            continue
+        total = 0
+        for country in all_countries:
+            if country in countries_with_data and year in mem_by_country_year[country]:
+                total += mem_by_country_year[country][year]
+            else:
+                # fallback: use ranked players at the closest week
+                total += ranked_wc.get((closest_week, country), 0)
+        membership_by_iso[f'{year}-07-01'] = total
+
+    # Merge membership dates into labels
+    all_labels_set = set(s.isoformat() if hasattr(s, 'isoformat') else str(s) for s in labels)
+    all_labels_set.update(membership_by_iso.keys())
+    merged_labels = sorted(all_labels_set)
+
+    all_weeks_iso = {(s.isoformat() if hasattr(s, 'isoformat') else str(s)): v for s, v in all_weeks.items()}
+    mcr_iso       = {(s.isoformat() if hasattr(s, 'isoformat') else str(s)): v for s, v in mcr.items()}
+    rcr_iso       = {(s.isoformat() if hasattr(s, 'isoformat') else str(s)): v for s, v in rcr.items()}
+
+    datasets = []
+    if membership_by_iso:
+        datasets.append({
+            'label': 'members', 'cssColor': '--chart-members', 'width': 2,
+            'pointRadius': 5, 'pointHoverRadius': 7, 'spanGaps': True,
+            'data': [membership_by_iso.get(s, None) for s in merged_labels],
+        })
+    datasets += [
+        {'label': 'all', 'cssColor': '--chart-tout', 'width': 2.5, 'spanGaps': True,
+         'data': [all_weeks_iso.get(s, None) for s in merged_labels]},
+        {'label': 'MCR', 'cssColor': '--chart-mcr',  'width': 2, 'spanGaps': True,
+         'data': [mcr_iso.get(s, None) for s in merged_labels]},
+        {'label': 'RCR', 'cssColor': '--chart-rcr',  'width': 2, 'spanGaps': True,
+         'data': [rcr_iso.get(s, None) for s in merged_labels]},
+    ]
+
     return {
-        'labels': [s.isoformat() if hasattr(s, 'isoformat') else str(s) for s in labels],
-        'datasets': [
-            {'label': 'Tout', 'cssColor': '--chart-tout', 'width': 2.5,
-             'data': [all_weeks.get(s, 0) for s in labels]},
-            {'label': 'MCR',  'cssColor': '--chart-mcr',  'width': 2,
-             'data': [mcr.get(s, 0) for s in labels]},
-            {'label': 'RCR',  'cssColor': '--chart-rcr',  'width': 2,
-             'data': [rcr.get(s, 0) for s in labels]},
-        ],
+        'labels': merged_labels,
+        'datasets': datasets,
     }
 
 
 def _chart_joueurs_detail(db, code):
     """
-    Returns MCR, RCR and Total (MCR+RCR) for a single country.
+    Returns MCR, RCR, Total and membership for a single country.
     Format: {labels, datasets: [{label, color, width, data}]}
     """
     rows = db.execute(text('''
@@ -110,16 +180,45 @@ def _chart_joueurs_detail(db, code):
     mcr = by_rules['MCR']
     rcr = by_rules['RCR']
 
+    # Membership: one point per year on July 1 — inject dates into labels so gaps are preserved
+    membership_rows = db.execute(text('''
+        SELECT year, count FROM country_memberships
+        WHERE country = :c ORDER BY year
+    '''), {'c': code}).fetchall()
+
+    membership_by_iso: dict = {f'{year}-07-01': count for year, count in membership_rows}
+
+    # Merge membership dates into the label set so the axis covers them
+    all_labels_set = set(s.isoformat() if hasattr(s, 'isoformat') else str(s) for s in labels)
+    all_labels_set.update(membership_by_iso.keys())
+    merged_labels = sorted(all_labels_set)
+
+    # Re-index weekly datasets onto merged labels (None for injected membership dates)
+    label_isos = [s.isoformat() if hasattr(s, 'isoformat') else str(s) for s in labels]
+    all_weeks_iso   = {label_isos[i]: v for i, v in enumerate(all_weeks.values()) if False} # rebuild below
+    all_weeks_iso   = {(s.isoformat() if hasattr(s, 'isoformat') else str(s)): v for s, v in all_weeks.items()}
+    mcr_iso         = {(s.isoformat() if hasattr(s, 'isoformat') else str(s)): v for s, v in mcr.items()}
+    rcr_iso         = {(s.isoformat() if hasattr(s, 'isoformat') else str(s)): v for s, v in rcr.items()}
+
+    datasets = []
+    if membership_by_iso:
+        datasets.append({
+            'label': 'members', 'cssColor': '--chart-members', 'width': 2,
+            'pointRadius': 5, 'pointHoverRadius': 7, 'spanGaps': True,
+            'data': [membership_by_iso.get(s, None) for s in merged_labels],
+        })
+    datasets += [
+        {'label': 'all',  'cssColor': '--chart-tout', 'width': 2, 'spanGaps': True,
+         'data': [all_weeks_iso.get(s, None) for s in merged_labels]},
+        {'label': 'MCR',  'cssColor': '--chart-mcr',  'width': 2, 'spanGaps': True,
+         'data': [mcr_iso.get(s, None) for s in merged_labels]},
+        {'label': 'RCR',  'cssColor': '--chart-rcr',  'width': 2, 'spanGaps': True,
+         'data': [rcr_iso.get(s, None) for s in merged_labels]},
+    ]
+
     return {
-        'labels': [s.isoformat() if hasattr(s, 'isoformat') else str(s) for s in labels],
-        'datasets': [
-            {'label': 'Tout', 'cssColor': '--chart-tout', 'width': 2,
-             'data': [all_weeks.get(s, 0) for s in labels]},
-            {'label': 'MCR',  'cssColor': '--chart-mcr',  'width': 2,
-             'data': [mcr.get(s, 0) for s in labels]},
-            {'label': 'RCR',  'cssColor': '--chart-rcr',  'width': 2,
-             'data': [rcr.get(s, 0) for s in labels]},
-        ],
+        'labels': merged_labels,
+        'datasets': datasets,
     }
 
 
@@ -313,6 +412,17 @@ def pays_liste(
         .all()
     )
 
+    # Latest membership count per country
+    memberships_raw = (
+        db.query(CountryMembership.country, CountryMembership.count, CountryMembership.year)
+        .order_by(CountryMembership.country, CountryMembership.year.desc())
+        .all()
+    )
+    memberships_latest: dict = {}
+    for code, count, year in memberships_raw:
+        if code not in memberships_latest:
+            memberships_latest[code] = {"count": count, "year": year}
+
     # All known countries
     all_codes = set(players_by_country.keys()) - {"", "GUEST"}
     pays_list = sorted([
@@ -323,12 +433,31 @@ def pays_liste(
             "nb_actifs":      actifs_par_pays.get(code, 0),
             "nb_tournaments": tournois_par_code.get(code, 0),
             "federation":     FEDERATIONS.get(code.upper()),
+            "membership":     memberships_latest.get(code),
         }
         for code in all_codes
     ], key=lambda x: (-x["nb_actifs"], x["name"]))
 
     import json
     chart_liste = _chart_joueurs_liste(db)
+
+    # ── Membership total for stat card ───────────────────────────────────
+    from datetime import date as _date
+    current_year = _date.today().year
+    stale_threshold = current_year - 2
+    total_members = 0
+    missing_membership: list[str] = []   # codes with no data at all
+    stale_membership: list[str] = []     # codes with data but older than threshold
+    for p in pays_list:
+        m = p["membership"]
+        if m:
+            total_members += m["count"]
+            if m["year"] < stale_threshold:
+                stale_membership.append(p["code"])
+        else:
+            # fallback: count active players
+            total_members += p["nb_actifs"]
+            missing_membership.append(p["code"])
 
     # ── Global stats ─────────────────────────────────────────────────────
     stats_raw = db.execute(text('''
@@ -345,12 +474,17 @@ def pays_liste(
                AND rules='RCR') AS classes_rcr
     ''')).fetchone()
     stats_globales = {
-        "nb_players":      stats_raw[0],
-        "nb_pays":         stats_raw[1],
-        "nb_tournois_mcr": stats_raw[2],
-        "nb_tournois_rcr": stats_raw[3],
-        "classes_mcr":     stats_raw[4],
-        "classes_rcr":     stats_raw[5],
+        "nb_players":         stats_raw[0],
+        "nb_pays":            stats_raw[1],
+        "nb_tournois_mcr":    stats_raw[2],
+        "nb_tournois_rcr":    stats_raw[3],
+        "classes_mcr":        stats_raw[4],
+        "classes_rcr":        stats_raw[5],
+        "total_members":      total_members,
+        "missing_membership": missing_membership,
+        "stale_membership":   stale_membership,
+        "current_year":       current_year,
+        "stale_threshold":    stale_threshold,
     }
 
     return templates.TemplateResponse(request, "countries/list.html", {
@@ -540,6 +674,18 @@ def pays_detail(
     import json
     chart_detail = _chart_joueurs_detail(db, code)
 
+    # ── Membership data for this country ────────────────────────────────
+    from datetime import date as _date2
+    _current_year = _date2.today().year
+    _stale_threshold = _current_year - 2
+    membership_latest = (
+        db.query(CountryMembership)
+        .filter_by(country=code)
+        .order_by(CountryMembership.year.desc())
+        .first()
+    )
+    membership_stale = membership_latest and membership_latest.year < _stale_threshold
+
     from app.models import ChampionshipSeries
     series_pays = db.query(ChampionshipSeries).filter_by(country=code).order_by(ChampionshipSeries.name).all()
 
@@ -584,6 +730,10 @@ def pays_detail(
         "chart_json":       json.dumps(chart_detail),
         # National circuits
         "series_pays":      series_pays,
+        # Membership
+        "membership_latest":  membership_latest,
+        "membership_stale":   membership_stale,
+        "nb_actifs":          nb_classes_mcr + nb_classes_rcr,
         # Federation
         "federation":       FEDERATIONS.get(code.upper()),
         "referee_ids":      referee_ids,

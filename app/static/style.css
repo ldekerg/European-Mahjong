@@ -64,6 +64,7 @@
     --chart-mcr:     #4a8fc8;
     --chart-rcr:     #c05010;
     --chart-tout:    #7a3a8a;
+    --chart-members: #16a34a;
     --chart-line1:   var(--chart-mcr);
     --chart-line2:   var(--chart-rcr);
     --chart-point:   #e03030;
@@ -132,6 +133,7 @@
     --chart-mcr:     #7ab8f0;
     --chart-rcr:     #f08050;
     --chart-tout:    #d080e8;
+    --chart-members: #4ade80;
     --chart-line1:   var(--chart-mcr);
     --chart-line2:   var(--chart-rcr);
     --chart-point:   #e03030;
@@ -1096,6 +1098,12 @@ caption.t-count {
 }
 .ville-badge-close:hover { background: rgba(255,255,255,0.45); }
 
+.warn-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 1rem; height: 1rem; border-radius: 50%;
+  background: #f59e0b; color: #fff; font-size: 0.65rem; font-weight: 700;
+  cursor: help; margin-left: 0.2rem; vertical-align: middle;
+}
 .badge-mcr { background: var(--mcr-bg); color: var(--mcr-fg); border: 1px solid var(--mcr-fg) }
 .badge-rcr { background: var(--rcr-bg); color: var(--rcr-fg); border: 1px solid var(--rcr-fg) }
 .badge-referee-mcr { background: var(--mcr-bg); color: var(--mcr-fg); border: 1px solid var(--mcr-fg); padding: 0.05rem 0.3rem; font-size: 0.62rem; vertical-align: middle; }

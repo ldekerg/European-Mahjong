@@ -178,7 +178,9 @@
     "tournaments_org_abbr": "Torneios",
     "suspended": "⛔ Suspenso",
     "suspended_title": "Suspenso pela EMA desde 2022",
-    "federation": "Federação"
+    "federation": "Federação",
+    "members_abbr": "Members",
+    "members_title": "Total registered members (latest year)"
   },
   "hof": {
     "medals": "🎖 Medalhas de torneios",

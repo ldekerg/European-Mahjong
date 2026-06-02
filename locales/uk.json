@@ -178,7 +178,9 @@
     "tournaments_org_abbr": "Турніри",
     "suspended": "⛔ Відсторонено",
     "suspended_title": "Відсторонено EMA з 2022 року",
-    "federation": "Федерація"
+    "federation": "Федерація",
+    "members_abbr": "Members",
+    "members_title": "Total registered members (latest year)"
   },
   "hof": {
     "medals": "🎖 Медалі турнірів",

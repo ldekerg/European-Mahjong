@@ -26,6 +26,7 @@
       <a href="/manage/championships/" {% if manage_section == 'championships' %}class="active"{% endif %}>Championships</a>
       {% if manage_user and manage_user.role == 'superadmin' %}
       <a href="/manage/admins/" {% if manage_section == 'admins' %}class="active"{% endif %}>Admins</a>
+      <a href="/manage/countries/memberships/" {% if manage_section == 'memberships' %}class="active"{% endif %}>Memberships</a>
       <a href="/manage/audit/" {% if manage_section == 'audit' %}class="active"{% endif %}>Audit</a>
       <a href="/manage/bots/" {% if manage_section == 'bots' %}class="active"{% endif %}>Bots</a>
       <a href="/manage/backups/" {% if manage_section == 'backups' %}class="active"{% endif %}>Backups</a>

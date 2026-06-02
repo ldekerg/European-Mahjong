@@ -41,7 +41,7 @@ from pathlib import Path
 from datetime import datetime as _dt
 
 from app.database import get_db, SessionLocal
-from app.models import AdminUser, Tournament, Player, Result, AnonymousResult, City, NationalityChange, Championship, ChampionshipSeries, ChampionshipTournament, AuditLog, Referee, TournamentReferee, RankingHistory
+from app.models import AdminUser, Tournament, Player, Result, AnonymousResult, City, NationalityChange, Championship, ChampionshipSeries, ChampionshipTournament, AuditLog, Referee, TournamentReferee, RankingHistory, CountryMembership
 from app.i18n import templates, ISO_NOM_PAYS
 
 # ---------------------------------------------------------------------------
@@ -1885,3 +1885,68 @@ async def admins_delete(admin_id: int, request: Request, db: Session = Depends(g
     db.commit()
     _set_flash(request, f"Admin '{target.username}' deleted.")
     return RedirectResponse("/manage/admins/", status_code=302)
+
+
+# ---------------------------------------------------------------------------
+# Country memberships
+# ---------------------------------------------------------------------------
+
+@router.get("/countries/memberships/")
+def memberships_list(request: Request, db: Session = Depends(get_db)):
+    user = _require_superadmin(request)
+    if isinstance(user, RedirectResponse):
+        return user
+    rows = (db.query(CountryMembership)
+              .order_by(CountryMembership.country, CountryMembership.year.desc())
+              .all())
+    # Group by country for display
+    from collections import defaultdict
+    by_country: dict = defaultdict(list)
+    for r in rows:
+        by_country[r.country].append(r)
+    ctx = _base_ctx(request, user, "memberships")
+    ctx["by_country"] = dict(sorted(by_country.items()))
+    ctx["countries"] = sorted(ISO_NOM_PAYS.items(), key=lambda x: x[1])
+    ctx["current_year"] = date.today().year
+    return templates.TemplateResponse(request, "manage/memberships.html", ctx)
+
+
+@router.post("/countries/memberships/create")
+async def memberships_create(request: Request, db: Session = Depends(get_db)):
+    user = _require_superadmin(request)
+    if isinstance(user, RedirectResponse):
+        return user
+    form = await request.form()
+    country = (form.get("country") or "").strip().upper()
+    try:
+        year = int(form.get("year") or 0)
+        count = int(form.get("count") or 0)
+    except ValueError:
+        _set_flash(request, "Invalid year or count.", "error")
+        return RedirectResponse("/manage/countries/memberships/", status_code=302)
+    if not country or year < 1990 or count < 0:
+        _set_flash(request, "Invalid data.", "error")
+        return RedirectResponse("/manage/countries/memberships/", status_code=302)
+    existing = db.query(CountryMembership).filter_by(country=country, year=year).first()
+    if existing:
+        existing.count = count
+        db.commit()
+        _set_flash(request, f"Updated {country} {year}: {count} members.")
+    else:
+        db.add(CountryMembership(country=country, year=year, count=count))
+        db.commit()
+        _set_flash(request, f"Added {country} {year}: {count} members.")
+    return RedirectResponse("/manage/countries/memberships/", status_code=302)
+
+
+@router.post("/countries/memberships/{membership_id}/delete")
+async def memberships_delete(membership_id: int, request: Request, db: Session = Depends(get_db)):
+    user = _require_superadmin(request)
+    if isinstance(user, RedirectResponse):
+        return user
+    row = db.query(CountryMembership).filter_by(id=membership_id).first()
+    if row:
+        db.delete(row)
+        db.commit()
+        _set_flash(request, f"Deleted {row.country} {row.year}.")
+    return RedirectResponse("/manage/countries/memberships/", status_code=302)

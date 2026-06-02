@@ -29,19 +29,42 @@
     return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
   }
 
+  var LABEL_MAP = {
+    'all':     '{{ trad("common.players") }}',
+    'members': '{{ trad("country.members_abbr") }}',
+  };
+  var HIDDEN_BY_DEFAULT = ['MCR', 'RCR'];
+
   function buildDatasets(raw) {
     return raw.map(function(d) {
       var color = d.cssColor ? cssVar(d.cssColor) : d.color;
-      return {
-        label:           d.label,
-        data:            d.data,
-        borderColor:     color,
-        backgroundColor: 'transparent',
-        borderWidth:     d.width || 1.5,
-        pointRadius:     0,
-        tension:         0.2,
-        _cssColor:       d.cssColor || null,
+      var isMembers = d.label === 'members';
+      var hidden = HIDDEN_BY_DEFAULT.indexOf(d.label) !== -1;
+
+      var ds = {
+        label:            LABEL_MAP[d.label] || d.label,
+        borderColor:      color,
+        backgroundColor:  isMembers ? color : 'transparent',
+        borderWidth:      d.width || 1.5,
+        pointRadius:      isMembers ? 6 : (d.pointRadius !== undefined ? d.pointRadius : 0),
+        pointHoverRadius: isMembers ? 8 : (d.pointHoverRadius !== undefined ? d.pointHoverRadius : 4),
+        spanGaps:         false,
+        tension:          0.2,
+        hidden:           hidden,
+        _cssColor:        d.cssColor || null,
+        _key:             d.label,
       };
+
+      if (isMembers) {
+        ds.data           = d.data;
+        ds.showLine       = false;
+        ds.pointHitRadius = 60;
+      } else {
+        ds.data    = d.data;
+        ds.spanGaps = true;
+      }
+
+      return ds;
     });
   }
 
@@ -66,23 +89,8 @@
             labels: { color: textColor, boxWidth: 14, font: { size: 11 } },
             onClick: function(e, legendItem, legend) {
               var chart = legend.chart;
-              var idx   = legendItem.datasetIndex;
-              var sel   = window._chartSelection[id];
-
-              if (sel === null) {
-                sel = new Set([idx]);               // isoler
-              } else if (sel.has(idx) && sel.size === 1) {
-                sel = null;                          // seul visible → tout réafficher
-              } else if (sel.has(idx)) {
-                sel = new Set(sel); sel.delete(idx); // retirer
-                if (sel.size === 0) sel = null;
-              } else {
-                sel = new Set(sel); sel.add(idx);    // ajouter
-              }
-              window._chartSelection[id] = sel;
-              chart.data.datasets.forEach(function(ds, i) {
-                ds.hidden = sel !== null && !sel.has(i);
-              });
+              var ds    = chart.data.datasets[legendItem.datasetIndex];
+              ds.hidden = !ds.hidden;
               chart.update('none');
             },
           },
