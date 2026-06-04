@@ -60,11 +60,11 @@ def _ranking_championnat(db: Session, championnat: Championship) -> list:
         by_tournament = data["results"]
         all_rankings = [by_tournament.get(tid, 0) for tid in tournoi_ids]
         top_n = sorted(all_rankings, reverse=True)[:n]
-        prenom, nom = data.get("prenom") or "", data.get("nom") or ""
+        prenom, nom = data.get("first_name") or "", data.get("name") or ""
         scores.append({
             "player_id": None, "player": None,
             "nom_affiche": f"{prenom} {nom}".strip(),
-            "nationality": data.get("nationalite") or "", "anonyme": True,
+            "nationality": data.get("nationality") or "", "anonyme": True,
             "score": round(sum(top_n) / n, 1),
             "nb_tournaments": len(by_tournament), "nb_comptes": n,
         })

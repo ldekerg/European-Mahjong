@@ -165,13 +165,13 @@
       Circuit : <a href="/championships/{{ circuit_serie.slug }}/{{ circuit_edition.year }}">{{ circuit_edition.name or circuit_serie.name }}</a>
     </div>
     {% set carte_pts = [] %}
-    {% for t in circuit_tournois %}{% set _ = carte_pts.append({'lat': t.ville.latitude, 'lon': t.ville.longitude, 'city': t.city, 'country': t.country, 'current': t.id == tournoi.id}) %}{% endfor %}
+    {% for t in circuit_tournois %}{% if t.city_obj %}{% set _ = carte_pts.append({'lat': t.city_obj.latitude, 'lon': t.city_obj.longitude, 'city': t.city, 'country': t.country, 'current': t.id == tournoi.id}) %}{% endif %}{% endfor %}
     {% set carte_simple_id = 'tournoi-map' %}
     {% include 'partials/map_simple.html' %}
   </div>
-  {% elif tournoi.ville %}
+  {% elif tournoi.city_obj %}
   <div style="margin-top:1rem">
-    {% set carte_pts = [{'lat': tournoi.ville.latitude, 'lon': tournoi.ville.longitude, 'lieu': tournoi.city, 'country': tournoi.country}] %}
+    {% set carte_pts = [{'lat': tournoi.city_obj.latitude, 'lon': tournoi.city_obj.longitude, 'lieu': tournoi.city, 'country': tournoi.country}] %}
     {% set carte_simple_id = 'tournoi-map' %}
     {% set carte_simple_zoom = 8 %}
     {% include 'partials/map_simple.html' %}
