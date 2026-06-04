@@ -14,7 +14,7 @@
     <col class="col-joueur-nom">
     <col class="col-hof-total">
     <col class="col-nom col-opt">
-    <col class="col-date-opt col-opt">
+    <col class="col-date col-opt col-opt">
   </colgroup>
   <thead>
     <tr>
@@ -23,7 +23,7 @@
       <th class="col-joueur-nom">{{ trad('hof.records_player') }}</th>
       <th class="col-hof-total right">{{ trad('common.score') }}</th>
       <th class="col-nom col-opt">{{ trad('common.tournament') }}</th>
-      <th class="col-date-opt col-opt center">{{ trad('common.date') }}</th>
+      <th class="col-date col-opt col-opt center">{{ trad('common.date') }}</th>
     </tr>
   </thead>
   <tbody>
@@ -36,7 +36,7 @@
       <td class="col-nom col-opt" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
         <a href="/tournaments/{{ row.tournoi_regles }}_{{ row.tournoi_ema_id }}" title="{{ row.tournoi_nom }}">{{ row.tournoi_nom[:30] }}</a>
       </td>
-      <td class="col-date-opt col-opt center dim">{{ row.date.strftime('%d/%m/%Y') if row.date.year != 1900 else '—' }}</td>
+      <td class="col-date col-opt col-opt center dim">{{ row.date.strftime('%d/%m/%Y') if row.date.year != 1900 else '—' }}</td>
     </tr>
     {% endfor %}
   </tbody>

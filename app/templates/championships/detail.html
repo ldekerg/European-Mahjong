@@ -138,13 +138,13 @@
 <div class="scroll-table">
 <table>
   <colgroup>
-    <col class="col-date-opt">
+    <col class="col-date col-opt">
     <col class="col-tournoi">
     <col class="col-joueurs">
   </colgroup>
   <thead>
     <tr>
-      <th class="col-date-opt">Date</th>
+      <th class="col-date col-opt">Date</th>
       <th class="col-tournoi">Tournoi</th>
       <th class="col-joueurs right">Jrs</th>
     </tr>
@@ -152,7 +152,7 @@
   <tbody>
     {% for t in tournaments %}
     <tr>
-      <td class="col-date-opt" style="font-size:0.82rem;white-space:nowrap">{{ t.start_date.strftime('%d/%m') }}</td>
+      <td class="col-date col-opt" style="font-size:0.82rem;white-space:nowrap">{{ t.start_date.strftime('%d/%m') }}</td>
       <td class="col-tournoi">
         <a href="/tournaments/{{ t.id }}">{{ t.name }}</a>
         <span class="dim" style="font-size:0.78rem"> — {{ t.city }}</span>
