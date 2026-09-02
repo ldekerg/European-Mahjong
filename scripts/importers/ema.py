@@ -110,6 +110,11 @@ def parse_date(raw: str) -> tuple[date, date]:
       '15-mars-15' (French month, 2-digit year)
       '9 Feb. 25'  (2-digit year)
       '2-3 February' (no year)
+      '2017'       (year only — some world championships)
+
+    Incomplete dates fall back to the start of the period: a missing day gives
+    the 1st of the month, a missing month gives January 1st. Only a date with
+    no usable year at all returns the 1900-01-01 sentinel.
     """
     import re
     months = {
@@ -153,11 +158,13 @@ def parse_date(raw: str) -> tuple[date, date]:
                 break
 
         if not month:
-            return date(1900, 1, 1), date(1900, 1, 1)
+            # Year only (e.g. "2017") → January 1st.
+            return date(year, 1, 1), date(year, 1, 1)
 
         days = [int(d) for d in re.findall(r'\b\d{1,2}\b', raw_body)]
         if not days:
-            return date(1900, 1, 1), date(1900, 1, 1)
+            # Month and year, no day (e.g. "Oct. 2017") → 1st of the month.
+            return date(year, month, 1), date(year, month, 1)
         day_start = days[0]
         # If multiple months detected (e.g. "31 May - 1 June"), use the first month/day
         all_months = []

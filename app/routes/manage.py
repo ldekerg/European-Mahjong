@@ -17,19 +17,26 @@ def _recompute_coefficient(tournament: "Tournament", db: Session):
     db.commit()
 
 
+def _tournament_weeks(tournament: "Tournament") -> list:
+    """The ranking weeks this tournament affects, oldest first."""
+    from app.ranking import tournament_first_week, week_monday
+    from app.ranking_history import weeks_between, filter_active_weeks
+
+    if not tournament.start_date or tournament.start_date.year == 1900:
+        return []
+
+    first = tournament_first_week(tournament.start_date)
+    today_week = week_monday(date.today())
+    return filter_active_weeks(list(weeks_between(first, today_week)))
+
+
 def _recompute_tournament_weeks(tournament: "Tournament"):
     """Recompute ranking_history for all weeks affected by this tournament.
     Runs synchronously — fine for single-tournament edits (max ~104 weeks).
     """
-    from app.ranking import tournament_first_week, week_monday
-    from app.ranking_history import compute_week, weeks_between, filter_active_weeks
+    from app.ranking_history import compute_week
 
-    if not tournament.start_date or tournament.start_date.year == 1900:
-        return 0
-
-    first = tournament_first_week(tournament.start_date)
-    today_week = week_monday(date.today())
-    weeks = filter_active_weeks(list(weeks_between(first, today_week)))
+    weeks = _tournament_weeks(tournament)
     rules = tournament.rules
     for w in weeks:
         compute_week(w, rules)
@@ -52,12 +59,23 @@ _BACKUPS_DIR = Path(os.environ.get("BACKUPS_DIR", "./backups"))
 
 
 def _take_snapshot(label: str = "") -> Path:
-    """Copy the SQLite DB file to backups/. Returns the backup path."""
+    """Copy the SQLite DB to backups/. Returns the backup path."""
     _BACKUPS_DIR.mkdir(parents=True, exist_ok=True)
     ts = _dt.utcnow().strftime("%Y%m%d_%H%M%S")
     slug = label.replace(" ", "_")[:40] if label else "manual"
     dest = _BACKUPS_DIR / f"ranking_{ts}_{slug}.db"
-    shutil.copy2(_DB_PATH, dest)
+    # sqlite3's backup API, not a file copy: in WAL mode the newest writes live
+    # in the -wal file, so copying only the .db yields a stale snapshot.
+    import sqlite3 as _sqlite3
+    src = _sqlite3.connect(_DB_PATH)
+    try:
+        out = _sqlite3.connect(dest)
+        try:
+            src.backup(out)
+        finally:
+            out.close()
+    finally:
+        src.close()
     # Keep only the 30 most recent backups
     backups = sorted(_BACKUPS_DIR.glob("ranking_*.db"))
     for old in backups[:-30]:
@@ -484,6 +502,56 @@ async def tournament_edit_post(tournament_id: int, request: Request, db: Session
     db.add(entry)
     db.commit()
     _set_flash(request, f"Tournoi « {t.name} » mis à jour.")
+    return RedirectResponse("/manage/tournaments/", status_code=302)
+
+
+@router.post("/tournaments/{tournament_id}/delete")
+async def tournament_delete_post(tournament_id: int, request: Request, db: Session = Depends(get_db)):
+    user = _require_auth(request)
+    if isinstance(user, RedirectResponse):
+        return user
+    t = db.query(Tournament).filter_by(id=tournament_id).first()
+    if not t:
+        _set_flash(request, "Tournoi introuvable.", "error")
+        return RedirectResponse("/manage/tournaments/", status_code=302)
+    allowed = _allowed_countries(user)
+    if user.role != "superadmin" and t.country not in allowed:
+        _set_flash(request, "Accès refusé.", "error")
+        return RedirectResponse("/manage/tournaments/", status_code=302)
+
+    name = t.name
+    counted = t.ema_id is not None
+    rules = t.rules
+    # Weeks must be listed while the tournament row still exists.
+    weeks = _tournament_weeks(t) if counted else []
+    report_path = t.obs_report_path
+
+    _take_snapshot(f"delete_tournoi_{tournament_id}")
+    _audit(db, request, "DELETE", "tournaments", tournament_id,
+           description=f"Deleted tournament «{name}»", old=t)
+
+    # Remove dependents before deleting the tournament.
+    db.query(Result).filter_by(tournament_id=tournament_id).delete()
+    db.query(AnonymousResult).filter_by(tournament_id=tournament_id).delete()
+    db.query(ChampionshipTournament).filter_by(tournament_id=tournament_id).delete()
+    db.query(TournamentReferee).filter_by(tournament_id=tournament_id).delete()
+    db.delete(t)
+    db.commit()
+
+    # Drop the observer report file, now that nothing references it.
+    if report_path and report_path.startswith("/static/obs_reports/"):
+        pdf = Path(__file__).resolve().parent.parent / report_path.lstrip("/")
+        pdf.unlink(missing_ok=True)
+
+    # Recompute ranking_history for the weeks the tournament used to count in.
+    msg = f"Tournoi « {name} » supprimé."
+    if weeks:
+        from app.ranking_history import compute_week
+        for w in weeks:
+            compute_week(w, rules)
+        msg += f" Classement recalculé sur {len(weeks)} semaine{'s' if len(weeks) > 1 else ''}."
+
+    _set_flash(request, msg)
     return RedirectResponse("/manage/tournaments/", status_code=302)
 
 

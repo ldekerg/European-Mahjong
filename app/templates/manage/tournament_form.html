@@ -197,6 +197,18 @@
 </form>
 
 {% if tournament %}
+<div class="manage-form" style="margin-top:2rem;border-top:1px solid var(--border);padding-top:1.25rem">
+  <h3 style="color:#dc2626;margin:0 0 0.5rem">Danger zone</h3>
+  <p class="form-hint" style="margin-bottom:0.75rem">
+    Supprime définitivement ce tournoi, ses résultats (classés et anonymes) et ses liens de championnat.
+    Le classement est recalculé pour les semaines concernées. Une sauvegarde est créée avant suppression.
+  </p>
+  <form method="post" action="/manage/tournaments/{{ tournament.id }}/delete"
+        onsubmit="return confirm('Supprimer définitivement le tournoi « {{ tournament.name|e }} » et tous ses résultats ?');">
+    <button type="submit" class="btn" style="background:#dc2626;color:#fff">🗑 Supprimer ce tournoi</button>
+  </form>
+</div>
+
 <script>
 var _TID = {{ tournament.id }};
 var _selectedReferee = null;

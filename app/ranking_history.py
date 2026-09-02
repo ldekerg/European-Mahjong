@@ -90,6 +90,14 @@ def compute_week(week: date, rules: str) -> int:
                     },
                 )
                 db.execute(stmt)
+            # Drop players who no longer rank this week — deleting a tournament can
+            # push someone below the threshold, and the upsert above never removes.
+            ranked_ids = [r["player_id"] for r in rows]
+            db.query(RankingHistory).filter(
+                RankingHistory.week == week,
+                RankingHistory.rules == rules,
+                RankingHistory.player_id.notin_(ranked_ids),
+            ).delete(synchronize_session=False)
             db.commit()
 
         return len(results)

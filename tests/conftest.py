@@ -68,22 +68,28 @@ def setup_db():
     p3 = Player(id="09990001", last_name="SMITH", first_name="John", nationality="UK", status="europeen")
     db.add_all([p1, p2, p3])
 
+    # Cities — tournaments link to them by city_id (Tournament.city is read-only)
+    c1 = City(id=1, name="Paris", country="FR", latitude=48.8566, longitude=2.3522)
+    c2 = City(id=2, name="Lyon", country="FR", latitude=45.7640, longitude=4.8357)
+    c3 = City(id=3, name="Bordeaux", country="FR", latitude=44.8378, longitude=-0.5792)
+    db.add_all([c1, c2, c3])
+
     # Tournaments
     t1 = Tournament(
         id=1, ema_id=100, rules="MCR", name="Test Open MCR 2025",
-        city="Paris", country="France", start_date=date(2025, 3, 1),
+        city_id=1, country="FR", start_date=date(2025, 3, 1),
         end_date=date(2025, 3, 2), nb_players=3, coefficient=1.0,
         tournament_type="normal", status="actif",
     )
     t2 = Tournament(
         id=2, ema_id=101, rules="MCR", name="Test Open MCR 2024",
-        city="Lyon", country="France", start_date=date(2024, 6, 15),
+        city_id=2, country="FR", start_date=date(2024, 6, 15),
         end_date=date(2024, 6, 15), nb_players=3, coefficient=1.0,
         tournament_type="normal", status="actif",
     )
     t3 = Tournament(
         id=3, ema_id=None, rules="MCR", name="Future MCR 2026",
-        city="Bordeaux", country="France", start_date=date(2026, 9, 1),
+        city_id=3, country="FR", start_date=date(2026, 9, 1),
         end_date=date(2026, 9, 1), nb_players=0, coefficient=1.0,
         tournament_type="normal", status="calendrier",
     )
