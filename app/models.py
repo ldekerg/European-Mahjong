@@ -40,6 +40,9 @@ class Tournament(Base):
 
     id              = Column(Integer, primary_key=True, autoincrement=True)
     ema_id          = Column(Integer, nullable=True)        # original EMA number, NULL if not yet assigned
+    # Official MERS tournament: makes it eligible for the ranking. Independent of
+    # ema_id — a tournament can be official before EMA publishes its number.
+    is_mers         = Column(Boolean, nullable=False, default=False)
     rules           = Column(String, nullable=False)         # MCR or RCR
     name            = Column(String, nullable=False)
     city_id         = Column(Integer, ForeignKey("cities.id"), nullable=True)  # NULL = unknown city

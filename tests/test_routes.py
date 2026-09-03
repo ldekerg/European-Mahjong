@@ -126,3 +126,85 @@ def test_championships_list_200(client):
 def test_championship_not_found(client):
     r = client.get("/championships/nonexistent-slug")
     assert r.status_code == 404
+
+
+# ── MERS flag / EMA number (is_mers) ──────────────────────────────────────────
+
+def _new_tournament_form(**overrides):
+    """Minimal valid payload for POST /manage/tournaments/new."""
+    data = {
+        "name": "Local Cup 2026", "rules": "MCR", "tournament_type": "normal",
+        "start_date": "2026-05-02", "end_date": "2026-05-03",
+        "nb_players": "20", "country": "FR", "city_id": "1", "status": "actif",
+    }
+    data.update(overrides)
+    return data
+
+
+def _fetch(db, name):
+    from app.models import Tournament
+    db.expire_all()
+    return db.query(Tournament).filter_by(name=name).first()
+
+
+def test_create_tournament_no_ema_id_invented(admin_client, db_session):
+    """A manually created tournament must not be given an EMA number."""
+    admin_client.post("/manage/tournaments/new",
+                      data=_new_tournament_form(name="No Invent 2026"),
+                      follow_redirects=False)
+    t = _fetch(db_session, "No Invent 2026")
+    assert t is not None
+    assert t.ema_id is None       # the collision bug: this used to be max+1
+    assert t.is_mers is False     # checkbox absent from the payload
+
+
+def test_create_tournament_mers_without_ema_id(admin_client, db_session):
+    """is_mers=1 with no EMA number is legitimate and must reach the ranking."""
+    from datetime import date
+    from app.ranking import active_tournaments, week_monday
+
+    admin_client.post("/manage/tournaments/new",
+                      data=_new_tournament_form(name="Mers No Number 2026", is_mers="on"),
+                      follow_redirects=False)
+    t = _fetch(db_session, "Mers No Number 2026")
+    assert t.ema_id is None
+    assert t.is_mers is True
+
+    ids = {x.id for x, _ in active_tournaments(db_session, week_monday(date(2026, 6, 1)), "MCR")}
+    assert t.id in ids, "a MERS tournament without an EMA number must rank"
+
+
+def test_mers_tournament_outside_window_does_not_rank(admin_client, db_session):
+    """is_mers alone is not enough: the 104-week window still applies."""
+    from datetime import date
+    from app.ranking import active_tournaments, week_monday
+
+    admin_client.post("/manage/tournaments/new",
+                      data=_new_tournament_form(name="Old Mers 2015", is_mers="on",
+                                                start_date="2015-05-02", end_date="2015-05-03"),
+                      follow_redirects=False)
+    t = _fetch(db_session, "Old Mers 2015")
+    assert t.is_mers is True
+
+    ids = {x.id for x, _ in active_tournaments(db_session, week_monday(date(2026, 6, 1)), "MCR")}
+    assert t.id not in ids, "out of the 104-week window, it must not rank"
+
+
+def test_create_tournament_duplicate_ema_id_rejected(admin_client, db_session):
+    """A taken (ema_id, rules) pair is refused with a message, not a 500."""
+    from app.models import Tournament
+
+    r = admin_client.post("/manage/tournaments/new",
+                          data=_new_tournament_form(name="Clash 2026", ema_id="100"),
+                          follow_redirects=False)
+    assert r.status_code == 302                     # redirect, not a crash
+    assert _fetch(db_session, "Clash 2026") is None  # nothing written
+    holder = db_session.query(Tournament).filter_by(ema_id=100, rules="MCR").one()
+    assert holder.name == "Test Open MCR 2025"       # fixture t1 keeps its number
+
+
+def test_manage_list_no_none_link(admin_client):
+    """Rows without an EMA number must not render /tournaments/MCR_None."""
+    r = admin_client.get("/manage/tournaments/")
+    assert r.status_code == 200
+    assert "_None" not in r.text

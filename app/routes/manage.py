@@ -109,17 +109,27 @@ def _audit(db: Session, request: Request, action: str, table: str, row_id,
     db.add(entry)
     # (caller must db.commit())
 
-# Tournament types that get an ema_id assigned automatically
-EMA_TYPES = {'normal', 'oemc', 'oerc', 'non_mers'}
+def _parse_ema_id(form_value: str) -> int | None:
+    """Return the EMA number from a form field, or None if left blank/invalid."""
+    try:
+        v = int(form_value)
+        return v if v > 0 else None
+    except (TypeError, ValueError):
+        return None
 
 
-def _next_ema_id(db: Session, rules: str) -> int:
-    """Returns max(ema_id)+1 for the given rules, scoped to non-world tournaments."""
-    result = db.query(func.max(Tournament.ema_id)).filter(
-        Tournament.rules == rules,
-        Tournament.ema_id < 1_000_000,  # exclude WMC/WRC ids
-    ).scalar()
-    return (result or 0) + 1
+def _ema_id_taken(db: Session, ema_id: int | None, rules: str, exclude_id: int | None = None):
+    """Return the tournament already holding this (ema_id, rules), if any.
+
+    The pair is unique (index uq_tournoi_ema_regles); checking up front turns an
+    IntegrityError into a readable message.
+    """
+    if ema_id is None:
+        return None
+    q = db.query(Tournament).filter(Tournament.ema_id == ema_id, Tournament.rules == rules)
+    if exclude_id is not None:
+        q = q.filter(Tournament.id != exclude_id)
+    return q.first()
 
 router = APIRouter(prefix="/manage")
 
@@ -388,15 +398,23 @@ async def tournament_new_post(request: Request, db: Session = Depends(get_db)):
 
     from app.ranking import mers_coefficient as _mcoeff
     t_type  = _resolve_tournament_type(form.get("tournament_type", "normal"), form.get("rules", "MCR"))
-    ema_id  = _next_ema_id(db, form["rules"]) if t_type in EMA_TYPES else None
+    # The EMA number is never invented: it stays empty until EMA publishes it.
+    ema_id  = _parse_ema_id(form.get("ema_id"))
+    is_mers = form.get("is_mers") == "on"
     start   = date.fromisoformat(form["start_date"])
     end     = date.fromisoformat(form["end_date"])
     nb_days = max(1, (end - start).days + 1)
     nb_p    = int(form["nb_players"])
     coeff   = _mcoeff(nb_days, nb_p, [], t_type)  # 0 countries until results are imported
 
+    clash = _ema_id_taken(db, ema_id, form["rules"])
+    if clash:
+        _set_flash(request, f"Le numéro EMA {ema_id} est déjà utilisé par « {clash.name} ».", "error")
+        return RedirectResponse("/manage/tournaments/new", status_code=302)
+
     t = Tournament(
         ema_id=ema_id,
+        is_mers=is_mers,
         rules=form["rules"],
         name=form["name"],
         city_id=_parse_city_id(form.get("city_id")),
@@ -419,8 +437,11 @@ async def tournament_new_post(request: Request, db: Session = Depends(get_db)):
            description=f"Created tournament «{t.name}»", new=t)
     db.commit()
 
-    suffix = f" (ID EMA : {ema_id})" if ema_id else ""
-    _set_flash(request, f"Tournoi « {t.name} » créé{suffix}.")
+    bits = []
+    if ema_id:
+        bits.append(f"ID EMA : {ema_id}")
+    bits.append("compte au classement MERS" if is_mers else "hors classement MERS")
+    _set_flash(request, f"Tournoi « {t.name} » créé ({', '.join(bits)}).")
     return RedirectResponse("/manage/tournaments/", status_code=302)
 
 
@@ -465,11 +486,15 @@ async def tournament_edit_post(tournament_id: int, request: Request, db: Session
     form = await request.form()
     t_type = _resolve_tournament_type(form.get("tournament_type", t.tournament_type), form.get("rules", t.rules))
 
-    # Assign ema_id if type changed to an EMA type and it had none
-    if t_type in EMA_TYPES and not t.ema_id:
-        t.ema_id = _next_ema_id(db, form.get("rules", t.rules))
+    new_ema_id = _parse_ema_id(form.get("ema_id"))
+    clash = _ema_id_taken(db, new_ema_id, form.get("rules", t.rules), exclude_id=t.id)
+    if clash:
+        _set_flash(request, f"Le numéro EMA {new_ema_id} est déjà utilisé par « {clash.name} ».", "error")
+        return RedirectResponse(f"/manage/tournaments/{tournament_id}/edit", status_code=302)
 
     old_snapshot = _obj_to_dict(t)
+    t.ema_id  = new_ema_id
+    t.is_mers = form.get("is_mers") == "on"
 
     from app.ranking import mers_coefficient as _mcoeff
     t.rules      = form["rules"]
@@ -520,7 +545,7 @@ async def tournament_delete_post(tournament_id: int, request: Request, db: Sessi
         return RedirectResponse("/manage/tournaments/", status_code=302)
 
     name = t.name
-    counted = t.ema_id is not None
+    counted = t.is_mers
     rules = t.rules
     # Weeks must be listed while the tournament row still exists.
     weeks = _tournament_weeks(t) if counted else []

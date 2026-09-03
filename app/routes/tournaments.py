@@ -31,7 +31,7 @@ def _tournaments_tab(db, rules: str, view: str, sort: str, asc: int, city) -> di
     week = week_monday(date.today())
     active_ids = {t.id: c for t, c in active_tournaments(db, week, rules)}
 
-    q = db.query(Tournament).filter(Tournament.rules == rules, Tournament.ema_id.isnot(None))
+    q = db.query(Tournament).filter(Tournament.rules == rules, Tournament.is_mers.is_(True))
     if view == "actifs":
         q = q.filter(Tournament.id.in_(active_ids.keys()))
     elif view == "speciaux":
@@ -56,7 +56,7 @@ def _tournaments_tab(db, rules: str, view: str, sort: str, asc: int, city) -> di
     ).join(City, Tournament.city_id == City.id
     ).filter(
         Tournament.city_id.isnot(None), Tournament.rules == rules,
-        Tournament.ema_id.isnot(None),
+        Tournament.is_mers.is_(True),
     )
     if view == "actifs":
         vq = vq.filter(Tournament.id.in_(active_ids.keys()))

@@ -28,15 +28,15 @@ def list_players(
     # Subqueries to count tournaments per player/rules + date of first tournament
     mcr_count = (
         db.query(Result.player_id, func.count(Result.id).label("nb"))
-        .join(T).filter(T.rules == "MCR", T.ema_id.isnot(None)).group_by(Result.player_id).subquery()
+        .join(T).filter(T.rules == "MCR", T.is_mers.is_(True)).group_by(Result.player_id).subquery()
     )
     rcr_count = (
         db.query(Result.player_id, func.count(Result.id).label("nb"))
-        .join(T).filter(T.rules == "RCR", T.ema_id.isnot(None)).group_by(Result.player_id).subquery()
+        .join(T).filter(T.rules == "RCR", T.is_mers.is_(True)).group_by(Result.player_id).subquery()
     )
     first_tournament = (
         db.query(Result.player_id, func.min(T.start_date).label("first"))
-        .join(T).filter(T.start_date != date(1900, 1, 1), T.ema_id.isnot(None))
+        .join(T).filter(T.start_date != date(1900, 1, 1), T.is_mers.is_(True))
         .group_by(Result.player_id).subquery()
     )
 
@@ -136,7 +136,7 @@ def player_detail(player_id: str, request: Request, db: Session = Depends(get_db
             db.query(Result)
             .join(Tournament)
             .filter(Result.player_id == player_id, Tournament.rules == rules,
-                    Tournament.ema_id.isnot(None))
+                    Tournament.is_mers.is_(True))
             .order_by(Tournament.start_date.desc())
             .all()
         )
@@ -346,14 +346,14 @@ def player_preview(
             Result.player_id == player_id,
             T.rules == rules_key,
             T.tournament_type.notin_(["wmc", "wrc"]),
-            T.ema_id.isnot(None),
+            T.is_mers.is_(True),
         ).count()
 
         active_ids = active_mcr if rules_key == "MCR" else active_rcr
         active_results = db.query(Result).join(T).filter(
             Result.player_id == player_id,
             Result.tournament_id.in_(active_ids.keys()),
-            T.ema_id.isnot(None)
+            T.is_mers.is_(True)
         ).all()
 
         snapshot = sorted([

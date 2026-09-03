@@ -46,9 +46,16 @@ def override_get_db():
 
 app.dependency_overrides[get_db] = override_get_db
 
-# Patch SessionLocal everywhere it's used directly (not via dependency injection)
+# Patch SessionLocal everywhere it's used directly (not via dependency injection).
+# Modules that did `from app.database import SessionLocal` hold their own
+# reference, so patching app.database alone does not reach them.
 _db_module.SessionLocal = TestSession
 _main_module.SessionLocal = TestSession
+
+import app.routes.manage as _manage_module
+import app.ranking_history as _rh_module
+_manage_module.SessionLocal = TestSession
+_rh_module.SessionLocal = TestSession
 
 
 # ── Fixtures ──────────────────────────────────────────────────────────────────
@@ -76,19 +83,19 @@ def setup_db():
 
     # Tournaments
     t1 = Tournament(
-        id=1, ema_id=100, rules="MCR", name="Test Open MCR 2025",
+        id=1, ema_id=100, is_mers=True, rules="MCR", name="Test Open MCR 2025",
         city_id=1, country="FR", start_date=date(2025, 3, 1),
         end_date=date(2025, 3, 2), nb_players=3, coefficient=1.0,
         tournament_type="normal", status="actif",
     )
     t2 = Tournament(
-        id=2, ema_id=101, rules="MCR", name="Test Open MCR 2024",
+        id=2, ema_id=101, is_mers=True, rules="MCR", name="Test Open MCR 2024",
         city_id=2, country="FR", start_date=date(2024, 6, 15),
         end_date=date(2024, 6, 15), nb_players=3, coefficient=1.0,
         tournament_type="normal", status="actif",
     )
     t3 = Tournament(
-        id=3, ema_id=None, rules="MCR", name="Future MCR 2026",
+        id=3, ema_id=None, is_mers=False, rules="MCR", name="Future MCR 2026",
         city_id=3, country="FR", start_date=date(2026, 9, 1),
         end_date=date(2026, 9, 1), nb_players=0, coefficient=1.0,
         tournament_type="normal", status="calendrier",
@@ -122,4 +129,38 @@ def setup_db():
 def client(setup_db):
     """FastAPI test client — depends on setup_db to ensure data is seeded first."""
     with TestClient(app) as c:
+        yield c
+
+
+@pytest.fixture
+def db_session(setup_db):
+    """Direct handle on the test database, for asserting on rows."""
+    db = TestSession()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
+@pytest.fixture
+def admin_client(setup_db):
+    """Test client logged in as a superadmin, for /manage routes."""
+    import bcrypt
+    from app.models import AdminUser
+
+    db = TestSession()
+    if not db.query(AdminUser).filter_by(username="test_admin").first():
+        db.add(AdminUser(
+            username="test_admin",
+            password_hash=bcrypt.hashpw(b"test_password", bcrypt.gensalt()).decode(),
+            role="superadmin",
+        ))
+        db.commit()
+    db.close()
+
+    with TestClient(app) as c:
+        r = c.post("/manage/login",
+                   data={"username": "test_admin", "password": "test_password"},
+                   follow_redirects=False)
+        assert r.status_code == 302, "login failed"
         yield c

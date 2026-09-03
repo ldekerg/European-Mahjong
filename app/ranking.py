@@ -69,7 +69,7 @@ def active_tournaments(db: Session, target_week: date, rules: str):
         .filter(
             Tournament.rules == rules,
             Tournament.tournament_type.notin_(["wmc", "wrc"]),
-            Tournament.ema_id.isnot(None),
+            Tournament.is_mers.is_(True),
             Tournament.start_date >= lower_bound,
             Tournament.start_date != date(1900, 1, 1),
         )

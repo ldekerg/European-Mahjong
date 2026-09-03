@@ -7,10 +7,6 @@
   <a href="/manage/tournaments/" class="btn btn-secondary">← Back</a>
 </div>
 
-{% if tournament and tournament.ema_id %}
-<p class="dim" style="margin-bottom:1rem;font-size:0.85rem">ID EMA : <strong>{{ tournament.ema_id }}</strong></p>
-{% endif %}
-
 <form method="post" class="manage-form" id="tournament-form">
   <div class="form-grid">
 
@@ -44,6 +40,22 @@
         {% endfor %}
       </select>
       <p class="form-hint" id="type-hint"></p>
+    </div>
+
+    <div class="form-group">
+      <label>EMA number</label>
+      <input type="number" name="ema_id" min="1" class="manage-input"
+             value="{{ tournament.ema_id if tournament and tournament.ema_id else '' }}">
+      <p class="form-hint">Number on mahjong-europe.org (TR_&lt;n&gt;.html). Leave empty until EMA publishes it.</p>
+    </div>
+
+    <div class="form-group">
+      <label>MERS status</label>
+      <label style="display:flex;align-items:center;gap:0.5rem;font-weight:normal">
+        <input type="checkbox" name="is_mers" {% if tournament and tournament.is_mers %}checked{% endif %}>
+        Official MERS tournament
+      </label>
+      <p class="form-hint">Makes it eligible for the ranking. No EMA number required.</p>
     </div>
 
     <div class="form-group">

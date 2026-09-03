@@ -51,7 +51,7 @@ def _player_current(db: Session, player_id: str, rules: str) -> dict | None:
     nb = db.execute(text("""
         SELECT COUNT(DISTINCT r.tournament_id)
         FROM results r JOIN tournaments t ON r.tournament_id = t.id
-        WHERE r.player_id = :pid AND t.rules = :r AND t.ema_id IS NOT NULL
+        WHERE r.player_id = :pid AND t.rules = :r AND t.is_mers = 1
     """), {"pid": player_id, "r": rules}).scalar() or 0
     best = db.execute(text("""
         SELECT MAX(rh2.score) FROM ranking_history rh2
@@ -82,7 +82,7 @@ def _common_tournaments(db: Session, player_ids: list[str], rules: str) -> list[
         SELECT t.id, t.name, t.start_date, c.name, t.country, t.nb_players
         FROM tournaments t
         LEFT JOIN cities c ON t.city_id = c.id
-        WHERE t.rules = :r AND t.ema_id IS NOT NULL
+        WHERE t.rules = :r AND t.is_mers = 1
           AND (
             SELECT COUNT(DISTINCT r.player_id) FROM results r
             WHERE r.tournament_id = t.id AND r.player_id IN ({placeholders})
@@ -140,7 +140,7 @@ def _frequent_opponents(db: Session, player_ids: list[str], rules: str, limit: i
         FROM results r
         JOIN players p ON r.player_id = p.id
         JOIN tournaments t ON r.tournament_id = t.id
-        WHERE t.rules = :r AND t.ema_id IS NOT NULL
+        WHERE t.rules = :r AND t.is_mers = 1
           AND r.player_id NOT IN ({placeholders})
           AND t.id IN (
             SELECT tournament_id FROM results

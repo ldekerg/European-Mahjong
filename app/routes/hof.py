@@ -209,7 +209,7 @@ def _compute_hof(db: Session, regles: str, periode: str) -> dict:
     ).join(Tournament, Result.tournament_id == Tournament.id
     ).filter(
         Tournament.rules == regles,
-        Tournament.ema_id.isnot(None),
+        Tournament.is_mers.is_(True),
     ).group_by(Result.player_id).subquery()
 
     medals_rows = db.query(medals_q, Player).join(Player, medals_q.c.player_id == Player.id).all()
