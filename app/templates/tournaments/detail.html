@@ -10,8 +10,8 @@
       <span class="badge {% if tournoi.rules == 'MCR' %}badge-mcr{% else %}badge-rcr{% endif %}">{{ tournoi.rules }}</span>
       {% if tournoi.tournament_type == 'wmc' %}<span class="badge badge-wmc">WMC</span>
       {% elif tournoi.tournament_type == 'wrc' %}<span class="badge badge-wmc">WRC</span>
-      {% elif tournoi.tournament_type == 'oemc' %}<span class="badge">OEMC</span>
-      {% elif tournoi.tournament_type == 'oerc' %}<span class="badge">ERMC</span>{% endif %}
+      {% elif tournoi.tournament_type == 'oemc' %}<span class="badge badge-oemc">OEMC</span>
+      {% elif tournoi.tournament_type == 'oerc' %}<span class="badge badge-oerc">ERMC</span>{% endif %}
       {% if resultats_incomplets %}
       <span class="badge badge-warning" title="{{ trad('common.missing_players', n=nb_anon_europeens) }}">{{ trad('common.partial_results') }}</span>
       {% endif %}

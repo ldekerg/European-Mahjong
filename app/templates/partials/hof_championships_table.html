@@ -21,8 +21,8 @@
         <a href="/tournaments/{{ trn.rules }}_{{ trn.ema_id }}">{{ trn.name[:28] }}</a>
         {% if trn.tournament_type == 'wmc' %}<span class="badge badge-wmc">WMC</span>
         {% elif trn.tournament_type == 'wrc' %}<span class="badge badge-wmc">WRC</span>
-        {% elif trn.tournament_type == 'oerc' %}<span class="badge">ERMC</span>
-        {% else %}<span class="badge">OEMC</span>{% endif %}
+        {% elif trn.tournament_type == 'oerc' %}<span class="badge badge-oerc">ERMC</span>
+        {% else %}<span class="badge badge-oemc">OEMC</span>{% endif %}
       </td>
       <td class="col-pos">
         <span class="pos-medal">{% if r.position == 1 %}🥇{% elif r.position == 2 %}🥈{% elif r.position == 3 %}🥉{% endif %}</span>

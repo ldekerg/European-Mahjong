@@ -898,7 +898,10 @@ tr:hover           td { --row-bg: var(--row-hover); }
 
 .badge-wmc    { background: var(--wmc-fg); color: var(--wmc-bg); border: 1px solid var(--wmc-fg); }
 
-.badge-oemc    { background: var(--oemc-fg); color: var(--oemc-bg); border: 1px solid var(--oemc-fg); }
+/* ERMC is the Riichi counterpart of OEMC (European championship), so it shares
+   its colours — the same way badge-wmc is reused for WRC. */
+.badge-oemc,
+.badge-oerc    { background: var(--oemc-fg); color: var(--oemc-bg); border: 1px solid var(--oemc-fg); }
 
 .badge-warning   { background: #fff3cd; color: #7a5c00; border: 1px solid #e6c840; }
 .badge-suspendu  { background: #fde8e8; color: #a00; border: 1px solid #e88; }
