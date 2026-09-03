@@ -39,7 +39,7 @@ window['{{ _fv }}'] = window['{{ _fv }}'] || function() {};
     {% set _asc = asc if asc is defined else 0 %}
     {% macro th_s(col, label, cls='', title='') %}
       {% if _s %}
-        {% set _active = (tri == col) %}
+        {% set _active = (sort == col) %}
         {% set _next = (0 if _active and _asc else 1) %}
         <th class="sortable-th {{ cls }}" title="{{ title or label }}">
           <a href="{{ _s }}&sort={{ col }}&asc={{ _next }}" class="th-sort-link">{{ label }}
@@ -51,12 +51,12 @@ window['{{ _fv }}'] = window['{{ _fv }}'] || function() {};
     {% endmacro %}
     <tr>
       {{ th_s('date',    trad('common.date'),          'col-date-lg') }}
-      <th class="col-tournoi">{{ trad('common.tournament') }}</th>
-      {{ th_s('lieu',    trad('common.city'),          'col-ville col-opt') }}
+      {{ th_s('name',    trad('common.tournament'),    'col-tournoi') }}
+      {{ th_s('city',    trad('common.city'),          'col-ville col-opt') }}
       <th class="col-duree col-opt center" title="{{ trad('common.duration') }}">🗓️</th>
       {{ th_s('coeff',   '⚖️', 'col-coeff col-opt center',   trad('common.coeff_title')) }}
-      {% if actifs_ids %}{{ th_s('joueurs', '👥', 'col-joueurs center', trad('common.nb_players')) }} {% endif %}
-      {% if not actifs_ids %}{{ th_s('joueurs', '👥', 'col-joueurs col-sticky center', trad('common.nb_players')) }}
+      {% if actifs_ids %}{{ th_s('players', '👥', 'col-joueurs center', trad('common.nb_players')) }} {% endif %}
+      {% if not actifs_ids %}{{ th_s('players', '👥', 'col-joueurs col-sticky center', trad('common.nb_players')) }}
       {% endif %}
       {% if actifs_ids %}<th class="col-contrib col-opt col-sticky center" title="{{ trad('tournament.contribution_title') }}">⏱️</th>{% endif %}
     </tr>

@@ -54,7 +54,7 @@
       {% if pays_stats %}
       <span style="display:inline-flex;flex-wrap:wrap;gap:0.3rem;margin-left:0.5rem;vertical-align:middle">
         {% for p in pays_stats %}
-        <a href="/countries/{{ p.code }}?tab=tournois"
+        <a href="/countries/{{ p.code }}?tab=tournaments"
            class="etiquette-pays">
           {{ p.code | flag }} <span class="dim">{{ p.nb }}</span>
         </a>

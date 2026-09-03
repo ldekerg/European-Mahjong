@@ -509,7 +509,7 @@ def pays_detail(
     code: str,
     week: Optional[str] = Query(None),
     rules: Optional[str] = Query(None),
-    sort: str = Query("nom"),
+    sort: str = Query("name"),
     asc: int = Query(1),
     tab: str = Query("ranking"),
     player_filter: str = Query("all"),  # all | referee_mcr | referee_rcr
@@ -650,13 +650,15 @@ def pays_detail(
         for j in joueurs_q
     ]
 
+    # Keys must match those emitted by partials/players_table.html.
     _sort_key = {
-        "nom":       lambda x: x["player"].last_name or "",
-        "prenom":    lambda x: x["player"].first_name or "",
-        "premier":   lambda x: x["premier"] or dt.max.date(),
-        "nb_mcr":    lambda x: x["nb_mcr"],
-        "nb_rcr":    lambda x: x["nb_rcr"],
-        "nb_total":  lambda x: x["nb_total"],
+        "name":        lambda x: x["player"].last_name or "",
+        "first_name":  lambda x: x["player"].first_name or "",
+        "nationality": lambda x: x["player"].nationality or "",
+        "first":       lambda x: x["premier"] or dt.max.date(),
+        "nb_mcr":      lambda x: x["nb_mcr"],
+        "nb_rcr":      lambda x: x["nb_rcr"],
+        "nb_total":    lambda x: x["nb_total"],
     }.get(sort, lambda x: x["player"].last_name or "")
     joueurs_data.sort(key=_sort_key, reverse=(asc == 0))
 

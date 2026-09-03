@@ -468,7 +468,7 @@ function filtreJoueurVille(ville, regles, el) {
   document.getElementById('ville-badge-nom-' + reglesLow).textContent = ville;
   // Lien vers page tournois
   var link = document.getElementById('ville-badge-link-' + reglesLow);
-  link.href = '/tournaments/?view=tous&rules=' + regles + '&sort=date&ville=' + encodeURIComponent(ville);
+  link.href = '/tournaments/?view=all&rules=' + regles + '&sort=date&city=' + encodeURIComponent(ville);
   link.querySelector('span').textContent = ville;
 }
 

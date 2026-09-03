@@ -261,8 +261,8 @@ function showMainTab(name, btn) {
 
 // MCR / RCR sub-tabs within Ranking tab
 var _activeRow = null;
-var _joueurDefautMCR = '{{ player_defaut_mcr or "" }}';
-var _joueurDefautRCR = '{{ player_defaut_rcr or "" }}';
+var _joueurDefautMCR = '{{ default_player_mcr or "" }}';
+var _joueurDefautRCR = '{{ default_player_rcr or "" }}';
 var _joueurPersiste  = '';
 
 function fetchApercu(joueurId, rules) {
