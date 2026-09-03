@@ -721,7 +721,7 @@ def pays_detail(
         "cities":           cities,
         "cartes":           cartes,
         "carte_bounds":     carte_bounds,
-        "ville_filtre":     None,
+        "city_filter":      None,
         # Players
         "players":          joueurs_data,
         "sort":             sort,

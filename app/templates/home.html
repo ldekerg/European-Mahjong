@@ -126,7 +126,7 @@
       {{ trad('home.recent_tournaments') }}
       <a href="/tournaments/" class="dim" style="font-size:0.78rem;font-weight:400;margin-left:0.5rem">{{ trad('common.see_all') }}</a>
     </h2>
-    {% with tournois=recent, actifs_ids={}, ville_filtre=None, tab_key='recent' %}
+    {% with tournois=recent, actifs_ids={}, city_filter=None, tab_key='recent' %}
     {% include 'partials/tournaments_table.html' %}
     {% endwith %}
   </div>

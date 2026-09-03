@@ -4,7 +4,7 @@
   <h1>{{ trad('common.tournaments') }}</h1>
   <div class="t-filters">
     <div class="t-filter-group">
-      {% for v, label in [('actifs', trad('common.active')), ('tous', trad('common.all')), ('speciaux', trad('common.special'))] %}
+      {% for v, label in [('actifs', trad('common.active')), ('all', trad('common.all')), ('speciaux', trad('common.special'))] %}
       <a href="?view={{ v }}&sort={{ sort }}" class="filter-btn {% if view == v %}active{% endif %}">{{ label }}</a>
       {% endfor %}
     </div>

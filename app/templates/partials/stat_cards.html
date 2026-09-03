@@ -31,7 +31,7 @@
       {% if data.best_rank %}
         {{ data.best_rank }}
         {% if data.date_best_rank %}
-        <a class="apercu-best" href="/ranking?week={{ data.date_best_rank }}&player={{ player.id }}&rules={{ rules | upper }}"
+        <a class="apercu-best" href="/ranking?week={{ data.date_best_rank }}&player_filter={{ player.id }}&rules={{ rules | upper }}"
            title="{{ trad('player.best_ranking') }}">
           🏆 <span class="apercu-best-date">{{ data.date_best_rank | fmt_date }}</span>
         </a>
@@ -67,7 +67,7 @@
       {% if data.max_score %}
         {{ data.max_score }}
         {% if data.date_max_score %}
-        <a class="apercu-best" href="/ranking?week={{ data.date_max_score }}&player={{ player.id }}&rules={{ rules | upper }}"
+        <a class="apercu-best" href="/ranking?week={{ data.date_max_score }}&player_filter={{ player.id }}&rules={{ rules | upper }}"
            title="{{ trad('player.best_score') }}">
           🏆 <span class="apercu-best-date">{{ data.date_max_score | fmt_date }}</span>
         </a>

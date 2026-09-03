@@ -133,14 +133,14 @@
     <div class="t-right">
       {% if cartes | length > 1 %}
         {% for grp in cartes %}
-          {% with cities=grp.cities, carte_bounds=grp.bounds, ville_filtre=ville_filtre,
+          {% with cities=grp.cities, carte_bounds=grp.bounds, city_filter=city_filter,
                   carte_id='t-map-pays-' + loop.index|string %}
           {% include 'partials/tournaments_map.html' %}
           {% endwith %}
           {% if not loop.last %}<div style="height:0.75rem"></div>{% endif %}
         {% endfor %}
       {% else %}
-        {% with cities=cities, carte_bounds=carte_bounds, ville_filtre=ville_filtre %}
+        {% with cities=cities, carte_bounds=carte_bounds, city_filter=city_filter %}
         {% include 'partials/tournaments_map.html' %}
         {% endwith %}
       {% endif %}

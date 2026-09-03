@@ -18,7 +18,7 @@
     {% endif %}
     <div class="apercu-nbt">{{ data.nb_active }} {{ trad('common.active') }} · {{ data.nb_total }} {{ trad('players.total') }}</div>
     {% if data.best %}
-    <a class="apercu-best" href="{{ base_ranking | default('/ranking') }}?week={{ data.best.week.isoformat() }}&player={{ player.id }}&rules={{ label }}"
+    <a class="apercu-best" href="{{ base_ranking | default('/ranking') }}?week={{ data.best.week.isoformat() }}&player_filter={{ player.id }}&rules={{ label }}"
        title="Voir le classement à cette date">
       🏆 #{{ data.best.position }}
       <span class="apercu-best-date">{{ data.best.week.strftime('%d/%m/%Y') }}</span>

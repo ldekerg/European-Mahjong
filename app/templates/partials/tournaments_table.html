@@ -17,9 +17,19 @@
 window['{{ _fv }}'] = window['{{ _fv }}'] || function() {};
 </script>
 
+{#
+  Two ways the table can be filtered by city:
+   - server-side (?city=… in the URL): the other rows are not in the page at all,
+     so clearing must reload without the parameter;
+   - client-side (a click on the map): rows are only hidden, JS restores them.
+#}
 <div id="{{ _badge_id }}" {% if not city_filter %}style="display:none"{% endif %} class="ville-badge">
   📍 <span id="{{ _badge_nom_id }}">{{ city_filter or '' }}</span>
+  {% if city_filter %}
+  <a href="{{ sort_url_base if sort_url_base is defined else '?' }}" class="ville-badge-close" title="{{ trad('tournament.clear_filter') }}">✕</a>
+  {% else %}
   <button onclick="{{ _fv }}(null)" class="ville-badge-close" title="{{ trad('tournament.clear_filter') }}">✕</button>
+  {% endif %}
 </div>
 
 <div class="scroll-table">

@@ -1,8 +1,8 @@
 {# Carte Leaflet des tournois.
    Leaflet CSS+JS chargés dans base.html (une seule fois).
    Variables requises :
-     villes       — liste de {lieu, pays, lat, lon, nb}
-     ville_filtre — str|None
+     cities       — liste de {city, country, lat, lon, nb}
+     city_filter  — str|None
    Variables optionnelles :
      tab_key      — str ('mcr'|'rcr') pour isoler par onglet
      carte_id     — str override de l'id du div carte
@@ -25,7 +25,7 @@
   var ROW_SEL      = '{{ _row_cls }}';
   var FV_NAME      = '{{ _fv }}';
   var cities       = {{ cities | tojson }};
-  var villeFiltre  = {{ (ville_filtre | tojson) if ville_filtre else 'null' }};
+  var villeFiltre  = {{ (city_filter | tojson) if city_filter else 'null' }};
   var map = null;
   var markers = [];
 
@@ -71,6 +71,16 @@
     if (villeFiltre) {
       document.getElementById(BADGE_NOM_ID).textContent = villeFiltre;
       document.getElementById(BADGE_ID).style.display = 'inline-flex';
+      // Filter came from the URL: highlight its marker the same way a click would.
+      markers.forEach(function(item) {
+        if (item.city === villeFiltre) {
+          item.m.setStyle({fillColor: item.col, fillOpacity: 1.0, radius: 9, weight: 3, color: '#fff'});
+          item.m.bringToFront();
+        } else {
+          item.m.setStyle({fillColor: item.col, fillOpacity: 0.1, radius: 6, weight: 1, color: '#fff'});
+          item.m.bringToBack();
+        }
+      });
     }
   }
 

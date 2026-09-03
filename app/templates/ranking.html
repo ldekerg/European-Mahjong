@@ -5,13 +5,13 @@
   <h1>EMA Ranking <a href="/ranking-system" class="info-link dim">{{ trad('ranking.formulas_link') }}</a></h1>
   <div class="date-nav">
       <!-- Le bouton "aujourd'hui" introduit un bug car la semaine courante n'est pas encore calculée
-    <a href="/ranking{% if selected_player %}?player={{ selected_player }}{% endif %}" class="nav-arrow nav-today">
+    <a href="/ranking{% if selected_player %}?player_filter={{ selected_player }}{% endif %}" class="nav-arrow nav-today">
       ⟳ {{ today_date.strftime('%d/%m/%Y') }}
     </a>
   -->
 
     {% if week_prev %}
-    <a href="/ranking?week={{ week_prev }}{% if selected_player %}&player={{ selected_player }}{% endif %}&rules={{ active_tab }}" class="nav-arrow">◀</a>
+    <a href="/ranking?week={{ week_prev }}{% if selected_player %}&player_filter={{ selected_player }}{% endif %}&rules={{ active_tab }}" class="nav-arrow">◀</a>
     {% else %}
     <span class="nav-arrow disabled">◀</span>
     {% endif %}
@@ -26,7 +26,7 @@
           <div class="week-group-label">{{ grp.year }}</div>
           {% for s in grp.weeks %}
           <a class="week-option {% if s.date == week %}active{% endif %}"
-             href="/ranking?week={{ s.date.isoformat() }}{% if selected_player %}&player={{ selected_player }}{% endif %}&rules={{ active_tab }}">
+             href="/ranking?week={{ s.date.isoformat() }}{% if selected_player %}&player_filter={{ selected_player }}{% endif %}&rules={{ active_tab }}">
             #{{ s.num }} — {{ s.date.strftime('%d/%m/%Y') }}
           </a>
           {% endfor %}
@@ -36,7 +36,7 @@
     </div>
 
     {% if week_next %}
-    <a href="/ranking?week={{ week_next }}{% if selected_player %}&player={{ selected_player }}{% endif %}&rules={{ active_tab }}" class="nav-arrow">▶</a>
+    <a href="/ranking?week={{ week_next }}{% if selected_player %}&player_filter={{ selected_player }}{% endif %}&rules={{ active_tab }}" class="nav-arrow">▶</a>
     {% else %}
     <span class="nav-arrow disabled">▶</span>
     {% endif %}
