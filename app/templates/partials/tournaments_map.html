@@ -65,7 +65,7 @@
       }).addTo(map);
       m.bindTooltip(v.city + ', ' + v.country + ' (' + v.nb + ')');
       m.on('click', function() { window[FV_NAME](v.city); });
-      markers.push({m: m, lieu: v.city, col: col});
+      markers.push({m: m, city: v.city, col: col});
     });
 
     if (villeFiltre) {
